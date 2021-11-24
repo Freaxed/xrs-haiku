@@ -1,0 +1,199 @@
+SubDir XRS_TOP ;
+
+# source directories
+local sourceDirs =
+	src
+	src/defs
+	src/util
+	src/utils
+	src/GUI
+	src/GUI/MediaBrowser
+	src/GUI/new_style2
+	src/GUI/track
+	src/GUI/MixerUI/
+	src/GUI/playlist
+	src/libfunky
+	src/XRS_Pro/Valuable
+	src/XRS_Pro/Log
+	src/XRS_Pro/Engine
+	src/XRS_Pro/Mixer
+	src/struct
+	src/struct/mixer
+	src/MainManager
+	src/media
+	src/Extensions/Sampler
+	src/Extensions/Tn306
+	src/Extensions/VIW
+	src/Extensions/JMDrum/src
+	src/Extensions/XFluidSynth
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(XRS_TOP)  $(sourceDir) ] ;
+}
+
+
+Application XRS :
+	
+	#src/media
+	VSTItem.cpp
+	VSTConfigureView.cpp
+	ParameterSlider.cpp
+	
+	#src/libfunky
+	Utils.cpp
+	ImageCache.cpp
+		
+	#src
+	Main.cpp
+	Configurator.cpp
+	WindowManager.cpp
+	MeasureManager.cpp
+	ZipOMaticActivity.cpp
+	PotViewer.cpp
+	XDigit.cpp
+	ADigit.cpp
+	TextControlFloater.cpp
+	Cursors.cpp
+	DrawCentredText.cpp
+	SJFilter.cpp
+	DrawingTidbits.cpp
+	VUView.cpp
+	
+
+	#src/utils
+	#--> WU_AppUtils.cpp
+	Xed_Utils.cpp
+	
+	#src/GUI
+	XrsWindow.cpp
+	URLView.cpp
+	AboutBox.cpp
+	TracksPanel.cpp
+	TrackInfoWindow.cpp
+	APot.cpp
+	XPot.cpp
+	FixedText.cpp
+	GfxMeter.cpp
+	MainWindow.cpp
+	XPanel.cpp
+	TickView.cpp
+	Panels.cpp
+	BzWindow.cpp
+	PositionView.cpp
+	XMatrix.cpp
+	PlugWindow.cpp
+	
+	
+	#src/GUI/track
+	JTrack.cpp
+	XTrack.cpp
+	XNotesView.cpp
+	
+	#src/GUI/MixerUI/
+	MixerWindow.cpp
+	MixableBox.cpp
+	XChannelSlider.cpp
+	
+	#src/GUI/MediaBrowser
+	IconListItem.cpp
+	XListItem.cpp
+	XListView.cpp
+	MBWindow.cpp
+	
+	#src/GUI/new_style2
+	TrackBlock.cpp
+	TrackEnd.cpp
+	TrackList.cpp
+	VolView.cpp
+	PianoControl.cpp
+	PianoEdit.cpp
+	
+	#src/GUI/playlist
+	XMName.cpp
+	XMPoz.cpp
+	MatrixWindow.cpp
+	
+	#src/XRS_Pro/Log
+	Logger.cpp
+	
+	#src/XRS_Pro/Valuable
+	Valuable.cpp
+	ValuableManager.cpp
+	ValuableController.cpp
+	
+	#src/XRS_Pro/Mixer
+	PMixer.cpp
+	PEffector.cpp
+	PBus.cpp
+	PMixable.cpp
+	
+	#src/XRS_Pro/Engine
+	Engine.cpp
+	JuiceEngine.cpp
+	
+	#src/struct
+	Sequence.cpp
+	Pattern.cpp
+	Note.cpp
+	Track.cpp
+	Song.cpp
+	
+	#src/MainManager
+	MidiTools.cpp
+	XrsMidiOut.cpp
+	XrsMidiIn.cpp
+	TrackManager.cpp
+	JFileManager.cpp
+	VstManager.cpp
+	XHost.cpp
+	TheApp.cpp
+	TrackBoost.cpp
+	
+	# --- Sampler ---
+	Sample.cpp
+	SamplerTrackBoost.cpp
+	ExternalManager.cpp
+	SamplerTrack.cpp
+	resample.cc
+	SamplerPanel.cpp
+	SampleView.cpp
+	
+	# --- Tn306 ---
+	TNTrackBoost.cpp
+	TNPanel.cpp
+	TNTrack.cpp
+	knob303.cpp
+	vcf303.cpp
+	vco303.cpp
+	vca303.cpp
+	deverb.cpp
+	synel.cpp
+	
+	# --- VIW ---
+	VIWPanel.cpp  
+	VIWTrackBoost.cpp  
+	VIWTrack.cpp  
+	VSTInstrument.cpp
+
+	# JMDRUM
+	Drum.cpp
+	JmDrums.cpp
+	# JMDrumMain.cpp
+	JMDrumPanel.cpp
+	JMDrumTrack.cpp
+	JMDrumTrackBoost.cpp
+	oscillator.cpp 
+
+	# ---  XFLUIDSYNTH ---
+	# SFSMain.cpp
+	SFSPanel.cpp 
+	SFSTrack.cpp
+	SFSTrackBoost.cpp
+	SFWindow.cpp 
+	XFSynth.cpp 
+		
+	: be translation game media midi midi2 tracker fluidsynth stdc++
+	: resources/XRS.rsrc resources/skin.rsrc  
+;

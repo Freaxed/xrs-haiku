@@ -1,0 +1,2 @@
+- Inserire una BScrollView per le traccie.
+- Cambio del BPM non funziona.

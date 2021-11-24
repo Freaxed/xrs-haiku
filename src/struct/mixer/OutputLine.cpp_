@@ -1,0 +1,97 @@
+#include "OutputLine.h"
+#include "VSTItem.h"
+
+OutputLine::OutputLine(const char *n):Pannable(){
+	
+	name=n;
+
+		
+	stream[0]=new float[FRAMES_NUM];
+	stream[1]=new float[FRAMES_NUM];
+	
+	for(int i=0;i<MAXPLUG;i++) vst[i]=NULL;
+	
+	ClearBuffer();
+
+	/*METER not portable code*/
+	top[0]=0;
+	top[1]=0;
+	hand=NULL;
+}
+
+OutputLine::~OutputLine(){
+
+	for(int i=0;i<MAXPLUG;i++){
+		if(vst[i]!=NULL){
+			delete vst[i];
+			vst[i] = NULL;
+		}
+	}	
+
+	delete stream[0];
+	delete stream[1];
+}
+
+void
+OutputLine::ClearBuffer(int32 size=FRAMES_NUM*FRAMESIZE)
+{
+	memset((char*)stream[0], 0, size/2);
+	memset((char*)stream[1], 0, size/2);
+}
+
+void
+OutputLine::AddBuffer(float**from,size_t size,int32 spiaz,float factor=1.0)
+{
+	
+	for(size_t i =0 ; i<size ; i++){
+	
+		stream[0][i+spiaz] += from[0][i];
+		stream[1][i+spiaz] += from[1][i];
+	}
+	
+
+}
+float*
+OutputLine::MeltBuffer(float**to,size_t size)
+{
+	//pan-filter??
+		top[0]=0;
+		top[1]=0;
+		
+	for(size_t i =0 ; i<size ; i++){	
+	
+		stream[0][i] *=GetLeft();
+		stream[1][i] *=GetRight();
+		
+		// Do you have a meter??
+		if(fabs(stream[0][i])>top[0]) top[0]=fabs(stream[0][i]);
+		if(fabs(stream[1][i])>top[1]) top[1]=fabs(stream[1][i]);
+		
+	
+	
+		to[0][i] += stream[0][i];
+		to[1][i] += stream[1][i];
+	}
+	
+	return top;
+}
+void
+OutputLine::ProcessBuffer(size_t frames)
+{
+	for(int i=0;i<MAXPLUG;i++)
+	{
+		if(vst[i]!=NULL)
+			vst[i]->FilterFloat(stream,stream,frames,NULL);
+				
+	}
+}
+
+void
+OutputLine::setTempo(int t)
+{
+	for(int j=0;j<MAXPLUG;j++)
+	{
+		if(vst[j]!=NULL)
+			vst[j]->setBPM(t);
+	}
+}

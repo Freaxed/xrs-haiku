@@ -1,0 +1,2 @@
+./obj.x86//MidiOutTrack.o : 
+dep//MidiOut/MidiOutTrack.d ./obj.x86//MidiOutTrack.o : ./src/MidiOutTrack.cpp src/MidiOutTrack.h   ../../struct/Track.h ../../defs/GlobalDef.h   /boot/develop/headers/be/support/SupportDefs.h   ../../defs/synthMessages.h ../../struct/XRSVoice.h   ../../XRS_Pro/Valuable/Pannable.h ../../XRS_Pro/Valuable/Valuable.h   midiout_locale.h /boot/develop/headers/posix/stdio.h   ../../struct/Note.h ../../struct/Pattern.h ../../utils/ObjectList.h   /boot/develop/headers/be/midi2/MidiProducer.h

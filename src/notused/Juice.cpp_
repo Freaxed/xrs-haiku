@@ -1,0 +1,750 @@
+#include "Juice.h"
+#include "Pattern.h"
+#include "GfxMsg.h"
+#include "GlobalDef.h"
+#include "Configurator.h"
+#include "Sequence.h"
+#include "async.h"
+#include "Mixer.h"
+#include "synthMessages.h"
+#include "XrsMidiIn.h"
+#include "XrsMidiOut.h"
+#include "MainWindow.h"
+#include 		<TimeSource.h>
+#include 		<SoundPlayer.h>
+#include 		<stdio.h>
+#include 		<List.h>
+#include 		<Message.h>
+#include "MeasureManager.h"
+//#include	"ControlObserver.h"
+#include	<Sound.h>
+#include "ValuableController.h"
+
+
+#ifdef XP
+	#include 		"XSoundPlayer.h"
+#endif
+
+static int		currentBuffer;
+static void*	buffers[PREBUFFER_SIZE];
+
+
+#define	ACQ				if(acquire_sem_etc(succo->stresaforo,1,B_RELATIVE_TIMEOUT,0)==B_OK){
+#define	CHK_LOCK(txt)	ACQ debugger(txt); }
+#define	IFDEBUG	if(false)
+//#define	DEBUG_VOICE
+
+/*temp experiment with midi*/
+XrsMidiIn 	*xmi;
+bigtime_t	last_time;
+uchar 		statusByte=0xF8;
+
+//extern	ControlObserver*	obs_volumes;	
+
+extern Mixer*				my_mixer;
+extern MainWindow*		main_window;
+
+time_t	performance;
+int min(int a, int b) { return a<b ? a:b; }
+
+
+ValuableController	vc_pos;
+
+Juice::Juice() :
+	BLooper("JuiceKiller 1.1 Oz",JUICE_PRIORITY),curSong(NULL)
+	
+{
+	vc_pos.SetValuableID("time.position.fulltick");
+	
+	buf_mes=new BMessage(BUF);
+
+	
+	meterl_mes=new BMessage(ASYNC);
+	meterl_mes->AddFloat("value_l",0);
+	meterl_mes->AddFloat("value_r",0);
+	
+	default_data=0;
+
+	isPlaying=false;
+	
+
+	
+	prepare_buffer(stream_note,stream_note_right,stream_note_left);
+	
+	stresaforo=create_sem(1, "stresaforo");
+	
+	Juice::_prepare();
+	
+	Run();
+			
+}
+void
+Juice::prepare_buffer(float** final,float *right,float*left)
+{
+	left=new float[ FRAMES_NUM];
+	right=new float[ FRAMES_NUM];
+	
+	final[0]=left;
+	final[1]=right;	
+
+}
+void
+Juice::clear_buffer(float** buf,int32 size)
+{
+	memset((char*)buf[0], 0, size/2);
+	memset((char*)buf[1], 0, size/2);
+}
+
+Juice::~Juice()
+{
+	CHK_LOCK("~Juice must be loked!")
+	
+	ReallyStop();
+
+	delete_sem(stresaforo);
+	
+	delete player;
+		
+	//free(preroll[0]);
+	//free(preroll[1]);
+	
+	Juice::_finalize();
+}
+void
+Juice::ReallyStop()
+{
+	player->Stop();
+	//memset(preroll[0],0,FRAMES_NUM*FRAMESIZE);
+	//memset(preroll[1],0,FRAMES_NUM*FRAMESIZE);
+	_clearBuffers();
+}
+void
+Juice::ReallyStart()
+{
+	player->Start();
+}
+bool
+Juice::QuitRequested()
+{
+	return BLooper::QuitRequested();
+}
+
+bool Juice::isPlay(){ return isPlaying; }
+
+void
+Juice::MessageReceived(BMessage* message)
+{
+
+	int z;
+	
+	switch(message->what)
+	{
+		
+		case BUF:
+		
+		/*	if(preroll_pos==1) 
+		
+				preroll_pos=0;
+			else 
+				preroll_pos=1;
+		*/
+		_changeBuffer();		
+		
+		ProcessBuffer((void*)this,_getBuffer(), FRAMES_NUM*FRAMESIZE);
+		
+ 		
+  			
+		break;
+		
+		case TEMPO_MOV:
+			z=(int)message->FindInt32("be:value");
+			setTempo(z);
+		break;
+		default:
+			BLooper::MessageReceived(message);
+		break;
+	}
+}
+void
+Juice::setTempo(int z)
+{
+	curSong->setTempo(z);
+	note_size=curSong->getNoteSize();
+	my_mixer->setTempo(z);
+	sendSMS(TempoChange,(float)note_size);	
+}
+void
+Juice::sendSMS(SynthMessage msg, float data)
+{
+	for(int y=0;y<curSong->getNumberTrack();y++)
+			
+				curSong->getTrackAt(y)->Message(msg,data);
+}
+int
+Juice::getTempo()
+{
+	if(curSong)
+		return curSong->getTempo();
+	else
+		return 120;
+}
+status_t
+Juice::Init()
+{
+	
+	//getSem();
+	//relSem();
+	
+	status_t err;
+	
+		
+	
+	fmt.format=media_raw_audio_format::B_AUDIO_FLOAT;
+	fmt.channel_count=2;
+	fmt.frame_rate=44100;
+	fmt.byte_order=B_MEDIA_LITTLE_ENDIAN;
+	fmt.buffer_size= FRAMES_NUM*FRAMESIZE;
+	
+	
+	#ifndef XP
+		player=new BSoundPlayer(&fmt,"SupernaturalJuice",PlayFileX,NULL,this);
+	#else
+		player=new XSoundPlayer(fmt,"x_SupernaturalJuice",PlayFileX,NULL,this);
+	#endif
+	
+	err=player->InitCheck();
+	if(err!=B_OK) printf("Error creating the player\n");
+	
+	xmi=XrsMidiIn::Get();	//??
+	
+	
+	ReallyStart();
+		
+	return err;
+}
+
+
+
+
+void
+Juice::moveNextCol()
+{
+	turn=mea_manager->MoveNextCol();	 		
+	last_buf_good=render;
+}
+
+void
+Juice::BeginExport(bool play=true)
+{
+	Lock();
+	
+	ReallyStop();
+	
+	main_window->PlayButtonOn(false);
+	
+	maxbuf=0;
+	row=0;
+	beatpos=0;
+	turn=false;
+	
+	last_buf_good=0;
+	if(curSong)
+	note_size=curSong->getNoteSize();
+	
+	sendSMS(SystemReset,0);
+	
+	printf("Juice::BeginExport * \n");
+	isPlaying=play;
+	process_row(this);
+	if(curSong){
+	loop_enable=curSong->getSequence()->loop_enable;
+	if(play) curSong->getSequence()->loop_enable=false;
+	}
+}
+void
+Juice::EndExport()
+{
+	Stop();
+	
+	maxbuf=0;
+	turn=false;
+	row=0;
+	beatpos=0;
+	last_buf_good=0;
+	note_size=curSong->getNoteSize();
+	
+	curSong->getSequence()->loop_enable=loop_enable;
+	
+	/* acquai cancellare tutto*/
+		for(int y=0;y<curSong->getNumberTrack();y++){
+			RemoveVoices(curSong->getTrackAt(y));
+			DeleteVoices(curSong->getTrackAt(y));
+			}
+	
+	my_mixer->Clear();
+	
+	sendSMS(SystemReset,0);
+		
+	printf("Juice::EndExport * \n");
+	
+	//memset(preroll[0],0,FRAMES_NUM*FRAMESIZE);
+	//memset(preroll[1],0,FRAMES_NUM*FRAMESIZE);
+	_clearBuffers();
+	
+		
+	
+	process_row(this);
+	ProcessBuffer((void*)this,Juice::_getBuffer(), FRAMES_NUM*4);
+	
+	printf("Juice::Started *\n");
+	
+	ReallyStart();
+	
+	isPlaying=false;
+
+//	ck_mes->ReplaceInt16("beat",-1);
+//	ck_mes->ReplaceInt16("pat",-1);
+//	ck_mes->ReplaceInt16("pos",-1);
+	Unlock();
+}
+
+void
+Juice::Reset(Song* s)
+{
+	CHK_LOCK("Juice::Reset must be loked!")
+	
+	curSong=s;
+	
+	maxbuf=0;
+	turn=false;
+	row=0;
+	beatpos=0;
+	//pospat=0;
+	last_buf_good=0;
+	
+	sendSMS(SystemReset,0);
+	
+	
+	if(s==NULL) return;
+	
+	setTempo(s->getTempo());
+	
+	//player->SetVolume(1.0);
+		
+}
+void
+Juice::Start()
+{	
+		
+		if(isPlaying) { Stop(); return; }
+		
+	
+		getSem("Juice::Start");
+	    	setTempo(curSong->getTempo()); //Quick Dirty
+	    	mea_manager->SetPosition(0);
+	    	isPlaying=true;
+		relSem("Juice::Start");
+		
+		sendSMS(SystemStart,0); // 7=SystemStart
+		
+//		ck_mes->ReplaceInt16("beat",-1);
+//		ck_mes->ReplaceInt16("pat",-1);
+//		ck_mes->ReplaceInt16("pos",-1);
+		
+//		obs_volumes->PostMessage(ck_mes);
+	
+	fulltick[0]=fulltick[1]=fulltick[2]=-1;	
+	vc_pos.SendValue(0,-1);
+	vc_pos.SendValue(1,mea_manager->_getCurPat());
+	vc_pos.SendValue(2,mea_manager->_getCurPos());
+	
+}
+
+status_t Juice::getSem(const char* who)
+{
+	int32 c;
+	get_sem_count(stresaforo,&c);
+	IFDEBUG printf("SEM %s : before acq! %ld\n",who,c); 
+	acquire_sem(stresaforo);
+	get_sem_count(stresaforo,&c);
+	IFDEBUG printf("SEM %s : after acq! %ld\n",who,c); 
+	return B_OK;
+}
+status_t Juice::relSem(const char* who)
+{
+	int32 c;
+	get_sem_count(stresaforo,&c);
+	IFDEBUG printf("SEM %s : before rel! %ld\n",who,c);
+	release_sem(stresaforo);
+	get_sem_count(stresaforo,&c);
+	IFDEBUG printf("SEM %s : after rel! %ld\n",who,c); 
+	return B_OK;
+}
+void
+Juice::Stop()
+{
+
+	if(!isPlaying) return;
+	
+	getSem("Juice::Stop");
+	 isPlaying=false;
+	relSem("Juice::Stop");
+	
+		
+	maxbuf=0;
+	row=0;
+	beatpos=0;
+	
+	sendSMS(SystemStop,0);
+//	ck_mes->ReplaceInt16("beat",-1);
+//	ck_mes->ReplaceInt16("pat",-1);
+//	ck_mes->ReplaceInt16("pos",-1);
+//	obs_volumes->PostMessage(ck_mes);
+	
+	bigtime_t late = player->Latency();
+	
+	fulltick[0]=fulltick[1]=fulltick[2]=-1;
+	vc_pos.SendValue(0,-1,late);
+	vc_pos.SendValue(1,-1,late);
+	vc_pos.SendValue(2,-1,late);
+	
+	
+}
+
+#ifdef XP
+	void Juice::PlayFileX(void * theCookie, bigtime_t timestamp,void * buffer,size_t size,const media_raw_audio_format & format)
+#else
+	void Juice::PlayFileX(void * theCookie,void * buffer,size_t size,const media_raw_audio_format & format)
+#endif
+
+{
+	Juice *succo=(Juice*)theCookie;
+	//succo->post_roll=succo->preroll_pos;
+	void* buf=Juice::_getBuffer();
+		
+	if(succo->isPlaying){
+		//vc_pos.SendValue(0,succo->fulltick[0]);
+		//vc_pos.SendValue(1,succo->fulltick[1]);
+		//vc_pos.SendValue(2,succo->fulltick[2]);
+	}
+		// obs_volumes->PostMessage(succo->ck_mes);
+	
+	succo->hand->Looper()->PostMessage(succo->meterl_mes,succo->hand);
+	
+	  
+  	memset(buffer,0,size);
+	
+	succo->PostMessage(succo->buf_mes);
+	memcpy(buffer,buf,size);
+  
+}
+
+
+void
+Juice::ProcessBuffer(
+	void * theCookie,
+	void * buffer,
+	size_t size)
+{
+	//performance=system_time();
+	
+	Juice *succo=(Juice*)theCookie;
+	
+	
+	ACQ
+	my_mixer->Clear();
+	
+		
+	Song * song =succo->curSong;
+	if(song==NULL) 
+	{
+		memset(buffer,0,size);
+		release_sem(succo->stresaforo);
+		return;
+	}
+	Track*	tmp;
+	int32 	trip=succo->curSong->getNumberTrack();	
+	
+	
+	/* New Juice Engine 'G32_Note_buf' version 
+	
+		1) Dividere il buffer in "note_size"
+		
+		2) Per ogni traccia mandare il bufferino da riempire.
+		
+		3) Per ogni nuova nota che sta' del buffer chiamare i NoteReady(note_pos)
+			delle traccie. e saltare al punto 2.
+		
+	*/
+	
+	
+	float*	met;
+	int  	buflen;
+	int		line;
+	int 		len=size/FRAMESIZE;
+	int 		tot=len;
+	int 		sampsperbeat=succo->note_size/4;
+	
+	
+	/* Punto 1 : Divisione in sotto bufferini */
+		
+	while(len) {
+	
+		buflen=min(len, (int)ceil(sampsperbeat-succo->beatpos));
+		succo->beatpos+=buflen; 
+		
+		/* Punto 2 : Processiamo il bufferino di ogni traccia.. */
+		
+		if(buflen>0 && buflen<=tot) 
+			
+			for(int x=0;x<trip;x++) 
+			{
+				tmp=(Track*)song->getTrackAt(x);
+				
+				//Scelta del canale di output:
+				line=tmp->getRouteLine();
+				my_mixer->EnableLine(line);
+				
+				// PROCESS
+				
+						
+						if(tmp->getProcessorType()==1) 
+						{
+							
+												
+							for(int i=0;i<tmp->voice_list.CountItems();i++){
+							
+								XRSVoice v=(XRSVoice)tmp->voice_list.ItemAt(i);
+								int32 ret=tmp->ProcessVoice(v,succo->stream_note, buflen); 
+								if(ret>0) my_mixer->AddBuffer(line,succo->stream_note,ret,tot-len);
+								else
+								{
+									//who remove the voice??
+									
+									succo->rem_list.AddItem((void*)v);
+									
+									
+								}
+							}
+							
+						if(succo->rem_list.CountItems()>0) succo->RemoveVoices(tmp);
+						
+						#ifdef DEBUG_VOICE
+						if(succo->rem_list.CountItems()>0)
+							printf("RemoveVoiceList %ld\n",succo->rem_list.CountItems());
+						if(tmp->voice_list.CountItems()>0)
+							printf("TrackVoiceList (%s) %ld\n",tmp->getName(),tmp->voice_list.CountItems());
+						#endif
+						
+						}
+						else
+							{
+								if(tmp->HasData()) tmp->Process(my_mixer->getBufferLine(line), buflen, tot-len);
+								
+							}
+						
+			}
+		
+		
+		
+		if(succo->beatpos>=sampsperbeat) {			
+			
+			succo->render=-1*(tot-len-buflen);
+			succo->beatpos-=sampsperbeat;
+			/* Punto 3 */
+			process_row(succo);
+		}
+		
+		
+		len-=buflen;
+		
+	}
+	
+		// Mixer Processing (questa parte tutta nel mixer con un bel Melt..)
+			
+		met=my_mixer->MixDown((float*)buffer,size/FRAMESIZE);
+		
+		succo->meterl_mes->ReplaceFloat("value_l",met[1]);
+		succo->meterl_mes->ReplaceFloat("value_r",met[0]);	
+		
+		release_sem(succo->stresaforo);
+		}
+		
+		  else //sem locked! 	
+		  {
+		   memset(buffer,0,size);
+		   printf("Lost packet! \n");
+		  }
+		  
+	//printf("Performance %lld\n",system_time()-performance);
+		
+}
+void
+Juice::process_row(Juice* succo)
+{
+	if(!succo->isPlaying) return;
+	
+	Track*	tmp;
+	int32 	trip=succo->curSong->getNumberTrack();	
+	int 		z=0;
+	bool		clear=false; 
+	int pat=0;
+	
+	z=mea_manager->ResetStep();
+		
+	if(z!=EMPTY_PATTERN)
+	
+
+		while(trip--)	
+		{
+			clear=false;	
+			tmp=(Track*)succo->curSong->getTrackAt(trip);
+			
+			z=mea_manager->ResetStep();
+				
+			pat=z;
+			
+			while(z!=-1)
+			{
+				
+				Pattern* pat=tmp->getPatternAt(z);
+				
+				// MidiClock
+				// nota:
+				// chissa se va.
+				// quel i*20 è relativo ad un tempo di 120bpm
+				// ed è quindi sbagliato.
+				/*bigtime_t t=last_time-x_player->m_playNode->TimeSource()->Now(); //system_time();;
+				printf("*process_row %lld\n",t);
+				for(int i=0;i<8;i++)
+				{
+					
+					t=t+i*20;
+					printf("process_row %lld\n",t);
+					XrsMidiOut::Get()->SpraySystemRealTime((uchar)248,t);
+				
+				}*/
+				if(!pat) return;		
+				Note *n=pat->getNoteAt(succo->row);
+					
+				if(n->getValue() && tmp->isOn())
+				{
+					//Cut_it_self version 19000 (as fruity)
+					
+					if(!clear && tmp->cit) {
+								succo->DeleteVoices(tmp);
+							   	clear=true;
+							   }
+				
+					XRSVoice v=tmp->newVoice(n,z);
+					if(v!=NULL)	succo->AddVoice(tmp ,v);
+				}		
+				
+				z=mea_manager->SubStep();
+			
+			} //end multi pattern!
+			
+		}  //end multi-track;
+		
+	
+	/* Lucine !  */
+	//succo->ck_mes->ReplaceInt16("beat",succo->row);
+	//succo->ck_mes->ReplaceInt16("pat",mea_manager->_getCurPat());
+	//succo->ck_mes->ReplaceInt16("pos",mea_manager->_getCurPos());
+	
+	// here maybe is better to use the ValuableController::SendValue(::::);
+	// BUT you have to evalaute a good delay time.
+	
+	//succo->fulltick[0] = succo->row;
+	//succo->fulltick[1] = mea_manager->_getCurPat();
+	//succo->fulltick[2] = mea_manager->_getCurPos();
+	
+	bigtime_t  late=succo->player->Latency();
+	vc_pos.SendValue(0,succo->row,late);
+	
+	succo->row++;
+	
+	if(succo->row > succo->curSong->getNumberNotes()-1) { 
+	
+		succo->row=0;
+		succo->moveNextCol();
+		vc_pos.SendValue(1,mea_manager->_getCurPat(),late);
+		vc_pos.SendValue(2,mea_manager->_getCurPos(),late);
+		
+	}
+}
+
+// Voice management (Under Costruction!!)
+
+void			
+Juice::AddVoice(Track* tmp ,XRSVoice v) { tmp->voice_list.AddItem((void*)v); }
+
+void
+Juice::InvalidVoice(XRSVoice){}
+
+void
+Juice::RemoveVoices(Track* tmp){
+
+	//printf("%s\n",__FUNCTION__);
+	for(int i=0;i<rem_list.CountItems();i++){
+	
+			tmp->voice_list.RemoveItem(rem_list.ItemAt(i));
+			tmp->killVoice(rem_list.ItemAt(i));
+			}
+			
+	rem_list.MakeEmpty();
+}
+void
+Juice::DeleteVoices(Track* tmp){
+
+	//printf("%s\n",__FUNCTION__);
+	for(int i=0;i<tmp->voice_list.CountItems();i++){
+	
+	
+				XRSVoice v=tmp->voice_list.ItemAt(i);
+				tmp->killVoice(v);
+			
+			}
+	tmp->voice_list.MakeEmpty();
+}
+
+XRSVoice Juice::getVoice(Track* tmp,int i){ return (XRSVoice)tmp->voice_list.ItemAt(i);}
+
+/**/
+void
+Juice::_prepare()
+{
+	currentBuffer=0; //?
+	_clearBuffers();
+	
+}
+void
+Juice::_finalize()
+{
+	currentBuffer=0; //?
+	for(int i=0;i<PREBUFFER_SIZE;i++) free(buffers[i]);
+	
+}
+void
+Juice::_clearBuffers()
+{
+	for(int i=0;i<PREBUFFER_SIZE;i++){
+	buffers[i]=malloc(FRAMES_NUM*FRAMESIZE);
+	memset(buffers[i],0,FRAMES_NUM*FRAMESIZE);
+	}
+}
+
+void* 
+Juice::_getBuffer()
+{
+	return buffers[currentBuffer];
+}
+void	
+Juice::_changeBuffer()
+{
+	if(currentBuffer==PREBUFFER_SIZE-1) currentBuffer=0;
+	else
+	currentBuffer++;
+}
+			
+//..

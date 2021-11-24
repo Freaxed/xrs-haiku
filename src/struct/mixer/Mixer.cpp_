@@ -1,0 +1,159 @@
+#include "Mixer.h"
+#include "OutputLine.h"
+
+#include "Valuable.h"
+#include "ValuableManager.h"
+
+#include <math.h>
+
+#define	FRAMESIZE 8
+
+Mixer::~Mixer(){
+
+	while(lines.CountItems()){
+		OutputLine* line;
+		line=lines.ItemAt(0);
+		lines.RemoveItemAt(0);
+		delete line;
+	}
+
+}
+Mixer::Mixer()
+{
+	// the global line is ALWAYS present
+	lines.AddItem(new OutputLine("master"));	
+	lines.AddItem(new OutputLine("lines.1"));	
+	lines.AddItem(new OutputLine("lines.2"));
+	lines.AddItem(new OutputLine("lines.3"));	
+	lines.AddItem(new OutputLine("lines.4"));	
+	
+	getLine(0)->Enable(true);
+	
+	/* register pannable! 
+	
+	*/
+	
+	/*meter : fix*/
+	for(int i=0;i<LINENUM;i++){
+	
+	hands[i]=NULL;
+	
+	//msg[i]=new BMessage(ASYNC);
+	msg[i].what = ASYNC;
+	msg[i].AddFloat("value_l",0);
+	msg[i].AddFloat("value_r",0);
+	}
+	
+	
+	
+	
+}
+
+void
+Mixer::Clear(){
+	
+	//OutputLine *linea;
+	for(int i=0;i<lines.CountItems();i++){
+	
+		getLine(i)->ClearBuffer();
+		if(i!=0)	//line 0 is ALWAYS enable
+			getLine(i)->Enable(false);
+	}
+
+}
+BString
+Mixer::getLineName(int i){ return getLine(i)->getName(); }
+void
+Mixer::EnableLine(int i)
+{
+	getLine(i)->Enable(true);
+}
+
+bool
+Mixer::IsEnableLine(int i){
+	return getLine(i)->IsEnable();
+}
+
+OutputLine*
+Mixer::getLine(int i){
+	return lines.ItemAt(i);
+}
+
+float**
+Mixer::getBufferLine(int i){
+	return getLine(i)->getBuffer();
+}
+void
+Mixer::AddBuffer(int line,float**from,size_t size,int32 spiaz,float factor=1.0)
+{
+	getLine(line)->AddBuffer(from,size,spiaz,factor);
+}
+
+float*
+Mixer::MixDown(float* to,size_t frames)
+{	
+	float** optr=getBufferLine(0);
+	float		vol=getLine(0)->getVolume();
+	top[0]=0;
+	top[1]=0;
+	
+	for(int i=1;i<lines.CountItems();i++){
+		 
+		 getLine(i)->ProcessBuffer(frames);	
+		 met=getLine(i)->MeltBuffer(optr,frames);
+		 if(hands[i]!=NULL) {
+		 				msg[i].ReplaceFloat("value_r",met[0]);
+						msg[i].ReplaceFloat("value_l",met[1]);
+		  }
+	}
+	
+	getLine(0)->ProcessBuffer(frames);
+	
+	
+	for(uint32 x=0;x<frames;x++)
+	{
+	
+		
+		//optr[0][x]=(float)xVcf->Process(optr[0][x],0,curSong->getVCFCutoff(),curSong->getVCFResonance());
+		//optr[1][x]=(float)xVcf->Process(optr[1][x],0,curSong->getVCFCutoff(),curSong->getVCFResonance());
+		
+		optr[0][x]*=vol;
+		optr[1][x]*=vol;
+				
+		// Do you have a meter??
+		if(fabs(optr[0][x])>top[0]) top[0]=fabs(optr[0][x]);
+		if(fabs(optr[1][x])>top[1]) top[1]=fabs(optr[1][x]);
+		
+		//Limiter!
+		
+		if(fabs(optr[0][x])>=1.0) optr[0][x]=(int32)copysign(1.0,optr[0][x]); 
+		if(fabs(optr[1][x])>=1.0) optr[1][x]=(int32)copysign(1.0,optr[1][x]);
+		
+
+		memcpy( (char*)to+x*FRAMESIZE,(char*)&optr[0][x],FRAMESIZE/2);
+		memcpy( (char*)to+x*FRAMESIZE+FRAMESIZE/2,(char*)&optr[1][x],FRAMESIZE/2);
+		
+		
+	}
+	
+	msg[0].ReplaceFloat("value_r",top[0]);
+	msg[0].ReplaceFloat("value_l",top[1]);
+	
+	//meter??
+	if(!sender) return top;
+	
+	for(int i=0;i<LINENUM;i++){
+	 	if(hands[i]!=NULL) sender->PostMessage(&msg[i],hands[i]);
+	}
+	
+	return top;
+}
+
+void
+Mixer::setTempo(int t)
+{
+	for(int i=0;i<lines.CountItems();i++)	
+		getLine(i)->setTempo(t);
+		
+	
+}

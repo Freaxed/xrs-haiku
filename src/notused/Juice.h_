@@ -1,0 +1,173 @@
+#ifndef JUICE_H
+#define JUICE_H
+
+#include <Handler.h>
+#include <OS.h>
+#include <Path.h>
+#include <MediaDefs.h>
+
+#include 	"Track.h"
+#include 	"struct_ev.h"
+#include 	"Song.h"
+#include "synthMessages.h"
+
+
+
+
+#define XP
+
+#ifndef XP
+	class BSoundPlayer;
+#else
+	class XSoundPlayer;
+#endif
+
+//class MatrixWindow;
+class JFileManager;
+class XHost;
+class TheApp;
+
+#define	 PREROLL_NUM	2
+#define	 PREROLL_DIM	16384
+#define	 FRAMES_NUM		1024
+#define	 FRAMESIZE		8 //sizeof(int16)*2
+#define	 BUF 			'buf'
+#define 	 JUICE_PRIORITY	B_URGENT_PRIORITY
+#define	 PREBUFFER_SIZE	2
+
+class Juice:public BLooper
+{
+
+
+ public:
+
+						Juice();
+						~Juice();
+					
+			status_t 	Init(); //OK?
+			void			Start();//
+			void			Stop();//
+		
+			
+			bool			isPlay();
+			void			Reset(Song*); //OK
+			
+	
+	virtual 	void			MessageReceived(BMessage* message);//OK
+	virtual	bool	 		QuitRequested();//OK
+
+			//Thread sem
+			status_t		getSem(const char* who);
+			status_t		relSem(const char* who);
+
+			int				getTempo();
+			
+			//bisogna renderlo privato..
+			
+			int				beatpos;
+			int				row;	
+			size_t			last_buf_good;
+			size_t			note_size;
+			private:
+				Song*			curSong;
+			public:
+			// Static
+			static	void ProcessBuffer(void * cookie,void * data,	size_t size);
+			static 	void 	process_row(Juice *);
+			
+			#ifndef XP
+			
+			static	void PlayFileX(void * cookie,void * data,	size_t size,const media_raw_audio_format & format);
+			
+			
+			#else
+				static void PlayFileX(void * cookie, bigtime_t timestamp, 
+								  void * data,
+								  size_t size, 
+								  const media_raw_audio_format & format);
+			#endif		
+		
+			//Patterns	
+			
+			void		moveNextCol();
+			bool		turn;
+			
+			void BeginExport(bool play=true);
+			void	EndExport();
+			
+			BHandler	*hand;
+
+protected:
+friend TheApp;
+			void			ReallyStop();
+			void			ReallyStart();
+protected:
+friend	XHost;
+
+			BList 	rem_list;
+
+			
+private:
+
+			void		_stop();	
+			void		sendSMS(SynthMessage msg, float data);	//;)
+			void		setTempo(int t);
+			
+			sem_id		stresaforo;
+			
+			
+									
+			//bool				isp;
+			bool				isPlaying;
+			bool				loop_enable;
+			
+			#ifndef XP
+				BSoundPlayer*			player;	
+			#else
+				XSoundPlayer*			player;
+			#endif
+			
+			media_raw_audio_format	fmt;
+			
+			//BMessage*			ck_mes;
+			BMessage*			buf_mes;
+			BMessage*			meterl_mes;
+			
+			float	fulltick[3];
+						
+			size_t				maxbuf;
+			int16				default_data;
+			bool					all_patterns;
+			int					render;
+						
+			
+			float *stream_note[2];
+			float *stream_note_left;
+			float *stream_note_right;
+			
+			
+			static void	prepare_buffer(float**,float*,float*);
+			static void	clear_buffer(float**,int32 size);
+			
+			//Events
+			void			AddVoice(Track*,XRSVoice);
+			void			InvalidVoice(XRSVoice);
+			void			RemoveVoices(Track*);
+			void			DeleteVoices(Track*);
+			XRSVoice		getVoice(Track*,int i);
+			
+			//Pre-buffer system 
+			static void* 	_getBuffer();	 //get the current buffer
+			static void	_changeBuffer(); //get the new choosen buffer
+						
+			static void	_prepare();
+			static void	_finalize();
+			static void	_clearBuffers();
+							
+			
+};
+//extern Juice*	succo;
+
+#endif
+
+//-
