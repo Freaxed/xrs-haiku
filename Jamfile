@@ -25,7 +25,7 @@ local sourceDirs =
 	src/Extensions/Tn306
 	src/Extensions/VIW
 	src/Extensions/JMDrum/src
-	src/Extensions/XFluidSynth
+#	src/Extensions/XFluidSynth
 ;
 
 local sourceDir ;
@@ -187,13 +187,14 @@ Application XRS :
 	oscillator.cpp 
 
 	# ---  XFLUIDSYNTH ---
-	# SFSMain.cpp
-	SFSPanel.cpp 
-	SFSTrack.cpp
-	SFSTrackBoost.cpp
-	SFWindow.cpp 
-	XFSynth.cpp 
+	## SFSMain.cpp
+	#SFSPanel.cpp 
+	#SFSTrack.cpp
+	#SFSTrackBoost.cpp
+	#SFWindow.cpp 
+	#XFSynth.cpp 
 		
-	: be translation game media midi midi2 tracker fluidsynth stdc++
+	#: be translation game media midi midi2 tracker fluidsynth stdc++
+	: be translation game media midi midi2 tracker stdc++
 	: resources/XRS.rsrc resources/skin.rsrc  
 ;

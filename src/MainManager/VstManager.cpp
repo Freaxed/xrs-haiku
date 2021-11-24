@@ -67,7 +67,7 @@ VstManager::VstManager()
 	// (/boot/home/config/add-ons/media/vstplugins)
 	
 	BPath vstaddon;
-	find_directory (B_COMMON_ADDONS_DIRECTORY, &vstaddon, true);
+	find_directory (B_USER_ADDONS_DIRECTORY, &vstaddon, true);
 	vstaddon.Append("media");
 	vstaddon.Append("vstplugins");
 		
@@ -86,7 +86,7 @@ VstManager::VstManager()
 	
 	/* presets directory */
 		
-	find_directory (B_COMMON_SETTINGS_DIRECTORY, &xpath, true);
+	find_directory (B_USER_SETTINGS_DIRECTORY, &xpath, true);
 	xpath.Append ("XRSPresets");
 	
 	status_t err = xdir.SetTo(xpath.Path());

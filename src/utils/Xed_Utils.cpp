@@ -504,7 +504,7 @@ XUtils::FillPresetsMenu(const char* name,BMenu* men,unsigned long msg){
 	BPath		xpath;
 	status_t	err;
 	
-	find_directory (B_COMMON_SETTINGS_DIRECTORY, &xpath, true);
+	find_directory (B_USER_SETTINGS_DIRECTORY, &xpath, true);
 	xpath.Append ("XRSPresets");
 	xpath.Append (name);
 	
@@ -537,7 +537,7 @@ XUtils::SavePreset(const char* plugname,const char* presname,BMessage* msg){
 	BPath		xpath;
 	status_t	err;
 	
-	find_directory (B_COMMON_SETTINGS_DIRECTORY, &xpath, true);
+	find_directory (B_USER_SETTINGS_DIRECTORY, &xpath, true);
 	xpath.Append ("XRSPresets");
 	xpath.Append (plugname);
 	
@@ -587,7 +587,7 @@ XUtils::LoadPreset(const char* plugname,const char* presname,BMessage* msg){
 	BPath		xpath;
 	status_t	err;
 	
-	find_directory (B_COMMON_SETTINGS_DIRECTORY, &xpath, true);
+	find_directory (B_USER_SETTINGS_DIRECTORY, &xpath, true);
 	xpath.Append ("XRSPresets");
 	xpath.Append (plugname);
 	

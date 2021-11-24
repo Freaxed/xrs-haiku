@@ -915,7 +915,7 @@ JFileManager::DoZip(entry_ref ref, const char* file_name,Song* s)
 		BPath path;
 		BDirectory dir;
 		
-		if (find_directory(B_COMMON_TEMP_DIRECTORY, & path) == B_OK)
+		if (find_directory(B_SYSTEM_TEMP_DIRECTORY, & path) == B_OK)
 			dir.SetTo(path.Path());
 		else 
 			return; //??
@@ -1426,7 +1426,7 @@ JFileManager::ZipStart(const char* destzip,const char* filename)
 	//directory_name << "/" << filename ;
 	
 	BPath path;
-	if (find_directory(B_COMMON_TEMP_DIRECTORY, & path) == B_OK)
+	if (find_directory(B_SYSTEM_TEMP_DIRECTORY, & path) == B_OK)
 	chdir (path.Path());
 	else return B_ERROR; //??
 	

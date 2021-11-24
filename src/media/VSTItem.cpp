@@ -173,7 +173,7 @@ long VSTItem::WantMidi ()
 	
 }
 //	Idle thread's entry point.
-static long idle_thread_start (void *arg)
+static int idle_thread_start (void *arg)
 {
 	VSTItem * plugin = (VSTItem*) arg;
 	plugin->IdleLoop ();

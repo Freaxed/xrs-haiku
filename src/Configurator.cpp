@@ -43,7 +43,7 @@ cf_Init(const char *filename)
 	// e ne prepara uno nuovo dove tutti possino scrivere i propri affari.
 	
 	
-	find_directory (B_COMMON_SETTINGS_DIRECTORY, &Config()->cf_path, true);
+	find_directory (B_USER_SETTINGS_DIRECTORY, &Config()->cf_path, true);
 	cf_path.Append (filename);
 	
 	status_t err;

@@ -43,7 +43,7 @@ bool
 ValuableManager::RegisterValuable(ValuableID id, Valuable* val)
 {
 	
-	printf("RegisterValuable [%s]  %d\n",id.String(), (int)val);
+	printf("RegisterValuable [%s]  %p\n",id.String(), val);
 	
 	iterator iter = map.Find(id);
 			

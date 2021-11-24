@@ -292,7 +292,7 @@ ExternalManager::_extractSample(entry_ref ref ,int32 spiaz )
 	status_t error;
 			
 	BEntry controllo_esiste(&ref);
-	if(controllo_esiste.Exists()==false) return B_FILE_NOT_FOUND;
+	if(controllo_esiste.Exists()==false) return B_ENTRY_NOT_FOUND;
 	
 	
 	BFile *file=new BFile();
