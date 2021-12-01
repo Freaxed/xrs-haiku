@@ -128,19 +128,22 @@ TracksPanel::RemoveTrack(int h)
 void
 TracksPanel::AddTrack(int h)
 {
-	JTrack* t;
-	
 	ScrollBar(B_HORIZONTAL)->SetValue(0);
 	
 	if(Window()->Lock()){
 	
-	
-		xnv.Add(t=tm->MakeJTrack(curSong->getTrackAt(h), BRect(BUTTONS_X_START,BUTTONS_Y_START+h*30-40,WINDOW_XL-18,BUTTONS_Y_START+JTRACK_LY+h*30-40),h),h);
+		JTrack* t = tm->MakeJTrack(curSong->getTrackAt(h), 
+		                         BRect(BUTTONS_X_START,
+		                               BUTTONS_Y_START+(float)h*30.0f-40.0f,
+		                               WINDOW_XL-18.0f,
+		                               BUTTONS_Y_START+JTRACK_LY+(float)h*30.0f-40.0f),
+		                               (int16)h);
+		xnv.Add(t);
 		t->RControl();
 		TrackList::AddTrack((TrackBlock*)t);
 		
 		BMessage *msg=new BMessage(TRACK_SET);
-		msg->AddInt16("id",h);
+		msg->AddInt16("id", (int16) h);
 		t->Init(msg);
 		int selPattern=MeasureManager::Get()->GetCurrentPattern();
 		t->Reset(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
@@ -304,7 +307,7 @@ TracksPanel::RemoveTrackAt(int id)
 	
 		tr=getJTrackAt(h);
 		BMessage *msg=new BMessage(TRACK_SET);
-		msg->AddInt16("id",h);
+		msg->AddInt16("id", (int16) h);
 		tr->Init(msg);
 		tr->Reset(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
 			

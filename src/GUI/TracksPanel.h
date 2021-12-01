@@ -17,7 +17,8 @@
 #include "TrackList.h"
 #include "ColorsDef.h"
 #include "TrackManager.h"
-#include "Vector.h"
+//#include "Vector.h"
+#include "VectorNew.h"
 
 class Song;
 class Pattern;
@@ -63,7 +64,7 @@ class TracksPanel : public TrackList
 		
 		void				FixScrollBar();
 		
-		Vector<JTrack*>	xnv;
+		VectorNew<JTrack*>	xnv;
 		Song			*curSong;
 		TrackManager	*tm; //uhm shold be removed for sanity
 		BView			*ticks;	
