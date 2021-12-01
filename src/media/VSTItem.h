@@ -29,7 +29,7 @@
 	class MIDI_consumer;
 #endif
 
-typedef	struct PlugInEntry {
+struct PlugInEntry {
 		BString			name;
 		BString			product;
 		entry_ref		ref;	

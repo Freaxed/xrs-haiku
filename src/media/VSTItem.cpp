@@ -457,8 +457,8 @@ long audioMaster (AEffect *eff, long opCode, long index, long value, void *ptr, 
 
 		//---------------------------
 		case audioMasterTempoAt:			// returns tempo (in bpm * 10000) at sample frame location passed in <value>
-			VSTItem * plugin;
-			plugin = VSTItem::Identify (eff);
+			//VSTItem * plugin;
+			//plugin = VSTItem::Identify (eff);
 			ret=bpm*10000;	
 		break;
 
@@ -671,7 +671,7 @@ void VSTItem::LoadPreset (BMessage *config)
 			int	prog = 0;
 			if(config->FindData ("floats", B_RAW_TYPE, prog, (const void **) &params, &size) == B_OK)
 			{
-				int	count = size / sizeof (float);
+				int	count = (int)size / sizeof (float);
 				for (int p = 0; p < count; p++)
 				{
 					fEffect->setParameter (fEffect, p, params[p]);

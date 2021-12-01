@@ -45,10 +45,10 @@ if $(OSPLAT) = X86 {
 	if $(IS_GCC4_PLATFORM) = 1 {
 		HDRS_INCLUDES_SEPARATOR = -iquote- ;
 	} else {
-		HDRS_INCLUDES_SEPARATOR = -I- ;
+		HDRS_INCLUDES_SEPARATOR =  -iquote- ;
 	}
 } else {
-	HDRS_INCLUDES_SEPARATOR = -i- ;
+	HDRS_INCLUDES_SEPARATOR =  -iquote-;
 }
 
 rule Cc
