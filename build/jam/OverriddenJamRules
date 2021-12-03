@@ -48,7 +48,7 @@ if $(OSPLAT) = X86 {
 		HDRS_INCLUDES_SEPARATOR =  -iquote- ;
 	}
 } else {
-	HDRS_INCLUDES_SEPARATOR =  -iquote-;
+	HDRS_INCLUDES_SEPARATOR =  -iquote- ;
 }
 
 rule Cc
