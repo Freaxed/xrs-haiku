@@ -61,7 +61,7 @@ WindowManager::_switch(BWindow* mw,int32 pos){
 	
 	if (mw->Lock())
 	{
-		if (hidden = mw->IsHidden()) 
+		if ((hidden = mw->IsHidden())) 
 			mw->Show();
 		else 
 			mw->Hide();
