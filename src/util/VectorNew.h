@@ -11,7 +11,7 @@
 template<typename Value>
 class VectorNew : public std::vector<Value> {
 public:
-	VectorNew(size_t chunkSize = 10):std::vector<Value>(chunkSize){}
+	VectorNew():std::vector<Value>(){}
 	
 	int Count() { return (int)this->size(); } 
 	
