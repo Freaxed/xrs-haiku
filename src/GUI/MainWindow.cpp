@@ -366,7 +366,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		case ADD_PATTERN:
 			{
-			int16 z=MeasureManager::Get()->GetCurrentPattern();
+			int z = MeasureManager::Get()->GetCurrentPattern();
 			XHost::Get()->SendMessage(X_LockSem,0);
 				curSong->AddMeasure();
 			XHost::Get()->SendMessage(X_UnLockSem,0);
@@ -378,7 +378,7 @@ MainWindow::MessageReceived(BMessage* message)
 		
 		case REMOVE_PATTERN:
 		{
-			int16 f=MeasureManager::Get()->GetCurrentPattern();
+			int f=MeasureManager::Get()->GetCurrentPattern();
 			
 			XHost::Get()->SendMessage(X_LockSem,0);
 				err=curSong->RemoveMeasure(f);

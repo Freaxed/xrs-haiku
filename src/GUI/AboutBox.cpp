@@ -101,7 +101,7 @@ AboutBox::AboutBox(bool mode):BWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_MODAL_WIN
 	
 	r.top=r.bottom+1;
 	
-	int k=0;
+	float k=0;
 	if(mode) 
 		k=150;
 		
