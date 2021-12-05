@@ -18,7 +18,7 @@ XPot::XPot(BRect frame, const char *name,
 	BMessage *state,
 	int32 minValue, int32 maxValue,BBitmap *p1,BBitmap *p2)
 	: APot(frame, name, NULL, NULL, minValue,maxValue,p1,p2),
-	ValuableView(valuable_channel),
+	ValuableView(valuable_channel, BString(name)),
 	m_vChannel(valuable_channel)
 {
 	

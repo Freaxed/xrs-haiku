@@ -1,9 +1,7 @@
 #ifndef _Logger_h_
 #define _Logger_h_
 
-//#include "BeDC.h"
 #include <String.h>
-
 
 enum loglevel {
 

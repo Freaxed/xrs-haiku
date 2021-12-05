@@ -69,7 +69,7 @@ SamplerPanel::SamplerPanel(SamplerTrackBoost* sb) :
 	pit_box->AddChild(pit_ck=new BCheckBox(r,"",T_SAMPLER_STRECH,new BMessage(PIT_ON)));
 	pit_ck->SetValue(0);
 	pit_ck->SetFontSize(12);
-	pit_box->AddChild(shift=new XDigit(BRect(120,5,120+36,5+21),"shift",new BMessage(MOD),NULL,1,32));
+	pit_box->AddChild(shift=new XDigit(BRect(120,5,120+36,5+21),"shift", "sampler_shift_xdigit", new BMessage(MOD),NULL,1,32));
 	
 	r=(pit_box->Frame());
 	r.OffsetBy(0,38);
@@ -85,7 +85,7 @@ SamplerPanel::SamplerPanel(SamplerTrackBoost* sb) :
 	pit_box->AddChild(boost_ck=new BCheckBox(r,"",T_SAMPLER_BOOST,new BMessage(BOOST_ON)));
 	boost_ck->SetValue(0);
 	boost_ck->SetFontSize(12);
-	pit_box->AddChild(depth=new XDigit(BRect(120,5,120+36,5+21), "depth", new BMessage(REL_MSG),NULL,1,4));
+	pit_box->AddChild(depth=new XDigit(BRect(120,5,120+36,5+21), "depth", "sampler_boost", new BMessage(REL_MSG),NULL,1,4));
 	
 	r=(pit_box->Frame());
 	r.OffsetBy(0,38);

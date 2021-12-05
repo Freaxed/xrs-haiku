@@ -7,8 +7,8 @@
 class BasicValuableView : public ValuableView {
 	
 	public:
-			 BasicValuableView(int channel,BHandler* dest)
-			 : ValuableView(channel){ fHandler = dest; };
+			 BasicValuableView(int channel, BString name, BHandler* dest)
+			 : ValuableView(channel, name){ fHandler = dest; };
 			
 		
 	

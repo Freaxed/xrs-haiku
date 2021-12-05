@@ -42,8 +42,8 @@ XMPoz::XMPoz(BRect r):BView(r,"Juice",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DR
 	//obs_volumes->attachHandler(this);
 	curPat=-1;
 	
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0,this));	
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(2,this));	
+	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0, "XMPoz_time.position.fulltick_ch0", this));	
+	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(2, "XMPoz_time.position.fulltick_ch2", this));	
 }
 
 void

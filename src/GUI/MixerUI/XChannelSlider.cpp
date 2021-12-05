@@ -27,11 +27,11 @@ XChannelSlider::XChannelSlider(
 									"XChannelSlider",
 									NULL,
 									model,min,max,
-									o),ValuableView(channel){
+									o),ValuableView(channel, name){
 									
 
 	
-	if(!ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this))
+	if(!ValuableManager::Get()->RegisterValuableView(id, (ValuableView*)this))
 	{
 		BString str("can't register XChannelSlider (");
 		str << name << ") with id : " << id;

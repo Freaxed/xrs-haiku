@@ -11,6 +11,7 @@
 #include "ValuableController.h"
 #include "Logger.h"
 
+#include <Messenger.h>
 #include <stdio.h>
 #include <String.h>
 
@@ -43,7 +44,7 @@ bool
 ValuableManager::RegisterValuable(ValuableID id, Valuable* val)
 {
 	
-	printf("RegisterValuable [%s]  %p\n",id.String(), val);
+	//Log(LOG_INFO, "RegisterValuable [%s]  %p",id.String(), val);
 	
 	iterator iter = map.Find(id);
 			
@@ -76,9 +77,11 @@ ValuableManager::RegisterValuableView(ValuableID id, ValuableView* val, bool upd
 	
 	if ( iter == map.End() ) 
 	{
-		Log(LOG_WARN,"RegisterValuableView: can't find a Valuable with name %s",id.String());
+		Log(LOG_WARN,"RegisterValuableView: can't find a Valuable with name [%s]",id.String());
 		return false;
 	}
+	
+	Log(LOG_INFO,"RegisterValuableView: adding new ValuableView [%s] for ValuableID [%s] (%p)",val->GetName().String(), id.String(), val);
 	
 	valuable_list *vlist = iter->Value();
 	vlist->list.Add(val);

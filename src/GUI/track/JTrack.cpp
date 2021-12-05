@@ -64,7 +64,7 @@ JTrack::RControl()
 	BRect	pos(volpot->Frame());
 	pos.right=pos.left+36;
 	pos.bottom=pos.top+22;
-	AddChild(line_pos=new XDigit(pos, "line_pos", new BMessage(TRACK_ROUTELINE),NULL,0,4));
+	AddChild(line_pos=new XDigit(pos, "line_pos", "mixer_pos", new BMessage(TRACK_ROUTELINE),NULL,0,4));
 	line_pos->MoveBy(-50,0);
 }
 

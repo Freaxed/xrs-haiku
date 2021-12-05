@@ -169,7 +169,7 @@ XTrack::SetName(const char *t)
 void
 XTrack::MessageReceived(BMessage* message)
 {
-	message->PrintToStream();
+	//message->PrintToStream();
 	switch(message->what){
 	
 	case 1347638341: //color dropped from kColor or similar.

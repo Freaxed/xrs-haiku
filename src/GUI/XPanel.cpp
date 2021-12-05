@@ -227,7 +227,7 @@ XPanel::AttachedToWindow()
 	//tempo
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	AddChild(bpm=new XDigit(r,"bmp",new BMessage(TEMPO_FINE),NULL,20,300));
+	AddChild(bpm=new XDigit(r,"bmp","tempo_bpm", new BMessage(TEMPO_FINE),NULL,20,300));
 	
 	//playlist
 	r.OffsetBy(55,0);
@@ -237,7 +237,7 @@ XPanel::AttachedToWindow()
 	
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	curpat=new XDigit(r,"curpat",new BMessage(CURPAT_MSG),NULL,1,1);
+	curpat=new XDigit(r,"curpat", "current_pattern", new BMessage(CURPAT_MSG),NULL,1,1);
 	AddChild(curpat);
 	curpat->SetTarget(this);
 	

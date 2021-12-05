@@ -57,8 +57,8 @@ void
 GfxMeter::AttachedToWindow()
 {
 	//we register the two channel notification
-	vleft  = new BasicValuableView(0, this);
-	vright = new BasicValuableView(1, this);
+	vleft  = new BasicValuableView(0, BString("GfxMeter_left"), this );
+	vright = new BasicValuableView(1, BString("GfxMeter_left"), this );
 	
 	ValuableManager::Get()->RegisterValuableView(fId, vleft, false);
 	ValuableManager::Get()->RegisterValuableView(fId, vright, false);	

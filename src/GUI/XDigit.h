@@ -17,7 +17,7 @@
 class XDigit : public ADigit, public ValuableView, public ValuableController
 {
 public:
-	XDigit(BRect frame, ValuableID id, BMessage *message, BMessage *state,
+	XDigit(BRect frame, ValuableID id,  BString name, BMessage *message, BMessage *state,
 		int32 minValue, int32 maxValue,
 		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		uint32 flags = B_FRAME_EVENTS | B_WILL_DRAW);

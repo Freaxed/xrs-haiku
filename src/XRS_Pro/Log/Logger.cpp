@@ -1,6 +1,6 @@
 #include "Logger.h"
 
-//BeDC	sender("Xrs Pro");
+#include <stdio.h>
 
 void printLevel(loglevel level){
 

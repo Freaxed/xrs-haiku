@@ -23,11 +23,9 @@
 
 PositionView::PositionView(BRect frame,int d): BView(frame,"Juice",B_FOLLOW_NONE,B_WILL_DRAW)
 {
-	BasicValuableView *bvv_pos=new BasicValuableView(0,this);	
-	
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",bvv_pos);
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(1,this));
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(2,this));
+	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0, "time.position.fulltick_ch0",this));
+	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(1, "time.position.fulltick_ch1",this));
+	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(2, "time.position.fulltick_ch2",this));
 			
 	pos[0]=pos[1]=pos[2]=-1;
 	pat[0]=pat[1]=pat[2]=-1;

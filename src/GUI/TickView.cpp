@@ -25,7 +25,7 @@ BBitmap*	b_tick;
 
 TickView::TickView(BRect frame,int d): BView(frame,"Juice",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW)
 {
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0,this));	
+	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0, "time.position.fulltick", this));	
 	xinc=23;
 	tick=-1;
 	space=10+160;

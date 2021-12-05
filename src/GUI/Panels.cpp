@@ -229,7 +229,7 @@ Panels::showSettings(Song* curSong)
 	x.right=x.left+36;
 	x.top=5;
 	x.bottom=x.top+22;
-	sampler->AddChild(a=new XDigit(x,"sampler",NULL,NULL,4,32));
+	sampler->AddChild(a=new XDigit(x,"sampler", "sampler?", NULL,NULL,4,32));
 	box2->AddChild(sampler);
 	x=sampler->Bounds();
 	x.InsetBy(4,4);
@@ -245,7 +245,7 @@ Panels::showSettings(Song* curSong)
 	x.right=x.left+36;
 	x.top=5;
 	x.bottom=x.top+22;
-	sampler->AddChild(b=new XDigit(x,"sampler2",NULL,NULL,2,8));
+	sampler->AddChild(b=new XDigit(x,"sampler2","sampler2?", NULL,NULL,2,8));
 	box2->AddChild(sampler);
 	x=sampler->Bounds();
 	x.InsetBy(4,4);

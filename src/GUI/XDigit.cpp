@@ -13,11 +13,11 @@
 
 XDigit::~XDigit() {}
 
-XDigit::XDigit(BRect frame, ValuableID id, BMessage *message, BMessage *state,
+XDigit::XDigit(BRect frame, ValuableID id, BString name, BMessage *message, BMessage *state,
 		int32 minValue, int32 maxValue,
 		uint32 resizingMode, uint32 flags):
 		ADigit(frame, message, state, minValue, maxValue, resizingMode, flags),
-		ValuableView(0)
+		ValuableView(0, name)
 {
 	
 	if(!ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this)){
