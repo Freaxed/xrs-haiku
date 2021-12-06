@@ -27,13 +27,13 @@ void Log(loglevel level,const char *text, ...){
 			va_start(args, text); 
 			vsprintf(buffer, text, args); 
 			va_end(args); 
-			//sender.SendFormat(buffer);
+
 			printLevel(level);
 			printf(buffer);
 			printf("\n");
 			      
 }
-
+/*
 void LogInfo(const char *text, ...){
 			char buffer[1024]; 
 			va_list args; 
@@ -46,6 +46,6 @@ void LogInfo(const char *text, ...){
 			printf(buffer);
 			printf("\n");  
 	
-}
+}*/
 
 //--end--

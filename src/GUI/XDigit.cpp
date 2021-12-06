@@ -20,24 +20,21 @@ XDigit::XDigit(BRect frame, ValuableID id, BString name, BMessage *message, BMes
 		ValuableView(0, name)
 {
 	
-	if(!ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this)){
-		BString str("can't register XDigit (");
-		str << ") with id : " << id;		
-		Log(LOG_WARN,str.String());	
-	}	
-		
+	ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this);
+			
 	SetValuableID(id);
 	SetDefaultChannel(0);
-		
-	float value=0; //ValuableManager::Get()->RetriveValue(id,valuable_channel);
-	SetValue((long)value);
+	
+	//This two lines should be 'automatic' as soon as we register.. no?:)
+	float value = ValuableManager::Get()->RetriveValue(id, 0);
+	ADigit::SetValue((int32)value, value);
 }
 
 
 void XDigit::AttachedToWindow(){
 	
 	ADigit::AttachedToWindow();
-	SetSender((ValuableView*)this);
+	SetSender((ValuableView*)this); //Maybe here we should send an update?
 }
 
 void XDigit::MessageReceived(BMessage* msg)

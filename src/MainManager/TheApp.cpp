@@ -42,7 +42,7 @@
 #include 	"PotViewer.h"
 #include 	"PMixer.h"
 #include	"JuiceEngine.h"
-
+#include	"BasicModelManager.h"
 
 
 extern PotViewer* potviewer = NULL;
@@ -98,6 +98,11 @@ TheApp::~TheApp()
 		 }
 		 if(mw->Lock()) 
 		 	mw->Quit();
+		 	
+		 fVManager->DumpValues();
+		 	
+		 delete fModel;
+	     
 	     if(fVManager->Lock())
 			fVManager->Quit();
 			
@@ -148,6 +153,8 @@ TheApp::PrepareToRun()
 	AddCommonFilter(win_manager);
 	
 	fVManager = ValuableManager::Get();
+	
+	fModel = new BasicModelManager();
 	
 	mea_manager= MeasureManager::Get();
 	AddCommonFilter(mea_manager);

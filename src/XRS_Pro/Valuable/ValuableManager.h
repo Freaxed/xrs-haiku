@@ -46,6 +46,8 @@ class ValuableManager : public BLooper
 				//don't like..				
 				BMessenger	*messenger;
 				
+				void	DumpValues();
+				
 								
 	private:
 					ValuableManager();

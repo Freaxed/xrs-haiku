@@ -60,6 +60,7 @@ Application XRS :
 	SJFilter.cpp
 	DrawingTidbits.cpp
 	VUView.cpp
+	BasicModelManager.cpp
 	
 
 	#src/utils

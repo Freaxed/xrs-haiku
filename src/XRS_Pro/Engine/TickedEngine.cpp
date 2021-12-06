@@ -14,12 +14,15 @@ TickedEngine::TickedEngine(const char* name):Engine(name) {
 	SetBPM(120);
 	fBeatpos = 0;
 }
-void	TickedEngine::SetBPM(int bpm){
-					fSamplesPerTick=(size_t)2646000/(size_t)bpm;
-					fSamplesPerTick /= fClock->Resolution();
-					fSamplesPerTick /= 4 ;
-					while(fSamplesPerTick % 4 !=0) fSamplesPerTick++;
-				}
+void	
+TickedEngine::SetBPM(int bpm){
+	
+	fSamplesPerTick=(size_t)2646000/(size_t)bpm;
+	fSamplesPerTick /= fClock->Resolution();
+	fSamplesPerTick /= 4 ;
+	
+	while(fSamplesPerTick % 4 !=0) fSamplesPerTick++;
+}
 
 
 void

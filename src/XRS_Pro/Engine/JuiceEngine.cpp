@@ -51,6 +51,9 @@ JuiceEngine::JuiceEngine(const char* name):Engine(name),
 	
 	the_clock.AddTickable(this);
 	the_clock.ResetAndNotify();
+
+	fValuableView = new BasicValuableView(0, "JuiceEngine");
+	ValuableManager::Get()->RegisterValuableView(VAL_ID_BPM, fValuableView, NULL); //FIXME
 	
 }
 

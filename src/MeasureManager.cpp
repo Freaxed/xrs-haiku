@@ -14,11 +14,12 @@
 
 #include <stdio.h>
 
+
 MeasureManager::MeasureManager()
 	:BMessageFilter(B_PROGRAMMED_DELIVERY,B_LOCAL_SOURCE,SETPAT),
 	curpat(0),sequence(NULL)
 {
-	IntValuable *iv_pos=new IntValuable(3);
+	GenericValuable<int32, 3> *iv_pos=new GenericValuable<int32, 3>;
 	
 	iv_pos->SetValue(0,-1); //substep ???
 	iv_pos->SetValue(1,-1);	//Pattern

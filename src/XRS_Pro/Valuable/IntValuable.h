@@ -3,20 +3,23 @@
 
 #include "Valuable.h"
 
-class IntValuable : public Valuable 
-{
+template<class BASETYPE, int CAPACITY = 1>
+class GenericValuable : public Valuable {
 	public:
-					IntValuable(int capacity = 1):Valuable(capacity)
-					{
-						// note, this is quite an hack
-						// we use the factor variable to just store and retrive
-						// the factorized value. can be usefull? or just messes all up!
-					};
+					GenericValuable() : Valuable(CAPACITY) {
+						for (int i=0;i<CAPACITY;i++)
+							SetFactor(i, 1.0f); 
+					}
 					
-		float		GetFactorizedValue(int id) 	 { return factor[id]; };
-		void		SetFactorizedValue(int id,float val) { factor[id] = val; };	
+		float		GetFactorizedValue(int id) 	 		 { return (float)fValue[id]; 	};
+		void		SetFactorizedValue(int id,float val) { fValue[id] = (BASETYPE)val;  };	
 		
+	private:
+		BASETYPE	fValue[CAPACITY];
 };
+
+typedef GenericValuable<int32, 1> ValuableInt32;
+typedef GenericValuable<int16, 1> ValuableInt16;
 
 #endif
 

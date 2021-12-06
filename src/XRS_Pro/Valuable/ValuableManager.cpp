@@ -60,8 +60,10 @@ ValuableManager::RegisterValuable(ValuableID id, Valuable* val)
 		map.Insert(id,vlist);
 	}
 	
-	if(val)
-		Log(LOG_INFO,"Registered Valuable [%s]",id.String());
+	if(val) {
+		for (int i=0;i<val->GetCapacity();i++)
+			Log(LOG_INFO,"Registered Valuable [%s]. Capacity %d , Value %d , Factorized %f", id.String(), i, val->GetValue(i), val->LowGetValue(i));
+	}
 	else
 		Log(LOG_INFO,"Registered Valuable [%s] (as NullValuable)",id.String());
 			
@@ -81,7 +83,7 @@ ValuableManager::RegisterValuableView(ValuableID id, ValuableView* val, bool upd
 		return false;
 	}
 	
-	Log(LOG_INFO,"RegisterValuableView: adding new ValuableView [%s] for ValuableID [%s] (%p)",val->GetName().String(), id.String(), val);
+	Log(LOG_INFO,"RegisterValuableView: adding new ValuableView [%s] for ValuableID [%s] (%p)",val->GetViewName().String(), id.String(), val);
 	
 	valuable_list *vlist = iter->Value();
 	vlist->list.Add(val);
@@ -89,14 +91,42 @@ ValuableManager::RegisterValuableView(ValuableID id, ValuableView* val, bool upd
 
 }
 
+void
+ValuableManager::DumpValues()
+{
+		LogInfo("---------------------------------------------");
+		iterator iter = map.Begin();
+		while(iter != map.End()){
+			valuable_list *vlist = iter->Value();
+			ValuableID	id = iter->Key();
+			LogInfo("> ValuableID [%s]", id.String());
+			Valuable* valuable = vlist->value;
+			for (int i=0; i<valuable->GetCapacity();i++)
+			{
+				LogInfo("-----> Capacity %d , Value %d , Factorized %f", i, valuable->GetValue(i), valuable->LowGetValue(i));
+			}
+			ValList& vList = vlist->list;
+			for (int i=0; i<vList.Count(); i++)
+			{
+				ValuableView* view = vList[i];
+				LogInfo("-----> ValuableView [%s] - channel [%d]", view->GetViewName().String(), view->GetChannel());
+			}
+			iter++;
+		}
+		LogInfo("---------------------------------------------");
+}
+
+
 float	
 ValuableManager::RetriveValue(ValuableID id,int channel){
 	
 	iterator iter = map.Find(id);
 	
 	if ( iter == map.End() ) 
+	{
+		LogWarn("Can't get value for [%s] on channel %d, returning 0.0", id.String(), channel);
 		return 0.0;
-		
+	}	
 	valuable_list *vlist = iter->Value();
 	
 	if(vlist->value == NullValuable)

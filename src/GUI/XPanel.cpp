@@ -14,12 +14,12 @@
 #include "Track.h"
 #include "Song.h"
 #include "TracksPanel.h"
-#include "XDigit.h"
 #include "ColorsDef.h"
 #include "XDigit.h"
 #include "XPot.h"
-#include	"MeasureManager.h"
-#include	"WindowManager.h"
+#include "MeasureManager.h"
+#include "WindowManager.h"
+#include "CommonValuableID.h"
 
 #include "VUView.h"
 
@@ -124,6 +124,7 @@ XPanel::MessageReceived(BMessage* message)
 	break;
 	
 	case TEMPO_FINE:
+		message->PrintToStream();
 		info = new BMessage(TEMPO_MOV);
 		info->AddInt32("be:value",bpm->GetValue());
 		Window()->PostMessage(info);
@@ -227,7 +228,7 @@ XPanel::AttachedToWindow()
 	//tempo
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	AddChild(bpm=new XDigit(r,"bmp","tempo_bpm", new BMessage(TEMPO_FINE),NULL,20,300));
+	AddChild(bpm=new XDigit(r,VAL_ID_BPM, "xpanel-bpm", new BMessage(TEMPO_FINE),NULL,20,300));
 	
 	//playlist
 	r.OffsetBy(55,0);

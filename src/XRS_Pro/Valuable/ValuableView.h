@@ -20,7 +20,7 @@ class ValuableView {
 			int32	GetChannel(){ return fChannel; };
 			bool	RegisterForValuable(ValuableID);	
 			
-			const BString	GetName() { return fName; };
+			const BString	GetViewName() { return fName; };
 
 			virtual	BHandler*	Handler() = 0;
 	

@@ -22,13 +22,7 @@ XPot::XPot(BRect frame, const char *name,
 	m_vChannel(valuable_channel)
 {
 	
-	if(!ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this)){
-		BString str("can't register XPot (");
-		str << name << ") with id : " << id;		
-		Log(LOG_WARN,str.String());	
-	}	
-	
-	
+	ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this);	
 	
 	SetValuableID(id);
 	SetDefaultChannel(valuable_channel);

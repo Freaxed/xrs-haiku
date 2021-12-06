@@ -39,6 +39,7 @@ class Valuable
 			int32		GetValue(int id);
 			void		SetValue(int id,int32 val);
 			void		SetValue(int32 val); //same value to all
+			int			GetCapacity() { return fCapacity; };
 			
 	//protected:
 	//friend ValuableManager;

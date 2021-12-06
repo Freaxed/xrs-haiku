@@ -12,7 +12,16 @@ enum loglevel {
 };
 
 void Log(loglevel,const char *text, ...);
-void LogInfo(const char *text, ...);
+
+#if 0
+#define LogInfo (X, ...)  Log(LOG_INFO, X, __VA_ARGS__);
+#define LogWarn (X, ...)  Log(LOG_WARN, X, __VA_ARGS__);
+#define LogFatal(X, ...)  Log(LOG_FATAL,X, __VA_ARGS__);
+#else
+template<typename... Args> void LogInfo  (const char * x, Args... args) { Log(LOG_INFO , x, args...); }
+template<typename... Args> void LogWarn  (const char * x, Args... args) { Log(LOG_WARN , x, args...); }
+template<typename... Args> void LogFatal (const char * x, Args... args) { Log(LOG_FATAL, x, args...); }
+#endif
 
 //finish this..
 loglevel LogLevel();
