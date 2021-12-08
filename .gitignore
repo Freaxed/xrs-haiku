@@ -1,4 +1,7 @@
 (Objects.xrs-haiku)/
 generated/*
+src/Valuable/(Objects.xrs-valuable)/
+src/Valuable/Valuable
+src/Valuable/compile_commands.json
 *.log
 

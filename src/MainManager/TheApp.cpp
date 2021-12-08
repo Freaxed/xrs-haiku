@@ -99,7 +99,7 @@ TheApp::~TheApp()
 		 if(mw->Lock()) 
 		 	mw->Quit();
 		 	
-		 fVManager->DumpValues();
+		 fVManager->Dump();
 		 	
 		 delete fModel;
 	     
@@ -153,6 +153,7 @@ TheApp::PrepareToRun()
 	AddCommonFilter(win_manager);
 	
 	fVManager = ValuableManager::Get();
+	fVManager->Run();
 	
 	fModel = new BasicModelManager();
 	

@@ -1,15 +1,14 @@
 #ifndef	_Pannable_H_
 #define	_Pannable_H_
 
-#include "Valuable.h"
 #include <math.h>
 
 #define	CHANNELS	2
 
-class	Pannable : public Valuable
+class	Pannable 
 {
 	public:
-		Pannable():Valuable(2){ SetFactor(0,127); SetFactor(1,64); pan=0.0f; vol=0.8f; calc_vols();}
+		Pannable(){ pan=0.0f; vol=0.8f; calc_vols(); }
 		
 				float	getVolume(){ return vol; };
 		virtual	void	setVolume(float val){ vol=val; calc_vols();};
@@ -25,10 +24,7 @@ class	Pannable : public Valuable
 		
 		float		GetLeft(){ return vols[0]; };
 		float		GetRight(){ return vols[1]; };
-		
-	protected:
-	virtual	float		GetFactorizedValue(int id){  if(id==0) return getVolume(); else return getPan(); };
-	virtual	void		SetFactorizedValue(int id,float v){ if(id==0) setVolume(v); else setPan(v);};
+
 		
 			float vols[CHANNELS];
 

@@ -8,7 +8,6 @@
  */
 
 #include "PMixable.h"
-#include "Logger.h"
 #include <memory.h>
 
 PMixable::PMixable():Pannable()

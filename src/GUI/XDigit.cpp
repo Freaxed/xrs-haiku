@@ -9,32 +9,22 @@
 
 #include "XDigit.h"
 #include "ValuableManager.h"
-#include "Logger.h"
 
 XDigit::~XDigit() {}
 
 XDigit::XDigit(BRect frame, ValuableID id, BString name, BMessage *message, BMessage *state,
 		int32 minValue, int32 maxValue,
 		uint32 resizingMode, uint32 flags):
-		ADigit(frame, message, state, minValue, maxValue, resizingMode, flags),
-		ValuableView(0, name)
-{
+		ADigit(frame, message, state, minValue, maxValue, resizingMode, flags) , vID(id)
+{	
 	
-	ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this);
-			
-	SetValuableID(id);
-	SetDefaultChannel(0);
-	
-	//This two lines should be 'automatic' as soon as we register.. no?:)
-	float value = ValuableManager::Get()->RetriveValue(id, 0);
-	ADigit::SetValue((int32)value, value);
 }
 
 
-void XDigit::AttachedToWindow(){
-	
+void XDigit::AttachedToWindow()
+{
 	ADigit::AttachedToWindow();
-	SetSender((ValuableView*)this); //Maybe here we should send an update?
+	ValuableManager::Get()->RegisterValuableReceiver(vID, (ValuableReceiver*)this);
 }
 
 void XDigit::MessageReceived(BMessage* msg)

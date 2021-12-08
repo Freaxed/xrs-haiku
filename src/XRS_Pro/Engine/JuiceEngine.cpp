@@ -8,7 +8,7 @@
  */
 
 #include "JuiceEngine.h"
-#include "Logger.h"
+#include "Log.h"
 #include "Song.h"
 #include "Track.h"
 
@@ -51,9 +51,6 @@ JuiceEngine::JuiceEngine(const char* name):Engine(name),
 	
 	the_clock.AddTickable(this);
 	the_clock.ResetAndNotify();
-
-	fValuableView = new BasicValuableView(0, "JuiceEngine");
-	ValuableManager::Get()->RegisterValuableView(VAL_ID_BPM, fValuableView, NULL); //FIXME
 	
 }
 
@@ -96,7 +93,7 @@ JuiceEngine::SetBPM(int bpm)
 	fCurrentSong->setTempo(bpm);
 	fSamplesPerBeat = fCurrentSong->getNoteSize();
 	fSamplesPerTick = fSamplesPerBeat/(fDefaultResolution*4);
-	//my_mixer->setTempo(bpm); //FIXXXXXXXXX
+
 	SendTrackMessage(TempoChange,(float)fSamplesPerBeat);	
 }
 
@@ -125,8 +122,8 @@ JuiceEngine::Starting(){
 	BufferPosition=0;
 
 	the_clock.ResetAndNotify();
-	the_clock.SendValue(1,MeasureManager::Get()->_getCurPat(),0);
-	the_clock.SendValue(2,MeasureManager::Get()->_getCurPos(),0);
+	the_clock.SendValue(P1,MeasureManager::Get()->_getCurPat(),0);
+	the_clock.SendValue(P2,MeasureManager::Get()->_getCurPos(),0);
 	
 	Acquire("JuiceEngine::Starting");
     
@@ -255,8 +252,8 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 	if (PMixer::Get()->Used())
 	{	
 		//too much?
-		ValuableManager::Get()->DirectSetValuable("vumter", 0, (int32)(PMixer::Get()->GetLastMaxValue(0) * 100.0));
-		ValuableManager::Get()->DirectSetValuable("vumter", 1, (int32)(PMixer::Get()->GetLastMaxValue(1) * 100.0));	
+		//ValuableManager::Get()->DirectSetValuable("vumter", 0, (int32)(PMixer::Get()->GetLastMaxValue(0) * 100.0));
+		//ValuableManager::Get()->DirectSetValuable("vumter", 1, (int32)(PMixer::Get()->GetLastMaxValue(1) * 100.0));	
 	}
 	
 	float **mixed = PMixer::Get()->Buffer();
@@ -314,15 +311,15 @@ JuiceEngine::process_row(int32 row)
 		
 	
 	bigtime_t  late=player->Latency();
-	the_clock.SendValue(0,row,late);
+	the_clock.SendValue(P0,row,late);
 	
 	row++;
 	
 	if(row > fCurrentSong->getNumberNotes()-1) { 
 		row=0;
 		MeasureManager::Get()->MoveNextCol();
-		the_clock.SendValue(1,MeasureManager::Get()->_getCurPat(),late);
-		the_clock.SendValue(2,MeasureManager::Get()->_getCurPos(),late);
+		the_clock.SendValue(P1,MeasureManager::Get()->_getCurPat(),late);
+		the_clock.SendValue(P2,MeasureManager::Get()->_getCurPos(),late);
 	}
 }
 

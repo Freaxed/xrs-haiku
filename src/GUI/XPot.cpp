@@ -9,8 +9,7 @@
 
 #include "XPot.h"
 
-#include "ValuableManager.h"
-#include "Logger.h"
+
 
 
 XPot::XPot(BRect frame, const char *name,
@@ -18,28 +17,17 @@ XPot::XPot(BRect frame, const char *name,
 	BMessage *state,
 	int32 minValue, int32 maxValue,BBitmap *p1,BBitmap *p2)
 	: APot(frame, name, NULL, NULL, minValue,maxValue,p1,p2),
-	ValuableView(valuable_channel, BString(name)),
-	m_vChannel(valuable_channel)
+	vID(id)
 {
-	
-	ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this);	
-	
-	SetValuableID(id);
-	SetDefaultChannel(valuable_channel);
-		
-	float value=ValuableManager::Get()->RetriveValue(id,valuable_channel);
-	SetValue((long)value);
+
 }
 
 XPot::~XPot() {}
 
 
-void XPot::AttachedToWindow(){
-	
+void XPot::AttachedToWindow() {	
 	APot::AttachedToWindow();
-	SetSender((ValuableView*)this);
-	SetMessage(CopyMessage());
-	SetTarget(ValuableManager::Get());
+	ValuableManager::Get()->RegisterValuableReceiver(vID,this);	
 }
 
 void XPot::MessageReceived(BMessage* msg)
@@ -48,7 +36,7 @@ void XPot::MessageReceived(BMessage* msg)
 	case MSG_VALUABLE_CHANGED: {
 	
 		float value;
-		if(msg->FindFloat("valuable:value",&value)==B_OK){	
+		if(msg->FindFloat(VAL_DATA_KEY, &value)==B_OK){	
 				UpdateValue((long)value);
 		}
 			

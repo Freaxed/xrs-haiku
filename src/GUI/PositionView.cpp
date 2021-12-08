@@ -11,28 +11,24 @@
 
 #include "Xed_Utils.h"
 #include "ValuableManager.h"
-#include "IntValuable.h"
 
 #include <Window.h>
 #include <Message.h>
 #include <stdio.h>
 
-#define XD 9
-#define YD 18
+#define XD 9.0f
+#define YD 18.0f
 
 
-PositionView::PositionView(BRect frame,int d): BView(frame,"Juice",B_FOLLOW_NONE,B_WILL_DRAW)
+PositionView::PositionView(BRect frame,int d): BView(frame,"PositionView",B_FOLLOW_NONE,B_WILL_DRAW)
 {
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0, "time.position.fulltick_ch0",this));
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(1, "time.position.fulltick_ch1",this));
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(2, "time.position.fulltick_ch2",this));
 			
 	pos[0]=pos[1]=pos[2]=-1;
 	pat[0]=pat[1]=pat[2]=-1;
 	beat[0]=beat[1]=beat[2]=-1;	
 	
 	digit=XUtils::GetBitmap(23); //FIX
-	space=0;
+
 }
 
 
@@ -142,39 +138,48 @@ PositionView::BiRect(int d)
 {
 	if(d<0) 
 		d=10;
-	return BRect(d*XD,0,d*XD+XD,YD);
+	return BRect((float)d*XD,0,(float)d*XD+XD,YD);
 }
 BRect
 PositionView::TRect(int pos)
 {
-	return BRect(space+pos*XD,0,space+pos*XD+XD,YD);
+	return BRect((float)pos*XD,0,(float)pos*XD+XD,YD);
 }
 void
 PositionView::AttachedToWindow()
 {
 	SetViewColor(Parent()->ViewColor());
 	BView::AttachedToWindow();
+	
+	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.substep",  this);
+	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.pattern",  this);
+	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.position", this);
+}
+
+void		
+PositionView::DetachedFromWindow()
+{
+	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.substep",  this);
+	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.pattern",  this);
+	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.position", this);
+	BView::DetachedFromWindow();
+	
 }
 void
 PositionView::MessageReceived(BMessage* msg)
 {
-	if(msg->what==MSG_VALUABLE_CHANGED)
+	if(msg->what == MSG_VALUABLE_CHANGED)
 	{
-		int channel = msg->FindInt16("valuable:value:id");
-		switch(channel)
-		{
-			case 0: //beat
-				SetBeat((int32)msg->FindFloat("valuable:value"));	
-				break;
-			case 1: //pat
-				SetPat((int32)msg->FindFloat("valuable:value"));
-				break;
-			case 2: //pos
-				SetPos((int32)msg->FindFloat("valuable:value"));
-				break;
-			default:
-				break;
-		}	
+			int32 value = -1;
+			if (ValuableTools::SearchValues("time.position.fulltick.substep",  msg, &value)) {
+				SetBeat(value);
+			} else
+			if (ValuableTools::SearchValues("time.position.fulltick.pattern",  msg, &value)) {
+				SetPat(value);
+			} else
+			if (ValuableTools::SearchValues("time.position.fulltick.position", msg, &value)) {
+				SetPos(value);
+			}
 	}
 		
 	else

@@ -3,7 +3,6 @@
 #include <Path.h>
 #include <Mime.h>
 #include <NodeInfo.h>
-//#include "Logger.h"
 
 #include "DownloadManager.h"
 extern DownloadManager*	download_manager;

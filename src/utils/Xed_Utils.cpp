@@ -10,7 +10,7 @@
 #include "Xed_Utils.h"
 #include "ZipOMaticActivity.h"
 #include "Utils.h" //libfunky
-#include "Logger.h"
+#include "Log.h"
 
 // defines da spostare/capire
 #define		B_VOLPAD		0;
@@ -123,7 +123,7 @@ XUtils::GetBitmapResource(type_code type,const char* name)
 
 	if (data == NULL) 
 	{
-		printf("Can't load skin element : %s\n",name);
+		LogError("Can't load skin element : %s\n",name);
 		return NULL;
 	}
 	
@@ -151,7 +151,7 @@ XUtils::GetBitmap(int32 index)
 	BBitmap *bit = (BBitmap*)(b_list->ItemAt(index)); 	
 	
 	if( bit == NULL ) {
-		LogWarn("XUtils::GetBitmap for index %d found nothing!", index);
+		LogError("XUtils::GetBitmap for index %d found nothing!", index);
 		bit = new BBitmap(BRect(0,0,1,1),B_GRAY1);
 	}
 	return bit;

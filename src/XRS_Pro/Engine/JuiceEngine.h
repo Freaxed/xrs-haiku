@@ -13,9 +13,7 @@
 #include 	"Engine.h"
 #include 	"synthMessages.h"
 #include	"Track.h"
-#include	"ValuableController.h"
 #include	"Tickable.h"
-#include	"BasicValuableView.h"
 
 class Song;
 class XHost;
@@ -68,10 +66,7 @@ class JuiceEngine : public Engine, public Tickable {
 			//Events
 			void			AddVoice(Track*,XRSVoice);
 			void			RemoveVoices(Track*);
-			void			DeleteVoices(Track*);
-			
-			BasicValuableView* fValuableView;
-			
+			void			DeleteVoices(Track*);			
 
 };
 

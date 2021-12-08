@@ -16,7 +16,6 @@
 #include	"SourceItem.h"
 #include	"AChannelSlider.h"
 #include 	"ValuableManager.h"
-#include	"BasicValuableView.h"
 #include	"Xed_Utils.h"
 #include 	"APot.h"
 #include	"Xed_Utils.h"
@@ -460,7 +459,7 @@ MixerWindow::Reset()
 			
 //			obs_volumes->SetValue(80,T_MIXER_MASTER);
 			//ui_list[i].slider->SendValue(0,80);
-			ValuableManager::Get()->SpreadValue("mixer.master",0,80.0);
+			ValuableManager::Get()->UpdateValue("mixer.master", 80.0f);
 			
 			
 		}

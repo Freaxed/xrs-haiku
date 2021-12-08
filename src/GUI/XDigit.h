@@ -11,10 +11,9 @@
 #define _XDigit_H
 
 #include "ADigit.h"
-#include "ValuableView.h"
-#include "ValuableController.h"
+#include "ValuableManager.h"
 
-class XDigit : public ADigit, public ValuableView, public ValuableController
+class XDigit : public ADigit, public ValuableReceiver
 {
 public:
 	XDigit(BRect frame, ValuableID id,  BString name, BMessage *message, BMessage *state,
@@ -26,12 +25,14 @@ public:
 	virtual ~XDigit();
 	
 	//valuableView
-	BHandler*	Handler() { return this;};
+	BHandler*	GetHandler() { return this;};
 	
 	
 	//events	
 	virtual void AttachedToWindow();
 	virtual void MessageReceived(BMessage* msg);
+private:
+	ValuableID 	vID;
 };
 
 #endif 

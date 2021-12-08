@@ -13,7 +13,6 @@
 #include "Message.h"
 #include "GfxMsg.h"
 #include "maxcount.h"
-#include "BasicValuableView.h"
 #include "ValuableManager.h"
 
 #include <stdio.h>
@@ -42,37 +41,24 @@ XMPoz::XMPoz(BRect r):BView(r,"Juice",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DR
 	//obs_volumes->attachHandler(this);
 	curPat=-1;
 	
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0, "XMPoz_time.position.fulltick_ch0", this));	
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(2, "XMPoz_time.position.fulltick_ch2", this));	
+
 }
 
 void
 XMPoz::MessageReceived(BMessage* msg)
 {
-	/*if(msg->what=='Mtr')
+	if(msg->what == MSG_VALUABLE_CHANGED)
 	{
-		setPosition(msg->FindInt16("pos"),msg->FindInt16("beat"));
+		msg->PrintToStream();
+		int32 value = -1;
+		if (ValuableTools::SearchValues("time.position.fulltick.substep",  msg, &value)) {
+				setPosition(curPat, value);
+		} else
+		if (ValuableTools::SearchValues("time.position.fulltick.position", msg, &value)) {
+				setPositionPar(value);
+		}
 	}
-	else*/
-	if(msg->what==MSG_VALUABLE_CHANGED)
-	{
-			int channel = msg->FindInt16("valuable:value:id");
-			//msg->PrintToStream();
-			switch(channel)
-			{
-				
-				case 0: //beat
-					setPosition(curPat,(int32)msg->FindFloat("valuable:value"));	
-				break;
-				case 2: //pos
-					setPositionPar((int32)msg->FindFloat("valuable:value"));
-				break;
-				default:
-				break;
-			}
-		
-		
-	}
+
 	else
 		BView::MessageReceived(msg);
 }
@@ -94,11 +80,22 @@ XMPoz::Reset(Sequence* s)
 void
 XMPoz::AttachedToWindow()
 {
-
+	BView::AttachedToWindow();
 	SetLowColor(200,200,220);
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetFontSize(7);
+	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.substep", this);	
+	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.position",this);	
+
 }
+void
+XMPoz::DetachedFromWindow()
+{
+	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.substep", this);	
+	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.position",this);	
+	BView::AttachedToWindow();
+}
+
 
 
 

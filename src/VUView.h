@@ -14,7 +14,7 @@
 #include "Valuable.h"
 
 
-class VUView : public BView, public Valuable
+class VUView : public BView /*, public Valuable*/
 {
 public:
 	VUView(BRect rect, ValuableID id);

@@ -16,13 +16,15 @@
 #include "XPot.h"
 #include "GfxMeter.h"
 #include "FixedText.h"
+#include "ValuableManager.h"
 
 class PMixable;
 
 class MixableBox : public BBox {
 	
 	public:
-			MixableBox(BPoint position,PMixable*);	
+			MixableBox(BPoint position,PMixable*);
+			
 	private:
 			PMixable*	fMixable;
 			

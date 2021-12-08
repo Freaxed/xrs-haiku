@@ -12,15 +12,11 @@
 BasicModelManager::BasicModelManager(){
 	
 	ValuableManager* val_manager = ValuableManager::Get();
-	fVBpm = new GenericValuable<int16>();
-	fVBpm->SetValue(0, 119);
-	val_manager->RegisterValuable(VAL_ID_BPM, fVBpm);
+	val_manager->RegisterValuable(VAL_ID_BPM, (int32)111);
 
 };
 
 BasicModelManager::~BasicModelManager() {
-	ValuableManager* val_manager = ValuableManager::Get();
-	val_manager->UnRegisterValuable(VAL_ID_BPM);
-	delete fVBpm;
-	fVBpm = NULL;	
+//	ValuableManager* val_manager = ValuableManager::Get();
+//	val_manager->UnRegisterValuable(VAL_ID_BPM);
 }

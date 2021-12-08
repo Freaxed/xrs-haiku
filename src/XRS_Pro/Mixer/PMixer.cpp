@@ -24,7 +24,7 @@ PMixer::PMixer():PBus(){
 	
 	//defaut routing table..
 	
-	ValuableManager::Get()->RegisterValuable("mixer.master",  this );
+	ValuableManager::Get()->RegisterValuable("mixer.master",  0.8f);
 	
 	//fMixerMeter = new IntValuable(2);
 	//ValuableManager::Get()->RegisterValuable("mixer.master.meter",  fMixerMeter );
@@ -39,8 +39,8 @@ PMixer::PMixer():PBus(){
 		BString valuableName("mixer.lines.");
 		valuableName << i;
 		
-		ValuableManager::Get()->RegisterValuable(valuableName.String(),&busses[i]);
-		busses[i].SetName(valuableName);
+		ValuableManager::Get()->RegisterValuable(valuableName.String(), 0.0f);
+		//busses[i].SetName(valuableName);
 		
 		//meters[i] = new IntValuable(2);
 		//valuableName << ".meter";

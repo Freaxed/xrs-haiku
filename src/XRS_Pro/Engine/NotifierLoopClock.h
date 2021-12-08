@@ -11,32 +11,40 @@
 #define NotifierLoopClock_H_
 
 #include 	"LoopClock.h"
-#include	"ValuableController.h"
+#include	"ValuableManager.h"
 
-class NotifierLoopClock : public LoopClock, public ValuableController {
+#define P0	"time.position.fulltick.substep"
+#define P1  "time.position.fulltick.pattern"
+#define P2  "time.position.fulltick.position"
+
+class NotifierLoopClock : public LoopClock {
 
 	public:
-				NotifierLoopClock(){
-					SetValuableID("time.position.fulltick");
-				}
+				NotifierLoopClock(){}
 				
 		
 		 void	TickAndNotify(bigtime_t delay){
-					Notify(beat,0,0,delay);
+					Notify(beat, 0, 0, delay);
 					Tick();
 				}
 		
 		void	ResetAndNotify(bigtime_t delay = 0){
 					Reset();
 					Notify(-1,-1,-1,delay);					
-				}			
+				}	
+				
+		void	SendValue(ValuableID vID, int32 value, bigtime_t fixme) {
+					ValuableManager::Get()->UpdateValue(vID, value);
+				}
+						
 	private:
 	
-		void	Notify(int beat,int b, int c,bigtime_t delay){
-					SendValue(0,beat,delay);
-					SendValue(1,b,delay);
-					SendValue(2,c,delay);
+		void	Notify(int32 beat,int32 b, int32 c, bigtime_t){
+					ValuableManager::Get()->UpdateValue(P0, beat);
+					ValuableManager::Get()->UpdateValue(P1, b);
+					ValuableManager::Get()->UpdateValue(P2, c);
 				}
+
 };
 #endif
 //--

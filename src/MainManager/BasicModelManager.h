@@ -8,19 +8,10 @@
 
 #include <SupportDefs.h>
 
-#include "IntValuable.h"
-
-
-
-class BasicModelManager{
-public:
-
+class BasicModelManager {
+	public:
 		BasicModelManager();
 		~BasicModelManager();
-		
-private:
-	GenericValuable<int16>*	fVBpm;
-	
 };
 
 

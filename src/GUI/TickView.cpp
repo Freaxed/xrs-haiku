@@ -9,6 +9,8 @@
 
 // TickView II
 //	15-12-03 xmas!
+// version haiku:
+//	08-12-21
 
 #include "TickView.h"
 
@@ -17,19 +19,16 @@
 #include <Message.h>
 #include <stdio.h>
 
-
-#include "BasicValuableView.h"
 #include "ValuableManager.h"
 
 BBitmap*	b_tick;
 const float	xinc  = 23.0;
 const float space = 170.0;
 
-TickView::TickView(BRect frame): BView(frame,"Juice",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW)
+TickView::TickView(BRect frame): BView(frame,"TickView",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW)
 {
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0, "TickView", this));	
-	tick=-1;
-	num_notes=16;
+	tick = -1;
+	num_notes = 16;
 	b_tick=XUtils::GetBitmap(5); //fix
 }
 
@@ -50,7 +49,7 @@ TickView::Draw(BRect b)
 }
 
 void
-TickView::SetTick(int c,int,int)
+TickView::SetTick(int c)
 {
 	if(c == tick) 
 		return;
@@ -86,16 +85,27 @@ TickView::TRect(int d)
 void
 TickView::AttachedToWindow()
 {
-	SetViewColor(Parent()->ViewColor());
 	BView::AttachedToWindow();
+	SetViewColor(Parent()->ViewColor());
+	
+	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.substep", this);	
+	
+}
+
+void 		
+TickView::DetachedFromWindow()
+{
+	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.substep", this);	
+	BView::DetachedFromWindow();
 }
 
 void
 TickView::MessageReceived(BMessage* msg)
 {
-	if(msg->what==MSG_VALUABLE_CHANGED)
+	int32 tick;
+	if(msg->what==MSG_VALUABLE_CHANGED && ValuableTools::SearchValues("time.position.fulltick.substep", msg, &tick))
 	{
-		SetTick((int32)msg->FindFloat("valuable:value"),0,0);
+		SetTick(tick);
 	}
 	else
 		BView::MessageReceived(msg);

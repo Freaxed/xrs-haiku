@@ -148,7 +148,7 @@ VIWTrack::newVoice(Note* n,int VoiceTag)
 	
 	viw->SendNote(curNote->getNote(),1,false); //Note OFF
 	
-	curNote->SetValue(n->GetValue(0));
+	curNote->setValue(n->getValue());
 	curNote->setNote(n->getNote());
 	
 	viw->SendNote(curNote->getNote(),curNote->getVolume());

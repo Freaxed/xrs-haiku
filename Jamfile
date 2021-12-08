@@ -13,7 +13,7 @@ local sourceDirs =
 	src/GUI/MixerUI/
 	src/GUI/playlist
 	src/libfunky
-	src/XRS_Pro/Valuable
+	src/Valuable
 	src/XRS_Pro/Log
 	src/XRS_Pro/Engine
 	src/XRS_Pro/Mixer
@@ -115,14 +115,11 @@ Application XRS :
 	XMName.cpp
 	XMPoz.cpp
 	MatrixWindow.cpp
-	
-	#src/XRS_Pro/Log
-	Logger.cpp
-	
+		
 	#src/XRS_Pro/Valuable
+	Logger.cpp
 	Valuable.cpp
 	ValuableManager.cpp
-	ValuableController.cpp
 	
 	#src/XRS_Pro/Mixer
 	PMixer.cpp

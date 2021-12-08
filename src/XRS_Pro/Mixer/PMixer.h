@@ -15,7 +15,6 @@
 
 #include "PBus.h"
 #include "PEffector.h"
-#include "IntValuable.h"
 
 #define	NUM_BUSSES	4
 

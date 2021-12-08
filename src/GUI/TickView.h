@@ -7,22 +7,25 @@
  */
 
 #include <View.h>
+#include "ValuableManager.h"
 
-class TickView : public BView
+class TickView : public BView , public ValuableReceiver
 {
 	public:
 		
 					TickView(BRect);
-		  void 		SetTick(int,int,int);
+		  void 		SetTick(int);
 		  void		SetNumberNotes(int);
 		  
 	      void 		Draw(BRect);
 	      void 		AttachedToWindow();
+	      void 		DetachedFromWindow();
 	      void		MessageReceived(BMessage*);
+	      BHandler* GetHandler(){ return this;}
 	
 	private:
 			
-			int tick,num_notes;
+			int32 	tick, num_notes;
 			BRect	TRect(int d);
 };
 

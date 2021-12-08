@@ -16,9 +16,9 @@
 
 #include "PNode.h"
 #include "Pannable.h"
+#include <SupportKit.h>
 
-
-class PMixable: public PNode, public Pannable {
+class PMixable: public PNode , public Pannable {
 
 	public:
 

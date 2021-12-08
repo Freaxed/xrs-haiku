@@ -8,7 +8,7 @@
  */
 
 #include "Engine.h"
-#include "Logger.h"
+#include "Log.h"
 
 #include <SoundPlayer.h>
 
@@ -44,7 +44,7 @@ Engine::Init() {
 	err = player->InitCheck();
 	
 	if (err != B_OK) 
-		Log(LOG_FATAL,"Error creating the player!\n");
+		LogFatal("Error creating the player!\n");
 	
 	ReallyStart();
 	
@@ -157,7 +157,7 @@ Engine::ProcessBuffer(
 	else 
 	{  //sem locked!
 		memset(buffer,0,size);
-		Log(LOG_WARN,"Lost packet!");
+		LogError("Lost packet!");
 	}
 	
 	//Log(LOG_WARN,"Latency: %d",player->Latency());

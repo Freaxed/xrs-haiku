@@ -11,12 +11,12 @@
 #define PositionView_h_
 
 #include <View.h>
-#include "BasicValuableView.h"
+#include "ValuableManager.h"
 
 
 class BBitmap;
 
-class PositionView : public BView
+class PositionView : public BView , public ValuableReceiver
 {
 	public:
 		
@@ -24,8 +24,11 @@ class PositionView : public BView
 		 
 	virtual void 		Draw(BRect);
 	virtual void 		AttachedToWindow();
+	virtual void		DetachedFromWindow();
 	
 	virtual void		MessageReceived(BMessage*);
+	
+		 BHandler* GetHandler() { return this; }
 	
 	private:
 		void	SetTick(int,int,int);
@@ -40,10 +43,11 @@ class PositionView : public BView
 			
 			
 			BBitmap*	digit;
-			float space;
 			BRect	BiRect(int d);
 			BRect	TRect(int d);
 			void	_reset(int*,int pos,int val,int bpos);
+			
+			ValuableID	vID;
 };
 #endif
 

@@ -20,7 +20,7 @@ const rgb_color high_color = {240, 255, 240};
 
 VUView::VUView(BRect rect, ValuableID id)
 	: BView(rect, "vumeter", B_FOLLOW_NONE, B_WILL_DRAW),
-	Valuable(2),
+//	Valuable(2),
 	fThreadId(-1),
 	fBitmap(NULL),
 	fQuitting(false)
@@ -39,10 +39,10 @@ VUView::VUView(BRect rect, ValuableID id)
 	fBitmapView = new BView(rect, "bitmapView", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
 	fBitmap->AddChild(fBitmapView);
 	
-	SetFactor(0,0.01);
+	/*SetFactor(0,0.01);
 	SetFactor(1,0.01);
 	
-	ValuableManager::Get()->RegisterValuable(id, this);
+	ValuableManager::Get()->RegisterValuable(id, this);*/
 }
 
 
@@ -127,7 +127,7 @@ VUView::RenderLoop()
 		
 		/* computing */
 		for (int32 channel = 0; channel < fChannels; channel++) {
-			level = GetValue(channel);
+			level = 0;//GetValue(channel);
 			for (int32 i=0; i<level; i++) {
 				if (levels[i][channel].red >= 90) {
 					SHIFT_UNTIL(levels[i][channel].red, 15, low_color.red);

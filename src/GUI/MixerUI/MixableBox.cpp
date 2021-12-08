@@ -24,9 +24,7 @@ MixableBox::MixableBox(BPoint position, PMixable* node)
 		  "a_mixable_box",B_FOLLOW_NONE,B_WILL_DRAW)
 		  ,fMixable(node)
 {
-	ValuableID id = ValuableManager::Get()->FindValuableID(fMixable);
-	
-//	printf("MixableBox ValuableID %s\n",id.String());
+	ValuableID id = "<sistemami>"; //fMixable->GetName();
 	
 	if (id == "") 
 		debugger("Register the Mixable before the MixableBox!");
@@ -43,7 +41,7 @@ MixableBox::MixableBox(BPoint position, PMixable* node)
 	rect.top = 26;
 		
 	//Slider
-	fSlider = new XChannelSlider(rect,"nome",id,0,NULL,0,127,B_VERTICAL);
+	fSlider = new XChannelSlider(rect, "XChannelSlider", id, 0, NULL, 0, 127, B_VERTICAL);
 	fSlider->SetLimitLabels(NULL,NULL);
 	fSlider->SetHashMarks(B_HASH_MARKS_RIGHT);
 	fSlider->SetHashMarkCount(16);
@@ -53,7 +51,7 @@ MixableBox::MixableBox(BPoint position, PMixable* node)
 	rect.OffsetTo(rect.right + 1,rect.top);
 	rect.bottom=rect.top+22;
 	rect.right=rect.left+22;
-	fPot = new XPot(rect,"pot",id,1,NULL,-64,+64,XUtils::GetBitmap(24),NULL);
+	fPot = new XPot(rect, "XPot", id, 1, NULL, -64, +64, XUtils::GetBitmap(24), NULL);
 	AddChild(fPot);
 	
 	//Meter

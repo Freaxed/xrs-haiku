@@ -11,7 +11,6 @@
 #include "XChannelSlider.h"
 
 #include "ValuableManager.h"
-#include "Logger.h"
 #include "Utils.h"
 
 XChannelSlider::XChannelSlider(		
@@ -27,24 +26,11 @@ XChannelSlider::XChannelSlider(
 									"XChannelSlider",
 									NULL,
 									model,min,max,
-									o),ValuableView(channel, name){
+									o),vID(id){
 									
 
 	
-	if(!ValuableManager::Get()->RegisterValuableView(id, (ValuableView*)this))
-	{
-		BString str("can't register XChannelSlider (");
-		str << name << ") with id : " << id;
-		Log(LOG_WARN,str.String());
-	}	
-	
-	SetValuableID(id);
-	SetDefaultChannel(channel);
 		
-	float value=ValuableManager::Get()->RetriveValue(id,channel);
-	
-	SetValue((long)value);
-	
 	fThumb = NULL; //disabled, haiku thumb is nice enought ;D LoadIcon("Slider.png");
 							
 };
@@ -55,10 +41,18 @@ void XChannelSlider::AttachedToWindow()
 {
 	AChannelSlider::AttachedToWindow();
 	
-	SetSender((ValuableView*)this);
-	SetMessage(CopyMessage());
-	SetModificationMessage(CopyMessage());
-	SetTarget(ValuableManager::Get());
+	
+	//SetMessage(CopyMessage());
+	//SetModificationMessage(CopyMessage());
+	//SetTarget(ValuableManager::Get());
+	
+	ValuableManager::Get()->RegisterValuableReceiver(vID, this);
+}
+
+void XChannelSlider::DetachedFromWindow() 
+{
+	ValuableManager::Get()->UnregisterValuableReceiver(vID, this);
+	BView::DetachedFromWindow();
 }
 
 

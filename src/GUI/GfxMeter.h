@@ -13,14 +13,11 @@
 
 #include <View.h>
 #include "async.h" //?
-#include "Valuable.h"
-#include "BasicValuableView.h"
+#include "ValuableManager.h"
 
 class BBitmap;
-class BasicValuableView;
-class ValuableID;
 
-class GfxMeter:	public BView
+class GfxMeter:	public BView, public ValuableReceiver
 {
 
 	typedef	BView  _inherited;
@@ -28,8 +25,11 @@ class GfxMeter:	public BView
 	public:				GfxMeter(BRect frame, ValuableID id);		
 						~GfxMeter();								
 		void	AttachedToWindow();
+		void	DetachedFromWindow();
 		void 	Draw(BRect r);
 		void 	MessageReceived(BMessage *message);
+		
+		BHandler*	GetHandler() { return (BView*)this;}
 		
 	private:
 	
@@ -44,10 +44,7 @@ class GfxMeter:	public BView
 		BRect		r_up_off;
 		BRect		r_down;
 		
-		ValuableID			fId;
-		BasicValuableView* 	vleft  ;
-		BasicValuableView* 	vright ;
-		//IntValuable*		fValues;
+		ValuableID			vID;
 };
 #endif
 //-

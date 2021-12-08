@@ -11,12 +11,11 @@
 #define _XPot_h
 
 #include 	"APot.h"
-#include	"ValuableView.h"
-#include	"ValuableController.h"
+#include 	"ValuableManager.h"
 
 #define	SB_MSG	'sbmp'
 
-class XPot : public APot, public ValuableView, public ValuableController
+class XPot : public APot, public ValuableReceiver
 {
 public:
 	XPot(BRect frame, const char *name,
@@ -30,7 +29,7 @@ public:
 
 	
 	//valuableView
-	BHandler*	Handler() { return this;};
+	BHandler*	GetHandler() { return this;};
 	
 	
 	//events	
@@ -40,8 +39,7 @@ public:
 
 	
 private:
-	
-	int			m_vChannel;
+	ValuableID vID;
 
 
 };

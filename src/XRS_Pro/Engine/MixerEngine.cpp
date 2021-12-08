@@ -1,5 +1,5 @@
 #include "MixerEngine.h"
-#include "Logger.h"
+#include "Log.h"
 #include "ETrack.h"
 #include "Playlist.h"
 #include "PianoRollContainer.h"
