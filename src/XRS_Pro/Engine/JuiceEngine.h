@@ -66,7 +66,10 @@ class JuiceEngine : public Engine, public Tickable {
 			//Events
 			void			AddVoice(Track*,XRSVoice);
 			void			RemoveVoices(Track*);
-			void			DeleteVoices(Track*);			
+			void			DeleteVoices(Track*);		
+			
+			float fPeakLeft;
+			float fPeakRight;	
 
 };
 

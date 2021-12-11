@@ -6,7 +6,8 @@
 
 #define VAL_DATA_KEY 			"valuable:value"
 #define VAL_ID       			"valuable:vID"
-#define MSG_VALUABLE_CHANGED 	'valc'
+#define MSG_VALUABLE_CHANGED 		'valc'
+#define MSG_BEVALUE32_TO_VALUABLE	'valb'
 
 
 typedef BString ValuableID;
@@ -46,6 +47,12 @@ class ValuableTools {
     template<class TYPE>
     static bool
 		SearchValues(ValuableID vID, BMessage* msg, TYPE *outData1, TYPE *outData2 = NULL, int32* countFound = NULL);
+		
+	static BMessage* CreateMessageForBController(ValuableID vID) {
+			BMessage* msg = new BMessage(MSG_BEVALUE32_TO_VALUABLE);
+			msg->AddString(VAL_ID, vID);
+			return msg;
+	}
 
 };
 

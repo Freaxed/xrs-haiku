@@ -17,6 +17,7 @@
 #include "PNode.h"
 #include "Pannable.h"
 #include <SupportKit.h>
+#include "Valuable.h"
 
 class PMixable: public PNode , public Pannable {
 
@@ -35,6 +36,9 @@ class PMixable: public PNode , public Pannable {
 			void	SetName(BString name){ fName=name; }
 			BString	GetName(){ return fName; }
 			
+			void		SetVID(ValuableID val){ vID=val; }
+			ValuableID	GetVID(){ return vID; }
+			
 			float	GetLastMaxValue(int channel);
 	
 			float**			Buffer(){ return stream;}
@@ -45,6 +49,7 @@ class PMixable: public PNode , public Pannable {
 	private:
 	
 			BString		fName;
+			ValuableID	vID;
 			float		fMaxValue[NUM_CHANNELS];
 			
 };

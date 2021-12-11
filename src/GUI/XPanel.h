@@ -25,6 +25,7 @@ class TracksPanel;
 class XDigit;
 class XPot;
 class BPictureButton;
+class PeakView;
 
 class XPanel : public BView
 {
@@ -46,7 +47,7 @@ class XPanel : public BView
 	
 		void	SelectTrack(int);
 		VUView* One;
-	
+		PeakView* Two;
 	
 		XDigit				*curpat;
 	

@@ -10,11 +10,11 @@ void GenericReceiver::MessageReceived(BMessage* msg) {
 		switch(msg->what) {
             case MSG_VALUABLE_CHANGED:
             {
-                float   volume;
+                int32   volume;
                 int32   bpm;
                 float	vmeter_l, vmeter_r;
                 if (ValuableTools::SearchValues("xrs.mixer.main.volume", msg, &volume)){  
-                	LogInfo("GenericReceiver: xrs.mixer.main.volume set to %f", volume);
+                	LogInfo("GenericReceiver: xrs.mixer.main.volume set to %d", volume);
                 } else
                 if (ValuableTools::SearchValues("xrs.time.bpm", msg, &bpm)){
                     LogInfo("GenericReceiver: xrs.time.bpm set to %d", bpm);

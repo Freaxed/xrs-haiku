@@ -23,11 +23,10 @@ class PMixable;
 class MixableBox : public BBox {
 	
 	public:
-			MixableBox(BPoint position,PMixable*);
+			MixableBox(BPoint position,ValuableID volume, ValuableID pan, ValuableID meter);
 			
 	private:
-			PMixable*	fMixable;
-			
+
 			FixedText*	fName;
 			XChannelSlider*	fSlider;
 			XPot*			fPot;

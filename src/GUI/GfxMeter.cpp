@@ -27,7 +27,6 @@ GfxMeter::GfxMeter(BRect frame, ValuableID id):BView(frame,  id.String(),  B_FOL
 		,vID(id)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	
 	ValuableManager::Get()->RegisterValuable(vID, 0.0f, 0.0f); //TODO move somewhere.!
 		
 }
@@ -88,7 +87,6 @@ void GfxMeter::MessageReceived(BMessage *msg){
 		
 		case MSG_VALUABLE_CHANGED:
 		{
-			printf("GfxMeter!\n"); msg->PrintToStream();
 			float value_r, value_l;
 			if(ValuableTools::SearchValues(vID, msg, &value_r, &value_l))
 			{					

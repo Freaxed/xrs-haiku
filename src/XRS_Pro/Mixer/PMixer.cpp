@@ -24,29 +24,28 @@ PMixer::PMixer():PBus(){
 	
 	//defaut routing table..
 	
-	ValuableManager::Get()->RegisterValuable("mixer.master",  0.8f);
+	ValuableManager::Get()->RegisterValuable("xrs.mixer.main.volume",  80);
+	ValuableManager::Get()->RegisterValuable("xrs.mixer.main.pan",  0);
+//	ValuableManager::Get()->RegisterValuable("xrs.mixer.main.meter",  80);
 	
-	//fMixerMeter = new IntValuable(2);
-	//ValuableManager::Get()->RegisterValuable("mixer.master.meter",  fMixerMeter );
-	
-	SetName("mixer.master");
+	SetName("Master");
 	
 	for(int i=0; i<NUM_BUSSES; i++){
 		
 		AddRouted(&busses[i]);
 		busses[i].SetUsed(false);
 		
-		BString valuableName("mixer.lines.");
-		valuableName << i;
+		BString valuableName("xrs.mixer.line.");
+		valuableName << i << ".volume";
 		
-		ValuableManager::Get()->RegisterValuable(valuableName.String(), 0.0f);
-		//busses[i].SetName(valuableName);
+		ValuableManager::Get()->RegisterValuable(valuableName.String(), 80);
 		
-		//meters[i] = new IntValuable(2);
-		//valuableName << ".meter";
-		//ValuableManager::Get()->RegisterValuable(valuableName,  meters[i] );
+		BString panID("xrs.mixer.line.");
+		panID << i << ".pan";
+		
+		ValuableManager::Get()->RegisterValuable(panID.String(), 0);
+		
 	
-		
 	}
 	
 	ClearBuffer();

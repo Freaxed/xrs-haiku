@@ -6,6 +6,8 @@
 #include <Looper.h>
 #include <Messenger.h>
 #include <map>
+#include "MonitorValuableManager.h"
+
 
 class ValuableReceiver  {
 		public:
@@ -17,7 +19,7 @@ class ValuableReceiver  {
 class ValuableManager : public BLooper {
 
 	private:
-				ValuableManager() {	}
+				ValuableManager():fMonitor(NULL) {	}
 	public:
 				static ValuableManager* Get() 
 				{
@@ -50,9 +52,12 @@ class ValuableManager : public BLooper {
 		
 		void	Dump();
 
-private:	
-
-		void SetValuableValue(BMessage* input, BMessage* output);		
+	
+		void	AttachMonitorValuableManager(MonitorValuableManager*);
+private:		
+		void SetValuableValue(BMessage* input, BMessage* output);	
+		
+		void	SpreadToValuableReceivers(BList& lViews, BMessage* valuable);	
 
 		typedef BList ValuableViewList;
 		struct ValuableInfo {
@@ -64,6 +69,8 @@ private:
 		
 		vMap	fRegisteredValuable;
 		typedef vMap::iterator	iterator;
+		
+		MonitorValuableManager*	fMonitor;
 };
 
 
@@ -86,6 +93,9 @@ bool ValuableManager::RegisterValuable(ValuableID vID, TYPE initialValue)
 	    fRegisteredValuable[vID] = vInfo;
 
 	    LogDebug("Registered Valuable [%s].", vID.String());
+	    
+	    if (fMonitor)
+	    	fMonitor->RegisterValuable(vID);
 	
 	    Unlock();
 		return true;

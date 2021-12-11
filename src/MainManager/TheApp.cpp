@@ -43,6 +43,7 @@
 #include 	"PMixer.h"
 #include	"JuiceEngine.h"
 #include	"BasicModelManager.h"
+#include	"ValuableMonitorWindow.h"
 
 
 extern PotViewer* potviewer = NULL;
@@ -100,6 +101,10 @@ TheApp::~TheApp()
 		 	mw->Quit();
 		 	
 		 fVManager->Dump();
+		 
+		 if(fValuableMonitor->Lock()) {
+		 	fValuableMonitor->Quit();
+		 }
 		 	
 		 delete fModel;
 	     
@@ -217,6 +222,10 @@ TheApp::PrepareToRun()
 	main_window->AddToSubset(mw);
 	main_window->Show();
 	
+	fValuableMonitor = new ValuableMonitorWindow();
+	fValuableMonitor->Show();
+	
+	fVManager->AttachMonitorValuableManager(fValuableMonitor);
 //	obs_volumes->setTarget("master",(Pannable*)my_mixer->getLine(0));
 //	obs_volumes->Run();
 

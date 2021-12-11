@@ -28,19 +28,34 @@ ValuableManager::MessageReceived(BMessage* msg) {
 
 				SetValuableValue(msg, valuable);	    
 
-				//spread the update to all the ValuableReceiver!
-	    		BList& lViews = iter->second->lViews;
-	    		for (int i=0;i<lViews.CountItems();i++) {
-	    			BMessenger(((ValuableReceiver*)lViews.ItemAt(i))->GetHandler()).SendMessage(valuable);
-	    		}    		
+				SpreadToValuableReceivers(iter->second->lViews, valuable);  		
 	    				
 			} else {
 				LogDebug("Check [%s] to %d ", vID.String(), typeFound);
 			}
 		}
 		//Single int32 value coming from haiku widgets directly..
-		case MSG_BEVALUE_TO_VALUABLE:
-			
+		case MSG_BEVALUE32_TO_VALUABLE:
+			BString vID;
+			type_code typeFound = -1;
+
+			if (msg->FindString(VAL_ID, &vID) == B_OK ) {
+			    	
+				iterator iter = fRegisteredValuable.find(vID);
+	    		if(iter == fRegisteredValuable.end()) {
+	    			LogError("No vID [%s] found in registered list!",vID.String());
+	    			return;
+	    		}
+	    		BMessage* valuable = iter->second->mLastMessage;
+				int32 bevalue = 0;
+				if (msg->FindInt32("be:value", 0, &bevalue) == B_OK) {
+					valuable->ReplaceInt32(VAL_DATA_KEY, 0, bevalue);
+				}
+	    		SpreadToValuableReceivers(iter->second->lViews, valuable);
+	    				
+			} else {
+				LogDebug("Check [%s] to %d ", vID.String(), typeFound);
+			}
 		break;
 	
 	}
@@ -68,6 +83,15 @@ void ValuableManager::SetValuableValue(BMessage* input, BMessage* output) {
 			}
 		}
 
+void	
+ValuableManager::SpreadToValuableReceivers(BList& lViews, BMessage* valuable)
+{
+		//spread the update to all the ValuableReceiver!
+		for (int i=0;i<lViews.CountItems();i++) {
+			BMessenger(((ValuableReceiver*)lViews.ItemAt(i))->GetHandler()).SendMessage(valuable);
+		} 
+}
+
 bool	
 ValuableManager::UnregisterValuable(ValuableID vID) {
 	if (Lock()){
@@ -85,6 +109,8 @@ ValuableManager::UnregisterValuable(ValuableID vID) {
    		iter = fRegisteredValuable.find(vID);
    		if(iter == fRegisteredValuable.end()) {
    			LogDebug("UnregisterValuable:  Valuable unregistered [%s]", vID.String());
+   			if (fMonitor)
+	    		fMonitor->UnregisterValuable(vID);
    		}
 		Unlock();
 		return true;
@@ -151,6 +177,21 @@ ValuableManager::UnregisterValuableReceiver(ValuableID vID, ValuableReceiver* re
 	}
 	return false;
 
+}
+
+void	
+ValuableManager::AttachMonitorValuableManager(MonitorValuableManager* monitor) {
+	if (Lock()){
+	fMonitor = monitor;
+	iterator iter = fRegisteredValuable.begin();
+		while(iter != fRegisteredValuable.end()){
+			ValuableID	id = iter->first;
+			LogDebug("AttachMonitorValuableManager [%s]", id.String());
+			monitor->RegisterValuable(id);
+			iter++;
+		}
+	Unlock();
+	}
 }
 
 

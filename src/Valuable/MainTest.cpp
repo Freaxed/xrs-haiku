@@ -3,10 +3,13 @@
 #include "ValuableManager.h"
 #include "Log.h"
 #include "GenericReceiver.h"
-
+#include "App.h"
+#include "MainWindow.h"
 
 int
 main() {
+
+	
 	Logger::SetLevel(LOG_LEVEL_DEBUG);
 	
 	GenericReceiver*	gReceiver = new GenericReceiver();
@@ -15,41 +18,41 @@ main() {
 	
 	ValuableManager* vManager = ValuableManager::Get();
 	vManager->Run();
+		
 	
-	vManager->RegisterValuable("xrs.mixer.main.volume", 	   	0.8f);
+	vManager->RegisterValuable("xrs.mixer.main.volume", 	   	80);
 	vManager->RegisterValuable("xrs.time.bpm", 			   (int32)120);
     vManager->RegisterValuable("xrs.mixer.main.vumeter", 0.62f, 0.74f);
+    
+    
+
+	
 	
 	vManager->RegisterValuableReceiver("xrs.mixer.main.volume", gReceiver);
 	vManager->RegisterValuableReceiver("xrs.time.bpm", 			gReceiver);
 	vManager->RegisterValuableReceiver("xrs.mixer.main.vumeter",gReceiver);
 	
-	getc(stdin);
 	
-	vManager->UpdateValue("xrs.mixer.main.volume", 9.7f);
+	App *app = new App();
+	app->Run();
 	
-	getc(stdin);
-	
+	vManager->UpdateValue("xrs.mixer.main.volume", 97);
 	vManager->UpdateValue("xrs.time.bpm", (int32)130);
-	
-	getc(stdin);
-	
 	vManager->UpdateValue("xrs.mixer.main.vumeter", 0.0f, 9.9f);
 	
-	getc(stdin);
+
 		
 	vManager->UnregisterValuable("xrs.mixer.main.volume");
-	vManager->UpdateValue("xrs.mixer.main.volume", 9999.7f);
+	vManager->UpdateValue("xrs.mixer.main.volume", 9999);
 	
-	getc(stdin);
 	
 	vManager->UnregisterValuableReceiver("xrs.time.bpm", gReceiver);
 	vManager->UpdateValue("xrs.time.bpm", (int32)250);
 	
-	getc(stdin);
 	
 	vManager->Dump();
 	
-	getc(stdin);
+	
+	delete app;
 
 }

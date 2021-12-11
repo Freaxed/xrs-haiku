@@ -36,6 +36,7 @@ class		TrackInfoWindow;
 class		ValuableManager;
 		//model	
 class		BasicModelManager;
+class		ValuableMonitorWindow;
 
 class TheApp : public BApplication {
 
@@ -92,5 +93,6 @@ private:
 		TrackInfoWindow*	trackinfo;	
 		ValuableManager*	fVManager;	
 		BasicModelManager*	fModel;
+		ValuableMonitorWindow* fValuableMonitor;
 		
 };

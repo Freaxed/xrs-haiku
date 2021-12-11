@@ -49,7 +49,6 @@ XMPoz::MessageReceived(BMessage* msg)
 {
 	if(msg->what == MSG_VALUABLE_CHANGED)
 	{
-		msg->PrintToStream();
 		int32 value = -1;
 		if (ValuableTools::SearchValues("time.position.fulltick.substep",  msg, &value)) {
 				setPosition(curPat, value);

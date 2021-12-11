@@ -19,9 +19,7 @@ class XPot : public APot, public ValuableReceiver
 {
 public:
 	XPot(BRect frame, const char *name,
-		ValuableID id, int32 valuable_channel, 
-		BMessage *satte,
-		int32 minValue, int32 maxValue,
+		ValuableID id, 
 		BBitmap *p1 = NULL ,BBitmap *p2 = NULL);
 		
 	virtual ~XPot();
@@ -34,8 +32,9 @@ public:
 	
 	//events	
 	
-	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage* msg);
+	void AttachedToWindow();
+	void DetachedFromWindow();
+	void MessageReceived(BMessage* msg);
 
 	
 private:

@@ -20,7 +20,7 @@
 #include "MeasureManager.h"
 #include "WindowManager.h"
 #include "CommonValuableID.h"
-
+#include "ValuablePeakView.h"
 #include "VUView.h"
 
 #include <Application.h>
@@ -208,15 +208,16 @@ XPanel::AttachedToWindow()
 	//meter
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	AddChild(One = new VUView(r,"vumeter")); //"mixer.master.meter"	
-	
+	AddChild(Two = new ValuablePeakView("xrs.mixer.main.meter", "PeakView"));
+	Two->MoveTo(r.left, r.top);
+	Two->ResizeTo(r.Width(), r.Height());
 	
 	// vol
 	r.OffsetBy(37,0);
 	r.bottom=r.top+22;
 	r.right=r.left+22;
 	
-	AddChild(master=new XPot(r, "master","mixer.master",0,NULL,0, 127,XUtils::GetBitmap(24),NULL));
+	AddChild(master=new XPot(r, "master","xrs.mixer.main.volume", XUtils::GetBitmap(24),NULL));
 	//r.OffsetBy(0,1);
 	//r.bottom=r.top+22;
 	

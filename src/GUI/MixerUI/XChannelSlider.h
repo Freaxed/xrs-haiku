@@ -21,12 +21,8 @@ class XChannelSlider: public AChannelSlider, public ValuableReceiver
 		   XChannelSlider(	BRect area,
 							const char * valuablename,
 							ValuableID id,
-							int channel,
-							BMessage * model,int min,int max,
 							orientation o);
-											
 	
-		BHandler*	Handler() { return this; }
 		//events	
 		void AttachedToWindow();
 		void DetachedFromWindow();
@@ -34,10 +30,8 @@ class XChannelSlider: public AChannelSlider, public ValuableReceiver
 		
 		BHandler* GetHandler() { return this;}
 		 
-		void 	DrawThumb();
-		
+	
 	private:
-		const BBitmap*	fThumb;
 		ValuableID	vID;
 
 };

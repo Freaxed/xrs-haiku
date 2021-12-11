@@ -20,14 +20,15 @@ const rgb_color high_color = {240, 255, 240};
 
 VUView::VUView(BRect rect, ValuableID id)
 	: BView(rect, "vumeter", B_FOLLOW_NONE, B_WILL_DRAW),
-//	Valuable(2),
 	fThreadId(-1),
 	fBitmap(NULL),
-	fQuitting(false)
+	fQuitting(false),
+	vID(id)
 {
 	rect.OffsetTo(B_ORIGIN);
 	fLevelCount = int(rect.Height()) / 2;
 	fChannels = 2;
+	value_l = value_r = 0;
 	fCurrentLevels = new int32[fChannels];
 	for (int channel=0; channel < fChannels; channel++)
 		fCurrentLevels[channel] = 0;
@@ -38,11 +39,7 @@ VUView::VUView(BRect rect, ValuableID id)
 	
 	fBitmapView = new BView(rect, "bitmapView", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
 	fBitmap->AddChild(fBitmapView);
-	
-	/*SetFactor(0,0.01);
-	SetFactor(1,0.01);
-	
-	ValuableManager::Get()->RegisterValuable(id, this);*/
+
 }
 
 
@@ -57,12 +54,14 @@ VUView::AttachedToWindow()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	Run();
+	ValuableManager::Get()->RegisterValuableReceiver(vID, this);
 }
 
 
 void
 VUView::DetachedFromWindow()
 {
+	ValuableManager::Get()->UnregisterValuableReceiver(vID, this);
 	Quit();
 }
 
@@ -109,11 +108,6 @@ VUView::RenderLaunch(void *data)
 void
 VUView::RenderLoop()
 {
-	
-	//FIX
-	
-	return;
-	
 	//FIX
 	rgb_color levels[fLevelCount][2];
 	
@@ -127,7 +121,7 @@ VUView::RenderLoop()
 		
 		/* computing */
 		for (int32 channel = 0; channel < fChannels; channel++) {
-			level = 0;//GetValue(channel);
+			level = GetValue(channel);
 			for (int32 i=0; i<level; i++) {
 				if (levels[i][channel].red >= 90) {
 					SHIFT_UNTIL(levels[i][channel].red, 15, low_color.red);
@@ -180,20 +174,37 @@ VUView::RenderLoop()
 	}	
 }
 
+void VUView::MessageReceived(BMessage *msg){	
+	
+	switch(msg->what)
+	{
+		
+		case MSG_VALUABLE_CHANGED:
+		{
+			float f_r, f_l;
+			if(ValuableTools::SearchValues(vID, msg, &f_r, &f_l))
+			{		
+				value_r = (int32)((float)fLevelCount * f_r);
+				value_l = (int32)((float)fLevelCount * f_l);
+				if (value_r!=0) printf("%d %f %d %f\n", value_r, value_l, f_r, f_l);
 
-
-float		
-VUView::GetFactorizedValue(int id)
-{
-	return (float)fCurrentLevels[id] * (float)fLevelCount;
+				/*if(pixel_l != value_l || 
+				   pixel_r != value_r )
+				{
+					pixel_l = value_l;
+					pixel_r = value_r;
+					Invalidate();
+				}*/
+			}			
+		}
+		break;
+		default:
+			BView::MessageReceived(msg);
+			break;
+	}
 }
 
-void		
-VUView::SetFactorizedValue(int id, float value)
-{
-	fCurrentLevels[id]=(int32)(value / fLevelCount);
-//	printf("SetFactorized %f %ld\n", value, fCurrentLevels[id]);
-}
+
 		
 
 void 

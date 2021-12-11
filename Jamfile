@@ -60,6 +60,8 @@ Application XRS :
 	SJFilter.cpp
 	DrawingTidbits.cpp
 	VUView.cpp
+	PeakView.cpp
+	ValuablePeakView.cpp
 	BasicModelManager.cpp
 	
 
@@ -120,6 +122,7 @@ Application XRS :
 	Logger.cpp
 	Valuable.cpp
 	ValuableManager.cpp
+	ValuableMonitorWindow.cpp
 	
 	#src/XRS_Pro/Mixer
 	PMixer.cpp
@@ -193,6 +196,6 @@ Application XRS :
 	#XFSynth.cpp 
 		
 	#: be translation game media midi midi2 tracker fluidsynth stdc++
-	: be translation game media midi midi2 tracker stdc++
+	: be localestub translation game media midi midi2 tracker stdc++
 	: resources/XRS.rsrc resources/skin.rsrc  
 ;

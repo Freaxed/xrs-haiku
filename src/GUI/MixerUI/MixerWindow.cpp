@@ -67,27 +67,18 @@ MixerWindow::Get()
 }
 
 MixerWindow::MixerWindow() : XrsWindow(BRect(150,130,280,60),"", B_FLOATING_WINDOW,B_ASYNCHRONOUS_CONTROLS|B_NOT_ZOOMABLE|B_AVOID_FOCUS|B_NOT_RESIZABLE)
-{
-	
+{	
 	SetName("mixer_");
 	SetTitle("Mixer");
-	
-	//BFont tmp(be_fixed_font);
-	
-	AddChild(new MixableBox(BPoint(000,0),PMixer::Get()));
-	AddChild(new MixableBox(BPoint(120,0),PMixer::Get()->BusAt(0)));
-	AddChild(new MixableBox(BPoint(240,0),PMixer::Get()->BusAt(1)));
-	AddChild(new MixableBox(BPoint(360,0),PMixer::Get()->BusAt(2)));
-	AddChild(new MixableBox(BPoint(480,0),PMixer::Get()->BusAt(3)));
-	
-	/*Mixer Meters set up*/
-	//FIX my_mixer->sender=this;
 
-//	ResizeTo(LINENUM*60-1 + 200,top+8*20-1);
+	AddChild(new MixableBox(BPoint(000,0), "xrs.mixer.main.volume"  , "xrs.mixer.main.pan"  , "xrs.mixer.main.meter"  ));
+	AddChild(new MixableBox(BPoint(120,0), "xrs.mixer.line.0.volume", "xrs.mixer.line.0.pan", "xrs.mixer.line.0.meter"));
+	AddChild(new MixableBox(BPoint(240,0), "xrs.mixer.line.1.volume", "xrs.mixer.line.1.pan", "xrs.mixer.line.1.meter"));
+	AddChild(new MixableBox(BPoint(360,0), "xrs.mixer.line.2.volume", "xrs.mixer.line.2.pan", "xrs.mixer.line.2.meter"));
+	AddChild(new MixableBox(BPoint(480,0), "xrs.mixer.line.3.volume", "xrs.mixer.line.3.pan", "xrs.mixer.line.3.meter"));
 
 	ResizeTo(600,240);
-	//LoadConfig(&r);
-	
+
 	expanded=(bool)Configurator::Get()->FloatKey("mixer_expanded",1);
 	
 	/* manca extra settaggio !*/
@@ -126,7 +117,7 @@ MixerWindow::QuitRequested()
 void
 MixerWindow::Refresh()
 {
-	int i;
+	int i = 0;
 //	for(i=0;i<4; i++) 
 //		if(&ui_list[i]==selected) break;
 //	selected=NULL;
@@ -459,7 +450,7 @@ MixerWindow::Reset()
 			
 //			obs_volumes->SetValue(80,T_MIXER_MASTER);
 			//ui_list[i].slider->SendValue(0,80);
-			ValuableManager::Get()->UpdateValue("mixer.master", 80.0f);
+			//ValuableManager::Get()->UpdateValue("mixer.main", 80.0f);
 			
 			
 		}
@@ -571,7 +562,7 @@ MixerWindow::LoadSettings(BMessage*	data)
 				}
 		else
 //				obs_volumes->SetValue(80,T_MIXER_MASTER);
-		ValuableManager::Get()->SpreadValue("mixer.master",0,80.0);
+		ValuableManager::Get()->SpreadValue("mixer.main",0,80.0);
 		
 		// ciclo per i preset vst
 		int j=0;

@@ -52,6 +52,8 @@ JuiceEngine::JuiceEngine(const char* name):Engine(name),
 	the_clock.AddTickable(this);
 	the_clock.ResetAndNotify();
 	
+	fPeakLeft = fPeakRight = -1.0; //force to update
+	
 }
 
 JuiceEngine::~JuiceEngine(){
@@ -250,10 +252,17 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 	// and we should also do it with the right delay time.. (FIX)
 	// and to all the busses.. (FIX)
 	if (PMixer::Get()->Used())
-	{	
-		//too much?
-		//ValuableManager::Get()->DirectSetValuable("vumter", 0, (int32)(PMixer::Get()->GetLastMaxValue(0) * 100.0));
-		//ValuableManager::Get()->DirectSetValuable("vumter", 1, (int32)(PMixer::Get()->GetLastMaxValue(1) * 100.0));	
+	{
+		float meter_l = PMixer::Get()->GetLastMaxValue(0);
+		float meter_r = PMixer::Get()->GetLastMaxValue(1);
+		
+		if (meter_l != fPeakLeft ||
+			meter_r != fPeakRight ) {
+				ValuableManager::Get()->UpdateValue("xrs.mixer.main.meter", meter_r, meter_l);
+				
+				fPeakLeft  = meter_l;
+				fPeakRight = meter_r;
+		}
 	}
 	
 	float **mixed = PMixer::Get()->Buffer();
