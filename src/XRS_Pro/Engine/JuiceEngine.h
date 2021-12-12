@@ -32,10 +32,10 @@ class JuiceEngine : public Engine, public Tickable {
 				void	ResetSong(Song* song);
 				
 				//starting events..
-				void	TickedHigh(uint64 time,long beat,long tick);
+				void	TickedHigh(uint64 time,int16 beat,int16 tick);
 			
 				//stopping events..
-				void	TickedLow(uint64 time,long beat,long tick);
+				void	TickedLow(uint64 time,int16 beat,int16 tick);
 		
 	protected:
 					JuiceEngine(const char* name);

@@ -19,7 +19,7 @@ class XPot : public APot, public ValuableReceiver
 {
 public:
 	XPot(BRect frame, const char *name,
-		ValuableID id, 
+		ValuableID id, int32 min, int32 max,
 		BBitmap *p1 = NULL ,BBitmap *p2 = NULL);
 		
 	virtual ~XPot();

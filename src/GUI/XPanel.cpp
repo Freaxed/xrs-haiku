@@ -217,7 +217,7 @@ XPanel::AttachedToWindow()
 	r.bottom=r.top+22;
 	r.right=r.left+22;
 	
-	AddChild(master=new XPot(r, "master","xrs.mixer.main.volume", XUtils::GetBitmap(24),NULL));
+	AddChild(master=new XPot(r, "master","xrs.mixer.main.volume", 0, 100, XUtils::GetBitmap(24),NULL));
 	//r.OffsetBy(0,1);
 	//r.bottom=r.top+22;
 	
@@ -229,7 +229,7 @@ XPanel::AttachedToWindow()
 	//tempo
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	AddChild(bpm=new XDigit(r,VAL_ID_BPM, "xpanel-bpm", new BMessage(TEMPO_FINE),NULL,20,300));
+	AddChild(bpm = new XDigit(r, VID_TEMPO_BPM, "xpanel-bpm", NULL, NULL, 20, 300));
 	
 	//playlist
 	r.OffsetBy(55,0);

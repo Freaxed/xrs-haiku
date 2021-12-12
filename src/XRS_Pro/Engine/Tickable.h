@@ -14,10 +14,10 @@ class Tickable {
 	public:
 	
 	//starting events..
-	virtual	void	TickedHigh(uint64 time,long beat,long tick) = 0;
+	virtual	void	TickedHigh(uint64 time,int16 beat,int16 tick) = 0;
 	
 	//stopping events..
-	virtual	void	TickedLow(uint64 time,long beat,long tick) = 0;
+	virtual	void	TickedLow(uint64 time,int16 beat,int16 tick) = 0;
 };
 #endif
 

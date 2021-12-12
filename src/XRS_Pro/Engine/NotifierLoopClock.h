@@ -12,34 +12,43 @@
 
 #include 	"LoopClock.h"
 #include	"ValuableManager.h"
+#include	"CommonValuableID.h"
 
-#define P0	"time.position.fulltick.substep"
-#define P1  "time.position.fulltick.pattern"
-#define P2  "time.position.fulltick.position"
+//Fix me..
+#define P0	VID_TEMPO_BEAT
+#define P1  VID_TEMPO_PATTERN
+#define P2  VID_TEMPO_MEASURE
 
-class NotifierLoopClock : public LoopClock {
+class NotifierLoopClock : public LoopClock, public  Tickable {
 
 	public:
-				NotifierLoopClock(){}
 				
-		
-		 void	TickAndNotify(bigtime_t delay){
-					Notify(beat, 0, 0, delay);
-					Tick();
+				NotifierLoopClock(){
+					//AddTickable(this);	
 				}
-		
-		void	ResetAndNotify(bigtime_t delay = 0){
+				
+				
+			//starting events..
+			void	TickedHigh(uint64 time,int16 beat,int16 tick) {
+				printf("time %ld - beat %d - tick %d\n");
+			}
+	
+			//stopping events..
+			void	TickedLow(uint64 time,int16 beat,int16 tick) {}
+	
+	
+		void	ResetAndNotify(bigtime_t fixme = 0){
 					Reset();
-					Notify(-1,-1,-1,delay);					
+					Notify(-1,-1,-1, 0);					
 				}	
 				
-		void	SendValue(ValuableID vID, int32 value, bigtime_t fixme) {
+		void	SendValue(ValuableID vID, int32 value, bigtime_t fixme = 0) {
 					ValuableManager::Get()->UpdateValue(vID, value);
 				}
 						
 	private:
 	
-		void	Notify(int32 beat,int32 b, int32 c, bigtime_t){
+		void	Notify(int32 beat,int32 b, int32 c, bigtime_t fixme){
 					ValuableManager::Get()->UpdateValue(P0, beat);
 					ValuableManager::Get()->UpdateValue(P1, b);
 					ValuableManager::Get()->UpdateValue(P2, c);

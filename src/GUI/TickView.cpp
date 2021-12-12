@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include "ValuableManager.h"
+#include "CommonValuableID.h"
 
 BBitmap*	b_tick;
 const float	xinc  = 23.0;
@@ -88,14 +89,14 @@ TickView::AttachedToWindow()
 	BView::AttachedToWindow();
 	SetViewColor(Parent()->ViewColor());
 	
-	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.substep", this);	
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BEAT, this);	
 	
 }
 
 void 		
 TickView::DetachedFromWindow()
 {
-	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.substep", this);	
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_TEMPO_BEAT, this);	
 	BView::DetachedFromWindow();
 }
 
@@ -103,7 +104,7 @@ void
 TickView::MessageReceived(BMessage* msg)
 {
 	int32 tick;
-	if(msg->what==MSG_VALUABLE_CHANGED && ValuableTools::SearchValues("time.position.fulltick.substep", msg, &tick))
+	if(msg->what==MSG_VALUABLE_CHANGED && ValuableTools::SearchValues(VID_TEMPO_BEAT, msg, &tick))
 	{
 		SetTick(tick);
 	}

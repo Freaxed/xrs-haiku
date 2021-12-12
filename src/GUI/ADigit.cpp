@@ -223,8 +223,10 @@ ADigit::set_mouse(BPoint p)
 
 void
 ADigit::postMsg()
-{
-	if(!rel_msg) return;
+{	
+	if(!rel_msg || !target) return;
+	
 	rel_msg->ReplaceInt32("be:value",GetValue());
-	Window()->PostMessage(rel_msg,target);
+	//rel_msg->PrintToStream();
+	target->Looper()->PostMessage(rel_msg, target);
 }

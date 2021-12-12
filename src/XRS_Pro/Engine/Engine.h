@@ -38,6 +38,11 @@
 #define	 _ME_	__PRETTY_FUNCTION__
 
 
+#define CHECK_LOCK if(!IsLocked()) debugger("Function called but not locked!");
+#define IF_LOCK if(Lock()) {
+#define UNLOCK Unlock(); }
+
+
 class BSoundPlayer;
 
 class Engine: public BLooper {
@@ -45,22 +50,23 @@ class Engine: public BLooper {
 	public:
 			 		Engine(const char* name="UntitledEngine");
 					~Engine();
+		
 		virtual 	void			MessageReceived(BMessage* message);
 					
 		status_t 		Init();
-		void			Start();
-		void			Stop();
+		void			Start(); //start the song
+		void			Stop();  //stop the song
 		bool			IsPlaying();
-		
-		void			ReallyStop();
-		void			ReallyStart();
+
+		void			ReallyStop();  //stops the audio flow
+		void			ReallyStart();// starts the audio flow
 	
 	public:
 			status_t	Acquire(const char *who );
 			status_t	Release(const char *who );		
 			status_t	AcquireEtc(const char *who );
 	
-	protected: //?
+	protected: 
 	
 		virtual void	SecureProcessBuffer(void * buffer, size_t size) = 0;
 		virtual void	Starting(){};
@@ -68,9 +74,12 @@ class Engine: public BLooper {
 		
 		BSoundPlayer*			player;
 	
-				//void	clear_buffer(_DATA_**,int32 size,int32 chs);
 	private:
 	
+	
+			void			DoStart();
+			void			DoStop();
+		
 			sem_id					stresaforo;	
 			bool					isPlaying;
 			bool					loop_enable;

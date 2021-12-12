@@ -28,6 +28,7 @@
 static NotifierLoopClock	the_clock; //put as singleton! (why? can't be a private attribute?)
 
 
+
 int min(int a, int b) { return a<b ? a:b; }
 
 JuiceEngine*
@@ -61,7 +62,7 @@ JuiceEngine::~JuiceEngine(){
 
 //tick!
 void	
-JuiceEngine::TickedHigh(uint64 time,long beat,long tick) 
+JuiceEngine::TickedHigh(uint64 time,int16 beat,int16 tick) 
 {
 	if ( tick == 0 )
 		process_row(beat);
@@ -69,7 +70,7 @@ JuiceEngine::TickedHigh(uint64 time,long beat,long tick)
 			
 
 // -**** NOT USED ******- //
-void JuiceEngine::TickedLow(uint64 time,long beat,long tick){}
+void JuiceEngine::TickedLow(uint64 time,int16 beat,int16 tick){}
 				
 
 
@@ -78,15 +79,15 @@ void JuiceEngine::TickedLow(uint64 time,long beat,long tick){}
 void
 JuiceEngine::ResetSong(Song* song)
 {
-	//Acquire("JuiceEngine::ResetSong");
+	IF_LOCK
 	
 	fCurrentSong = song;
 	SendTrackMessage(SystemReset,0);
 		
 	if(song)
 		SetBPM(song->getTempo());
-	
-	//Release("JuiceEngine::ResetSong");		
+
+	UNLOCK
 }
 
 void	
@@ -111,6 +112,8 @@ JuiceEngine::GetBPM() {
 void		
 JuiceEngine::SendTrackMessage(SynthMessage msg, float data){
 	
+	CHECK_LOCK;
+	
 	if(fCurrentSong)
 	for(int y=0;y<fCurrentSong->getNumberTrack();y++)
 		fCurrentSong->getTrackAt(y)->Message(msg,data);
@@ -123,9 +126,10 @@ JuiceEngine::Starting(){
 
 	BufferPosition=0;
 
-	the_clock.ResetAndNotify();
-	the_clock.SendValue(P1,MeasureManager::Get()->_getCurPat(),0);
-	the_clock.SendValue(P2,MeasureManager::Get()->_getCurPos(),0);
+	the_clock.Reset();
+	the_clock.SendValue(P0, -1);
+	the_clock.SendValue(P1, MeasureManager::Get()->_getCurPat());
+	the_clock.SendValue(P2, MeasureManager::Get()->_getCurPos());
 	
 	Acquire("JuiceEngine::Starting");
     

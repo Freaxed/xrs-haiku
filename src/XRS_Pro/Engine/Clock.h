@@ -26,13 +26,13 @@ class Clock {
 		
 		void	AddTickable(Tickable* t){ fLTick.Add(t); }
 	
-		void	Reset(){ beat=tick=0; }
+		void	Reset(){ beat = tick = 0; }
 		
 		uint64	Time(){ return beat*fDefaultResolution+tick;}
 		
 		long	Resolution(){ return fDefaultResolution; }
 		
-		void	NotifyTickedLow(uint64	time,long beat,long tick){
+		void	NotifyTickedLow(uint64	time,int16 beat,int16 tick){
 			for(int i=0;i<fLTick.Count();i++)
 				fLTick[i]->TickedLow(time,beat,tick);
 							
@@ -44,8 +44,8 @@ class Clock {
 		}
 				
 	protected:
-		long	beat;
-		long	tick;
+		int16	beat;
+		int16	tick;
 	
 	private:	
 		Vector<Tickable*>	fLTick;		

@@ -41,7 +41,6 @@ class XPanel : public BView
 			
 		void		PlayButtonOn(bool);
 		void		ResetMeasureCount();
-		//GfxMeter*	getMeter(){ return One;}
 
 	private:
 	

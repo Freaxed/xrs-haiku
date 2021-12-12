@@ -45,7 +45,7 @@ MixableBox::MixableBox(BPoint position, ValuableID volume, ValuableID pan, Valua
 	rect.OffsetTo(rect.right + 1,rect.top);
 	rect.bottom=rect.top+22;
 	rect.right=rect.left+22;
-	fPot = new XPot(rect, "XPot", pan, XUtils::GetBitmap(24), NULL);
+	fPot = new XPot(rect, "XPot", pan, -100, +100, XUtils::GetBitmap(24), NULL);
 	AddChild(fPot);
 	
 	//Meter

@@ -29,8 +29,9 @@ public:
 	
 	
 	//events	
-	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage* msg);
+	 void AttachedToWindow();
+	 void DetachedFromWindow();
+	 void MessageReceived(BMessage* msg);
 private:
 	ValuableID 	vID;
 };

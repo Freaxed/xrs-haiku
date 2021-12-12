@@ -14,6 +14,7 @@
 #include "GfxMsg.h"
 #include "maxcount.h"
 #include "ValuableManager.h"
+#include "CommonValuableID.h"
 
 #include <stdio.h>
 #include <Window.h>
@@ -38,10 +39,8 @@ XMPoz::XMPoz(BRect r):BView(r,"Juice",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DR
 	tracking[1]=false;
 	marker[0].Set(1,0,MARKER_SIZE,14);
 	marker[1].Set(MARKER_SIZE+2,0,MARKER_SIZE+1+MARKER_SIZE,14);
-	//obs_volumes->attachHandler(this);
-	curPat=-1;
-	
 
+	curPat=-1;
 }
 
 void
@@ -50,10 +49,10 @@ XMPoz::MessageReceived(BMessage* msg)
 	if(msg->what == MSG_VALUABLE_CHANGED)
 	{
 		int32 value = -1;
-		if (ValuableTools::SearchValues("time.position.fulltick.substep",  msg, &value)) {
+		if (ValuableTools::SearchValues(VID_TEMPO_BEAT,  msg, &value)) {
 				setPosition(curPat, value);
 		} else
-		if (ValuableTools::SearchValues("time.position.fulltick.position", msg, &value)) {
+		if (ValuableTools::SearchValues(VID_TEMPO_MEASURE, msg, &value)) {
 				setPositionPar(value);
 		}
 	}
@@ -83,15 +82,15 @@ XMPoz::AttachedToWindow()
 	SetLowColor(200,200,220);
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetFontSize(7);
-	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.substep", this);	
-	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.position",this);	
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BEAT,   this);	
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_MEASURE, this);	
 
 }
 void
 XMPoz::DetachedFromWindow()
 {
-	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.substep", this);	
-	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.position",this);	
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_TEMPO_BEAT,   this);	
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_TEMPO_MEASURE,this);	
 	BView::AttachedToWindow();
 }
 

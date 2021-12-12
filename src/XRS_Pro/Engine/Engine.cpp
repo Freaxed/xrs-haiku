@@ -12,6 +12,9 @@
 
 #include <SoundPlayer.h>
 
+#define	 MESSAGE_START 	'star'
+#define	 MESSAGE_STOP 	'stop'
+
 Engine::Engine(const char* name) :
 	BLooper("AudioEngine",ENGINE_PRIORITY),fName(name) {	
 
@@ -69,41 +72,63 @@ Engine::~Engine() {
 
 void
 Engine::ReallyStop() {
+	
+	IF_LOCK
+	
 	player->Stop();
 	_clearBuffers();
+	
+	UNLOCK
 }
 
 void
 Engine::ReallyStart(){
+	
+	IF_LOCK
+	
 	player->Start();
+	
+	UNLOCK
 }
 
 bool 
 Engine::IsPlaying(){ return isPlaying; }
 
-void
-Engine::Start() {	
-		
-		if(isPlaying) 
-		{ 
-			Stop(); 
-			return; 
-		}
-		
-		Acquire(_ME_);
-		///Quick Dirty
-    	isPlaying=true;
-		Release(_ME_);
-		Starting();
+void Engine::Start() {
+	PostMessage(MESSAGE_START);
+}
+
+void Engine::Stop() {
+	PostMessage(MESSAGE_STOP);
 }
 
 void
-Engine::Stop() {
+Engine::DoStart() 
+{
+	CHECK_LOCK
+			
+	if(isPlaying) 
+	{
+		Stop(); 
+		return; 
+	}
+	
+   	isPlaying = true;
 
+	Starting();
+}
+
+
+
+void
+Engine::DoStop()
+{
+	CHECK_LOCK
+	
 	if(!isPlaying) return;
-	Acquire(_ME_);
-	 isPlaying=false;
-	Release(_ME_);
+
+	isPlaying = false;
+
 	Stopping();
 }
 
@@ -174,7 +199,12 @@ Engine::MessageReceived(BMessage* message)
 			_changeBuffer();		
 			ProcessBuffer(_getBuffer(), FRAMES_NUM*FRAMESIZE);
 			break;
-		
+		case MESSAGE_START:
+			DoStart();
+		break;
+		case MESSAGE_STOP:
+			DoStop();
+		break;
 		default:
 			BLooper::MessageReceived(message);
 			break;

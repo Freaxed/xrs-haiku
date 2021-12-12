@@ -18,9 +18,6 @@ MeasureManager::MeasureManager()
 	:BMessageFilter(B_PROGRAMMED_DELIVERY,B_LOCAL_SOURCE,SETPAT),
 	curpat(0),sequence(NULL)
 {
-	ValuableManager::Get()->RegisterValuable("time.position.fulltick.substep",  -1);
-	ValuableManager::Get()->RegisterValuable("time.position.fulltick.pattern",  -1);
-	ValuableManager::Get()->RegisterValuable("time.position.fulltick.position", -1);	
 	ValuableManager::Get()->RegisterValuable("measure.allpatters", 0);
 	
 	curPos=0;

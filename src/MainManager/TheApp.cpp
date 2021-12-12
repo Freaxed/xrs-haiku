@@ -61,7 +61,7 @@ TheApp::TheApp(const char * signature) :
 TheApp::~TheApp()
 {
 	//if(msucco->Lock()){
-	if(msucco->Acquire("~TheApp") == B_OK){	
+	if(msucco->Acquire("~TheApp") == B_OK){
 		msucco->Stop();
 		msucco->ReallyStop();	//stop the engine	
 		xhost->AllowLock(false);

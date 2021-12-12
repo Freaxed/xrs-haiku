@@ -11,6 +11,7 @@
 
 #include "Xed_Utils.h"
 #include "ValuableManager.h"
+#include "CommonValuableID.h"
 
 #include <Window.h>
 #include <Message.h>
@@ -151,17 +152,17 @@ PositionView::AttachedToWindow()
 	SetViewColor(Parent()->ViewColor());
 	BView::AttachedToWindow();
 	
-	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.substep",  this);
-	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.pattern",  this);
-	ValuableManager::Get()->RegisterValuableReceiver("time.position.fulltick.position", this);
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BEAT,     this);
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_PATTERN,  this);
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_MEASURE,  this);
 }
 
 void		
 PositionView::DetachedFromWindow()
 {
-	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.substep",  this);
-	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.pattern",  this);
-	ValuableManager::Get()->UnregisterValuableReceiver("time.position.fulltick.position", this);
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_TEMPO_BEAT,     this);
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_TEMPO_PATTERN,  this);
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_TEMPO_MEASURE,  this);
 	BView::DetachedFromWindow();
 	
 }
@@ -171,13 +172,13 @@ PositionView::MessageReceived(BMessage* msg)
 	if(msg->what == MSG_VALUABLE_CHANGED)
 	{
 			int32 value = -1;
-			if (ValuableTools::SearchValues("time.position.fulltick.substep",  msg, &value)) {
+			if (ValuableTools::SearchValues(VID_TEMPO_BEAT,  msg, &value)) {
 				SetBeat(value);
 			} else
-			if (ValuableTools::SearchValues("time.position.fulltick.pattern",  msg, &value)) {
+			if (ValuableTools::SearchValues(VID_TEMPO_PATTERN,  msg, &value)) {
 				SetPat(value);
 			} else
-			if (ValuableTools::SearchValues("time.position.fulltick.position", msg, &value)) {
+			if (ValuableTools::SearchValues(VID_TEMPO_MEASURE, msg, &value)) {
 				SetPos(value);
 			}
 	}

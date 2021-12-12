@@ -12,9 +12,9 @@
 
 
 
-XPot::XPot(BRect frame, const char *name,
-	ValuableID id, BBitmap *p1,BBitmap *p2)
-	: APot(frame, name, NULL, NULL, -100, 100, p1, p2),
+XPot::XPot(BRect frame, const char *name, ValuableID id, int32 min, int32 max, 
+	 BBitmap *p1,BBitmap *p2)
+	: APot(frame, name, NULL, NULL, min, max, p1, p2),
 	vID(id)
 {
 
