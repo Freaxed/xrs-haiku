@@ -16,12 +16,7 @@
 #include <Message.h>
 #include <stdio.h>
 #include <math.h>
-/*
-static rgb_color	clipColor={255,255,255};
-static rgb_color	backColor={115,134,167};
-static rgb_color	rightColor={106,124,154};
-static rgb_color	leftColor={106,124,154};
-*/
+
 
 GfxMeter::GfxMeter(BRect frame, ValuableID id):BView(frame,  id.String(),  B_FOLLOW_NONE,B_WILL_DRAW)
 		,vID(id)
@@ -31,10 +26,10 @@ GfxMeter::GfxMeter(BRect frame, ValuableID id):BView(frame,  id.String(),  B_FOL
 		
 }
 
-GfxMeter::~GfxMeter()
-{
-	ValuableManager::Get()->UnregisterValuable(vID); //TODO move somewhere!
+GfxMeter::~GfxMeter() {
+
 }
+
 void
 GfxMeter::DetachedFromWindow() 
 {
