@@ -48,7 +48,7 @@
 
 extern PotViewer* potviewer = NULL;
 
-#define SCREEN_TIME 2000000
+#define SCREEN_TIME 0 //2000000
 
 TheApp::TheApp(const char * signature) :
 	BApplication(signature)
