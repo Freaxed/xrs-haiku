@@ -4,8 +4,10 @@
 #include <Box.h>
 #include <Slider.h>
 #include <TextView.h>
+#include <ScrollView.h>
+#include <ListView.h>
 
-#define H_LABEL 30
+#define H_LABEL 20
 
 ValuableMonitorWindow::ValuableMonitorWindow(void)
 	:	BWindow(BRect(100,100,500,400),"ValuableMonitorWindow",B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
@@ -17,8 +19,12 @@ ValuableMonitorWindow::ValuableMonitorWindow(void)
 	volume->SetOrientation(B_VERTICAL);
 	volume->SetTarget(ValuableManager::Get());
 
+	fValuePanel = new BListView(BRect(81, 0, 400 - B_H_SCROLL_BAR_HEIGHT, 300 - B_V_SCROLL_BAR_WIDTH), "fValuePanel", B_SINGLE_SELECTION_LIST);
+	
+	fScrollView = new BScrollView("scroll", fValuePanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
 	mainBox->AddChild(volume);
-	AddChild(mainBox);	
+	AddChild(mainBox);
+	AddChild(fScrollView);
 
 }
 
@@ -28,9 +34,8 @@ ValuableMonitorWindow::RegisterValuable(ValuableID vID) {
 	if (Lock()){
 		if (mValuableLabel.find(vID) == mValuableLabel.end()) {
 			int32 count = mValuableLabel.size();
-			mValuableLabel[vID] = new BTextView(BRect(81, 0 + (H_LABEL*count), 400 - 81, H_LABEL + (H_LABEL*count)), vID.String(), BRect(0,0,400-81,60), B_FOLLOW_LEFT);
-			mValuableLabel[vID]->SetText(vID.String());
-			AddChild(mValuableLabel[vID]);
+			mValuableLabel[vID] = new BStringItem(vID);
+			fValuePanel->AddItem(mValuableLabel[vID]);
 			ValuableManager::Get()->RegisterValuableReceiver(vID, this);
 		}
 	
@@ -64,6 +69,7 @@ ValuableMonitorWindow::MessageReceived(BMessage *msg)
 			if (msg->FindString(VAL_ID, &vID) == B_OK) {
 				if (mValuableLabel.find(vID) != mValuableLabel.end()) {
 					mValuableLabel[vID]->SetText(GetValuableString(vID, msg));
+					fValuePanel->InvalidateItem(fValuePanel->IndexOf(mValuableLabel[vID]));
 				}
 			}
 		}

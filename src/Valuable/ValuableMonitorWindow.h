@@ -6,7 +6,9 @@
 #include "MonitorValuableManager.h"
 #include <map>
 class BSlider;
-class BTextView;
+class BStringItem;
+class BScrollView;
+class BListView;
 
 class ValuableMonitorWindow : public BWindow , public ValuableReceiver, public MonitorValuableManager
 {
@@ -26,9 +28,12 @@ private:
 
 	BString GetValuableString(ValuableID vID, BMessage* input);
 
-	std::map<ValuableID, BTextView*>	mValuableLabel;
-	typedef std::map<ValuableID, BTextView*>::iterator Iterator;
+	std::map<ValuableID, BStringItem*>	mValuableLabel;
+	typedef std::map<ValuableID, BStringItem*>::iterator Iterator;
 	BSlider* volume;
+	
+	BScrollView*	fScrollView;
+	BListView*	    fValuePanel;
 };
 
 #endif
