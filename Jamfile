@@ -14,9 +14,8 @@ local sourceDirs =
 	src/GUI/playlist
 	src/libfunky
 	src/Valuable
-	src/XRS_Pro/Log
-	src/XRS_Pro/Engine
-	src/XRS_Pro/Mixer
+	src/Engine
+	src/Mixer
 	src/struct
 	src/struct/mixer
 	src/MainManager
