@@ -10,22 +10,23 @@
 #ifndef _ADigit_H
 #define _ADigit_H
 
-#include <View.h>
+#include <Control.h>
 #include <Handler.h>
 #include <Message.h>
+#include "Log.h"
 
-class ADigit : public BView
+class ADigit : public BControl
 {
 public:
-	ADigit(BRect frame,BMessage *message,BMessage *state,
+	ADigit(BRect frame,BMessage *message,
 		int32 minValue, int32 maxValue,
 		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		uint32 flags = B_FRAME_EVENTS | B_WILL_DRAW);
 
 
 	void	SetMax(int32 value){ m_fMaxValue=value;}
-	void 	SetValue(int32 newValue,bool invoke=true);
-	int32	GetValue(){ return m_fCurValue;};
+	void 	UpdateValue(int32 newValue, bool invoke);
+	int32	GetValue(){ return Value();};
 	
 	 void MouseDown(BPoint where);
 	 void MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg);
@@ -35,15 +36,14 @@ public:
 	 void Draw(BRect updateRect);
 	
 	void	SetSens(int v){ sens=v;};
-	void	SetTarget(BHandler* t){target=t;}
-	void	SetReleaseMessage(int32 val){ release->what=val;};
-		
+	
+	
 private:
+	void 	SetValue(int32 newValue);
+	void 	set_mouse(BPoint p);
 	
-	void	postMsg();
-	void set_mouse(BPoint p);
-	
-	int32 m_fMinValue, m_fMaxValue,m_fCurValue;
+	int32 	m_fMinValue; 
+	int32	m_fMaxValue;
 
 	const char * namex;
 	bool m_bMark;
@@ -54,14 +54,11 @@ private:
 	
 	BPoint m_ptPrev;
 	BPoint mouse_start;
-	BMessage	*rel_msg;
-	BMessage	*switch_msg;
 	
 	BBitmap *digit;
-	BHandler*	target;
+
 	int dig[3];
 	char dix[4];
-	BMessage	*release;
 	int sens;
 
 };

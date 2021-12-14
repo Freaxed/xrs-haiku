@@ -31,7 +31,7 @@ MidiPanel::MidiPanel():PlugPanel(){
 	r.right-=50;
 	r.bottom-=2;
 	sampler->AddChild(new BStringView(r,"",T_MIDIOUT_OUTPUT));
-	sampler->AddChild(ch=new XDigit(BRect(120,5,120+36,5+21),new BMessage(SET_MIDICH),NULL,1,16));
+	sampler->AddChild(ch=new XDigit(BRect(120,5,120+36,5+21),new BMessage(SET_MIDICH),1,16));
 	
 	//
 	sbox.OffsetBy(0,50);
@@ -44,7 +44,7 @@ MidiPanel::MidiPanel():PlugPanel(){
 	
 	menu=new BMenu(instruments[0]);
 	sampler2->AddChild(field=new BMenuField(r,"","",menu));
-	sampler2->AddChild(ch2=new XDigit(BRect(120,5,120+36,5+21),new BMessage(SET_PG),NULL,0,127));
+	sampler2->AddChild(ch2=new XDigit(BRect(120,5,120+36,5+21),new BMessage(SET_PG),0,127));
 	
 	sbox.OffsetBy(0,30);
 	AddChild(new BStringView(sbox,"",T_MIDIOUT_CONTROLLERS));
@@ -72,7 +72,7 @@ MidiPanel::MidiPanel():PlugPanel(){
 	r.OffsetBy(s,0);
 	mess=new BMessage(SET_CC);
 	mess->AddInt16("id",i);
-	my_cont[i].number=new XDigit(r,mess,NULL,0,127);
+	my_cont[i].number=new XDigit(r,mess,0,127);
 	AddChild(my_cont[i].number);
 	}
 	

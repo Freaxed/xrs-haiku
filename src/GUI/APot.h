@@ -28,7 +28,7 @@ public:
 	void 	SetValueRange(int32 min, int32 max);
 		
 	
-	virtual	void	SetValue(int32 newValue);
+
 			float	SetAngle(float newDegrees);
 			float	Angle() const;
 	virtual int32   ValueForAngle(float degrees) const;
@@ -61,10 +61,16 @@ public:
 	
 	float	distance;	//dirty thing
 	
+	void	SetValue(int32 newValue);
+	
 protected:
 		void	UpdateValue(int32 newValue);
+		
 	
 private:
+	
+
+	
 	int32 m_fMinValue, m_fMaxValue;
 	float m_fMinAngle, m_fMaxAngle;
 	float m_fDragAngle;

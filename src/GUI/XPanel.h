@@ -56,7 +56,7 @@ class XPanel : public BView
 		BPictureButton		*vst;
 		
 		
-		XDigit			*bpm;
+		//XDigit			*bpm;
 		Song			*curSong;
 		XPot*		 	master;
 		char			ttext[4];

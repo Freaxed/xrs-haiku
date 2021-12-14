@@ -229,7 +229,7 @@ Panels::showSettings(Song* curSong)
 	x.right=x.left+36;
 	x.top=5;
 	x.bottom=x.top+22;
-	sampler->AddChild(a=new XDigit(x,"sampler", "sampler?", NULL,NULL,4,32));
+	sampler->AddChild(a=new XDigit(x, VID_EMPTY, "sampler?", NULL, 4,32));
 	box2->AddChild(sampler);
 	x=sampler->Bounds();
 	x.InsetBy(4,4);
@@ -245,7 +245,7 @@ Panels::showSettings(Song* curSong)
 	x.right=x.left+36;
 	x.top=5;
 	x.bottom=x.top+22;
-	sampler->AddChild(b=new XDigit(x,"sampler2","sampler2?", NULL,NULL,2,8));
+	sampler->AddChild(b=new XDigit(x, VID_EMPTY,"sampler2?", NULL, 2,8));
 	box2->AddChild(sampler);
 	x=sampler->Bounds();
 	x.InsetBy(4,4);
@@ -267,8 +267,8 @@ Panels::showSettings(Song* curSong)
 	tw->SetText(curSong->getDescription());
 	cb->SetValue(curSong->popupdesc);
 	
-	a->SetValue((double)curSong->getNumberNotes());
-	b->SetValue((long)tracknote_division);
+	a->UpdateValue((int32)curSong->getNumberNotes(), true);
+	b->UpdateValue((int32)tracknote_division, true);
 	
 	BMessage *out=new BMessage();
 	out->AddPointer("win",(void*)win);

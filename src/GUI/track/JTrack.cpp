@@ -64,7 +64,7 @@ JTrack::RControl()
 	BRect	pos(volpot->Frame());
 	pos.right=pos.left+36;
 	pos.bottom=pos.top+22;
-	AddChild(line_pos=new XDigit(pos, "line_pos", "mixer_pos", new BMessage(TRACK_ROUTELINE),NULL,0,4));
+	AddChild(line_pos=new XDigit(pos, "line_pos", "mixer_pos", new BMessage(TRACK_ROUTELINE),0,4));
 	line_pos->MoveBy(-50,0);
 }
 
@@ -125,7 +125,7 @@ JTrack::MessageReceived(BMessage* message)
 		panpot->SetValue(0);
 	break;
 	case FORCE_ROUTELINE:
-		if(message->FindInt32("be:value")!= line_pos->GetValue()) line_pos->SetValue(message->FindInt32("be:value"),false);
+		if(message->FindInt32("be:value")!= line_pos->GetValue()) ((BControl*)line_pos)->SetValue(message->FindInt32("be:value"));
 	break;
 	
 	case TRACK_ROUTELINE:
@@ -248,7 +248,7 @@ JTrack::Reset(Pattern* p ,Track* tr)
 	panpot->MoveTo(170+23*poz+32,panpot->Frame().top);		
 	
 	line_pos->MoveTo(panpot->Frame().right+10,0);
-	line_pos->SetValue(myTrack->getRouteLine(),false);
+	((BControl*)line_pos)->SetValue(myTrack->getRouteLine());
 	
 	volpot->SetValue( (int32)(myTrack->getVolume()*100));
 	volpot->SetOn(myTrack->isOn());

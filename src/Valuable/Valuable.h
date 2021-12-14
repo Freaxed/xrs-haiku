@@ -13,6 +13,9 @@
 typedef BString ValuableID;
 class ValuableManager;
 
+#define VID_EMPTY	BString()
+#define IS_VID_EMPTY(vID) (vID.Length() == 0)
+
 // This template is a wrapper to quickly create some 'data'
 
 template<class TYPE>

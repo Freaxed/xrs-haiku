@@ -351,7 +351,7 @@ SFWindow::InitGUI()
 	ir.right-=50; 
 	ir.bottom-=6;
 	sampler->AddChild(new BStringView(ir,"",T_SFS_NR));
-	sampler->AddChild(digit_chorus_n=new XDigit(BRect(120,5,120+36,5+21),"chorus",new BMessage('choX'),NULL,1,99));
+	sampler->AddChild(digit_chorus_n=new XDigit(BRect(120,5,120+36,5+21),"chorus",new BMessage('choX'),1,99));
 	box->AddChild(sampler);
 	
 	

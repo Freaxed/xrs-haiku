@@ -12,26 +12,39 @@
 
 XDigit::~XDigit() {}
 
-XDigit::XDigit(BRect frame, ValuableID id, BString name, BMessage *message, BMessage *state,
+XDigit::XDigit(BRect frame, ValuableID id, BString name, BMessage *message,
 		int32 minValue, int32 maxValue,
 		uint32 resizingMode, uint32 flags):
-		ADigit(frame, ValuableTools::CreateMessageForBController(id), state, minValue, maxValue, resizingMode, flags) , vID(id)
+		ADigit(frame, message, minValue, maxValue, resizingMode, flags) , vID(id)
 {	
-	
+	SetName(name);
+}
+
+XDigit::XDigit(BRect frame, BMessage *message,
+		int32 minValue, int32 maxValue,
+		uint32 resizingMode,
+		uint32 flags):
+		ADigit(frame, message, minValue, maxValue, resizingMode, flags) , vID(VID_EMPTY)
+{
+	SetName("anonymous");
 }
 
 
 void XDigit::AttachedToWindow()
 {
 	ADigit::AttachedToWindow();
-	SetTarget(ValuableManager::Get());
-	//SetReleaseMessage();
-	
-	ValuableManager::Get()->RegisterValuableReceiver(vID, (ValuableReceiver*)this);
+	if (IS_VID_EMPTY(vID) == false) {
+		SetMessage(ValuableTools::CreateMessageForBController(vID));
+		SetTarget(ValuableManager::Get());
+		ValuableManager::Get()->RegisterValuableReceiver(vID, this);
+	}
 }
 
-void XDigit::DetachedFromWindow() {
-	ValuableManager::Get()->UnregisterValuableReceiver(vID, (ValuableReceiver*)this);
+void XDigit::DetachedFromWindow() 
+{
+	if (false == IS_VID_EMPTY(vID)) {
+		ValuableManager::Get()->UnregisterValuableReceiver(vID, this);
+	}
 	ADigit::DetachedFromWindow();
 }
 
@@ -42,7 +55,7 @@ void XDigit::MessageReceived(BMessage* msg)
 		{
 			int32 value;
 			if (ValuableTools::SearchValues(vID, msg, &value)){
-					SetValue(value, false);
+					UpdateValue(value, false);
 			}
 		}
 	break;

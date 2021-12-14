@@ -313,9 +313,9 @@ MainWindow::MessageReceived(BMessage* message)
 		case PLAY_ALL_SET:
 			MeasureManager::Get()->SetPatternMode(fPanel->isAllPat());
 			break;
-		case TEMPO_MOV:
+		/*case TEMPO_MOV:
 			JuiceEngine::Get()->PostMessage(message);
-			break;
+			break;*/
 		case TRACK_SET:
 			PostMessage(message, fTracksPanel);
 			break;

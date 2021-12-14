@@ -20,7 +20,7 @@
 #include <String.h>
 #include <stdlib.h>
 #include "Cursors.h" //local define
-
+#include "Log.h"
 
 #define	DIGITSIZE	10.
 #define	HEIGHT		15.
@@ -28,35 +28,28 @@
 #define YPOS		4.
 
 
-ADigit::ADigit(BRect frame, BMessage *message,BMessage *state,
+ADigit::ADigit(BRect frame, BMessage *message,
 	int32 minValue, int32 maxValue,
 	uint32 resizingMode, uint32 flags)
-	: BView(frame,  "_adigit",  B_FOLLOW_NONE,B_WILL_DRAW),
+	: BControl(frame,  "_adigit",  "_", message, B_FOLLOW_NONE,B_WILL_DRAW),
 	m_fMinValue(minValue), m_fMaxValue(maxValue),
-	track(false),
-	rel_msg(message),
-	switch_msg(state),
-	target(NULL)
+	track(false)
 {
-	SetValue(m_fMinValue);
 	SetViewColor(B_TRANSPARENT_COLOR);
 	
-	digit=XUtils::GetBitmap(14); //fix
+	digit = XUtils::GetBitmap(14); //fix
 	
-	if(digit==NULL) 
-		printf("no bitmap!\n");
+	if(digit == NULL) 
+		printf("ADigit: no bitmap!\n");
 	
-	if(rel_msg) 
-		rel_msg->AddInt32("be:value",0);
+	SetValueNoUpdate(m_fMinValue);
 	
-	release=new BMessage();
 	sens=5;
 }
 
 void
-ADigit::SetValue(int32 n, bool invoke)
+ADigit::SetValue(int32 n)
 {
-		
 	if(n<m_fMinValue) 
 		n=m_fMinValue;
 		
@@ -71,11 +64,15 @@ ADigit::SetValue(int32 n, bool invoke)
 		if(dig[i]<0) dig[i]=0;
 	}
 			
-	m_fCurValue=n;
-	Invalidate();
-	
-	if(invoke) 
-		postMsg();
+	BControl::SetValue(n);
+}
+
+void
+ADigit::UpdateValue(int32 n, bool invoke)
+{	
+	SetValue(n);
+	if (invoke)
+		Invoke();
 }
 void
 ADigit::Draw(BRect box)
@@ -153,18 +150,15 @@ ADigit::MessageReceived(BMessage* msg)
 		//qui controllo: se è un numero, se è minore del minimo o maggiore del massimo.
 		const char* name;
 		msg->FindString("_value", &name);
-		int num=atoi(name);
-		if(num < m_fMinValue) num=m_fMinValue;
-		if(num > m_fMaxValue) num=m_fMaxValue;
-		
-		SetValue(num,true);
+		int32 num=atoi(name);
+		UpdateValue(num, true);
 		
 		Window()->WindowActivated(true);
 	}
 	
 	break;
 	default:
-		BView::MessageReceived(msg);
+		BControl::MessageReceived(msg);
 	break;
 	}
 }
@@ -172,14 +166,14 @@ ADigit::MessageReceived(BMessage* msg)
 void
 ADigit::MouseUp(BPoint p)
 {
-	if(track && switch_msg) Window()->PostMessage(switch_msg,target);
+	if(track) Invoke();
 	track=false;
 	
 	be_app->ShowCursor();
 	
 	set_mouse(mouse_start);
 	
-	Window()->PostMessage(release,target);
+	Invoke();
 	SetMouseEventMask(0);
 	
 }
@@ -187,46 +181,30 @@ void
 ADigit::MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg)
 {
 	if(!track){
-	if(code==B_INSIDE_VIEW)
-		be_app->SetCursor((const void *)(c_h_resize_cursor));
-	else
-		be_app->SetCursor(B_HAND_CURSOR);
-	return;
+		if(code==B_INSIDE_VIEW)
+			be_app->SetCursor((const void *)(c_h_resize_cursor));
+		else
+			be_app->SetCursor(B_HAND_CURSOR);
+		return;
 	}
 	
-	if(where.y < m_ptPrev.y-sens && m_fCurValue+1 <= m_fMaxValue) 
-		{
-		 SetValue(m_fCurValue+1);
-		
-		set_mouse(mouse_start);	
-		
-
-		}else
-	if(where.y > m_ptPrev.y+sens && m_fCurValue-1 >= m_fMinValue) 
-		{
-		  SetValue(m_fCurValue-1);
-		  set_mouse(mouse_start);	
-		  
-		}
-	
-		
+	if(where.y < m_ptPrev.y-sens && Value()+1 <= m_fMaxValue) 
+	{
+		 UpdateValue(Value()+1, true);
+	     set_mouse(mouse_start);	
+	}
+	else
+	if(where.y > m_ptPrev.y+sens && Value()-1 >= m_fMinValue) 
+	{
+	     UpdateValue(Value()-1, true);
+		 set_mouse(mouse_start);	
+	}
 }
 void 
 ADigit::set_mouse(BPoint p)
 {
-			int32 x=(int32)p.x;
-			int32 y=(int32)p.y;
-			if(x!=0 && y!=0) //bug??
-			set_mouse_position(x,y);
-	
-}
-
-void
-ADigit::postMsg()
-{	
-	if(!rel_msg || !target) return;
-	
-	rel_msg->ReplaceInt32("be:value",GetValue());
-	//rel_msg->PrintToStream();
-	target->Looper()->PostMessage(rel_msg, target);
+	int32 x=(int32)p.x;
+	int32 y=(int32)p.y;
+	if(x!=0 && y!=0) //bug??
+		set_mouse_position(x,y);	
 }
