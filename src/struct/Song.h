@@ -40,8 +40,8 @@ class Song
 		
 		size_t		getNoteSize(); //in frame	
 					
-		void		setTempo(int bpm); //in bpm 
-		int			getTempo();
+		void		setTempo(int32 bpm); //in bpm 
+		int32			getTempo();
 						
 		BEntry*		getEntry();
 		void		setEntry(BEntry*);
@@ -74,7 +74,7 @@ class Song
 			BString			description;
 			Sequence*		sequence;
 			size_t			note_size;
-			int				tempo_bpm;
+			int32				tempo_bpm;
 			BEntry*			file_entry;	
 			bool			modified;
 			int				num_notes;

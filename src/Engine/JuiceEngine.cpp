@@ -55,9 +55,33 @@ JuiceEngine::JuiceEngine(const char* name):Engine(name),
 	
 	fPeakLeft = fPeakRight = -1.0; //force to update
 	
+	//Not sure if it's the right location..
+	if (!ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BPM, this))
+		LogFatal("JuiceEngine can't register to BPM!");
+	
 }
 
 JuiceEngine::~JuiceEngine(){
+}
+
+void	
+JuiceEngine::MessageReceived(BMessage* msg) {
+	if (msg->what == MSG_VALUABLE_CHANGED)
+			ValuableChanged(msg);
+	else
+			Engine::MessageReceived(msg);
+}
+
+void	
+JuiceEngine::ValuableChanged(BMessage* msg) {
+	ValuableID vID;
+	if (msg->FindString(VAL_ID, 0, &vID) == B_OK) {
+		if (vID == VID_TEMPO_BPM) {
+			int32 bpm;
+			if (msg->FindInt32(VAL_DATA_KEY, 0, &bpm) == B_OK)
+				SetBPM(bpm);
+		}
+	}
 }
 
 //tick!
@@ -83,9 +107,7 @@ JuiceEngine::ResetSong(Song* song)
 	
 	fCurrentSong = song;
 	SendTrackMessage(SystemReset,0);
-		
-	if(song)
-		SetBPM(song->getTempo());
+	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, song->getTempo()); //huge bug: it's not syncronous!
 
 	UNLOCK
 }
@@ -93,8 +115,10 @@ JuiceEngine::ResetSong(Song* song)
 void	
 JuiceEngine::SetBPM(int bpm)
 {
-	fCurrentSong->setTempo(bpm);
-	fSamplesPerBeat = fCurrentSong->getNoteSize();
+	//if (fCurrentSong) fCurrentSong->setTempo(bpm);
+	int32 note_size=(size_t)2646000/bpm;
+	while(note_size % 4 !=0) note_size++;
+	fSamplesPerBeat = note_size; //fCurrentSong->getNoteSize();
 	fSamplesPerTick = fSamplesPerBeat/(fDefaultResolution*4);
 
 	SendTrackMessage(TempoChange,(float)fSamplesPerBeat);	
@@ -132,11 +156,8 @@ JuiceEngine::Starting(){
 	the_clock.SendValue(P2, MeasureManager::Get()->_getCurPos());
 	
 	Acquire("JuiceEngine::Starting");
-    
-    	if(fCurrentSong)
-    		SetBPM(fCurrentSong->getTempo()); //Quick Dirty
-    
-    	MeasureManager::Get()->SetPosition(0);
+
+   	MeasureManager::Get()->SetPosition(0);
    	
    	Release("JuiceEngine::Startig");
 		

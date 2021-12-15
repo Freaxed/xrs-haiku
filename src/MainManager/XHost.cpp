@@ -64,8 +64,8 @@ XHost::SendMessage(int msg,void* param, void* extra)
 		break;			
 	case X_BPM:
 		{
-		 int tempo=JuiceEngine::Get()->GetBPM();
-		 memcpy(param,(void*)&tempo,sizeof(int));
+		 //int tempo=JuiceEngine::Get()->GetBPM();
+		 //memcpy(param,(void*)&tempo,sizeof(int));
 		}
 		break;		
 	case X_MainWindowDeactivate:

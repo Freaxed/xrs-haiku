@@ -36,6 +36,9 @@ class JuiceEngine : public Engine, public Tickable {
 			
 				//stopping events..
 				void	TickedLow(uint64 time,int16 beat,int16 tick);
+				
+				
+				void	MessageReceived(BMessage* msg);
 		
 	protected:
 					JuiceEngine(const char* name);
@@ -43,6 +46,7 @@ class JuiceEngine : public Engine, public Tickable {
 			void	Stopping();
 			void	SecureProcessBuffer(void * buffer, size_t size);
 		 	void	SendTrackMessage(SynthMessage msg, float data);
+		 	void	ValuableChanged(BMessage* msg);
 	
 	protected:
 		friend	class XHost;

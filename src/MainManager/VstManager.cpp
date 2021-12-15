@@ -123,9 +123,9 @@ VstManager::CreateVst(int pos)
 	VSTItem* vst2=new  VSTItem(ple->ref.name);
 	
 	int tempo;
-	XHost::Get()->SendMessage(X_BPM,&tempo);
-	vst2->setBPM(tempo);
-	
+//	XHost::Get()->SendMessage(X_BPM,&tempo);
+//	vst2->setBPM(tempo);
+	debugger("We have to send tempo to VST");	
 	return vst2;
 }
 void
