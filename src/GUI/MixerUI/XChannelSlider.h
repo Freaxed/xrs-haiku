@@ -15,7 +15,7 @@
 #include "ValuableManager.h"
 
 
-class XChannelSlider: public AChannelSlider, public ValuableReceiver
+class XChannelSlider: public AChannelSlider
 {
 	public:
 		   XChannelSlider(	BRect area,
@@ -27,8 +27,6 @@ class XChannelSlider: public AChannelSlider, public ValuableReceiver
 		void AttachedToWindow();
 		void DetachedFromWindow();
 		void MessageReceived(BMessage* msg);
-		
-		BHandler* GetHandler() { return this;}
 		 
 	
 	private:

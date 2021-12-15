@@ -15,7 +15,7 @@
 
 #define	SB_MSG	'sbmp'
 
-class XPot : public APot, public ValuableReceiver
+class XPot : public APot
 {
 public:
 	XPot(BRect frame, const char *name,
@@ -23,12 +23,7 @@ public:
 		BBitmap *p1 = NULL ,BBitmap *p2 = NULL);
 		
 	virtual ~XPot();
-		
 
-	
-	//valuableView
-	BHandler*	GetHandler() { return this;};
-	
 	
 	//events	
 	

@@ -14,7 +14,7 @@
 #include "ValuableManager.h"
 
 
-class VUView : public BView , public ValuableReceiver
+class VUView : public BView
 {
 public:
 	VUView(BRect rect, ValuableID id);
@@ -23,7 +23,7 @@ public:
 	void DetachedFromWindow();
 	void Draw(BRect updateRect);
 	void MessageReceived(BMessage*);
-	BHandler*	GetHandler(){ return this; };
+
 	void ComputeNextLevel(void *data, size_t size);
 	
 	int32 GetValue(int32 channel){ return channel == 0 ? value_l : value_r ;}

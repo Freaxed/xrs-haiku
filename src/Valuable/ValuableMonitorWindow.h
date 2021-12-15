@@ -10,14 +10,13 @@ class BStringItem;
 class BScrollView;
 class BListView;
 
-class ValuableMonitorWindow : public BWindow , public ValuableReceiver, public MonitorValuableManager
+class ValuableMonitorWindow : public BWindow , public MonitorValuableManager
 {
 public:
 						ValuableMonitorWindow(void);
 			void		MessageReceived(BMessage *msg);
 			bool		QuitRequested(void);
-			
-			BHandler*	GetHandler() { return this; }
+
 			
 protected:
 friend MonitorValuableManager;			

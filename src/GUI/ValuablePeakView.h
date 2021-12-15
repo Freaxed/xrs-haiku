@@ -10,15 +10,13 @@
 #include "PeakView.h"
 #include "ValuableManager.h"
 
-class ValuablePeakView : public PeakView, public ValuableReceiver {
+class ValuablePeakView : public PeakView {
 public:
 		ValuablePeakView(ValuableID id, const char* name);
 		
 		void				MessageReceived(BMessage* message);
 		void				AttachedToWindow();
 		void				DetachedFromWindow();
-		
-		BHandler*	GetHandler() { return this; }
 
 private:
 		ValuableID	vID;

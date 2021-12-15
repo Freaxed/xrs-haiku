@@ -14,7 +14,7 @@
 #include "ValuableManager.h"
 class Sequence;
 
-class XMPoz: public BView, public ValuableReceiver
+class XMPoz: public BView
 {
 	public:
 			XMPoz(BRect);
@@ -27,7 +27,7 @@ class XMPoz: public BView, public ValuableReceiver
 		 void	MessageReceived(BMessage*);
 		 void	AttachedToWindow();
 		 void	DetachedFromWindow();
-		 BHandler* GetHandler() { return this;}
+
 			
 			
 			 void		Reset(Sequence*);

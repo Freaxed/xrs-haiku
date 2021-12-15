@@ -32,10 +32,9 @@
 
 BMenuItem* new_bpm_menu(const char* label, int32 bpm_value) {
 	BMessage *msg = ValuableTools::CreateMessageForBController(VID_TEMPO_BPM);
-	msg->what = 'bpms';
 	msg->AddInt32("be:value", bpm_value);
 	BMenuItem* item =new BMenuItem(label, msg);
-	//item->SetTarget(this); //ValuableManager::Get());
+	item->SetTarget(ValuableManager::Get());
 	return item;
 }
 
@@ -53,6 +52,9 @@ XPanel::XPanel(BRect rect): BView(rect, "XPanel", B_FOLLOW_ALL_SIDES, B_WILL_DRA
 	bpm_menu->AddItem(new_bpm_menu("180 bpm", 180));
 	bpm_menu->AddItem(new_bpm_menu("200 bpm", 200));
 	bpm_menu->AddItem(new_bpm_menu("220 bpm", 220));
+	bpm_menu->SetLabelFromMarked(false);
+	bpm_menu->SetRadioMode(false);
+
 	key_rel=true;
 }
 
@@ -125,24 +127,14 @@ XPanel::MessageReceived(BMessage* message)
 		info->AddInt32("be:value",bpm->GetValue());
 		Window()->PostMessage(info);
 	break;*/
-	case 'bpms': //BPM from the menu
-		{
-			int32 val=message->FindInt32("be:value");
-			bpm_menu->FindMarked()->SetMarked(false);
-			ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, val);
-			//info=new BMessage(TEMPO_MOV);
-			//info->AddInt32("be:value",val);
-			//bpm->SetValue(val);
-			//Window()->PostMessage(info);
-		}
-	break;
 	case 'bpmp': //show the BPM menu
 		{
 			BPoint point;
 			point.x=tool[9]->Frame().left+2;
 			point.y=tool[9]->Frame().bottom+2;
 			point=ConvertToScreen(point);
-			bpm_menu->Go(point,true,true,true);
+			bpm_menu->Go(point, true, false, true);
+			bpm_menu->MakeFocus();
 		}
 	break;
 	case 'winl':
@@ -247,8 +239,6 @@ XPanel::AttachedToWindow()
 	tool[10]->SetTarget(this);
 		
 		
-	bpm_menu->SetTargetForItems(this);
-	bpm_menu->SetLabelFromMarked(false);
 	MakeFocus(false);
 	
 	MeasureManager::Get()->RegisterMe(this);

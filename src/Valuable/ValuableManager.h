@@ -9,13 +9,6 @@
 #include "MonitorValuableManager.h"
 
 
-class ValuableReceiver  {
-		public:
-			ValuableReceiver(){}
-			virtual BHandler* GetHandler() = 0;	
-};
-
-
 class ValuableManager : public BLooper {
 
 	private:
@@ -35,9 +28,9 @@ class ValuableManager : public BLooper {
 		template<class TYPE>
 		void	UpdateValue(ValuableID vID, TYPE fValue1, TYPE fValue2);
 		
-		bool	RegisterValuableReceiver(ValuableID vID, ValuableReceiver* receiver, bool doUpdate = true);
+		bool	RegisterValuableReceiver(ValuableID vID, BHandler* receiver, bool doUpdate = true);
 		
-		bool	UnregisterValuableReceiver(ValuableID vID, ValuableReceiver* receiver);
+		bool	UnregisterValuableReceiver(ValuableID vID, BHandler* receiver);
 		
 		template<class TYPE>
 		bool	RegisterValuable(ValuableID vID, TYPE initialValue);

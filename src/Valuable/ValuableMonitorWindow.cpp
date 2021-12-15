@@ -33,7 +33,7 @@ void
 ValuableMonitorWindow::RegisterValuable(ValuableID vID) {
 	if (Lock()){
 		if (mValuableLabel.find(vID) == mValuableLabel.end()) {
-			int32 count = mValuableLabel.size();
+			//int32 count = mValuableLabel.size();
 			mValuableLabel[vID] = new BStringItem(vID);
 			fValuePanel->AddItem(mValuableLabel[vID]);
 			ValuableManager::Get()->RegisterValuableReceiver(vID, this);

@@ -17,7 +17,7 @@
 
 class BBitmap;
 
-class GfxMeter:	public BView, public ValuableReceiver
+class GfxMeter:	public BView
 {
 
 	typedef	BView  _inherited;
@@ -29,7 +29,6 @@ class GfxMeter:	public BView, public ValuableReceiver
 		void 	Draw(BRect r);
 		void 	MessageReceived(BMessage *message);
 		
-		BHandler*	GetHandler() { return (BView*)this;}
 		
 	private:
 	

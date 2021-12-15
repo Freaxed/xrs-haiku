@@ -16,7 +16,7 @@
 
 class BBitmap;
 
-class PositionView : public BView , public ValuableReceiver
+class PositionView : public BView 
 {
 	public:
 		
@@ -28,7 +28,6 @@ class PositionView : public BView , public ValuableReceiver
 	
 	virtual void		MessageReceived(BMessage*);
 	
-		 BHandler* GetHandler() { return this; }
 	
 	private:
 		void	SetTick(int,int,int);

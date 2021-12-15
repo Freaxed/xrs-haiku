@@ -4,7 +4,7 @@
 #include "Log.h"
 #include "GenericReceiver.h"
 #include "App.h"
-#include "MainWindow.h"
+#include "ValuableMonitorWindow.h"
 
 int
 main() {

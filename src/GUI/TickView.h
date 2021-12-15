@@ -9,7 +9,7 @@
 #include <View.h>
 #include "ValuableManager.h"
 
-class TickView : public BView , public ValuableReceiver
+class TickView : public BView
 {
 	public:
 		
@@ -21,7 +21,7 @@ class TickView : public BView , public ValuableReceiver
 	      void 		AttachedToWindow();
 	      void 		DetachedFromWindow();
 	      void		MessageReceived(BMessage*);
-	      BHandler* GetHandler(){ return this;}
+
 	
 	private:
 			

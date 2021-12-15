@@ -10,15 +10,11 @@
 #include "ValuableManager.h"
 #include <Looper.h>
 
-class GenericReceiver : public BLooper, public ValuableReceiver {
+class GenericReceiver : public BLooper {
 	public:
 	GenericReceiver():BLooper("Generic"){};
 	
 	void MessageReceived(BMessage* msg);
-	
-	BHandler* GetHandler() {
-		return this;
-	}
 	
 };
 

@@ -13,7 +13,7 @@
 #include "ADigit.h"
 #include "ValuableManager.h"
 
-class XDigit : public ADigit, public ValuableReceiver
+class XDigit : public ADigit
 {
 public:
 	XDigit(BRect frame, ValuableID id,  BString name, BMessage *message,
@@ -28,9 +28,6 @@ public:
 
 	
 	virtual ~XDigit();
-	
-	//valuableView
-	BHandler*	GetHandler() { return this;};
 	
 	
 	//events	

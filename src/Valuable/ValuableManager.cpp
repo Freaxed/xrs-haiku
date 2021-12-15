@@ -88,7 +88,7 @@ ValuableManager::SpreadToValuableReceivers(BList& lViews, BMessage* valuable)
 {
 		//spread the update to all the ValuableReceiver!
 		for (int i=0;i<lViews.CountItems();i++) {
-			BMessenger(((ValuableReceiver*)lViews.ItemAt(i))->GetHandler()).SendMessage(valuable);
+			BMessenger(((BHandler*)lViews.ItemAt(i))).SendMessage(valuable);
 		} 
 }
 
@@ -119,29 +119,29 @@ ValuableManager::UnregisterValuable(ValuableID vID) {
 }	
 
 bool	
-ValuableManager::RegisterValuableReceiver(ValuableID vID, ValuableReceiver* receiver, bool doUpdate){
+ValuableManager::RegisterValuableReceiver(ValuableID vID, BHandler* receiver, bool doUpdate){
 	if (Lock()) {
 		iterator iter = fRegisteredValuable.find(vID);
 			
 		if(iter == fRegisteredValuable.end())
 		{
-			LogDebug("RegisterValuableReceiver: No Valuable registered [%s] - called by [%s]", vID.String(), receiver->GetHandler()->Name());
+			LogDebug("RegisterValuableReceiver: No Valuable registered [%s] - called by [%s]", vID.String(), receiver->Name());
 			Unlock();
 			return false;
 		}
 		
 		if (iter->second->lViews.HasItem((void*)receiver))
 		{
-			LogDebug("RegisterValuableReceiver: ValuableReceiver already registered [%s] - called by [%s]", vID.String(), receiver->GetHandler()->Name());
+			LogDebug("RegisterValuableReceiver: ValuableReceiver already registered [%s] - called by [%s]", vID.String(), receiver->Name());
 			Unlock();
 			return false;
 		}
 		
 		iter->second->lViews.AddItem((void*)receiver);
-		LogDebug("RegisterValuableReceiver: ValuableReceiver registered [%s] - called by [%s]", vID.String(), receiver->GetHandler()->Name());
+		LogDebug("RegisterValuableReceiver: ValuableReceiver registered [%s] - called by [%s]", vID.String(), receiver->Name());
 		
 		if (doUpdate) {
-			BMessenger(receiver->GetHandler()).SendMessage(iter->second->mLastMessage);
+			BMessenger(receiver).SendMessage(iter->second->mLastMessage);
 		}
 					
 		Unlock();
@@ -152,25 +152,25 @@ ValuableManager::RegisterValuableReceiver(ValuableID vID, ValuableReceiver* rece
 
 
 bool	
-ValuableManager::UnregisterValuableReceiver(ValuableID vID, ValuableReceiver* receiver) {
+ValuableManager::UnregisterValuableReceiver(ValuableID vID, BHandler* receiver) {
 	
 	if (Lock()){
 		iterator iter = fRegisteredValuable.find(vID);
 		if(iter == fRegisteredValuable.end())
 		{
-			LogDebug("UnregisterValuableReceiver: No Valuable registered [%s] - called by [%s]", vID.String(), receiver->GetHandler()->Name());
+			LogDebug("UnregisterValuableReceiver: No Valuable registered [%s] - called by [%s]", vID.String(), receiver->Name());
 			Unlock();
 			return false;
 		}
 		if (iter->second->lViews.HasItem((void*)receiver) == false)
 		{
-			LogDebug("UnregisterValuableReceiver: ValuableReceiver doesn't have registered [%s] - called by [%s]", vID.String(), receiver->GetHandler()->Name());
+			LogDebug("UnregisterValuableReceiver: ValuableReceiver doesn't have registered [%s] - called by [%s]", vID.String(), receiver->Name());
 			Unlock();
 			return false;
 		}
 		
 		iter->second->lViews.RemoveItem(receiver);
-		LogDebug("UnregisterValuableReceiver: ValuableReceiver unregistered [%s] - called by [%s]", vID.String(), receiver->GetHandler()->Name());
+		LogDebug("UnregisterValuableReceiver: ValuableReceiver unregistered [%s] - called by [%s]", vID.String(), receiver->Name());
 
 		Unlock();
 		return true;
@@ -207,8 +207,8 @@ ValuableManager::Dump() {
 			msg->PrintToStream();
 			for (int i=0; i<vlist.CountItems(); i++)
 			{
-				ValuableReceiver* view = (ValuableReceiver*)vlist.ItemAt(i);
-				LogDebug("-----> ValuableReceiver [%s]", view->GetHandler()->Name());
+				BHandler* view = (BHandler*)vlist.ItemAt(i);
+				LogDebug("-----> ValuableReceiver [%s]", view->Name());
 			}
 			iter++;
 		}
