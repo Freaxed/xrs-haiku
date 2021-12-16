@@ -10,7 +10,7 @@
 #include "PMixable.h"
 #include <memory.h>
 
-PMixable::PMixable():Pannable()
+PMixable::PMixable()
 {
 	for(int i=0; i<NUM_CHANNELS; i++) 
 	{
@@ -39,9 +39,9 @@ PMixable::MixBuffer(float**from, size_t frames, int32 spiaz)
 	float min[2]={0.0,0.0};
 	float max[2]={0.0,0.0};
 	for(size_t i =0 ; i<frames ; i++) {
-		for(int c=0; c<NUM_CHANNELS;c++)
+		for(int8 c=0; c<NUM_CHANNELS;c++)
 		{
-			stream[c][i + spiaz] += from[c][i] *vols[c];
+			stream[c][i + spiaz] += from[c][i] * getVolumeChannel(c);
 			
 			
 			if (min[c] > stream[c][i + spiaz])
@@ -50,7 +50,7 @@ PMixable::MixBuffer(float**from, size_t frames, int32 spiaz)
 				max[c] = stream[c][i + spiaz];
 		}
 	}
-	for(int c=0; c<NUM_CHANNELS;c++){
+	for(int8 c=0; c<NUM_CHANNELS;c++){
 			if (-max[c] > (min[c] + 1))
 			max[c] = -min[c];
 		

@@ -15,11 +15,11 @@
 #define _PMixable_H_
 
 #include "PNode.h"
-#include "Pannable.h"
+#include "StereoVolumes.h"
 #include <SupportKit.h>
 #include "Valuable.h"
 
-class PMixable: public PNode , public Pannable {
+class PMixable: public PNode , public StereoVolumes {
 
 	public:
 
