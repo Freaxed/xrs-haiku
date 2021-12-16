@@ -32,6 +32,7 @@
 #include	<ListView.h>
 #include	<Button.h>
 #include	<PictureButton.h>
+#include	"CommonValuableID.h"
 
 #define	VERTICAL_SLIDE	'vers'
 #define	VST_STATE		'vsts'
@@ -71,11 +72,11 @@ MixerWindow::MixerWindow() : XrsWindow(BRect(150,130,280,60),"", B_FLOATING_WIND
 	SetName("mixer_");
 	SetTitle("Mixer");
 
-	AddChild(new MixableBox(BPoint(000,0), "xrs.mixer.main.volume"  , "xrs.mixer.main.pan"  , "xrs.mixer.main.meter"  ));
-	AddChild(new MixableBox(BPoint(120,0), "xrs.mixer.line.0.volume", "xrs.mixer.line.0.pan", "xrs.mixer.line.0.meter"));
-	AddChild(new MixableBox(BPoint(240,0), "xrs.mixer.line.1.volume", "xrs.mixer.line.1.pan", "xrs.mixer.line.1.meter"));
-	AddChild(new MixableBox(BPoint(360,0), "xrs.mixer.line.2.volume", "xrs.mixer.line.2.pan", "xrs.mixer.line.2.meter"));
-	AddChild(new MixableBox(BPoint(480,0), "xrs.mixer.line.3.volume", "xrs.mixer.line.3.pan", "xrs.mixer.line.3.meter"));
+	AddChild(new MixableBox(BPoint(000,0), "Master (Line 0)", VID_MIXER_MAIN_VOL, "xrs.mixer.main.pan"  , "xrs.mixer.main.meter"  ));
+	AddChild(new MixableBox(BPoint(120,0), "Line 1",          "xrs.mixer.line.0.volume", "xrs.mixer.line.0.pan", "xrs.mixer.line.0.meter"));
+	AddChild(new MixableBox(BPoint(240,0), "Line 2",          "xrs.mixer.line.1.volume", "xrs.mixer.line.1.pan", "xrs.mixer.line.1.meter"));
+	AddChild(new MixableBox(BPoint(360,0), "Line 3",          "xrs.mixer.line.2.volume", "xrs.mixer.line.2.pan", "xrs.mixer.line.2.meter"));
+	AddChild(new MixableBox(BPoint(480,0), "Line 4",          "xrs.mixer.line.3.volume", "xrs.mixer.line.3.pan", "xrs.mixer.line.3.meter"));
 
 	ResizeTo(600,240);
 

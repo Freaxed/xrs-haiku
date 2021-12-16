@@ -19,13 +19,13 @@
 #define HEIGHT	240
 
 
-MixableBox::MixableBox(BPoint position, ValuableID volume, ValuableID pan, ValuableID meter)
+MixableBox::MixableBox(BPoint position, BString name, ValuableID volume, ValuableID pan, ValuableID meter)
 	:BBox(BRect(position,position + BPoint(WIDTH-1,HEIGHT-1)),
 		  "a_mixable_box",B_FOLLOW_NONE,B_WILL_DRAW)
 {
 	
 	//Title
-	fName=new FixedText(BRect(5,5,115,25), "text");
+	fName=new FixedText(BRect(5,5,115,25), name);
 	fName->SetAlignment(B_ALIGN_CENTER);
 	AddChild(fName);
 	

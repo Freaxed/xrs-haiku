@@ -24,7 +24,6 @@ PMixer::PMixer():PBus(){
 	
 	//defaut routing table..
 	
-	ValuableManager::Get()->RegisterValuable("xrs.mixer.main.volume",  80);
 	ValuableManager::Get()->RegisterValuable("xrs.mixer.main.pan",  0);
 //	ValuableManager::Get()->RegisterValuable("xrs.mixer.main.meter",  80);
 	

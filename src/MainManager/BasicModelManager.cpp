@@ -8,15 +8,19 @@
 #include "ValuableManager.h"
 #include "CommonValuableID.h"
 
+#define REG(X, Y) ValuableManager::Get()->RegisterValuable(X, Y);
+
 
 BasicModelManager::BasicModelManager(){
 	
-	ValuableManager* val_manager = ValuableManager::Get();
+	REG(VID_TEMPO_BPM,     (int32)120);
+	REG(VID_TEMPO_BEAT,    (int32) -1);
+	REG(VID_TEMPO_PATTERN, (int32) -1);
+	REG(VID_TEMPO_MEASURE, (int32) -1);
 	
-	val_manager->RegisterValuable(VID_TEMPO_BPM,     (int32)120);
-	val_manager->RegisterValuable(VID_TEMPO_BEAT,    (int32) -1);
-	val_manager->RegisterValuable(VID_TEMPO_PATTERN, (int32) -1);
-	val_manager->RegisterValuable(VID_TEMPO_MEASURE, (int32) -1);
+	//Mixer
+	REG(VID_MIXER_MAIN_VOL, (int32)80);
+	
 
 };
 

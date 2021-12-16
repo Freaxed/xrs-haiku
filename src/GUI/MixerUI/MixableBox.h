@@ -23,7 +23,7 @@ class PMixable;
 class MixableBox : public BBox {
 	
 	public:
-			MixableBox(BPoint position,ValuableID volume, ValuableID pan, ValuableID meter);
+			MixableBox(BPoint position, BString name, ValuableID volume, ValuableID pan, ValuableID meter);
 			
 	private:
 

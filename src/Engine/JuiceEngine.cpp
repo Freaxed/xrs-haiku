@@ -56,9 +56,8 @@ JuiceEngine::JuiceEngine(const char* name):Engine(name),
 	fPeakLeft = fPeakRight = -1.0; //force to update
 	
 	//Not sure if it's the right location..
-	if (!ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BPM, this))
-		LogFatal("JuiceEngine can't register to BPM!");
-	
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BPM, this);
+	ValuableManager::Get()->RegisterValuableReceiver(VID_MIXER_MAIN_VOL, this);
 }
 
 JuiceEngine::~JuiceEngine(){
@@ -80,6 +79,11 @@ JuiceEngine::ValuableChanged(BMessage* msg) {
 			int32 bpm;
 			if (msg->FindInt32(VAL_DATA_KEY, 0, &bpm) == B_OK)
 				SetBPM(bpm);
+		} else
+		if (vID == VID_MIXER_MAIN_VOL) {
+			int32 vol;
+			if (msg->FindInt32(VAL_DATA_KEY, 0, &vol) == B_OK)
+				PMixer::Get()->SetGain((float)vol/100.0f);
 		}
 	}
 }
