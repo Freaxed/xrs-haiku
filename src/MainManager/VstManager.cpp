@@ -125,7 +125,7 @@ VstManager::CreateVst(int pos)
 	int tempo;
 //	XHost::Get()->SendMessage(X_BPM,&tempo);
 //	vst2->setBPM(tempo);
-	debugger("We have to send tempo to VST");	
+	LogError("We have to send tempo to VST");	
 	return vst2;
 }
 void
