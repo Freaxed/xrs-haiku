@@ -72,11 +72,14 @@ MixerWindow::MixerWindow() : XrsWindow(BRect(150,130,280,60),"", B_FLOATING_WIND
 	SetName("mixer_");
 	SetTitle("Mixer");
 
-	AddChild(new MixableBox(BPoint(000,0), "Master (Line 0)", VID_MIXER_MAIN_VOL, "xrs.mixer.main.pan"  , "xrs.mixer.main.meter"  ));
-	AddChild(new MixableBox(BPoint(120,0), "Line 1",          "xrs.mixer.line.0.volume", "xrs.mixer.line.0.pan", "xrs.mixer.line.0.meter"));
-	AddChild(new MixableBox(BPoint(240,0), "Line 2",          "xrs.mixer.line.1.volume", "xrs.mixer.line.1.pan", "xrs.mixer.line.1.meter"));
-	AddChild(new MixableBox(BPoint(360,0), "Line 3",          "xrs.mixer.line.2.volume", "xrs.mixer.line.2.pan", "xrs.mixer.line.2.meter"));
-	AddChild(new MixableBox(BPoint(480,0), "Line 4",          "xrs.mixer.line.3.volume", "xrs.mixer.line.3.pan", "xrs.mixer.line.3.meter"));
+	for (uint8 i=0;i<MIXERLINES_COUNT;i++) {
+		BString label = "Line ";
+		label << i;
+		if (i == 0) 
+			label << " (Master)";
+			
+		AddChild(new MixableBox(BPoint(120*i,0), label, VID_MIXER_LIN_VOL(i), VID_MIXER_LIN_PAN(i), VID_MIXER_LIN_MET(i)));
+	}
 
 	ResizeTo(600,240);
 
@@ -99,7 +102,7 @@ MixerWindow::~MixerWindow()
 	
 	for(int i=0;i<4;i++)
 	{
-		Select(i);
+		//Select(i);
 		for(int j=0;j<8;j++) 
 			DeleteVstWindow(j);
 	}
@@ -122,11 +125,10 @@ MixerWindow::Refresh()
 //	for(i=0;i<4; i++) 
 //		if(&ui_list[i]==selected) break;
 //	selected=NULL;
-	Select(i);
+	//Select(i);
 }
-void
-MixerWindow::Select(int i)
-{}
+
+
 void
 MixerWindow::MessageReceived(BMessage* msg)
 {
@@ -156,7 +158,6 @@ MixerWindow::MessageReceived(BMessage* msg)
 	break;
 	case VERTICAL_CLICK:
 		k=msg->FindInt16("id");
-		Select(k);
 	break;
 	case VERTICAL_SLIDE:
 		//ASSERT(k>0)
@@ -464,7 +465,7 @@ MixerWindow::Reset()
 			
 			}
 	
-		Select(i);
+		//Select(i);
 		
 		for(int j=0;j<8;j++)
 		{
@@ -472,7 +473,7 @@ MixerWindow::Reset()
 		}
 		
 	}
-	Select(0);
+	//Select(0);
 	Unlock();
 	}
 }

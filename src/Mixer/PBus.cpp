@@ -36,7 +36,7 @@ PBus::Process(PBus* caller,size_t frames)
 	
 	if (caller && Used())
 	{
-	  printf("Caller section called!");
+	 // printf("Caller section called!");
 	  caller->MixBuffer(stream,frames,0);
 	  //caller->SetUsed(true);
 	}

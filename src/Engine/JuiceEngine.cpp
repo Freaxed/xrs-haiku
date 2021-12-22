@@ -53,11 +53,17 @@ JuiceEngine::JuiceEngine(const char* name):Engine(name),
 	the_clock.AddTickable(this);
 	the_clock.ResetAndNotify();
 	
-	fPeakLeft = fPeakRight = -1.0; //force to update
+	for (uint8 i=0;i<MIXERLINES_COUNT;i++) 
+		fPeakLeft[i] = fPeakRight[i] = -1.0; //force to update
 	
 	//Not sure if it's the right location..
-	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BPM, this);
-	ValuableManager::Get()->RegisterValuableReceiver(VID_MIXER_MAIN_VOL, this);
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BPM, 	 this);
+	
+	for (uint8 i=0;i<MIXERLINES_COUNT;i++) {
+		ValuableManager::Get()->RegisterValuableReceiver(VID_MIXER_LIN_VOL(i), this);
+		ValuableManager::Get()->RegisterValuableReceiver(VID_MIXER_LIN_PAN(i), this);
+	}
+
 }
 
 JuiceEngine::~JuiceEngine(){
@@ -80,10 +86,19 @@ JuiceEngine::ValuableChanged(BMessage* msg) {
 			if (msg->FindInt32(VAL_DATA_KEY, 0, &bpm) == B_OK)
 				SetBPM(bpm);
 		} else
-		if (vID == VID_MIXER_MAIN_VOL) {
-			int32 vol;
-			if (msg->FindInt32(VAL_DATA_KEY, 0, &vol) == B_OK)
-				PMixer::Get()->SetGain((float)vol/100.0f);
+		if (vID.Compare(BASE_VID_MIXER_LINE, BASE_VID_MIXER_LINE.Length()) == 0) {
+			
+			int32 value;
+			if (msg->FindInt32(VAL_DATA_KEY, 0, &value) != B_OK){
+				return;
+			}
+			
+			uint8 busKey = vID.ByteAt(BASE_VID_MIXER_LINE.Length()) - '0';
+			if(vID.FindFirst(BASE_VID_VOLUME, BASE_VID_MIXER_LINE.Length() + 1) != B_ERROR) {
+				PMixer::Get()->BusAt(busKey)->SetGain((float)value/100.0f);
+			} else if(vID.FindFirst(BASE_VID_PAN, BASE_VID_MIXER_LINE.Length() + 1) != B_ERROR) {
+				PMixer::Get()->BusAt(busKey)->SetPan((float)value/100.0f);
+			}	
 		}
 	}
 }
@@ -215,16 +230,14 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 				Track*	track=(Track*)fCurrentSong->getTrackAt(x);
 				
 				//Scelta del canale di output (PBus):				
-				int   line = track->getRouteLine();
-				PBus* a_bus = NULL;	
+				uint8   line = track->getRouteLine();
+				PBus* a_bus = PMixer::Get()->BusAt(line);
 				
-				if (line == 0)
-					a_bus = PMixer::Get();
-				else
-					a_bus = PMixer::Get()->BusAt(line - 1);
 					
-				if(!a_bus) 
-					break; // should never happen! TODO:add warnings log.
+				if(!a_bus) {
+					LogError("Invalid mixer line in track %d --> line is %d", x, line);
+					break; // should never happen!
+				}
 				
 				// PROCESS
 				if(track->getProcessorType() == 1)  
@@ -275,31 +288,44 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 	
 	float*	fbuffer=(float*)buffer;
 
-	PMixer::Get()->Process((PBus*)NULL,frames); //qui il mixer mixa i vari bus insieme (aggiungendo i vst)
+	PMixer::Get()->GetMain()->Process((PBus*)NULL,frames); //qui il mixer mixa i vari bus insieme (aggiungendo i vst)
 
-	// we need to notify the meters.. iThink@
-	// and we should also do it with the right delay time.. (FIX)
-	// and to all the busses.. (FIX)
-	if (PMixer::Get()->Used())
-	{
-		float meter_l = PMixer::Get()->GetLastMaxValue(0);
-		float meter_r = PMixer::Get()->GetLastMaxValue(1);
-		
-		if (meter_l != fPeakLeft ||
-			meter_r != fPeakRight ) {
-				ValuableManager::Get()->UpdateValue("xrs.mixer.main.meter", meter_r, meter_l);
-				
-				fPeakLeft  = meter_l;
-				fPeakRight = meter_r;
-		}
-	}
+	UpdateMeters();
 	
-	float **mixed = PMixer::Get()->Buffer();
+	float **mixed = PMixer::Get()->GetMain()->Buffer();
 	for(int i=0 ;i<frames; i++){
 		fbuffer[(0 + i) * 2    ]	= mixed[0][i];
 		fbuffer[(0 + i) * 2 + 1] 	= mixed[1][i];
 	}
 	
+}
+
+void
+JuiceEngine::UpdateMeters()
+{
+	// we need to notify the meters.. 
+	// and we should also do it with the right delay time.. (FIX)
+	for (uint8 i=0;i<MIXERLINES_COUNT;i++) 
+	{		
+		float meter_l = 0.0f;
+		float meter_r = 0.0f;
+					
+		if (PMixer::Get()->BusAt(i)->Used())
+		{
+			meter_l = PMixer::Get()->BusAt(i)->GetLastMaxValue(0);
+			meter_r = PMixer::Get()->BusAt(i)->GetLastMaxValue(1);
+		}
+		
+		if (meter_l != fPeakLeft[i] ||
+			meter_r != fPeakRight[i] ) 
+		{
+				ValuableManager::Get()->UpdateValue(VID_MIXER_LIN_MET(i), meter_r, meter_l);
+				
+				fPeakLeft[i]  = meter_l;
+				fPeakRight[i] = meter_r;
+		}
+		
+	}	
 }
 
 void

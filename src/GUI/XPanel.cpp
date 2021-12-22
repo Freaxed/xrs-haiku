@@ -197,7 +197,7 @@ XPanel::AttachedToWindow()
 	//meter
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	AddChild(Two = new ValuablePeakView(VID_MIXER_MAIN_VOL, "PeakView"));
+	AddChild(Two = new ValuablePeakView(VID_MIXER_MAIN_MET, "PeakView"));
 	Two->MoveTo(r.left, r.top);
 	Two->ResizeTo(r.Width(), r.Height());
 	
@@ -206,7 +206,7 @@ XPanel::AttachedToWindow()
 	r.bottom=r.top+22;
 	r.right=r.left+22;
 	
-	AddChild(master=new XPot(r, "master","xrs.mixer.main.volume", 0, 100, XUtils::GetBitmap(24),NULL));
+	AddChild(master=new XPot(r, "master", VID_MIXER_MAIN_VOL, 0, 100, XUtils::GetBitmap(24),NULL));
 	//r.OffsetBy(0,1);
 	//r.bottom=r.top+22;
 	

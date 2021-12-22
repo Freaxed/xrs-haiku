@@ -13,6 +13,7 @@
 XChannelSlider::XChannelSlider(BRect area, const char * name, ValuableID id, orientation o):
 				AChannelSlider(area, name, NULL, NULL, 0, 100, o), vID(id)
 {
+	SetLimitLabels("%", NULL);
 };
 									
 
@@ -43,6 +44,9 @@ void XChannelSlider::MessageReceived(BMessage* msg)
 			int32 value;
 			if (ValuableTools::SearchValues(vID, msg, &value)){
 					SetValue(value);
+					BString label;
+					label << value << "%";
+					SetLimitLabels(label.String(), NULL);
 			}
 		}
 		break;

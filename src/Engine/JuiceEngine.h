@@ -14,6 +14,7 @@
 #include 	"synthMessages.h"
 #include	"Track.h"
 #include	"Tickable.h"
+#include 	"CommonValuableID.h"
 
 class Song;
 class XHost;
@@ -54,6 +55,7 @@ class JuiceEngine : public Engine, public Tickable {
 					
 	private:
 			
+			void	UpdateMeters();
 						
 			float *stream_note[2];
 			float *stream_stream[2];
@@ -72,8 +74,8 @@ class JuiceEngine : public Engine, public Tickable {
 			void			RemoveVoices(Track*);
 			void			DeleteVoices(Track*);		
 			
-			float fPeakLeft;
-			float fPeakRight;	
+			float fPeakLeft[MIXERLINES_COUNT];
+			float fPeakRight[MIXERLINES_COUNT];	
 
 };
 

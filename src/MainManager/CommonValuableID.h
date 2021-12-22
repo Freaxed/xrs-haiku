@@ -12,23 +12,27 @@
 #define VID_TEMPO_MEASURE		"xrs.time.measure" //the number of measure playing (when ALL is ON)
 
 
-#define VID_MIXER_MAIN_VOL		"xrs.mixer.main.volume"
-#define VID_MIXER_LIN1_VOL		"xrs.mixer.line.0.volume"
-#define VID_MIXER_LIN2_VOL		"xrs.mixer.line.1.volume"
-#define VID_MIXER_LIN3_VOL		"xrs.mixer.line.2.volume"
-#define VID_MIXER_LIN4_VOL		"xrs.mixer.line.3.volume"
+// MIXER VIDs
 
-#define VID_MIXER_MAIN_PAN		"xrs.mixer.main.pan"
-#define VID_MIXER_LIN1_PAN		"xrs.mixer.line.0.pan"
-#define VID_MIXER_LIN2_PAN		"xrs.mixer.line.1.pan"
-#define VID_MIXER_LIN3_PAN		"xrs.mixer.line.2.pan"
-#define VID_MIXER_LIN4_PAN		"xrs.mixer.line.3.pan"
+// "xrs.mixer.line.0.volume" is the main gain (0 line in the main output)
 
-#define VID_MIXER_MAIN_MET		"xrs.mixer.main.meter"
-#define VID_MIXER_LIN1_MET		"xrs.mixer.line.0.meter"
-#define VID_MIXER_LIN2_MET		"xrs.mixer.line.1.meter"
-#define VID_MIXER_LIN3_MET		"xrs.mixer.line.2.meter"
-#define VID_MIXER_LIN4_MET		"xrs.mixer.line.3.meter"
+#define	MIXERLINES_COUNT		5 //0 main + 1..4 subline
+
+#define	BASE_VID_MIXER_LINE		ValuableID("xrs.mixer.line.")
+#define BASE_VID_VOLUME			".volume"
+#define BASE_VID_PAN			".pan"
+#define BASE_VID_METER			".meter"
+
+#define VID_MIXER_LIN_VOL(X)		BASE_VID_MIXER_LINE.Append((char)('0' + (uint8)X), 1).Append(BASE_VID_VOLUME)
+#define VID_MIXER_LIN_PAN(X)		BASE_VID_MIXER_LINE.Append((char)('0' + (uint8)X), 1).Append(BASE_VID_PAN)
+#define VID_MIXER_LIN_MET(X)		BASE_VID_MIXER_LINE.Append((char)('0' + (uint8)X), 1).Append(BASE_VID_METER)
+
+#define VID_MIXER_MAIN_VOL			VID_MIXER_LIN_VOL(0)
+#define VID_MIXER_MAIN_PAN			VID_MIXER_LIN_PAN(0)
+#define VID_MIXER_MAIN_MET			VID_MIXER_LIN_MET(0)
+
+
+
 
 
 #endif // CommonValuableID_H

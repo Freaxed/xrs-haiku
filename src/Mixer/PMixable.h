@@ -33,9 +33,7 @@ class PMixable: public PNode , public StereoVolumes {
 			// MeltBuffer: add but with factors (return MAX arrays..lastop )
 			// void			MeltBuffer(float**to,size_t size,float *factors);
 			
-			void	SetName(BString name){ fName=name; }
-			BString	GetName(){ return fName; }
-			
+		
 			void		SetVID(ValuableID val){ vID=val; }
 			ValuableID	GetVID(){ return vID; }
 			

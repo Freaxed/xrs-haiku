@@ -15,17 +15,18 @@
 
 #include "PBus.h"
 #include "PEffector.h"
+#include "CommonValuableID.h"
 
-#define	NUM_BUSSES	4
-
-class PMixer: public PBus {
+class PMixer {
 
 	public:
 			
 			static PMixer* Get(); //get the 'system' mixer
 			
 					~PMixer();
-			PBus*	BusAt(uint pos);			
+					
+			PBus*	BusAt(uint8 pos);
+			PBus*	GetMain();			
 			void	ResetBuffers();					
 
 	// from the mixer everythings start and
@@ -35,7 +36,7 @@ class PMixer: public PBus {
 	
 		 PMixer();
 		//these are the busses:
-		PBus 	busses[NUM_BUSSES];
+		PBus 	busses[MIXERLINES_COUNT];
 		
 };
 #endif

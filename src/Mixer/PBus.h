@@ -16,7 +16,7 @@
 #include "PMixable.h"
 #include "PEffector.h"
 
-#include "Vector.h"
+#include "VectorNew.h"
 #include "Pannable.h"
 
 class PBus: public PMixable  {
@@ -35,7 +35,7 @@ class PBus: public PMixable  {
 					bool	Used(){ return m_used; }
 					
 					void	AddRouted(PBus* routed){ fRouted.Add(routed); }
-					void	RemoveRouted(PBus* routed){ fRouted.Remove(routed); }
+					//void	RemoveRouted(PBus* routed){ fRouted.Remove(routed); }
 					
 					PEffector*	Effector(){ return &fEffector; }
 	private:
@@ -45,6 +45,6 @@ class PBus: public PMixable  {
 			bool	  m_used;
 			
 			
-			Vector<PBus*>	fRouted;
+			VectorNew<PBus*>	fRouted;
 };
 #endif

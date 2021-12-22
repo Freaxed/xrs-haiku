@@ -20,40 +20,15 @@ PMixer::Get()
 }
 
 
-PMixer::PMixer():PBus(){ 
-	
-	//defaut routing table..
-	
-	ValuableManager::Get()->RegisterValuable("xrs.mixer.main.pan",  0);
-//	ValuableManager::Get()->RegisterValuable("xrs.mixer.main.meter",  80);
-	
-	SetName("Master");
-	
-	for(int i=0; i<NUM_BUSSES; i++){
-		
-		AddRouted(&busses[i]);
-		busses[i].SetUsed(false);
-		
-		BString valuableName("xrs.mixer.line.");
-		valuableName << i << ".volume";
-		
-		ValuableManager::Get()->RegisterValuable(valuableName.String(), 80);
-		
-		BString panID("xrs.mixer.line.");
-		panID << i << ".pan";
-		
-		ValuableManager::Get()->RegisterValuable(panID.String(), 0);
-		
-	
-	}
-	
-	ClearBuffer();
-	
+PMixer::PMixer(){ 
+	for(int i=1; i<MIXERLINES_COUNT; i++){
+		BusAt(0)->AddRouted(&busses[i]);	
+	}	
+	BusAt(0)->ClearBuffer();
 }
 
 PMixer::~PMixer()
 {
-	//TODO unregistering all and delete.
 
 }
 
@@ -61,23 +36,24 @@ PMixer::~PMixer()
 void	
 PMixer::ResetBuffers()
 {
-	if (Used())
-	{
-		ClearBuffer();
-		SetUsed(false);
-	}
-	
-	for(int i=0;i<NUM_BUSSES;i++)
+	for(int i=0;i<MIXERLINES_COUNT;i++) {
 		if(busses[i].Used())
-		{	
+		{
 			busses[i].ClearBuffer();
 			busses[i].SetUsed(false);
 		}
+	}
+}
+PBus*	
+PMixer::GetMain() {
+	return BusAt(0);
 }
 				
 PBus*	
-PMixer::BusAt(uint pos){
-	if(pos>=NUM_BUSSES) return NULL;
+PMixer::BusAt(uint8 pos){
+	if (pos >= MIXERLINES_COUNT) 
+		return NULL;
+		
 	return &busses[pos];
 }
 	

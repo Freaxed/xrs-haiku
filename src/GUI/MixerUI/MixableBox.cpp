@@ -20,7 +20,7 @@
 
 
 MixableBox::MixableBox(BPoint position, BString name, ValuableID volume, ValuableID pan, ValuableID meter)
-	:BBox(BRect(position,position + BPoint(WIDTH-1,HEIGHT-1)),
+	:BBox(BRect(position, position + BPoint(WIDTH - 1, HEIGHT - 1)),
 		  "a_mixable_box",B_FOLLOW_NONE,B_WILL_DRAW)
 {
 	
@@ -36,24 +36,29 @@ MixableBox::MixableBox(BPoint position, BString name, ValuableID volume, Valuabl
 		
 	//Slider
 	fSlider = new XChannelSlider(rect, "XChannelSlider", volume, B_VERTICAL);
-	fSlider->SetLimitLabels(NULL,NULL);
-	fSlider->SetHashMarks(B_HASH_MARKS_RIGHT);
-	fSlider->SetHashMarkCount(16);
+	fSlider->SetHashMarks(B_HASH_MARKS_BOTH);
+	fSlider->SetHashMarkCount(10);
+	fSlider->ResizeToPreferred();
+	rect = fSlider->Frame();
 	AddChild(fSlider);
+	
 
 	//Pot
-	rect.OffsetTo(rect.right + 1,rect.top);
-	rect.bottom=rect.top+22;
-	rect.right=rect.left+22;
+	rect.OffsetTo(rect.right + 10, rect.top);
+	rect.right  = rect.left+ 36;
+	rect.bottom = rect.top + 22;
+	fMeter=new GfxMeter(rect, meter);
+
+	AddChild(fMeter);
+	
+	//Meter	
+	rect.OffsetBy(0,25);
+	rect.bottom = rect.top+22;
+	rect.right = rect.left+22;
 	fPot = new XPot(rect, "XPot", pan, -100, +100, XUtils::GetBitmap(24), NULL);
 	AddChild(fPot);
 	
-	//Meter
-	
-	rect.OffsetBy(0,25);
-	rect.right=rect.left+36;
-	fMeter=new GfxMeter(rect, meter);
-	AddChild(fMeter);
+	//
 }
 
 

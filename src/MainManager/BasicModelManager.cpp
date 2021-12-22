@@ -8,7 +8,7 @@
 #include "ValuableManager.h"
 #include "CommonValuableID.h"
 
-#define REG(X, Y) ValuableManager::Get()->RegisterValuable(X, Y);
+#define REG(X...)    ValuableManager::Get()->RegisterValuable(X);
 
 
 BasicModelManager::BasicModelManager(){
@@ -19,9 +19,11 @@ BasicModelManager::BasicModelManager(){
 	REG(VID_TEMPO_MEASURE, (int32) -1);
 	
 	//Mixer
-	REG(VID_MIXER_MAIN_VOL, (int32)80);
-	
-
+	for (uint8 i=0; i<5; i++) {
+		REG(VID_MIXER_LIN_VOL(i), (int32)80);
+		REG(VID_MIXER_LIN_PAN(i), (int32)00);
+		REG(VID_MIXER_LIN_MET(i), (float)0.0f, (float)0.0f);
+	}
 };
 
 BasicModelManager::~BasicModelManager() {

@@ -30,7 +30,7 @@ private:
 			fVolumes[0] *= (1.0f - fPan);
 		else
 		if(fPan < 0) 
-			fVolumes[0] *= (1.0f + fPan);
+			fVolumes[1] *= (1.0f + fPan);
 		
 		LogTrace("[StereoVolumes] fVolumes[%f,%f] fGain[%f] fPan[%f]", fVolumes[0], fVolumes[1], fGain, fPan);
 	}
