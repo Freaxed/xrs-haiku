@@ -11,37 +11,29 @@
 #define _XPot_h
 
 #include 	"APot.h"
-#include	"ValuableView.h"
-#include	"ValuableController.h"
+#include 	"ValuableManager.h"
 
 #define	SB_MSG	'sbmp'
 
-class XPot : public APot, public ValuableView, public ValuableController
+class XPot : public APot
 {
 public:
 	XPot(BRect frame, const char *name,
-		ValuableID id, int32 valuable_channel, 
-		BMessage *satte,
-		int32 minValue, int32 maxValue,
+		ValuableID id, int32 min, int32 max,
 		BBitmap *p1 = NULL ,BBitmap *p2 = NULL);
 		
 	virtual ~XPot();
-		
 
-	
-	//valuableView
-	BHandler*	Handler() { return this;};
-	
 	
 	//events	
 	
-	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage* msg);
+	void AttachedToWindow();
+	void DetachedFromWindow();
+	void MessageReceived(BMessage* msg);
 
 	
 private:
-	
-	int			m_vChannel;
+	ValuableID vID;
 
 
 };

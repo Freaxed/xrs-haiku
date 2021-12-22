@@ -80,7 +80,7 @@ MainWindow::MainWindow() :
 	//split->SetViewInsetBy(BPoint(0,0));
 	//fPanel->AddChild(split);	
 		
-	ticks=new TickView( BRect(0,XPANEL_H,WINDOW_XL-B_V_SCROLL_BAR_WIDTH,XPANEL_H+INFO_BAR_LY+2),0);
+	ticks=new TickView( BRect(0,XPANEL_H,WINDOW_XL-B_V_SCROLL_BAR_WIDTH,XPANEL_H+INFO_BAR_LY+2));
 	fPanel->AddChild(ticks);
 	
 	ticks->AddChild(new PositionView( BRect(10,0,10+54+54,18),0));		
@@ -313,9 +313,9 @@ MainWindow::MessageReceived(BMessage* message)
 		case PLAY_ALL_SET:
 			MeasureManager::Get()->SetPatternMode(fPanel->isAllPat());
 			break;
-		case TEMPO_MOV:
+		/*case TEMPO_MOV:
 			JuiceEngine::Get()->PostMessage(message);
-			break;
+			break;*/
 		case TRACK_SET:
 			PostMessage(message, fTracksPanel);
 			break;

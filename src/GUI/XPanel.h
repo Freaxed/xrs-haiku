@@ -25,6 +25,7 @@ class TracksPanel;
 class XDigit;
 class XPot;
 class BPictureButton;
+class PeakView;
 
 class XPanel : public BView
 {
@@ -40,13 +41,12 @@ class XPanel : public BView
 			
 		void		PlayButtonOn(bool);
 		void		ResetMeasureCount();
-		//GfxMeter*	getMeter(){ return One;}
 
 	private:
 	
 		void	SelectTrack(int);
 		VUView* One;
-	
+		PeakView* Two;
 	
 		XDigit				*curpat;
 	
@@ -56,7 +56,7 @@ class XPanel : public BView
 		BPictureButton		*vst;
 		
 		
-		XDigit			*bpm;
+		//XDigit			*bpm;
 		Song			*curSong;
 		XPot*		 	master;
 		char			ttext[4];

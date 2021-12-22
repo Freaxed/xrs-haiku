@@ -1,6 +1,5 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,22 +7,25 @@
  */
 
 #include <View.h>
+#include "ValuableManager.h"
 
 class TickView : public BView
 {
 	public:
 		
-					TickView(BRect,int d);
-		  void 		SetTick(int,int,int);
+					TickView(BRect);
+		  void 		SetTick(int);
 		  void		SetNumberNotes(int);
-	virtual void 		Draw(BRect);
-	virtual void 		AttachedToWindow();
-	
-	virtual void		MessageReceived(BMessage*);
+		  
+	      void 		Draw(BRect);
+	      void 		AttachedToWindow();
+	      void 		DetachedFromWindow();
+	      void		MessageReceived(BMessage*);
+
 	
 	private:
-			float	xinc,space,space2;
-			int tick,num_notes;
+			
+			int32 	tick, num_notes;
 			BRect	TRect(int d);
 };
 

@@ -19,21 +19,13 @@
 #define HEIGHT	240
 
 
-MixableBox::MixableBox(BPoint position, PMixable* node)
-	:BBox(BRect(position,position + BPoint(WIDTH-1,HEIGHT-1)),
+MixableBox::MixableBox(BPoint position, BString name, ValuableID volume, ValuableID pan, ValuableID meter)
+	:BBox(BRect(position, position + BPoint(WIDTH - 1, HEIGHT - 1)),
 		  "a_mixable_box",B_FOLLOW_NONE,B_WILL_DRAW)
-		  ,fMixable(node)
 {
-	ValuableID id = ValuableManager::Get()->FindValuableID(fMixable);
-	
-//	printf("MixableBox ValuableID %s\n",id.String());
-	
-	if (id == "") 
-		debugger("Register the Mixable before the MixableBox!");
-	
 	
 	//Title
-	fName=new FixedText(BRect(5,5,115,25),node->GetName().String());
+	fName=new FixedText(BRect(5,5,115,25), name);
 	fName->SetAlignment(B_ALIGN_CENTER);
 	AddChild(fName);
 	
@@ -43,25 +35,30 @@ MixableBox::MixableBox(BPoint position, PMixable* node)
 	rect.top = 26;
 		
 	//Slider
-	fSlider = new XChannelSlider(rect,"nome",id,0,NULL,0,127,B_VERTICAL);
-	fSlider->SetLimitLabels(NULL,NULL);
-	fSlider->SetHashMarks(B_HASH_MARKS_RIGHT);
-	fSlider->SetHashMarkCount(16);
+	fSlider = new XChannelSlider(rect, "XChannelSlider", volume, B_VERTICAL);
+	fSlider->SetHashMarks(B_HASH_MARKS_BOTH);
+	fSlider->SetHashMarkCount(10);
+	fSlider->ResizeToPreferred();
+	rect = fSlider->Frame();
 	AddChild(fSlider);
+	
 
 	//Pot
-	rect.OffsetTo(rect.right + 1,rect.top);
-	rect.bottom=rect.top+22;
-	rect.right=rect.left+22;
-	fPot = new XPot(rect,"pot",id,1,NULL,-64,+64,XUtils::GetBitmap(24),NULL);
+	rect.OffsetTo(rect.right + 10, rect.top);
+	rect.right  = rect.left+ 36;
+	rect.bottom = rect.top + 22;
+	fMeter=new GfxMeter(rect, meter);
+
+	AddChild(fMeter);
+	
+	//Meter	
+	rect.OffsetBy(0,25);
+	rect.bottom = rect.top+22;
+	rect.right = rect.left+22;
+	fPot = new XPot(rect, "XPot", pan, -100, +100, XUtils::GetBitmap(24), NULL);
 	AddChild(fPot);
 	
-	//Meter
-	id += ".meter";
-	rect.OffsetBy(0,25);
-	rect.right=rect.left+36;
-	fMeter=new GfxMeter(rect, id);
-	AddChild(fMeter);
+	//
 }
 
 

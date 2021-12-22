@@ -69,7 +69,7 @@ SamplerPanel::SamplerPanel(SamplerTrackBoost* sb) :
 	pit_box->AddChild(pit_ck=new BCheckBox(r,"",T_SAMPLER_STRECH,new BMessage(PIT_ON)));
 	pit_ck->SetValue(0);
 	pit_ck->SetFontSize(12);
-	pit_box->AddChild(shift=new XDigit(BRect(120,5,120+36,5+21),"shift", "sampler_shift_xdigit", new BMessage(MOD),NULL,1,32));
+	pit_box->AddChild(shift=new XDigit(BRect(120,5,120+36,5+21), VID_EMPTY, "sampler_shift_xdigit", new BMessage(MOD),1,32));
 	
 	r=(pit_box->Frame());
 	r.OffsetBy(0,38);
@@ -85,7 +85,7 @@ SamplerPanel::SamplerPanel(SamplerTrackBoost* sb) :
 	pit_box->AddChild(boost_ck=new BCheckBox(r,"",T_SAMPLER_BOOST,new BMessage(BOOST_ON)));
 	boost_ck->SetValue(0);
 	boost_ck->SetFontSize(12);
-	pit_box->AddChild(depth=new XDigit(BRect(120,5,120+36,5+21), "depth", "sampler_boost", new BMessage(REL_MSG),NULL,1,4));
+	pit_box->AddChild(depth=new XDigit(BRect(120,5,120+36,5+21), VID_EMPTY, "sampler_boost", new BMessage(REL_MSG),1,4));
 	
 	r=(pit_box->Frame());
 	r.OffsetBy(0,38);
@@ -154,12 +154,12 @@ SamplerPanel::SetTrack(SamplerTrack *tr)
 	{
 		
 		sw->Init(0,NULL,0,0);
-		shift->SetValue(16);
+		shift->UpdateValue(16, true);
 		pit_ck->SetValue(false);
 		boost_ck->SetValue(false);
 		//field->SetLabel("No sample selected");
 		menu->Superitem()->SetLabel(T_SAMPLER_NOSELECTED);
-		depth->SetValue(1);
+		depth->UpdateValue(1, true);
 		Window()->Unlock();
 		return;
 	}
@@ -170,11 +170,11 @@ SamplerPanel::SetTrack(SamplerTrack *tr)
 		sw->Init(my_sample->channels,my_sample->wave_data,my_sample->frames,tr->isReversed());
 		//field->SetLabel(my_sample->name);
 		menu->Superitem()->SetLabel(my_sample->name);
-		shift->SetValue(tr->getResample());
+		shift->UpdateValue(tr->getResample(), true);
 		pit_ck->SetValue(tr->isResampleEnable());
 		boost_ck->SetValue(tr->isBoostEnable());
 		rev->SetValue(tr->isReversed());
-		depth->SetValue(tr->amp);
+		depth->UpdateValue((int32)tr->amp, true);
 		sw->SetAmp(tr->amp);
 
 		

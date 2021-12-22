@@ -21,7 +21,7 @@
 	#include <MidiProducer.h>
 	#include "VSTMIDIConsumer.h"
 #endif
-
+#include "Log.h"
 
 BList*				vst_list = NULL;
 VstTimeInfo* 		time_info = NULL;
@@ -277,15 +277,15 @@ VSTItem * VSTItem::Identify (AEffect * effect)
 
 void VSTItem::load_plug_ins (const char *rootdir) //, BList *list)
 {
-	printf("Parsing %s and looking for VSTs\n", rootdir);	
+	LogTrace("VSTItem::load_plug_ins, parsing %s and looking for VSTs\n", rootdir);	
 	DIR* dir = opendir (rootdir);
 	if (dir)
 	{
-		printf(" DIR found\n");
+		LogTrace(" DIR found\n");
 		struct dirent * entry = readdir (dir);
 		while (entry)
 		{
-			printf(" ENTRY found %s\n", entry->d_name);
+			LogTrace("VSTItem::load_plug_ins, ENTRY found %s\n", entry->d_name);
 			if (strcmp (entry->d_name, ".") != 0 && strcmp (entry->d_name, "..") != 0)
 			{
 				char path[PATH_MAX];
@@ -304,7 +304,7 @@ void VSTItem::load_plug_ins (const char *rootdir) //, BList *list)
 							&& node.ReadAttr ("BEOS:TYPE", B_MIME_STRING_TYPE, 0, type, B_MIME_TYPE_LENGTH) > 0
 							&& strcasecmp (type, B_APP_MIME_TYPE) == 0) {
 							// To help debugging if a crash occurs...
-							printf ("Loading \"%s\" as an addon... ", path);
+							LogTrace ("VSTItem::load_plug_ins, Loading \"%s\" as an addon... ", path);
 							fflush (stdout);
 							char	name[B_OS_NAME_LENGTH];
 							strncpy (name, entry->d_name, B_OS_NAME_LENGTH);
@@ -313,16 +313,14 @@ void VSTItem::load_plug_ins (const char *rootdir) //, BList *list)
 							image_id vstaddon = load_add_on (path);
 							if (vstaddon > 0)
 							{	// the file is indeed an addon, but is it a VST plugin?
-								printf ("OK! VST Plugin?... ");
-								fflush (stdout);
 								AEffect * effect;
 								AEffect * (*main_plugin) (audioMasterCallback audioMaster);
 								if (get_image_symbol (vstaddon, "main_plugin", B_SYMBOL_TYPE_TEXT, (void**) &main_plugin) == B_OK)
 								{	// Chances are now that this is a VST plugin, but is it supported?...
-									printf ("Yes!\n");
 									effect = (*main_plugin) (&audioMaster);
 									if (effect && effect->magic == kEffectMagic)
 									{
+										LogTrace ("VSTItem::load_plug_ins, Valid VST Plugin! magic[%ld] numOutputs[%ld] numInputs[%ld]\n", effect->magic, effect->numOutputs, effect->numInputs);
 										if (effect->numOutputs <= 2 && effect->numInputs <= 2)
 										{
 											effect->dispatcher (effect, effOpen, 0, 0, 0, 0.);
@@ -342,6 +340,7 @@ void VSTItem::load_plug_ins (const char *rootdir) //, BList *list)
 												
 												ple->product=name;
 																					
+											LogTrace ("VSTItem::load_plug_ins, Name [%s] Product [%s]", ple->name, ple->product);
 											
 											ple->ref.set_name(path);
 											ple->isSynth=(effect->flags & effFlagsIsSynth); //effect->isSynth;

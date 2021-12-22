@@ -9,6 +9,8 @@
 
 // TickView II
 //	15-12-03 xmas!
+// version haiku:
+//	08-12-21
 
 #include "TickView.h"
 
@@ -17,108 +19,94 @@
 #include <Message.h>
 #include <stdio.h>
 
-
-#include "BasicValuableView.h"
 #include "ValuableManager.h"
+#include "CommonValuableID.h"
 
 BBitmap*	b_tick;
+const float	xinc  = 23.0;
+const float space = 170.0;
 
-TickView::TickView(BRect frame,int d): BView(frame,"Juice",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW)
+TickView::TickView(BRect frame): BView(frame,"TickView",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW)
 {
-	ValuableManager::Get()->RegisterValuableView("time.position.fulltick",new BasicValuableView(0, "time.position.fulltick", this));	
-	xinc=23;
-	tick=-1;
-	space=10+160;
-	num_notes=16;
+	tick = -1;
+	num_notes = 16;
 	b_tick=XUtils::GetBitmap(5); //fix
 }
 
 void 
 TickView::SetNumberNotes(int d)
 {
-	num_notes=d;
-	//ResizeTo(23*num_notes+2,Frame().Height());
+	num_notes = d;
 	Invalidate();
 }
+
 void
 TickView::Draw(BRect b)
 {
-	//BBox::Draw(b);	
-	for(int i=0;i<num_notes;i++)
+	for(float i=0.0f; i<(float)num_notes; i++)
 	{
-		
-		//SetPenSize(2);
-		//StrokeRect(BRect(space+i*xinc-6,3,space+i*xinc+5,9+5));
-		//SetPenSize(1);
-		DrawBitmap(b_tick,BPoint(space+i*xinc-7,3));
+		DrawBitmap(b_tick,BPoint(space + (i*xinc) - 7.0f, 3.0f));
 	}
 }
 
 void
-TickView::SetTick(int c,int,int)
+TickView::SetTick(int c)
 {
-	if(c==tick) return;
+	if(c == tick) 
+		return;
 	
-	tick=c;
-	if(c<0){
-		Invalidate();
-		
+	tick = c;
+	
+	if ( c < 0 ) {
+		Invalidate();		
 		return;
 	}
 	
-	
-	
 	if(Window()->Lock())
 	{
-	
-		//rgb_color old_c=HighColor();
-		
-		//if(a==b)
-			SetHighColor(255,10,0,255); 
-		//   	   else
-		//  	SetHighColor(155,10,156,0); 
-		   
-		
+		SetHighColor(255,10,0,255); 
 		FillRect(TRect(tick));
 		SetHighColor(ViewColor());
-		//SetHighColor(75,107,154);
 				
 		if(tick!=0)
 			FillRect(TRect(tick-1));
 		else
-			FillRect(TRect(num_notes-1));
-		
+			FillRect(TRect(num_notes-1));		
 		
 		Window()->Unlock();
-		//SetHighColor(old_c);
 	}
-	
-	
-	
-	
 }
 
 BRect
 TickView::TRect(int d)
 {
-	return BRect(space+d*xinc-5,5,space+d*xinc+4,9);
+	return BRect(space + ((float)d * xinc) - 5.0f, 5.0f, space + ((float)d * xinc) + 4.0f, 9.0f);
 }
+
 void
 TickView::AttachedToWindow()
 {
-	SetViewColor(Parent()->ViewColor());
 	BView::AttachedToWindow();
+	SetViewColor(Parent()->ViewColor());
+	
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BEAT, this);	
+	
 }
+
+void 		
+TickView::DetachedFromWindow()
+{
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_TEMPO_BEAT, this);	
+	BView::DetachedFromWindow();
+}
+
 void
 TickView::MessageReceived(BMessage* msg)
 {
-	/*if(msg->what=='Mtr')
+	int32 tick;
+	if(msg->what==MSG_VALUABLE_CHANGED && ValuableTools::SearchValues(VID_TEMPO_BEAT, msg, &tick))
 	{
-		SetTick(msg->FindInt16("beat"),msg->FindInt16("pat"),msg->FindInt16("curpat"));
-	}*/
-	if(msg->what==MSG_VALUABLE_CHANGED)
-	{
-		SetTick((int32)msg->FindFloat("valuable:value"),0,0);
+		SetTick(tick);
 	}
 	else
 		BView::MessageReceived(msg);

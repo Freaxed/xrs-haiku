@@ -10,59 +10,36 @@
 
 #include "GfxMeter.h"
 #include "Xed_Utils.h"
-#include "BasicValuableView.h"
 #include "ValuableManager.h"
-
+#include "Valuable.h"
+#include "Log.h"
 #include <Message.h>
 #include <stdio.h>
 #include <math.h>
-/*
-static rgb_color	clipColor={255,255,255};
-static rgb_color	backColor={115,134,167};
-static rgb_color	rightColor={106,124,154};
-static rgb_color	leftColor={106,124,154};
-*/
+
 
 GfxMeter::GfxMeter(BRect frame, ValuableID id):BView(frame,  id.String(),  B_FOLLOW_NONE,B_WILL_DRAW)
-		,fId(id)
+		,vID(id)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	
-	//fValues = new IntValuable(2);
-	ValuableManager::Get()->RegisterValuable(fId, NullValuable);
-	
-	//we register the two channel notification
-	vleft  = NULL ; 
-	vright = NULL ;				
+	ValuableManager::Get()->RegisterValuable(vID, 0.0f, 0.0f); //TODO move somewhere.!
+		
 }
 
-GfxMeter::~GfxMeter()
+GfxMeter::~GfxMeter() {
+
+}
+
+void
+GfxMeter::DetachedFromWindow() 
 {
-	ValuableManager::Get()->UnRegisterValuable(fId);
-	
-	//delete fValues;
-	
-	if(!vleft || !vright)
-		return;
-		
-	ValuableManager::Get()->UnRegisterValuableView(fId, vleft);
-	ValuableManager::Get()->UnRegisterValuableView(fId, vright);
-	
-	delete vleft;
-	delete vright;	
-			
+	ValuableManager::Get()->UnregisterValuableReceiver(vID, this);
+	BView::DetachedFromWindow();
 }
 
 void
 GfxMeter::AttachedToWindow()
-{
-	//we register the two channel notification
-	vleft  = new BasicValuableView(0, BString("GfxMeter_left"), this );
-	vright = new BasicValuableView(1, BString("GfxMeter_left"), this );
-	
-	ValuableManager::Get()->RegisterValuableView(fId, vleft, false);
-	ValuableManager::Get()->RegisterValuableView(fId, vright, false);	
-	
+{	
 	off = XUtils::GetBitmap(21);
 	on = XUtils::GetBitmap(22);
 	
@@ -77,52 +54,49 @@ GfxMeter::AttachedToWindow()
 	r_down.OffsetBy(4,12);
 	
 	width = r_up.Width();
+	
+	ValuableManager::Get()->RegisterValuableReceiver(vID, this);
+	
+	BView::AttachedToWindow();
 		
 }
 void GfxMeter::Draw(BRect k)
 {
-	r_up.right = r_up.left + pixel_l * 100.;
-	r_bitmap.right = r_bitmap.left + pixel_l * 100.;
+	r_up.right = r_up.left + pixel_l * 100.0f;
+	r_bitmap.right = r_bitmap.left + pixel_l * 100.0f;
 	
 	DrawBitmapAsync(on,r_bitmap,r_up);
 	
-	r_down.right = r_down.left + pixel_r * 100.;
-	r_bitmap.right = r_bitmap.left + pixel_r * 100.;
+	r_down.right = r_down.left + pixel_r * 100.0f;
+	r_bitmap.right = r_bitmap.left + pixel_r * 100.0f;
 	
 	DrawBitmap(on,r_bitmap,r_down);
 		
 }
 	
 	
-void GfxMeter::MessageReceived(BMessage *message){	
+void GfxMeter::MessageReceived(BMessage *msg){	
 	
-	switch(message->what)
+	switch(msg->what)
 	{
 		
 		case MSG_VALUABLE_CHANGED:
 		{
-			//message->PrintToStream();
-			float value;
-			if(message->FindFloat("valuable:value",&value) == B_OK)
-			{	
-				int16 id = message->FindInt16("valuable:id");
-				
-				if(id == 0 && pixel_l != value)
+			float value_r, value_l;
+			if(ValuableTools::SearchValues(vID, msg, &value_r, &value_l))
+			{					
+				if(pixel_l != value_l || 
+				   pixel_r != value_r )
 				{
-					pixel_l = value;
-					Invalidate(); // at least half view!
+					pixel_l = value_l;
+					pixel_r = value_r;
+					Invalidate();
 				}
-				else
-				if (pixel_r != value)
-				{
-					pixel_r = value;
-					Invalidate(); // at least half view!
-				}	
 			}			
 		}
 		break;
 		default:
-			_inherited::MessageReceived(message);
+			_inherited::MessageReceived(msg);
 			break;
 	}
 }

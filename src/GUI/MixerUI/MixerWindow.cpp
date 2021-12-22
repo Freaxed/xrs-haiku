@@ -16,7 +16,6 @@
 #include	"SourceItem.h"
 #include	"AChannelSlider.h"
 #include 	"ValuableManager.h"
-#include	"BasicValuableView.h"
 #include	"Xed_Utils.h"
 #include 	"APot.h"
 #include	"Xed_Utils.h"
@@ -33,6 +32,7 @@
 #include	<ListView.h>
 #include	<Button.h>
 #include	<PictureButton.h>
+#include	"CommonValuableID.h"
 
 #define	VERTICAL_SLIDE	'vers'
 #define	VST_STATE		'vsts'
@@ -68,27 +68,21 @@ MixerWindow::Get()
 }
 
 MixerWindow::MixerWindow() : XrsWindow(BRect(150,130,280,60),"", B_FLOATING_WINDOW,B_ASYNCHRONOUS_CONTROLS|B_NOT_ZOOMABLE|B_AVOID_FOCUS|B_NOT_RESIZABLE)
-{
-	
+{	
 	SetName("mixer_");
 	SetTitle("Mixer");
-	
-	//BFont tmp(be_fixed_font);
-	
-	AddChild(new MixableBox(BPoint(000,0),PMixer::Get()));
-	AddChild(new MixableBox(BPoint(120,0),PMixer::Get()->BusAt(0)));
-	AddChild(new MixableBox(BPoint(240,0),PMixer::Get()->BusAt(1)));
-	AddChild(new MixableBox(BPoint(360,0),PMixer::Get()->BusAt(2)));
-	AddChild(new MixableBox(BPoint(480,0),PMixer::Get()->BusAt(3)));
-	
-	/*Mixer Meters set up*/
-	//FIX my_mixer->sender=this;
 
-//	ResizeTo(LINENUM*60-1 + 200,top+8*20-1);
+	for (uint8 i=0;i<MIXERLINES_COUNT;i++) {
+		BString label = "Line ";
+		label << i;
+		if (i == 0) 
+			label << " (Master)";
+			
+		AddChild(new MixableBox(BPoint(120*i,0), label, VID_MIXER_LIN_VOL(i), VID_MIXER_LIN_PAN(i), VID_MIXER_LIN_MET(i)));
+	}
 
 	ResizeTo(600,240);
-	//LoadConfig(&r);
-	
+
 	expanded=(bool)Configurator::Get()->FloatKey("mixer_expanded",1);
 	
 	/* manca extra settaggio !*/
@@ -108,7 +102,7 @@ MixerWindow::~MixerWindow()
 	
 	for(int i=0;i<4;i++)
 	{
-		Select(i);
+		//Select(i);
 		for(int j=0;j<8;j++) 
 			DeleteVstWindow(j);
 	}
@@ -127,15 +121,14 @@ MixerWindow::QuitRequested()
 void
 MixerWindow::Refresh()
 {
-	int i;
+	int i = 0;
 //	for(i=0;i<4; i++) 
 //		if(&ui_list[i]==selected) break;
 //	selected=NULL;
-	Select(i);
+	//Select(i);
 }
-void
-MixerWindow::Select(int i)
-{}
+
+
 void
 MixerWindow::MessageReceived(BMessage* msg)
 {
@@ -165,7 +158,6 @@ MixerWindow::MessageReceived(BMessage* msg)
 	break;
 	case VERTICAL_CLICK:
 		k=msg->FindInt16("id");
-		Select(k);
 	break;
 	case VERTICAL_SLIDE:
 		//ASSERT(k>0)
@@ -460,7 +452,7 @@ MixerWindow::Reset()
 			
 //			obs_volumes->SetValue(80,T_MIXER_MASTER);
 			//ui_list[i].slider->SendValue(0,80);
-			ValuableManager::Get()->SpreadValue("mixer.master",0,80.0);
+			//ValuableManager::Get()->UpdateValue("mixer.main", 80.0f);
 			
 			
 		}
@@ -473,7 +465,7 @@ MixerWindow::Reset()
 			
 			}
 	
-		Select(i);
+		//Select(i);
 		
 		for(int j=0;j<8;j++)
 		{
@@ -481,7 +473,7 @@ MixerWindow::Reset()
 		}
 		
 	}
-	Select(0);
+	//Select(0);
 	Unlock();
 	}
 }
@@ -572,7 +564,7 @@ MixerWindow::LoadSettings(BMessage*	data)
 				}
 		else
 //				obs_volumes->SetValue(80,T_MIXER_MASTER);
-		ValuableManager::Get()->SpreadValue("mixer.master",0,80.0);
+		ValuableManager::Get()->SpreadValue("mixer.main",0,80.0);
 		
 		// ciclo per i preset vst
 		int j=0;

@@ -43,7 +43,7 @@ class MixerWindow : public XrsWindow
 	private:		
 						MixerWindow();
 				void	_postValue(int x);
-				void	Select(int i);
+
 				void	VSTSelect(int i);
 				void	LoadVST(int k,OutputLine*,int i);
 				

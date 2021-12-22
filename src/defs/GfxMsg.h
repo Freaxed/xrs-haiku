@@ -8,7 +8,7 @@
 #define	NOTE_SET		5001 
 #define	TRACK_ON		5003 
 #define	TRACK_SAMP		5004 
-#define	TEMPO_MOV		5006 
+//#define	TEMPO_MOV		5006 
 #define	MENU_BANK		5007 
 #define	NONE_BANK		5008
 #define	GENERIC			5010 

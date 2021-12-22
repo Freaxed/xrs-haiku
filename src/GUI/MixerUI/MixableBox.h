@@ -16,16 +16,17 @@
 #include "XPot.h"
 #include "GfxMeter.h"
 #include "FixedText.h"
+#include "ValuableManager.h"
 
 class PMixable;
 
 class MixableBox : public BBox {
 	
 	public:
-			MixableBox(BPoint position,PMixable*);	
-	private:
-			PMixable*	fMixable;
+			MixableBox(BPoint position, BString name, ValuableID volume, ValuableID pan, ValuableID meter);
 			
+	private:
+
 			FixedText*	fName;
 			XChannelSlider*	fSlider;
 			XPot*			fPot;

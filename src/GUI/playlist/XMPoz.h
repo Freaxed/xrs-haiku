@@ -11,6 +11,7 @@
 #define _XMPoz_
 
 #include <View.h>
+#include "ValuableManager.h"
 class Sequence;
 
 class XMPoz: public BView
@@ -24,7 +25,9 @@ class XMPoz: public BView
 		 void	MouseUp(BPoint p);
 		 void	MouseMoved(BPoint point,uint32 transit,const BMessage *message);
 		 void	MessageReceived(BMessage*);
-		 void	AttachedToWindow();	
+		 void	AttachedToWindow();
+		 void	DetachedFromWindow();
+
 			
 			
 			 void		Reset(Sequence*);

@@ -20,8 +20,8 @@
 #include	<NodeInfo.h>
 #include	<Menu.h>
 #include	<MenuItem.h>
-
-#include <stdio.h>
+#include	"Log.h"
+#include 	<stdio.h>
 
 
 #define	VST_PRESET_MIME "audio/XRS-VstPresetFile"
@@ -65,13 +65,16 @@ VstManager::VstManager()
 	VSTItem::load_plug_ins (vstxrs.Path());
 	
 	// (/boot/home/config/add-ons/media/vstplugins)
+     //	/boot/system/add-ons/media/vstplugins
 	
-	BPath vstaddon;
-	find_directory (B_USER_ADDONS_DIRECTORY, &vstaddon, true);
-	vstaddon.Append("media");
-	vstaddon.Append("vstplugins");
+	BPath vstaddon("/boot/system/add-ons/media/vstplugins");
+//	find_directory (B_USER_ADDONS_DIRECTORY, &vstaddon, true);
+//	vstaddon.Append("media");
+//	vstaddon.Append("vstplugins");
 		
 	VSTItem::load_plug_ins (vstaddon.Path());
+		
+	LogInfo("Loading pluing in path [%s]", vstaddon.Path());
 		
 	//TODO: we should find a way to avoid already loaded VST.
 		
@@ -120,9 +123,9 @@ VstManager::CreateVst(int pos)
 	VSTItem* vst2=new  VSTItem(ple->ref.name);
 	
 	int tempo;
-	XHost::Get()->SendMessage(X_BPM,&tempo);
-	vst2->setBPM(tempo);
-	
+//	XHost::Get()->SendMessage(X_BPM,&tempo);
+//	vst2->setBPM(tempo);
+	LogError("We have to send tempo to VST");	
 	return vst2;
 }
 void

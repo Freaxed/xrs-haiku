@@ -14,13 +14,13 @@
 #include "Track.h"
 #include "Song.h"
 #include "TracksPanel.h"
-#include "XDigit.h"
 #include "ColorsDef.h"
 #include "XDigit.h"
 #include "XPot.h"
-#include	"MeasureManager.h"
-#include	"WindowManager.h"
-
+#include "MeasureManager.h"
+#include "WindowManager.h"
+#include "CommonValuableID.h"
+#include "ValuablePeakView.h"
 #include "VUView.h"
 
 #include <Application.h>
@@ -29,31 +29,35 @@
 #include <TranslationUtils.h>
 #include <InterfaceKit.h>
 #include <stdio.h>
-	
 
-
-
-XPanel::XPanel(BRect rect): BView(rect,"_xthis",B_FOLLOW_ALL_SIDES,B_WILL_DRAW | B_NAVIGABLE)
-{
-
-	
-	bpm_menu=new BPopUpMenu("popup",false);
-	
-	BMessage *msg=new BMessage('bpms');
-	bpm_menu->AddItem(new BMenuItem(" 60 bpm",msg));
-	bpm_menu->AddItem(new BMenuItem(" 80 bpm",msg));
-	bpm_menu->AddItem(new BMenuItem("100 bpm",msg));
-	bpm_menu->AddItem(new BMenuItem("120 bpm",msg));
-	bpm_menu->AddItem(new BMenuItem("140 bpm",msg));
-	bpm_menu->AddItem(new BMenuItem("160 bpm",msg));
-	bpm_menu->AddItem(new BMenuItem("180 bpm",msg));
-	bpm_menu->AddItem(new BMenuItem("200 bpm",msg));
-	bpm_menu->AddItem(new BMenuItem("220 bpm",msg));
-	
-	key_rel=true;
-	//SetEventMask(B_KEYBOARD_EVENTS);
-	
+BMenuItem* new_bpm_menu(const char* label, int32 bpm_value) {
+	BMessage *msg = ValuableTools::CreateMessageForBController(VID_TEMPO_BPM);
+	msg->AddInt32("be:value", bpm_value);
+	BMenuItem* item =new BMenuItem(label, msg);
+	item->SetTarget(ValuableManager::Get());
+	return item;
 }
+
+
+
+XPanel::XPanel(BRect rect): BView(rect, "XPanel", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_NAVIGABLE)
+{	
+	bpm_menu = new BPopUpMenu("popup",false);
+	bpm_menu->AddItem(new_bpm_menu(" 60 bpm",  60));
+	bpm_menu->AddItem(new_bpm_menu(" 80 bpm",  80));
+	bpm_menu->AddItem(new_bpm_menu("100 bpm", 100));
+	bpm_menu->AddItem(new_bpm_menu("120 bpm", 120));
+	bpm_menu->AddItem(new_bpm_menu("140 bpm", 140));
+	bpm_menu->AddItem(new_bpm_menu("160 bpm", 160));
+	bpm_menu->AddItem(new_bpm_menu("180 bpm", 180));
+	bpm_menu->AddItem(new_bpm_menu("200 bpm", 200));
+	bpm_menu->AddItem(new_bpm_menu("220 bpm", 220));
+	bpm_menu->SetLabelFromMarked(false);
+	bpm_menu->SetRadioMode(false);
+
+	key_rel=true;
+}
+
 void
 XPanel::PlayButtonOn(bool state){
 	play_bt->SetValue(state);
@@ -78,11 +82,12 @@ XPanel::ResetMeasureCount(){
 void
 XPanel::Reset(Song* s,TracksPanel* f)
 {
-	curSong=s;
-	//curPattern=0;
-	tp=f;
-	bpm->SetValue(curSong->getTempo());
-	curpat->SetValue(1);
+	curSong = s;
+	tp = f;
+	
+	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, curSong->getTempo()); //To be removed!
+	
+	curpat->UpdateValue(1, true);
 	all_bt->SetValue(MeasureManager::Get()->GetPatternMode());
 	ResetMeasureCount();
 }
@@ -91,10 +96,8 @@ XPanel::Reset(Song* s,TracksPanel* f)
 void
 XPanel::MessageReceived(BMessage* message)
 {
-
-	BMessage *info;
 	
-	if(message->what>1000 && message->what<2000)
+	if(message->what>1000 && message->what<2000) //?
 	{
 		
 		if(message->what>1900) Window()->PostMessage(message);
@@ -105,10 +108,6 @@ XPanel::MessageReceived(BMessage* message)
 	switch(message->what)
 	{
 	
-	/*case OBSERVED:
-		master->SetValue(message->FindInt32("be:value"));
-		//temp->SetValue();
-	break; */
 	case CURPAT_MSG:
 		message->what=SETPAT;
 		message->ReplaceInt32("be:value",message->FindInt32("be:value")-1);
@@ -116,35 +115,26 @@ XPanel::MessageReceived(BMessage* message)
 	break;
 	
 	case SETPAT:
-		curpat->SetValue(MeasureManager::Get()->GetCurrentPattern()+1,false);
+		curpat->UpdateValue(MeasureManager::Get()->GetCurrentPattern()+1, false); 
 	break;
 	
 	case PLAY_START:
 		play_bt->SetValue(!play_bt->Value());
 	break;
 	
-	case TEMPO_FINE:
+	/*case TEMPO_FINE:
 		info = new BMessage(TEMPO_MOV);
 		info->AddInt32("be:value",bpm->GetValue());
 		Window()->PostMessage(info);
-	break;
-	case 'bpms':
-		{
-			int32 val=message->FindInt32("index")*20+60;
-			bpm_menu->FindMarked()->SetMarked(false);
-			info=new BMessage(TEMPO_MOV);
-			info->AddInt32("be:value",val);
-			bpm->SetValue(val);
-			Window()->PostMessage(info);
-		}
-	break;
-	case 'bpmp':
+	break;*/
+	case 'bpmp': //show the BPM menu
 		{
 			BPoint point;
 			point.x=tool[9]->Frame().left+2;
 			point.y=tool[9]->Frame().bottom+2;
 			point=ConvertToScreen(point);
-			bpm_menu->Go(point,true,true,true);
+			bpm_menu->Go(point, true, false, true);
+			bpm_menu->MakeFocus();
 		}
 	break;
 	case 'winl':
@@ -207,27 +197,28 @@ XPanel::AttachedToWindow()
 	//meter
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	AddChild(One = new VUView(r,"vumeter")); //"mixer.master.meter"	
-	
+	AddChild(Two = new ValuablePeakView(VID_MIXER_MAIN_MET, "PeakView"));
+	Two->MoveTo(r.left, r.top);
+	Two->ResizeTo(r.Width(), r.Height());
 	
 	// vol
 	r.OffsetBy(37,0);
 	r.bottom=r.top+22;
 	r.right=r.left+22;
 	
-	AddChild(master=new XPot(r, "master","mixer.master",0,NULL,0, 127,XUtils::GetBitmap(24),NULL));
+	AddChild(master=new XPot(r, "master", VID_MIXER_MAIN_VOL, 0, 100, XUtils::GetBitmap(24),NULL));
 	//r.OffsetBy(0,1);
 	//r.bottom=r.top+22;
 	
 	//bpm
 	r.OffsetBy(55,0);
 	r.right=r.left+24;
-	AddChild( tool[9] = XUtils::ToolBarButton( r, 9, "bpm", new BMessage('bpmp'), B_ONE_STATE_BUTTON, this));
+	AddChild( tool[9] = XUtils::ToolBarButton( r, 9, "bpm_menu", new BMessage('bpmp'), B_ONE_STATE_BUTTON, this));
 	tool[9]->SetTarget(this);
 	//tempo
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	AddChild(bpm=new XDigit(r,"bmp","tempo_bpm", new BMessage(TEMPO_FINE),NULL,20,300));
+	AddChild(new XDigit(r, VID_TEMPO_BPM, "bpm-xdigit", NULL, 20, 300));
 	
 	//playlist
 	r.OffsetBy(55,0);
@@ -237,7 +228,7 @@ XPanel::AttachedToWindow()
 	
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	curpat=new XDigit(r,"curpat", "current_pattern", new BMessage(CURPAT_MSG),NULL,1,1);
+	curpat=new XDigit(r,"curpat", "current_pattern", new BMessage(CURPAT_MSG),1,1);
 	AddChild(curpat);
 	curpat->SetTarget(this);
 	
@@ -248,9 +239,6 @@ XPanel::AttachedToWindow()
 	tool[10]->SetTarget(this);
 		
 		
-	bpm->SetTarget(this);
-	bpm_menu->SetTargetForItems(this);
-	bpm_menu->SetLabelFromMarked(false);
 	MakeFocus(false);
 	
 	MeasureManager::Get()->RegisterMe(this);
@@ -290,12 +278,9 @@ XPanel::KeyDown(const char *key,int32 z)
 		if(msg){
 			
 			int key2=msg->FindInt32("key"); //,&key2);
-			if(key2>=2 && key2<=9){
-				
+			if(key2>=2 && key2<=9){				
 				key2--;
-				curpat->SetValue(key2);
-				//Window()->PostMessage(new BMessage(POSPAT),this);
-				
+				curpat->UpdateValue(key2, true);
 			}	
 		}
 		break;	
@@ -315,12 +300,10 @@ XPanel::KeyDown(const char *key,int32 z)
 			tp->soloSelectedTrack();
 		break;
 		case B_PAGE_UP:
-		curpat->SetValue(curpat->GetValue()-1);
-		//Window()->PostMessage(new BMessage(SETPAT),this);
+			curpat->UpdateValue(curpat->GetValue()-1, true);
 		break;
 		case B_PAGE_DOWN:
-		curpat->SetValue(curpat->GetValue()+1);
-		//Window()->PostMessage(new BMessage(SETPAT),this);
+			curpat->UpdateValue(curpat->GetValue()+1, true);
 		break;
 		default:break;
 		

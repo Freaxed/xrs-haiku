@@ -10,43 +10,10 @@
 
 #include "XChannelSlider.h"
 
-#include "ValuableManager.h"
-#include "Logger.h"
-#include "Utils.h"
-
-XChannelSlider::XChannelSlider(		
-							BRect area,
-							const char * name,
-							ValuableID id,
-							int channel,
-							BMessage * model,int min,int max,
-							orientation o):
-									
-							AChannelSlider(
-									area,
-									"XChannelSlider",
-									NULL,
-									model,min,max,
-									o),ValuableView(channel, name){
-									
-
-	
-	if(!ValuableManager::Get()->RegisterValuableView(id, (ValuableView*)this))
-	{
-		BString str("can't register XChannelSlider (");
-		str << name << ") with id : " << id;
-		Log(LOG_WARN,str.String());
-	}	
-	
-	SetValuableID(id);
-	SetDefaultChannel(channel);
-		
-	float value=ValuableManager::Get()->RetriveValue(id,channel);
-	
-	SetValue((long)value);
-	
-	fThumb = NULL; //disabled, haiku thumb is nice enought ;D LoadIcon("Slider.png");
-							
+XChannelSlider::XChannelSlider(BRect area, const char * name, ValuableID id, orientation o):
+				AChannelSlider(area, name, NULL, NULL, 0, 100, o), vID(id)
+{
+	SetLimitLabels("%", NULL);
 };
 									
 
@@ -54,11 +21,17 @@ XChannelSlider::XChannelSlider(
 void XChannelSlider::AttachedToWindow()
 {
 	AChannelSlider::AttachedToWindow();
-	
-	SetSender((ValuableView*)this);
-	SetMessage(CopyMessage());
-	SetModificationMessage(CopyMessage());
+
+	SetModificationMessage(ValuableTools::CreateMessageForBController(vID));
 	SetTarget(ValuableManager::Get());
+	
+	ValuableManager::Get()->RegisterValuableReceiver(vID, this);
+}
+
+void XChannelSlider::DetachedFromWindow() 
+{
+	ValuableManager::Get()->UnregisterValuableReceiver(vID, this);
+	AChannelSlider::DetachedFromWindow();
 }
 
 
@@ -66,32 +39,22 @@ void XChannelSlider::AttachedToWindow()
 void XChannelSlider::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-	case MSG_VALUABLE_CHANGED:
+		case MSG_VALUABLE_CHANGED:
 		{
-			float value;
-			if(msg->FindFloat("valuable:value",&value)==B_OK){	
-				msg->PrintToStream();
-				if (value != Value()) {
+			int32 value;
+			if (ValuableTools::SearchValues(vID, msg, &value)){
 					SetValue(value);
-				}
+					BString label;
+					label << value << "%";
+					SetLimitLabels(label.String(), NULL);
 			}
-			
 		}
-	break;
-
-	default:
-		BControl::MessageReceived(msg);
-	break;
+		break;
+	
+		default:
+			BControl::MessageReceived(msg);
+		break;
 	}
-
-}
-
-void XChannelSlider::DrawThumb()
-{
-	if(fThumb)
-		DrawBitmap(fThumb,ThumbFrame());
-	else
-		AChannelSlider::DrawThumb();
 }
 
 //--

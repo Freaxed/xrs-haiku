@@ -11,11 +11,10 @@
 #define _AChannelSlider_
 
 
-#include "ValuableController.h"
 #include <Window.h>
 #include <Slider.h>
 
-class AChannelSlider: public BSlider, public ValuableController
+class AChannelSlider: public BSlider
 {
 public:
 		   AChannelSlider(			BRect rect,

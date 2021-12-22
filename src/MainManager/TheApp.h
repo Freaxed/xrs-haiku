@@ -33,7 +33,10 @@ class		MainWindow;
 class		MatrixWindow;
 class		MBWindow;
 class		TrackInfoWindow;	
-class		ValuableManager;	
+class		ValuableManager;
+		//model	
+class		BasicModelManager;
+class		ValuableMonitorWindow;
 
 class TheApp : public BApplication {
 
@@ -89,5 +92,7 @@ private:
 		MBWindow*			media_browser;
 		TrackInfoWindow*	trackinfo;	
 		ValuableManager*	fVManager;	
+		BasicModelManager*	fModel;
+		ValuableMonitorWindow* fValuableMonitor;
 		
 };

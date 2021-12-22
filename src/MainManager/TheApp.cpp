@@ -42,12 +42,13 @@
 #include 	"PotViewer.h"
 #include 	"PMixer.h"
 #include	"JuiceEngine.h"
-
+#include	"BasicModelManager.h"
+#include	"ValuableMonitorWindow.h"
 
 
 extern PotViewer* potviewer = NULL;
 
-#define SCREEN_TIME 2000000
+#define SCREEN_TIME 0 //2000000
 
 TheApp::TheApp(const char * signature) :
 	BApplication(signature)
@@ -60,7 +61,7 @@ TheApp::TheApp(const char * signature) :
 TheApp::~TheApp()
 {
 	//if(msucco->Lock()){
-	if(msucco->Acquire("~TheApp") == B_OK){	
+	if(msucco->Acquire("~TheApp") == B_OK){
 		msucco->Stop();
 		msucco->ReallyStop();	//stop the engine	
 		xhost->AllowLock(false);
@@ -98,6 +99,15 @@ TheApp::~TheApp()
 		 }
 		 if(mw->Lock()) 
 		 	mw->Quit();
+		 	
+		 fVManager->Dump();
+		 
+		 if(fValuableMonitor->Lock()) {
+		 	fValuableMonitor->Quit();
+		 }
+		 	
+		 delete fModel;
+	     
 	     if(fVManager->Lock())
 			fVManager->Quit();
 			
@@ -148,6 +158,9 @@ TheApp::PrepareToRun()
 	AddCommonFilter(win_manager);
 	
 	fVManager = ValuableManager::Get();
+	fVManager->Run();
+	
+	fModel = new BasicModelManager();
 	
 	mea_manager= MeasureManager::Get();
 	AddCommonFilter(mea_manager);
@@ -209,6 +222,10 @@ TheApp::PrepareToRun()
 	main_window->AddToSubset(mw);
 	main_window->Show();
 	
+	fValuableMonitor = new ValuableMonitorWindow();
+	fValuableMonitor->Show();
+	
+	fVManager->AttachMonitorValuableManager(fValuableMonitor);
 //	obs_volumes->setTarget("master",(Pannable*)my_mixer->getLine(0));
 //	obs_volumes->Run();
 

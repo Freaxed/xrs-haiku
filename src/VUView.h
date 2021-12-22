@@ -11,10 +11,10 @@
 #include <Bitmap.h>
 #include <View.h>
 
-#include "Valuable.h"
+#include "ValuableManager.h"
 
 
-class VUView : public BView, public Valuable
+class VUView : public BView
 {
 public:
 	VUView(BRect rect, ValuableID id);
@@ -22,10 +22,11 @@ public:
 	void AttachedToWindow();
 	void DetachedFromWindow();
 	void Draw(BRect updateRect);
+	void MessageReceived(BMessage*);
+
 	void ComputeNextLevel(void *data, size_t size);
 	
-	float	GetFactorizedValue(int id);
-	void	SetFactorizedValue(int id, float);
+	int32 GetValue(int32 channel){ return channel == 0 ? value_l : value_r ;}
 		
 private:
 	void Run();
@@ -40,6 +41,9 @@ private:
 	int32 fLevelCount;
 	int32 *fCurrentLevels;
 	int32 fChannels;
+	ValuableID	vID;
+	int32 value_r;
+	int32 value_l;
 };
 
 #endif	/* VUVIEW_H */

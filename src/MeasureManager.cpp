@@ -10,25 +10,15 @@
 #include "MeasureManager.h"
 #include "Sequence.h"
 #include "ValuableManager.h"
-#include "IntValuable.h"
 
 #include <stdio.h>
+
 
 MeasureManager::MeasureManager()
 	:BMessageFilter(B_PROGRAMMED_DELIVERY,B_LOCAL_SOURCE,SETPAT),
 	curpat(0),sequence(NULL)
 {
-	IntValuable *iv_pos=new IntValuable(3);
-	
-	iv_pos->SetValue(0,-1); //substep ???
-	iv_pos->SetValue(1,-1);	//Pattern
-	iv_pos->SetValue(2,-1); //position (?)
-	
-	ValuableManager::Get()->RegisterValuable("time.position.fulltick",iv_pos);
-		
-	//IntValuable *allpatters=new IntValuable();
-	iv_pos->SetValue(0,0); //false!	
-	ValuableManager::Get()->RegisterValuable("measure.allpatters",iv_pos);
+	ValuableManager::Get()->RegisterValuable("measure.allpatters", 0);
 	
 	curPos=0;
 }

@@ -9,48 +9,55 @@
 
 #include "XDigit.h"
 #include "ValuableManager.h"
-#include "Logger.h"
 
 XDigit::~XDigit() {}
 
-XDigit::XDigit(BRect frame, ValuableID id, BString name, BMessage *message, BMessage *state,
+XDigit::XDigit(BRect frame, ValuableID id, BString name, BMessage *message,
 		int32 minValue, int32 maxValue,
 		uint32 resizingMode, uint32 flags):
-		ADigit(frame, message, state, minValue, maxValue, resizingMode, flags),
-		ValuableView(0, name)
+		ADigit(frame, message, minValue, maxValue, resizingMode, flags) , vID(id)
+{	
+	SetName(name);
+}
+
+XDigit::XDigit(BRect frame, BMessage *message,
+		int32 minValue, int32 maxValue,
+		uint32 resizingMode,
+		uint32 flags):
+		ADigit(frame, message, minValue, maxValue, resizingMode, flags) , vID(VID_EMPTY)
 {
-	
-	if(!ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this)){
-		BString str("can't register XDigit (");
-		str << ") with id : " << id;		
-		Log(LOG_WARN,str.String());	
-	}	
-		
-	SetValuableID(id);
-	SetDefaultChannel(0);
-		
-	float value=0; //ValuableManager::Get()->RetriveValue(id,valuable_channel);
-	SetValue((long)value);
+	SetName("anonymous");
 }
 
 
-void XDigit::AttachedToWindow(){
-	
+void XDigit::AttachedToWindow()
+{
 	ADigit::AttachedToWindow();
-	SetSender((ValuableView*)this);
+	if (IS_VID_EMPTY(vID) == false) {
+		SetMessage(ValuableTools::CreateMessageForBController(vID));
+		SetTarget(ValuableManager::Get());
+		ValuableManager::Get()->RegisterValuableReceiver(vID, this);
+	}
+}
+
+void XDigit::DetachedFromWindow() 
+{
+	if (false == IS_VID_EMPTY(vID)) {
+		ValuableManager::Get()->UnregisterValuableReceiver(vID, this);
+	}
+	ADigit::DetachedFromWindow();
 }
 
 void XDigit::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-	case MSG_VALUABLE_CHANGED: {
-	
-		float value;
-		if(msg->FindFloat("valuable:value",&value)==B_OK){	
-				//UpdateValue((long)value);
+		case MSG_VALUABLE_CHANGED:
+		{
+			int32 value;
+			if (ValuableTools::SearchValues(vID, msg, &value)){
+					UpdateValue(value, false);
+			}
 		}
-			
-	}
 	break;
 
 	default:

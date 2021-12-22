@@ -12,29 +12,25 @@
 #define _XChannelSlider_
 
 #include "AChannelSlider.h"
-#include "ValuableView.h"
+#include "ValuableManager.h"
 
 
-class XChannelSlider: public AChannelSlider, public ValuableView
+class XChannelSlider: public AChannelSlider
 {
 	public:
 		   XChannelSlider(	BRect area,
 							const char * valuablename,
 							ValuableID id,
-							int channel,
-							BMessage * model,int min,int max,
 							orientation o);
-											
 	
-		BHandler*	Handler() { return this; }
 		//events	
 		void AttachedToWindow();
+		void DetachedFromWindow();
 		void MessageReceived(BMessage* msg);
-		
-		void 	DrawThumb();
-		
+		 
+	
 	private:
-		const BBitmap*	fThumb;
+		ValuableID	vID;
 
 };
 

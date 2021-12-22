@@ -9,56 +9,43 @@
 
 #include "XPot.h"
 
-#include "ValuableManager.h"
-#include "Logger.h"
 
 
-XPot::XPot(BRect frame, const char *name,
-	ValuableID id, int32 valuable_channel,
-	BMessage *state,
-	int32 minValue, int32 maxValue,BBitmap *p1,BBitmap *p2)
-	: APot(frame, name, NULL, NULL, minValue,maxValue,p1,p2),
-	ValuableView(valuable_channel, BString(name)),
-	m_vChannel(valuable_channel)
+
+XPot::XPot(BRect frame, const char *name, ValuableID id, int32 min, int32 max, 
+	 BBitmap *p1,BBitmap *p2)
+	: APot(frame, name, NULL, NULL, min, max, p1, p2),
+	vID(id)
 {
-	
-	if(!ValuableManager::Get()->RegisterValuableView(id,(ValuableView*)this)){
-		BString str("can't register XPot (");
-		str << name << ") with id : " << id;		
-		Log(LOG_WARN,str.String());	
-	}	
-	
-	
-	
-	SetValuableID(id);
-	SetDefaultChannel(valuable_channel);
-		
-	float value=ValuableManager::Get()->RetriveValue(id,valuable_channel);
-	SetValue((long)value);
+
 }
 
 XPot::~XPot() {}
 
+void XPot::DetachedFromWindow() {
+	ValuableManager::Get()->UnregisterValuableReceiver(vID, this);		
+	APot::DetachedFromWindow();
+}
 
-void XPot::AttachedToWindow(){
-	
+void XPot::AttachedToWindow() {	
 	APot::AttachedToWindow();
-	SetSender((ValuableView*)this);
-	SetMessage(CopyMessage());
+	
+	SetMessage(ValuableTools::CreateMessageForBController(vID));
 	SetTarget(ValuableManager::Get());
+
+	ValuableManager::Get()->RegisterValuableReceiver(vID, this);	
 }
 
 void XPot::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-	case MSG_VALUABLE_CHANGED: {
-	
-		float value;
-		if(msg->FindFloat("valuable:value",&value)==B_OK){	
-				UpdateValue((long)value);
+		case MSG_VALUABLE_CHANGED:
+		{
+			int32 value;
+			if (ValuableTools::SearchValues(vID, msg, &value)){
+					UpdateValue(value);
+			}
 		}
-			
-	}
 	break;
 
 	default:

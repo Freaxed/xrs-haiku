@@ -46,6 +46,4 @@ class VstManager
 		bool		CheckMimeType(BFile* file);
 };
 
-extern	VstManager*			vst_manager;
-
 #endif

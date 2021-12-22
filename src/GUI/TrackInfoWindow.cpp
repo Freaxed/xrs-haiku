@@ -44,7 +44,7 @@ TrackInfoWindow::TrackInfoWindow():XrsWindow(BRect(640+0,230+0,640+179,230+280),
 	r.right-=50;
 	r.top+=2;
 	sampler->AddChild(en=new BCheckBox(r,"",T_TRACKINFO_MIDIN,new BMessage(ENABLE_MIDI_IN)));
-	sampler->AddChild(ch=new XDigit(BRect(120,5,120+36,5+22), "id" ,"sampler_midi_in", new BMessage(SET_MIDI_IN), NULL, 1,16));
+	sampler->AddChild(ch=new XDigit(BRect(120,5,120+36,5+22), VID_EMPTY ,"sampler_midi_in", new BMessage(SET_MIDI_IN), 1,16));
 	ch->SetTarget(this);
 	bot->AddChild(sampler);
 	AddChild(bot);
@@ -67,7 +67,7 @@ TrackInfoWindow::SetTrack(Track* tr){
 	
 	if (Lock())
 	{
-		ch->SetValue(tr->GetMidiInCh()+1);
+		ch->UpdateValue(tr->GetMidiInCh()+1, true);
 		en->SetValue(tr->IsMidiInEnable());
 		Unlock();
 	}

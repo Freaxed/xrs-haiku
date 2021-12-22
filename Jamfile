@@ -13,10 +13,9 @@ local sourceDirs =
 	src/GUI/MixerUI/
 	src/GUI/playlist
 	src/libfunky
-	src/XRS_Pro/Valuable
-	src/XRS_Pro/Log
-	src/XRS_Pro/Engine
-	src/XRS_Pro/Mixer
+	src/Valuable
+	src/Engine
+	src/Mixer
 	src/struct
 	src/struct/mixer
 	src/MainManager
@@ -60,6 +59,9 @@ Application XRS :
 	SJFilter.cpp
 	DrawingTidbits.cpp
 	VUView.cpp
+	PeakView.cpp
+	ValuablePeakView.cpp
+	BasicModelManager.cpp
 	
 
 	#src/utils
@@ -114,14 +116,12 @@ Application XRS :
 	XMName.cpp
 	XMPoz.cpp
 	MatrixWindow.cpp
-	
-	#src/XRS_Pro/Log
-	Logger.cpp
-	
+		
 	#src/XRS_Pro/Valuable
+	Logger.cpp
 	Valuable.cpp
 	ValuableManager.cpp
-	ValuableController.cpp
+	ValuableMonitorWindow.cpp
 	
 	#src/XRS_Pro/Mixer
 	PMixer.cpp
@@ -195,6 +195,6 @@ Application XRS :
 	#XFSynth.cpp 
 		
 	#: be translation game media midi midi2 tracker fluidsynth stdc++
-	: be translation game media midi midi2 tracker stdc++
+	: be localestub translation game media midi midi2 tracker stdc++
 	: resources/XRS.rsrc resources/skin.rsrc  
 ;
