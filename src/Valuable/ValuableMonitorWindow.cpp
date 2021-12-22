@@ -12,18 +12,10 @@
 ValuableMonitorWindow::ValuableMonitorWindow(void)
 	:	BWindow(BRect(100,100,500,400),"ValuableMonitorWindow",B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	BBox* mainBox = new BBox(BRect(0,0,80,300), "mainBox", B_FOLLOW_LEFT);
-
-	volume = new BSlider(BRect(20,20,60,250), "volume", "volume", NULL , 0, 100);
-	volume->SetModificationMessage(ValuableTools::CreateMessageForBController("xrs.mixer.main.volume"));
-	volume->SetOrientation(B_VERTICAL);
-	volume->SetTarget(ValuableManager::Get());
-
-	fValuePanel = new BListView(BRect(81, 0, 400 - B_H_SCROLL_BAR_HEIGHT, 300 - B_V_SCROLL_BAR_WIDTH), "fValuePanel", B_SINGLE_SELECTION_LIST);
+	fValuePanel = new BListView(BRect(0, 0, 400 - B_H_SCROLL_BAR_HEIGHT, 300 - B_V_SCROLL_BAR_WIDTH), "fValuePanel", B_SINGLE_SELECTION_LIST);
 	
 	fScrollView = new BScrollView("scroll", fValuePanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
-	mainBox->AddChild(volume);
-	AddChild(mainBox);
+
 	AddChild(fScrollView);
 
 }
@@ -33,7 +25,6 @@ void
 ValuableMonitorWindow::RegisterValuable(ValuableID vID) {
 	if (Lock()){
 		if (mValuableLabel.find(vID) == mValuableLabel.end()) {
-			//int32 count = mValuableLabel.size();
 			mValuableLabel[vID] = new BStringItem(vID);
 			fValuePanel->AddItem(mValuableLabel[vID]);
 			ValuableManager::Get()->RegisterValuableReceiver(vID, this);
@@ -61,10 +52,6 @@ ValuableMonitorWindow::MessageReceived(BMessage *msg)
 	{
 		case MSG_VALUABLE_CHANGED:
 		{
-			int32 newValue;
-			if (ValuableTools::SearchValues("xrs.mixer.main.volume", msg, &newValue))
-				volume->SetValue(newValue);
-				
 			ValuableID vID;
 			if (msg->FindString(VAL_ID, &vID) == B_OK) {
 				if (mValuableLabel.find(vID) != mValuableLabel.end()) {
