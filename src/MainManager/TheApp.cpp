@@ -524,7 +524,7 @@ TheApp::CopyPattern(Pattern* from,Pattern* to)
 		to->getNoteAt(i)->setValue(from->getNoteAt(i)->getValue());
 		to->getNoteAt(i)->setNote(from->getNoteAt(i)->getNote());
 		to->getNoteAt(i)->setOct(from->getNoteAt(i)->getOct());
-		to->getNoteAt(i)->setVolume(from->getNoteAt(i)->getVolume());	
+		to->getNoteAt(i)->SetGain(from->getNoteAt(i)->Gain());	
 	}
 }
 void
@@ -535,7 +535,7 @@ TheApp::ClearPattern(Pattern* to)
 		to->getNoteAt(i)->setValue(false);	
 		to->getNoteAt(i)->setNote(0);	
 		to->getNoteAt(i)->setOct(0);	
-		to->getNoteAt(i)->setVolume(0.8);	
+		to->getNoteAt(i)->SetGain(0.8);	
 	}
 }
 bool

@@ -21,6 +21,7 @@
 				
 */
 
+#define PUMP_UP_FACTOR 1.5f
 
 TNTrack::TNTrack():Track()
 {
@@ -67,8 +68,8 @@ TNTrack::Process(float** buffer,int32 samples_num,int spiaz,float factor)
 
 	for(int y=0;y<samples_num;y++)
 	{
-		buffer[0][spiaz+y]+=f[y]/32767.*GetLeft()*curNote->GetRight()*1.5*factor;
-		buffer[1][spiaz+y]+=f[y]/32767.*GetRight()*curNote->GetLeft()*1.5*factor;
+		buffer[0][spiaz+y]+=f[y]/32767.0f * Left()  * curNote->Right() * PUMP_UP_FACTOR * factor;
+		buffer[1][spiaz+y]+=f[y]/32767.0f * Right() * curNote->Left()  * PUMP_UP_FACTOR * factor;
 	}
 	current_note_length-=samples_num;
 	return;

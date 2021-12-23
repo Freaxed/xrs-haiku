@@ -113,15 +113,15 @@ JTrack::MessageReceived(BMessage* message)
 		myTrack->setOn(volpot->IsOn());
 	break;
 	case TRACK_VOL:
-		myTrack->setVolume((float)volpot->Value()/(float)100);
+		myTrack->SetGain((float)volpot->Value()/100.0f);
 	break;
 	case TRACK_PAN:
-		myTrack->setPan((float)panpot->Value()/(float)100);
+		myTrack->SetPan((float)panpot->Value()/100.0f);
 	break;
 	case	B_SIMPLE_DATA:
 	break;
 	case PAN_RESET:
-		myTrack->setPan(0);
+		myTrack->SetPan(0.0f);
 		panpot->SetValue(0);
 	break;
 	case FORCE_ROUTELINE:
@@ -250,10 +250,10 @@ JTrack::Reset(Pattern* p ,Track* tr)
 	line_pos->MoveTo(panpot->Frame().right+10,0);
 	((BControl*)line_pos)->SetValue(myTrack->getRouteLine());
 	
-	volpot->SetValue( (int32)(myTrack->getVolume()*100));
+	volpot->SetValue( (int32)(myTrack->Gain() * 100.0f));
 	volpot->SetOn(myTrack->isOn());
 	
-	panpot->SetValue((int32)(myTrack->getPan()*100));
+	panpot->SetValue((int32)(myTrack->Pan() * 100.0f));
 	
 
 	SetName(tr->getName());

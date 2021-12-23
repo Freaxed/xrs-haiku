@@ -194,7 +194,7 @@ VolView::_drawNote(int h)
 			
 			if(mode_view==VELOCITY_VIEW)
 			{
-			 float vol=curPattern->getNoteAt(h)->getVolume();
+			 float vol = curPattern->getNoteAt(h)->Gain();
 			 SetHighColor(84,140,213);
 			 
 			 
@@ -205,7 +205,7 @@ VolView::_drawNote(int h)
 			if(mode_view==PAN_VIEW)
 			{
 			//Pan?	
-			 float vol=curPattern->getNoteAt(h)->getPan();
+			 float vol=curPattern->getNoteAt(h)->Pan();
 			 SetHighColor(255,255,0);
 			 if(vol>0) 
 			 	rect.Set(NOTESTART+(BUTTON_LX+BUTTON_X_SPACE)*h+1,(BUTTON_LY/2),NOTESTART+(BUTTON_LX+BUTTON_X_SPACE)*(h+1)-BUTTON_X_SPACE-1,(BUTTON_LY/2)+(BUTTON_LY/2)*vol);
@@ -282,10 +282,10 @@ VolView::_setValue(Note* n,float y)
 {
 	
 	if(mode_view==VELOCITY_VIEW)
-		n->setVolume(1.-(y/(float)BUTTON_LY));	
+		n->SetGain(1.-(y/(float)BUTTON_LY));	
 	else
 	if(mode_view==PAN_VIEW)
-		n->setPan((y/(float)(BUTTON_LY/2))-1.0);
+		n->SetPan((y/(float)(BUTTON_LY/2))-1.0);
 	else
 	if(mode_view==SUSTAIN_VIEW)
 		n->setOct(n->getOct()^8);
@@ -305,10 +305,10 @@ VolView::_resetPar()
 	
 	for(int i=0;i<curPattern->getNumberNotes();i++)
 	if(mode_view==VELOCITY_VIEW)
-		curPattern->getNoteAt(i)->setVolume(0.8);	
+		curPattern->getNoteAt(i)->SetGain(0.8);	
 	else
 	if(mode_view==PAN_VIEW)
-		curPattern->getNoteAt(i)->setPan(0.0);
+		curPattern->getNoteAt(i)->SetPan(0.0);
 	else
 	if(mode_view==SUSTAIN_VIEW)
 		//curPattern->getNoteAt(i)->setOct(curPattern->getNoteAt(i)->getOct()^8);
@@ -325,10 +325,10 @@ VolView::_randPar()
 		double r = ( (double)rand() / (double)(RAND_MAX+1) );
 		
 		if(mode_view==VELOCITY_VIEW)
-		curPattern->getNoteAt(i)->setVolume(-r);	
+		curPattern->getNoteAt(i)->SetGain(-r);	
 		else
 		if(mode_view==PAN_VIEW)
-		curPattern->getNoteAt(i)->setPan((r*-2)-1.0);
+		curPattern->getNoteAt(i)->SetPan((r*-2)-1.0);
 		else
 		if(mode_view==SUSTAIN_VIEW)
 		if(rand() % 2)

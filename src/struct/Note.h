@@ -11,9 +11,9 @@
 #ifndef _NOTE_H_
 #define _NOTE_H_
 
-#include	"Pannable.h"
+#include	"StereoVolumes.h"
 
-class Note: public Pannable
+class Note: public StereoVolumes
 {
 	public:
 	

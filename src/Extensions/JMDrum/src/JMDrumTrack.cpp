@@ -114,8 +114,8 @@ JMDrumTrack::ProcessVoice(XRSVoice voice,float ** buffer ,int32 samples_num)
 		if(drum->AmpEnvStage)
 		{
 			sl=(drum->GetSample()/32767.0);
-			buffer[0][i] = sl*GetRight()*n->GetRight();
-	 		buffer[1][i] = sl*GetLeft()*n->GetLeft();
+			buffer[0][i] = sl*Right() * n->Right();
+	 		buffer[1][i] = sl*Left()  * n->Left();
 		}
 		else
 		 goto uscita;
@@ -136,7 +136,7 @@ JMDrumTrack::newVoice(Note* n,int VoiceTag)
 	
 	
 	//noteon
-	values.OutVol=(n->getVolume());
+	values.OutVol=(n->Gain());
 	
 	if (Vals[8] == 0)	// If Mode 1.x
 	
