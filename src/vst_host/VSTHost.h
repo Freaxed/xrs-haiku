@@ -90,7 +90,7 @@ struct VSTEffect
 //typedefs
 typedef int32			(*audioMasterCallback)(VSTEffect*, int32, int32, int32, void*, float);
 typedef VSTEffect* 		(*VSTEntryProc)(audioMasterCallback audioMaster);
-inline 	float 			vstround(float x) {return ceil(x-0.5);}
+inline 	float 			vstround(float x) {return ceil(x-0.5f);}
 
 //structure for droplist parameters
 struct  DropListValue {

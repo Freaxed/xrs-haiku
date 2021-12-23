@@ -36,7 +36,7 @@ ParameterSlider::ParameterSlider (BRect frame, VSTParameter* para)
 	frame.OffsetTo (B_ORIGIN);
 	frame.left = (frame.right + frame.left) / 2;
 	frame.top += 15;
-	//frame.bottom = frame.top + 11;
+	frame.bottom = frame.top + 110;//!!!
 	
 
 	fDisplay = new BStringView (frame, NULL, fParameter->Unit());
@@ -51,8 +51,7 @@ void ParameterSlider::SetValue (int32 v)
 	float	value = float (v) / FACTOR_F;
 	if (fStore)
 		fParameter->SetValue (value);
-//	fEffect->dispatcher (fEffect, effGetParamDisplay, fIndex, 0, display, 0.f);
-//	clean_string (display);
+
 	char	complete[128];
 	sprintf (complete, "%s %s", fParameter->CurrentValue(), fParameter->Unit());
 	if (strcmp (complete, fDisplay->Text ()) != 0)
@@ -67,17 +66,17 @@ void ParameterSlider::AttachedToWindow ()
 {
 	BSlider::AttachedToWindow ();
 	LoadParameter ();
-	//SetLabel (fParameter->Name());
+	SetLabel (fParameter->Name());
 	if(fParameter->Index() % 2 )  {
-						SetViewColor(tint_color(ViewColor(),B_DARKEN_1_TINT));
-						fDisplay->SetViewColor(255,0,0);
-					}
+	   SetViewColor(tint_color(ViewColor(),B_DARKEN_1_TINT));
+	   fDisplay->SetViewColor(255,0,0);
+	}
 }
 
 void ParameterSlider::LoadParameter ()
 {
 	fStore = false;
 	fParameter->Value();
-	SetValue (fParameter->Value() * FACTOR_F);
+	SetValue ((int32)(fParameter->Value() * FACTOR_F));
 	fStore = true;
 }

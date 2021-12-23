@@ -21,7 +21,7 @@
 				
 */
 
-#define PUMP_UP_FACTOR 1.5f
+#define PUMP_UP_FACTOR 3.0f
 
 TNTrack::TNTrack():Track()
 {

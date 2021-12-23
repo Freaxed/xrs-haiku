@@ -83,16 +83,17 @@ SamplerTrack::newVoice(Note* n,int VoiceTag){
 	
 	coef = coef / curSample->freq_divisor;
 		
-	if(coef!=1.) { 
-						Voice->refiller=new SampleRefiller(Voice->sample);
-						Resampler *arts=new Resampler(Voice->refiller,(const void*)Voice);
-						arts->setStep(coef);
-						arts->setChannels(Voice->sample->channels);
-						arts->setBits(16);
-						
-						
-						Voice->converter=arts;
-			}
+	if(coef!=1.) {	
+		
+		Voice->refiller = new SampleRefiller(Voice->sample);
+		Resampler *arts = new Resampler(Voice->refiller,(const void*)Voice);
+		arts->setStep(coef);
+		arts->setChannels(Voice->sample->channels);
+		arts->setBits(16);
+		
+		
+		Voice->converter=arts;
+	}
 					
 				
 	

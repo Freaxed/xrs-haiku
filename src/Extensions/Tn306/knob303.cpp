@@ -165,7 +165,7 @@ void TB303Knobs::AttachedToWindow()
 }
 
 APot *
-TB303Knobs::MakeController(BRect r,const char* n1,const char* n2,int min,int max ,int cur,const rgb_color col,int32 ms)
+TB303Knobs::MakeController(BRect r,const char* title,const char* n2,int min,int max ,int cur,const rgb_color col,int32 ms)
 {
 	const BBitmap *x = LoadIcon("tnpot");
 	APot	*p;
