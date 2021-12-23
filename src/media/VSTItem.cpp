@@ -23,115 +23,40 @@
 #endif
 #include "Log.h"
 
-BList*				vst_list = NULL;
-VstTimeInfo* 		time_info = NULL;
-int					bpm = 0;
-bool				bpm_change = true;
 
+static int32
+VHostCallback(VSTEffect* effect, int32 opcode, int32 index, int32 value,
+	void* ptr, float opt);
+	
 
-VSTItem::VSTItem(const char* filename):fSampleRate (kDefaultFrameRate), fBlockSize (kDefaultBlockSize),  active(true), fIdleSem (-1)
+VSTItem::VSTItem(const char* path)
 {
-	fImage = load_add_on (filename);
-	if (fImage > 0)
-	{
-		AEffect * (*main_plugin) (audioMasterCallback audioMaster);
-		if (get_image_symbol (fImage, "main_plugin", B_SYMBOL_TYPE_TEXT, (void**) &main_plugin) == B_OK)
-		{
-			fEffect = (*main_plugin) (&audioMaster);
-			if (fEffect && fEffect->magic == kEffectMagic)
-			{
-				fLastFilter =(uint32) system_time ();
-				Register (this, fEffect);
-				// set up the plugin
-				fEffect->dispatcher (fEffect, effOpen, 0, 0, 0, 0.);
-				fEffect->dispatcher (fEffect,effSetProgram  ,  0, 0, NULL, 0.f);
-				fEffect->dispatcher (fEffect, effSetSampleRate, 0, 0, 0, float (fSampleRate));
-				fEffect->dispatcher (fEffect, effSetBlockSize, 0, kDefaultBlockSize, 0, 0.);
-				
-				SetStatus(false);	//force reset!
-				SetStatus(true); // turn on!
-				
-				bpm_change=true;
-								
-				char	tryname[100];
-																
-				if(fEffect->dispatcher (fEffect,effGetEffectName , 0, 0,(void*)tryname, 0.))
-												
-							name.SetTo(tryname);
-				else
-					name.SetTo(BPath(filename).Leaf());
-					
-											
-				if(fEffect->dispatcher (fEffect,effGetProductString , 0, 0,(void*)tryname, 0.))
-												productname.SetTo(tryname);
-											else
-												productname.SetTo(name.String());
-				
-				filename_path.SetTo(filename);
-				
-				if(time_info==NULL) time_info=new VstTimeInfo();
-					time_info->samplePos = 0;
-					time_info->sampleRate = 44100;
-					time_info->flags |= kVstTempoValid;
-				return;
-			}
-			// plugin is not ok. Leak rather than take a risk to crash...
-		}
-		/*else
-			fprintf (stderr, "entry point not found in the plugin\n");*/
-		unload_add_on (fImage);
-		fImage = 0;
-	}
+	LoadModule(path, VHostCallback);
 }
 
 VSTItem::~VSTItem()
 {
-	printf("Deleting VST..\n");
-	if (fImage > 0)
-	{
-		// terminate the idle thread if necessary
-		sem_info sinfo;
-		if (fIdleSem != -1 && get_sem_info (fIdleSem, &sinfo) == B_OK)
-		{
-			delete_sem (fIdleSem);
-			status_t	r;
-			wait_for_thread (fIdleThread, &r);
-		}
 	#ifdef VSTMIDI
-		if (fMidiConsumer)
-		{
-//			puts ("Closing midi consumer");
+		if (fMidiConsumer) {
 			sem_id finish = fMidiConsumer->Finish ();
 		
 			acquire_sem_etc (finish, 1, B_RELATIVE_TIMEOUT, 1000000);
-//			printf ("result: %s\n", strerror (r));			
 		}
 	#endif	
-		fEffect->dispatcher (fEffect, effClose, 0, 0, 0, 0.);
-		Unregister (fEffect);
-		unload_add_on (fImage);
-	}
+		
+		
+		LogDebug("Deleting VSTItem.. [%s]\n", EffectName());
+		UnLoadModule();
+
 }
 
 void
 VSTItem::setBPM(int y)
 {
-	bpm=y;
-	time_info->tempo = bpm;
-	bpm_change=true;
+	//TODO
 }
 
-void
-VSTItem::SetStatus(bool b)
-{
-	active=b;
-	 
-	if(b)
-	 	fEffect->dispatcher (fEffect, effMainsChanged, 0, 1, 0, 0.);	// turn on (resume)
-	else
-	    fEffect->dispatcher (fEffect, effMainsChanged, 0, 0, 0, 0.);	// turn off (suspend)
-	 
-}
+
 void VSTItem::SetMidiProducer (int32 id)
 {	//QUI__QUI
 	#ifdef VSTMIDIX
@@ -156,6 +81,7 @@ const char * VSTItem::GetMidiProducerName ()
 	return "XRSBeta";
 	//time
 }		
+
 long VSTItem::WantMidi ()
 {
 	//QUI--QUI
@@ -172,204 +98,125 @@ long VSTItem::WantMidi ()
 	return 1;
 	
 }
-//	Idle thread's entry point.
-static int idle_thread_start (void *arg)
-{
-	VSTItem * plugin = (VSTItem*) arg;
-	plugin->IdleLoop ();
-	return B_OK;
-}
-long VSTItem::NeedIdle ()
-{
-//	printf ("Idle needed for %s\n", fFactory->fName.String ());
-	sem_info	sinfo;
-	if (fIdleSem == -1 || get_sem_info (fIdleSem, &sinfo) != B_OK)
-	{
-//		puts ("Creating Idle thread");
-		fIdleSem = create_sem (0, "VST plugin Idle Semaphore");
-		resume_thread (fIdleThread = spawn_thread (idle_thread_start, "VST Plugin Idle", B_NORMAL_PRIORITY, this));
-	}
-	return 1;
-}
-void VSTItem::IdleLoop ()
-{
-	// Note this common BeOS use of a semaphore to control timing & live of a user level timer.
-	// The timer will try to acquire the semaphore. In "normal" cases, it will time out
-	// and will then do its timer's work (in that case call the plugin idle call).
-	// When the timer has to be destroyed, then the semaphore is simply deleted.
-	// The acquisition of the semaphore fails, and the timer knows it has to die.
-	// This allows very compact, efficient & clean code.
 
-//	puts ("Idle Thread created!");
-	bigtime_t	nextIdle = system_time ();
-	while (acquire_sem_etc (fIdleSem, 1, B_ABSOLUTE_TIMEOUT, nextIdle) == B_TIMED_OUT)
-	{
-		nextIdle += 10000;	// idle every 10 ms.
-		if (!fEffect->dispatcher (fEffect, effIdle, 0, 0, 0, 0))
-		{
-			// The plugin says that no more idle is needed!
-//			printf ("Idle no longer needed!\n");
-			delete_sem (fIdleSem);
-			fIdleSem = -1;
-			return;
-		}
-	}
-//	printf ("Idle thread gone!\n");
-}
-void VSTItem::Register (VSTItem * plugin, AEffect * effect)
-{
-	fLock.Lock ();
-	int	index = 0;
-	while (index < fPairsCount && fPairs[index].effect != NULL)
-		index++;
-	if (index >= fPairsCount)
-	{
-		int newCount = fPairsCount + 10;
-		if (fPairsCount > 0)
-			fPairs = (effectPluginPair*) realloc (fPairs, sizeof (effectPluginPair) * newCount);
-		else
-			fPairs = (effectPluginPair*) malloc (sizeof (effectPluginPair) * newCount);
-		while (fPairsCount < newCount)
-			fPairs[fPairsCount++].effect = NULL;
-	}
-	fPairs[index].effect = effect;
-	fPairs[index].plugin = plugin;
-	fLock.Unlock ();
-}
 
-void VSTItem::Unregister (AEffect * effect)
+enum
 {
-	fLock.Lock ();
-	int	index = 0;
-	while (index < fPairsCount)
-	{
-		if (fPairs[index].effect == effect)
-		{
-			fPairs[index].effect = NULL;
-			break;
-		}
-		index++;
-	}
-	fLock.Unlock ();
-}
-
-VSTItem * VSTItem::Identify (AEffect * effect)
+	audioMasterAutomate = 0,		// index, value, returns 0
+	audioMasterVersion,				// VST Version supported (for example 2200 for VST 2.2)
+	audioMasterCurrentId,			// Returns the unique id of a plug that's currently
+									// loading
+	audioMasterIdle,				// Call application idle routine (this will
+									// call effEditIdle for all open editors too) 
+	audioMasterPinConnected			// Inquire if an input or output is beeing connected;
+									// index enumerates input or output counting from zero,
+									// value is 0 for input and != 0 otherwise. note: the
+									// return value is 0 for <true> such that older versions
+									// will always return true.	
+};
+enum
 {
-	fLock.Lock ();
-	int	index = 0;
-	VSTItem * plugin = NULL;
-	while (index < fPairsCount)
-	{
-		if (fPairs[index].effect == effect)
-		{
-			plugin = fPairs[index].plugin;
-			break;
-		}
-		index++;
-	}
-	/*if (plugin)
-		printf ("Identified plugin \n");
-	else
-		puts ("could not identify a plugin");*/
-	fLock.Unlock ();
-	return plugin;
-}
+	//---from here VST 2.0 extension opcodes------------------------------------------------------
+	// VstEvents + VstTimeInfo
+	audioMasterWantMidi = audioMasterPinConnected + 2,	// <value> is a filter which is currently ignored
+	audioMasterGetTime,				// returns const VstTimeInfo* (or 0 if not supported)
+									// <value> should contain a mask indicating which fields are required
+									// (see valid masks above), as some items may require extensive
+									// conversions
+	audioMasterProcessEvents,		// VstEvents* in <ptr>
+	audioMasterSetTime,				// VstTimenfo* in <ptr>, filter in <value>, not supported
+	audioMasterTempoAt,				// returns tempo (in bpm * 10000) at sample frame location passed in <value>
 
-void VSTItem::load_plug_ins (const char *rootdir) //, BList *list)
-{
-	LogTrace("VSTItem::load_plug_ins, parsing %s and looking for VSTs\n", rootdir);	
-	DIR* dir = opendir (rootdir);
-	if (dir)
-	{
-		LogTrace(" DIR found\n");
-		struct dirent * entry = readdir (dir);
-		while (entry)
-		{
-			LogTrace("VSTItem::load_plug_ins, ENTRY found %s\n", entry->d_name);
-			if (strcmp (entry->d_name, ".") != 0 && strcmp (entry->d_name, "..") != 0)
-			{
-				char path[PATH_MAX];
-				strcpy (path, rootdir);
-				strcat (path, "/");
-				strcat (path, entry->d_name);
+	// parameters
+	audioMasterGetNumAutomatableParameters,
+	audioMasterGetParameterQuantization,	// returns the integer value for +1.0 representation,
+											// or 1 if full single float precision is maintained
+											// in automation. parameter index in <value> (-1: all, any)
+	// connections, configuration
+	audioMasterIOChanged,				// numInputs and/or numOutputs has changed
+	audioMasterNeedIdle,				// plug needs idle calls (outside its editor window)
+	audioMasterSizeWindow,				// index: width, value: height
+	audioMasterGetSampleRate,
+	audioMasterGetBlockSize,
+	audioMasterGetInputLatency,
+	audioMasterGetOutputLatency,
+	audioMasterGetPreviousPlug,			// input pin in <value> (-1: first to come), returns cEffect*
+	audioMasterGetNextPlug,				// output pin in <value> (-1: first to come), returns cEffect*
 
-				struct stat st;
-				if (stat (path, &st) == 0)
-				{
-					if (S_ISREG (st.st_mode))
-					{
-						BNode	node (path);
-						char	type[B_MIME_TYPE_LENGTH];
-						if (node.InitCheck () == B_OK 
-							&& node.ReadAttr ("BEOS:TYPE", B_MIME_STRING_TYPE, 0, type, B_MIME_TYPE_LENGTH) > 0
-							&& strcasecmp (type, B_APP_MIME_TYPE) == 0) {
-							// To help debugging if a crash occurs...
-							LogTrace ("VSTItem::load_plug_ins, Loading \"%s\" as an addon... ", path);
-							fflush (stdout);
-							char	name[B_OS_NAME_LENGTH];
-							strncpy (name, entry->d_name, B_OS_NAME_LENGTH);
-							//rename_thread (find_thread (NULL), name);
-							// an executable has been found. Try to load it as a VST plugin
-							image_id vstaddon = load_add_on (path);
-							if (vstaddon > 0)
-							{	// the file is indeed an addon, but is it a VST plugin?
-								AEffect * effect;
-								AEffect * (*main_plugin) (audioMasterCallback audioMaster);
-								if (get_image_symbol (vstaddon, "main_plugin", B_SYMBOL_TYPE_TEXT, (void**) &main_plugin) == B_OK)
-								{	// Chances are now that this is a VST plugin, but is it supported?...
-									effect = (*main_plugin) (&audioMaster);
-									if (effect && effect->magic == kEffectMagic)
-									{
-										LogTrace ("VSTItem::load_plug_ins, Valid VST Plugin! magic[%ld] numOutputs[%ld] numInputs[%ld]\n", effect->magic, effect->numOutputs, effect->numInputs);
-										if (effect->numOutputs <= 2 && effect->numInputs <= 2)
-										{
-											effect->dispatcher (effect, effOpen, 0, 0, 0, 0.);
-											
-											
-											PlugInEntry	*ple=new PlugInEntry();
-											char	name[100];
-																				
-											if(effect->dispatcher (effect,effGetEffectName , 0, 0,(void*)name, 0.))
-												
-												ple->name=name;
-											else
-												
-												ple->name=entry->d_name;
-												
-											if(effect->dispatcher (effect,effGetProductString , 0, 0,(void*)name, 0.))
-												
-												ple->product=name;
-																					
-											LogTrace ("VSTItem::load_plug_ins, Name [%s] Product [%s]", ple->name, ple->product);
-											
-											ple->ref.set_name(path);
-											ple->isSynth=(effect->flags & effFlagsIsSynth); //effect->isSynth;
-											
-											vst_list->AddItem ((void*)ple);
-											
-										}
-										effect->dispatcher (effect, effClose, 0, 0, 0, 0.);
-										
-									}
-								}
-									
-								unload_add_on (vstaddon);
-							} 
-								
-						}
-					}
-					else if (S_ISDIR (st.st_mode))
-						load_plug_ins (path);
-				}
-			}
-			entry = readdir (dir);
-		}
-		closedir (dir);
-	}
+	// realtime info
+	audioMasterWillReplaceOrAccumulate,	// returns: 0: not supported, 1: replace, 2: accumulate
+	audioMasterGetCurrentProcessLevel,	// returns: 0: not supported,
+										// 1: currently in user thread (gui)
+										// 2: currently in audio thread (where process is called)
+										// 3: currently in 'sequencer' thread (midi, timer etc)
+										// 4: currently offline processing and thus in user thread
+										// other: not defined, but probably pre-empting user thread.
+	audioMasterGetAutomationState,		// returns 0: not supported, 1: off, 2:read, 3:write, 4:read/write
+
+	// offline
+	audioMasterOfflineStart,
+	audioMasterOfflineRead,				// ptr points to offline structure, see below. return 0: error, 1 ok
+	audioMasterOfflineWrite,			// same as read
+	audioMasterOfflineGetCurrentPass,
+	audioMasterOfflineGetCurrentMetaPass,
+
+	// other
+	audioMasterSetOutputSampleRate,		// for variable i/o, sample rate in <opt>
+	audioMasterGetSpeakerArrangement,	// result in ret
+	audioMasterGetOutputSpeakerArrangement = audioMasterGetSpeakerArrangement,
+	audioMasterGetVendorString,			// fills <ptr> with a string identifying the vendor (max 64 char)
+	audioMasterGetProductString,		// fills <ptr> with a string with product name (max 64 char)
+	audioMasterGetVendorVersion,		// returns vendor-specific version
+	audioMasterVendorSpecific,			// no definition, vendor specific handling
+	audioMasterSetIcon,					// void* in <ptr>, format not defined yet
+	audioMasterCanDo,					// string in ptr, see below
+	audioMasterGetLanguage,				// see enum
+	audioMasterOpenWindow,				// returns platform specific ptr
+	audioMasterCloseWindow,				// close window, platform specific handle in <ptr>
+	audioMasterGetDirectory,			// get plug directory, FSSpec on MAC, else char*
+	audioMasterUpdateDisplay,			// something has changed, update 'multi-fx' display
+
+	//---from here VST 2.1 extension opcodes------------------------------------------------------
+	audioMasterBeginEdit,               // begin of automation session (when mouse down), parameter index in <index>
+	audioMasterEndEdit,                 // end of automation session (when mouse up),     parameter index in <index>
+	audioMasterOpenFileSelector,		// open a fileselector window with VstFileSelect* in <ptr>
 	
-	// Add
+	//---from here VST 2.2 extension opcodes------------------------------------------------------
+	audioMasterCloseFileSelector,		// close a fileselector operation with VstFileSelect* in <ptr>: Must be always called after an open !
+	audioMasterEditFile,				// open an editor for audio (defined by XML text in ptr)
+	audioMasterGetChunkFile,			// get the native path of currently loading bank or project
+										// (called from writeChunk) void* in <ptr> (char[2048], or sizeof(FSSpec))
+
+	//---from here VST 2.3 extension opcodes------------------------------------------------------
+	audioMasterGetInputSpeakerArrangement	// result a VstSpeakerArrangement in ret
+};
+static int32
+VHostCallback(VSTEffect* effect, int32 opcode, int32 index, int32 value,
+	void* ptr, float opt)
+{
+	intptr_t result = 0;
+	
+	switch(opcode)
+	{
+		case VST_MASTER_PRODUCT:
+			if (ptr) {
+				strcpy((char*)ptr, "XRS");
+				result = 1;
+			}
+			break;
+		case VST_MASTER_VERSION :
+			result = 2000;
+			break;
+		default:
+			LogError("Unhandled VHostCallback opcode %d value %d", opcode, value);
+		break;
+	}
+
+	return result;
 }
-long audioMaster (AEffect *eff, long opCode, long index, long value, void *ptr, float opt)
+
+/*
+long audioMaster (VSTEffect *eff, long opCode, long index, long value, void *ptr, float opt)
 {
 	long ret = 0;
 	//VstTimeInfo *a;
@@ -431,7 +278,7 @@ long audioMaster (AEffect *eff, long opCode, long index, long value, void *ptr, 
 			//time_info.flags |= kVstTempoValid;
 			//time_info.tempo =bpm;
 			//ret=(long)&time_info;
-			ret=(long)time_info;
+			//ret=(long)time_info;
 			//bpm_change=false;
 						
 		}
@@ -480,31 +327,34 @@ long audioMaster (AEffect *eff, long opCode, long index, long value, void *ptr, 
 		//---------------------------
 		case audioMasterNeedIdle:			// plug needs idle calls (outside its editor window)
 		{
-			VSTItem * plugin = VSTItem::Identify (eff);
-			if (plugin)
-				ret = plugin->NeedIdle ();
+			LogFatal("VSTItem::audioMasterNeedIdle");
+//			VSTItem * plugin = VSTItem::Identify (eff);
+//			if (plugin)
+//				ret = plugin->NeedIdle ();
 			break;
 		}
 
 		//---------------------------
 		case audioMasterGetSampleRate:
 		{
-			VSTItem * plugin = VSTItem::Identify (eff);
-			if (plugin)
-				ret = plugin->GetSampleRate ();
-			else
-				ret = kDefaultFrameRate;
+			LogFatal("VSTItem::audioMasterGetSampleRate");
+//			VSTItem * plugin = VSTItem::Identify (eff);
+//			if (plugin)
+//				ret = plugin->GetSampleRate ();
+//			else
+//				ret = kDefaultFrameRate;
 			break;
 		}
 
 		//---------------------------
 		case audioMasterGetBlockSize:
 		{
-			VSTItem * plugin = VSTItem::Identify (eff);
-			if (plugin)
-				ret = plugin->GetBlockSize ();
-			else
-				ret = kDefaultBlockSize;
+			LogFatal("VSTItem::audioMasterGetSampleRate");
+//			VSTItem * plugin = VSTItem::Identify (eff);
+//			if (plugin)
+//				ret = plugin->GetBlockSize ();
+//			else
+//				ret = kDefaultBlockSize;
 			break;
 		}
 
@@ -626,10 +476,11 @@ long audioMaster (AEffect *eff, long opCode, long index, long value, void *ptr, 
 		//---------------------------
   		case audioMasterGetDirectory:			// get plug directory, FSSpec on MAC, else char pointer
 		{
-			VSTItem * plugin = VSTItem::Identify (eff);
-			if (plugin)
-				//QUI--QUI ret = (long) plugin->fFactory->fFolderPath.String ();
-				printf("Ops.. i don't know where is plug-in directory..\n");
+			LogFatal("VSTItem::audioMasterGetSampleRate");
+//			VSTItem * plugin = VSTItem::Identify (eff);
+//			if (plugin)
+//				//QUI--QUI ret = (long) plugin->fFactory->fFolderPath.String ();
+//				printf("Ops.. i don't know where is plug-in directory..\n");
 			break;
 		}
 
@@ -642,127 +493,78 @@ long audioMaster (AEffect *eff, long opCode, long index, long value, void *ptr, 
 
 	return ret;
 }
-void certify_fEffect (AEffect * fEffect)
-{
-	//printf ("Testing fEffect %x\n", int (fEffect));
-	if (fEffect->magic == 'VstP')
-		puts ("Magic ok");
-	/*else
-		printf ("Magic not ok: %x\n", int (fEffect->magic));*/
-	//printf ("Progs: %d	Params: %d	Inputs: %d	Outputs: %d\n", int (fEffect->numPrograms), int (fEffect->numParams), int (fEffect->numInputs), int (fEffect->numOutputs));
-}
+*/
+
 void VSTItem::LoadPreset (BMessage *config)
 {	
-	const float *	params;
-	const void *	chunk;
-	ssize_t		size;
-	
-	if (fEffect->flags & effFlagsProgramChunks)
-		{
-			int	prog = 0;
-			if (config->FindData ("chunk", B_RAW_TYPE, prog, &chunk, &size) == B_OK)
-			{
-				fEffect->dispatcher (fEffect, effSetChunk, 0, size, (void*) chunk, 0.f);
-			}
-		}
-		else
-		{
-			int	prog = 0;
-			if(config->FindData ("floats", B_RAW_TYPE, prog, (const void **) &params, &size) == B_OK)
-			{
-				int	count = (int)size / sizeof (float);
-				for (int p = 0; p < count; p++)
-				{
-					fEffect->setParameter (fEffect, p, params[p]);
-					//printf("Load Param %d value %f\n",p,params[p]);
-				}
-			}
-		}
-}
-//deprecated (only for 1.2 compatib.)
-void VSTItem::LoadPresetOLD (BMessage *config)
-{// BMessage -> plugin
-	const float *	params;
-	const void *	chunk;
-	ssize_t			size;
-	int32			currentProgram;
-	if (config->FindInt32 ("current", &currentProgram) == B_OK)
-	{
-		if (fEffect->flags & effFlagsProgramChunks)
-		{
-			int	prog = 0;
-			const char * name;
-			while (config->FindData ("chunk", B_RAW_TYPE, prog, &chunk, &size) == B_OK
-				&& config->FindString ("name", prog, &name) == B_OK
-				&& prog < fEffect->numPrograms)
-			{
-				fEffect->dispatcher (fEffect, effSetProgram, 0, prog++, 0, 0.f);
-				fEffect->dispatcher (fEffect, effSetProgramName, 0, 0, (char*) name, 0);
-				fEffect->dispatcher (fEffect, effSetChunk, 0, size, (void*) chunk, 0.f);
-			}
-		}
-		else
-		{
-			int	prog = 0;
-			const char * name;
-			while (config->FindData ("floats", B_RAW_TYPE, prog, (const void **) &params, &size) == B_OK
-				&& config->FindString ("name", prog, &name) == B_OK
-				&& prog < fEffect->numPrograms)
-			{
-				fEffect->dispatcher (fEffect, effSetProgram, 0, prog++, 0, 0.f);
-				fEffect->dispatcher (fEffect, effSetProgramName, 0, 0, (char*) name, 0);
-				int	count = size / sizeof (float);
-				for (int p = 0; p < count; p++)
-				{
-					fEffect->setParameter (fEffect, p, params[p]);
-				}
-			}
-		}
-		fEffect->dispatcher (fEffect, effSetProgram, 0, currentProgram, 0, 0.f);
-	}
+//	const float *	params;
+//	const void *	chunk;
+//	ssize_t		size;
+//	
+//   	if (fEffect->flags & effFlagsProgramChunks)
+//	{
+//		int	prog = 0;
+//		if (config->FindData ("chunk", B_RAW_TYPE, prog, &chunk, &size) == B_OK)
+//		{
+//			fEffect->dispatcher (fEffect, effSetChunk, 0, size, (void*) chunk, 0.f);
+//		}
+//	}
+//	else
+//	{
+//		int	prog = 0;
+//		if(config->FindData ("floats", B_RAW_TYPE, prog, (const void **) &params, &size) == B_OK)
+//		{
+//			int	count = (int)size / sizeof (float);
+//			for (int p = 0; p < count; p++)
+//			{
+//				fEffect->setParameter (fEffect, p, params[p]);
+//				//printf("Load Param %d value %f\n",p,params[p]);
+//			}
+//		}
+//	}
 }
 
 
 void VSTItem::SavePreset (BMessage *config)
 {	
-	
-	if (fEffect->flags & effFlagsProgramChunks)
-	{
-		void *		chunk;
-		ssize_t		size;
-		size = fEffect->dispatcher (fEffect, effGetChunk, 0, 0, &chunk, 0.f);
-		config->AddData ("chunk", B_RAW_TYPE, chunk, size);
-	}
-	else
-	{
-		int		count = fEffect->numParams;
-		if (count > 0)
-		{
-			float *	params = new float[count];
-			for (int p = 0; p < count; p++)
-					params[p] = fEffect->getParameter (fEffect, p);
-				config->AddData ("floats", B_RAW_TYPE, params, count * sizeof (float));
-			delete[] params;
-		}
-	}
+//	
+//	if (fEffect->flags & effFlagsProgramChunks)
+//	{
+//		void *		chunk;
+//		ssize_t		size;
+//		size = fEffect->dispatcher (fEffect, effGetChunk, 0, 0, &chunk, 0.f);
+//		config->AddData ("chunk", B_RAW_TYPE, chunk, size);
+//	}
+//	else
+//	{
+//		int		count = fEffect->numParams;
+//		if (count > 0)
+//		{
+//			float *	params = new float[count];
+//			for (int p = 0; p < count; p++)
+//					params[p] ive= fEffect->getParameter (fEffect, p);
+//				config->AddData ("floats", B_RAW_TYPE, params, count * sizeof (float));
+//			delete[] params;
+//		}
+//	}
 }
 status_t VSTItem::FilterFloat (float **input, float **output, int32 framecount, void *info)
 {
-	if(!active) return B_OK;	
-	//fLastFilter = (uint32) system_time ();
-	// value set by default. VST plugin need to know how big the buffer
-	// *might* be, that is, the upper limit of framecount...
-	if (framecount > fBlockSize)
+	if(!IsActive()) 
+		return B_OK;	
+	
+	if (framecount != BlockSize())
 	{
-		// with SoundPlay, this should happen only once when the plugin is first used...
-		fEffect->dispatcher (fEffect, effMainsChanged, 0, 0, 0, 0.);	// turn off
-		fEffect->dispatcher (fEffect, effSetBlockSize, 0, framecount, 0, 0.);
-		fEffect->dispatcher (fEffect, effMainsChanged, 0, 1, 0, 0.);	// turn on
-		fBlockSize = framecount;
+		LogTrace("VSTItem updating block size from %ld to %ld", BlockSize(), framecount);		
+		SetBlockSize(framecount);
 	}
 	
-	//new xrs1.4
 	
+	//LogError("FilterFloat called\n");
+	Effect()->processReplacing (Effect(), input, output, framecount);
+	
+	//new xrs1.4
+	/*
 	if (fEffect->flags & effFlagsCanReplacing)
 	{
 		//if (fEffect->numOutputs < 2)
@@ -776,7 +578,7 @@ status_t VSTItem::FilterFloat (float **input, float **output, int32 framecount, 
 		fEffect->process(fEffect, input, outputs, framecount);
 		
 	}
-	
+	*/
 	
 	//processing..
 	
@@ -816,10 +618,7 @@ status_t VSTItem::FilterFloat (float **input, float **output, int32 framecount, 
 
 BView * VSTItem::Configure ()
 {
-	return (new VSTConfigureView(this));
+	return new VSTConfigureView(this);
 }
 
 
-effectPluginPair *	VSTItem::fPairs = NULL;
-int VSTItem::fPairsCount = 0;
-BLocker VSTItem::fLock;

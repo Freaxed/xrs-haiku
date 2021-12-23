@@ -188,6 +188,15 @@ VSTParameter::ListItemAt(int index)
 	return item;
 }
 
+const char*		
+VSTParameter::CurrentValue(void)
+{
+	char temp[256];
+	temp[0] = 0;
+	fEffect->dispatcher(fEffect, VST_GET_PARAM_STR, fIndex, 0, temp, 0);
+	fCurValue.SetTo(temp);
+	return fCurValue.String();
+}
 
 float
 VSTParameter::Value()
@@ -298,7 +307,7 @@ VSTPlugin::~VSTPlugin()
 }
 
 int
-VSTPlugin::LoadModule(const char *path)
+VSTPlugin::LoadModule(const char *path, audioMasterCallback hostCallback)
 {
 	char effectName[256] = {0};
 	char vendorString[256] = {0};
@@ -319,7 +328,7 @@ VSTPlugin::LoadModule(const char *path)
 		return VST_ERR_NO_MAINPROC;
 	}
 
-	fEffect = VSTMainProc(VHostCallback);
+	fEffect = VSTMainProc(hostCallback ? hostCallback : VHostCallback);
 	if (fEffect==NULL) {
 		unload_add_on(fModule);
 		return VST_ERR_NOT_LOADED;
@@ -349,13 +358,19 @@ VSTPlugin::LoadModule(const char *path)
 		VSTParameter *param = new VSTParameter(this, i);
 		fParameters.AddItem(param);
 	}
-
+	
 	fEffect->dispatcher(fEffect, VST_STATE_CHANGED, 0, 1, 0, 0);
 
 	ReAllocBuffers();
 
 	fActive = true;
 	return B_OK;
+}
+
+bool			
+VSTPlugin::IsSynth() 
+{
+	return (fEffect->flags & VST_FLAG_IS_SYNTH);
 }
 
 int

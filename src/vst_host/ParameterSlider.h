@@ -12,14 +12,11 @@
 
 #include 	<StringView.h>
 #include	<Slider.h>
-
-#ifndef __audioeffectx__
-#include "audioeffectx.h"
-#endif		
+#include	"VSTHost.h"		
 
 class ParameterSlider : public BSlider {
 public:
-				ParameterSlider (BRect frame, AEffect * effect, int index);
+				ParameterSlider (BRect frame, VSTParameter*);
 	void		 	AttachedToWindow ();
 	void			SetValue (int32 v);
 	void			LoadParameter ();
@@ -27,9 +24,7 @@ public:
 
 private:
 	BStringView *	fDisplay;
-	AEffect *		fEffect;
-	int				fIndex;
-	char				fUnit[64];
+	VSTParameter*	fParameter;
 	bool				fStore;
 };
 

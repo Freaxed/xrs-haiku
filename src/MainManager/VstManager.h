@@ -17,6 +17,7 @@ class 	VSTItem;
 
 #include	<Path.h>
 #include    <List.h>
+#include	"VSTList.h"
 
 class VstManager
 {
@@ -26,7 +27,6 @@ class VstManager
 		
 		static	VstManager*	Get();
 		
-		BList*		getList(){ return &list;}
 		VSTItem*	CreateVst(int pos);	
 		void		DeleteVst(VSTItem* plug);
 		bool		SavePreset(VSTItem* plug,const char*name,BMessage* msg);
@@ -39,8 +39,11 @@ class VstManager
 	private:
 	
 					VstManager();
-		BList		list;
-		BPath		vstpath;
+		VSTList*	fVstList;
+		
+		//presets  (fix names);
+		BDirectory	xdir;
+		BPath 		xpath;
 
 		void		AddMime(BFile* file);
 		bool		CheckMimeType(BFile* file);

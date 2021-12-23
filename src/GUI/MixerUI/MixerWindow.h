@@ -34,7 +34,7 @@ class MixerWindow : public XrsWindow
 				bool	QuitRequested();
 				void 	Refresh();	
 							
-				void	CreateVstWindow(VSTItem* vst,int pos);
+				void	CreateVstWindow(VSTItem* vst, uint8 line);
 				void	DeleteVstWindow(int pos);
 				
 				void	SaveSettings(BMessage*	data);
@@ -47,12 +47,11 @@ class MixerWindow : public XrsWindow
 				void	VSTSelect(int i);
 				void	LoadVST(int k,OutputLine*,int i);
 				
-				int		FindVST(const char*);
+				//int		FindVST(const char*);
 				
 				bool 	SetVST(BMessage *msg);
 				
-				// deprecated!
-				int		FindVSTOLD(const char*);
+
 				void	Reset();
 				
 				

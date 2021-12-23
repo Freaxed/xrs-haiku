@@ -24,6 +24,7 @@ local sourceDirs =
 	src/Extensions/Tn306
 	src/Extensions/VIW
 	src/Extensions/JMDrum/src
+	src/vst_host
 #	src/Extensions/XFluidSynth
 ;
 
@@ -172,10 +173,10 @@ Application XRS :
 	synel.cpp
 	
 	# --- VIW ---
-	VIWPanel.cpp  
-	VIWTrackBoost.cpp  
-	VIWTrack.cpp  
-	VSTInstrument.cpp
+	#VIWPanel.cpp  
+	#VIWTrackBoost.cpp  
+	#VIWTrack.cpp  
+	#VSTInstrument.cpp
 
 	# JMDRUM
 	Drum.cpp
@@ -193,6 +194,11 @@ Application XRS :
 	#SFSTrackBoost.cpp
 	#SFWindow.cpp 
 	#XFSynth.cpp 
+	
+	#vst_host
+	VSTHost.cpp
+	VSTList.cpp
+	
 		
 	#: be translation game media midi midi2 tracker fluidsynth stdc++
 	: be localestub translation game media midi midi2 tracker stdc++

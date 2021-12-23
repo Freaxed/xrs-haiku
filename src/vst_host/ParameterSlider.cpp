@@ -10,6 +10,9 @@
 #include	"ParameterSlider.h"
 #include	<stdio.h>
 
+#define		FACTOR_I	((int32)1000)
+#define		FACTOR_F	((float)1000.0f)
+
 void clean_string (char* d)
 {	// removes leading & ending spaces & tabs
 	char* f = d;
@@ -26,18 +29,17 @@ void clean_string (char* d)
 }
 
 // Generic Parameter
-ParameterSlider::ParameterSlider (BRect frame, AEffect * effect, int index)
-	:BSlider (frame, B_EMPTY_STRING, "", NULL, 0, 10000), fEffect (effect), fIndex (index), fStore (false)
+ParameterSlider::ParameterSlider (BRect frame, VSTParameter* para)
+	:BSlider (frame, para->Name(), "", NULL, 0, FACTOR_I), fParameter (para), fStore (false)
 {
 	SetFontSize(10);
 	frame.OffsetTo (B_ORIGIN);
 	frame.left = (frame.right + frame.left) / 2;
-	frame.top+=5;
-	frame.bottom = frame.top + 11;
-	memset(fUnit,'\0',64);
-	fEffect->dispatcher (fEffect, effGetParamLabel, fIndex, 0, fUnit, 0.f);
-	clean_string (fUnit);
-	fDisplay = new BStringView (frame, NULL, fUnit);
+	frame.top += 15;
+	//frame.bottom = frame.top + 11;
+	
+
+	fDisplay = new BStringView (frame, NULL, fParameter->Unit());
 	fDisplay->SetFontSize(10);
 	AddChild (fDisplay);
 	fDisplay->SetAlignment (B_ALIGN_RIGHT);
@@ -46,14 +48,13 @@ ParameterSlider::ParameterSlider (BRect frame, AEffect * effect, int index)
 void ParameterSlider::SetValue (int32 v)
 {
 	BSlider::SetValue (v);
-	char	display[64];
-	float	value = float (v) / 10000.f;
+	float	value = float (v) / FACTOR_F;
 	if (fStore)
-		fEffect->setParameter (fEffect, fIndex, value);
-	fEffect->dispatcher (fEffect, effGetParamDisplay, fIndex, 0, display, 0.f);
-	clean_string (display);
+		fParameter->SetValue (value);
+//	fEffect->dispatcher (fEffect, effGetParamDisplay, fIndex, 0, display, 0.f);
+//	clean_string (display);
 	char	complete[128];
-	sprintf (complete, "%s %s", display, fUnit);
+	sprintf (complete, "%s %s", fParameter->CurrentValue(), fParameter->Unit());
 	if (strcmp (complete, fDisplay->Text ()) != 0)
 		fDisplay->SetText (complete);
 }
@@ -66,11 +67,8 @@ void ParameterSlider::AttachedToWindow ()
 {
 	BSlider::AttachedToWindow ();
 	LoadParameter ();
-	char	name[64];
-	fEffect->dispatcher (fEffect, effGetParamName, fIndex, 0, name, 0.f);
-	clean_string (name);
-	SetLabel (name);
-	if(fIndex % 2 )  {
+	//SetLabel (fParameter->Name());
+	if(fParameter->Index() % 2 )  {
 						SetViewColor(tint_color(ViewColor(),B_DARKEN_1_TINT));
 						fDisplay->SetViewColor(255,0,0);
 					}
@@ -79,6 +77,7 @@ void ParameterSlider::AttachedToWindow ()
 void ParameterSlider::LoadParameter ()
 {
 	fStore = false;
-	SetValue (int32 (fEffect->getParameter (fEffect, fIndex) * 10000.f));
+	fParameter->Value();
+	SetValue (fParameter->Value() * FACTOR_F);
 	fStore = true;
 }

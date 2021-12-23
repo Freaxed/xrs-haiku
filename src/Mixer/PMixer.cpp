@@ -9,6 +9,7 @@
 
 #include "PMixer.h"
 #include "ValuableManager.h"
+#include "VstManager.h"
 
 PMixer* 
 PMixer::Get()
@@ -25,6 +26,14 @@ PMixer::PMixer(){
 		BusAt(0)->AddRouted(&busses[i]);	
 	}	
 	BusAt(0)->ClearBuffer();
+	
+	//Lets try to add by code a VST 
+	// 26 = Delay
+	BusAt(1)->Effector()->AddVST(VstManager::Get()->CreateVst(26)); // Delay
+	BusAt(2)->Effector()->AddVST(VstManager::Get()->CreateVst(10)); // RoundPan
+	BusAt(3)->Effector()->AddVST(VstManager::Get()->CreateVst(6)); // SubSynth
+	BusAt(4)->Effector()->AddVST(VstManager::Get()->CreateVst(29)); // OverDrive
+	
 }
 
 PMixer::~PMixer()

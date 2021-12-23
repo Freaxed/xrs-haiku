@@ -51,7 +51,7 @@ PlugWindow::PlugWindow(VSTItem* p,bool scroll) :
 	config=(VSTConfigureView*)plugin->Configure();
 	scroll= !config->HasNativeUI() && scroll;
 	SetControls(config,scroll);
-	SetPrograms(plugin->name.String(),config->GetMenu());
+	SetPrograms(plugin->EffectName(),config->GetMenu());
 	
 }
 PlugWindow::~PlugWindow()
@@ -69,11 +69,6 @@ PlugWindow::QuitRequested()
 void
 PlugWindow::SetControls(BView* conf,bool scr)
 {
-
-
-
-
-
 	if(Lock())
 	{
 		bar=new BMenuBar(BRect(0,0,30,20),"Bar");
@@ -89,8 +84,7 @@ PlugWindow::SetControls(BView* conf,bool scr)
 			AddChild(new BScrollBar(BRect(conf->Bounds().Width()+1,bar->Frame().Height(),conf->Bounds().Width()+1+B_V_SCROLL_BAR_WIDTH,300),"scoller",conf,0,conf->Bounds().Height()+bar->				Frame().Height()-300,B_VERTICAL));	
 			
 		}
-			
-			
+		
 			AddChild(box);
 			Unlock();
 			
@@ -103,6 +97,8 @@ PlugWindow::SetControls(BView* conf,bool scr)
 void
 PlugWindow::SetPrograms(const char *name,BMenu* prog)
 {
+	if (NULL == prog)
+		return;
 	Lock();
 	bar->AddItem(nameMenu=new BMenuItem(name,new BMessage(X_WIN_ZOOM)));
 	nameMenu->SetTarget(this);
@@ -180,7 +176,7 @@ PlugWindow::MessageReceived(BMessage* msg)
 		BMessage	set;
 		plugin->SavePreset(&set);
 		set.AddString("name",nome.String());
-		set.AddString("plugin_name",plugin->name.String());
+		set.AddString("plugin_name",plugin->EffectName());
 		
 		if(VstManager::Get()->SavePreset(plugin,nome.String(),&set)){
 			presetz->AddItem(new BMenuItem(nome.String(),new BMessage(X_LOAD_PRESET)));

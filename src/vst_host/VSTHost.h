@@ -57,6 +57,9 @@
 #define VST_GET_PRODUCT_STR 0x30
 #define VST_GET_VENDOR_VER	0x31
 
+#define VST_FLAG_IS_SYNTH 		 1 << 8
+#define VST_FLAG_NOSOUND_IN_STOP 1 << 9
+
 //vst plugin structure
 struct VSTEffect
 {
@@ -105,7 +108,8 @@ public:
 		float			Value(void);
 		void			SetValue(float value);
 		const char*		MinimumValue(void);
-		const char*		MaximumValue(void);
+		const char*		MaximumValue(void); 
+		const char*		CurrentValue(void);
 		const char*		Unit(void);
 		int				Index(void);
 		int				Type(void);
@@ -123,6 +127,7 @@ private:
 		BString			fUnit;
 		BString			fMinValue;
 		BString			fMaxValue;
+		BString			fCurValue;
 		BList			fDropList;
 		bigtime_t		fChanged;
 		float			fLastValue;
@@ -133,7 +138,7 @@ class VSTPlugin {
 public:
 						VSTPlugin();
 						~VSTPlugin();
-		int				LoadModule(const char *path);
+		int				LoadModule(const char *path, audioMasterCallback hostCallback = NULL);
 		int 			UnLoadModule(void);
 		int				SetSampleRate(float rate);
 		float			SampleRate(void);
@@ -150,6 +155,8 @@ public:
 		int				Channels(int mode);
 		int				ReAllocBuffers(void);
 		void			Process(float *buffer, int samples, int channels);
+		bool			IsSynth();
+		bool			IsActive() { return fActive; }
 private:
 		VSTEntryProc 	GetMainEntry();
 		VSTEffect*		fEffect;

@@ -27,7 +27,8 @@ class PMixer {
 					
 			PBus*	BusAt(uint8 pos);
 			PBus*	GetMain();			
-			void	ResetBuffers();					
+			void	ResetBuffers();			
+			uint8	CountBusses() { return 	MIXERLINES_COUNT;}	
 
 	// from the mixer everythings start and
 	// everythings end.
