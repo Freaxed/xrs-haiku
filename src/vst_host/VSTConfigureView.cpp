@@ -26,29 +26,30 @@
 
 #define	X_WIN_ZOOM		'xwzo'
 
-const float kConfigHeight = 5;
+
+const float kParameterWidth  = 60;
+const float kParameterHeight = 300;
 
 VSTConfigureView::VSTConfigureView (VSTPlugin * plugin) :
 	BBox (BRect (0, 0, 10, 10), B_EMPTY_STRING, 0, B_WILL_DRAW),
 	fMidiSelect (0), fPlugin (plugin)
 {
+	nativeUI = false; //for now.
+	
+	int count = plugin->ParametersCount();
+
+	
+	ResizeTo (kParameterWidth * count, kParameterHeight);
+	
+	BRect frame (2, 2, 2 + kParameterWidth, kParameterHeight - 2);
+	
+	for (int p = 0; p < count; p++)
 	{
-		nativeUI = false;
-		int count = plugin->ParametersCount();
-		const float kParameterWidth = 275;
-		const float kParameterHeight = 50;
-		
-		ResizeTo (kParameterWidth, kParameterHeight * count + kConfigHeight);
-		
-		BRect frame (2, kConfigHeight, kParameterWidth - 2 , kConfigHeight + kParameterHeight);
-		
-		for (int p = 0; p < count; p++)
-		{
-			ParameterSlider *  ps = new ParameterSlider (frame, plugin->Parameter(p));
-			AddChild (ps);
-			frame.top    += kParameterHeight;
-			frame.bottom += kParameterHeight;
-		}
+		ParameterSlider *  ps = new ParameterSlider (frame, plugin->Parameter(p));
+		AddChild (ps);
+//		frame.top    += kParameterHeight;
+//		frame.bottom += kParameterHeight;
+		frame.OffsetBy(kParameterWidth, 0);
 	}
 }
 bool

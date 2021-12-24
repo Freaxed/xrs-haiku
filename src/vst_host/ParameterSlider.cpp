@@ -28,21 +28,28 @@ void clean_string (char* d)
 	*d = 0;
 }
 
+BRect& shorter_rect(BRect& rect) {
+	rect.bottom -= 30;
+	return rect;
+}
 // Generic Parameter
 ParameterSlider::ParameterSlider (BRect frame, VSTParameter* para)
-	:BSlider (frame, para->Name(), "", NULL, 0, FACTOR_I), fParameter (para), fStore (false)
+	:BSlider (shorter_rect(frame), para->Name(), "", NULL, 0, FACTOR_I), fParameter (para), fStore (false)
 {
-	SetFontSize(10);
-	frame.OffsetTo (B_ORIGIN);
-	frame.left = (frame.right + frame.left) / 2;
-	frame.top += 15;
-	frame.bottom = frame.top + 110;//!!!
-	
-
+	SetOrientation(B_VERTICAL);
+	SetFontSize(10);	
+	BString label(fParameter->Name());
+	if (strlen(fParameter->Unit()) > 0)
+		label << " (" << fParameter->Unit() << ")";
+		
+	SetLabel (label.String());
+	SetLimitLabels(fParameter->MinimumValue(), fParameter->MaximumValue());
+	//BRect rect (0, frame.Height(), frame.Width(), frame.Height() + 30);
+	frame.top    = frame.bottom + 1;
+	frame.bottom = frame.top    + 30;
 	fDisplay = new BStringView (frame, NULL, fParameter->Unit());
 	fDisplay->SetFontSize(10);
-	AddChild (fDisplay);
-	fDisplay->SetAlignment (B_ALIGN_RIGHT);
+	fDisplay->SetAlignment (B_ALIGN_CENTER);
 }
 					
 void ParameterSlider::SetValue (int32 v)
@@ -65,11 +72,15 @@ void ParameterSlider::LinkController()
 void ParameterSlider::AttachedToWindow ()
 {
 	BSlider::AttachedToWindow ();
+	Parent()->AddChild(fDisplay);
+	float w,h;
+	GetPreferredSize(&w, &h);
+	fDisplay->ResizeTo(w, 30);
 	LoadParameter ();
-	SetLabel (fParameter->Name());
+
 	if(fParameter->Index() % 2 )  {
-	   SetViewColor(tint_color(ViewColor(),B_DARKEN_1_TINT));
-	   fDisplay->SetViewColor(255,0,0);
+	   //SetViewColor();
+	   fDisplay->SetViewColor(tint_color(ViewColor(),B_DARKEN_1_TINT));
 	}
 }
 
