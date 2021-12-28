@@ -161,7 +161,7 @@ BPictureButton*
 XUtils::ToolBarButton(BRect buttonsize, int32 index, const char *tip, BMessage *msg, uint32 state, BView *view)
 {
 	BBitmap *icons = new BBitmap(GetBitmap(19)); 
-	BBitmap *up    = new BBitmap(GetBitmap(20)); //BTranslationUtilsXUtils::GetBitmapFile("./Skin/EmptyButton.png");
+	BBitmap *up    = new BBitmap(GetBitmap(20));
 	BBitmap *dis   = new BBitmap(up);
 
 	
@@ -430,16 +430,7 @@ XUtils::CheckIsBank(entry_ref *ref)
 	
 	return B_OK;
 }
-/*
-status_t
-XUtils::GetDefaultBankRef(entry_ref *rif)
-{
-	XUtils::GetBankRef("DefaultBank",rif);
-	BEntry e(rif,true);
-	e.GetRef(rif);
-	if(e.Exists()) return B_OK;
-			else return B_ERROR;
-}*/
+
 status_t
 XUtils::GetDefaultSongRef(entry_ref *rif)
 {

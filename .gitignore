@@ -7,6 +7,6 @@ src/Valuable/compile_commands.json
 objects.x86_64*
 *_
 src/tests/test-vst/TestHost
-src/tests/test-vst/BeApp
+src/tests/test-vst/TestVSTGui
 (Objects*
 compile_commands.json

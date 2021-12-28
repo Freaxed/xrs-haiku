@@ -18,7 +18,7 @@ main(){
 				type = "DropList";
 				
 			printf("   %d -- %s %s type [%s] Min[%s] Max[%s]\n", para->Index(), para->Name(), para->Unit(), type.String(), para->MinimumValue(), para->MaximumValue());
-			printf("   Value %f\n", para->Value());
+			printf("   Value %f - ListCount %d\n", para->Value(), para->ListCount());
 		}
 	}
 	printf("DONE.\n");
