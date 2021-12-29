@@ -10,6 +10,15 @@
 #include "PotViewer.h"
 #include <String.h>
 
+PotViewer*	
+PotViewer::Get()
+{
+	static	PotViewer*	instance = NULL;
+	if (instance == NULL) 
+			instance = new PotViewer();
+	return instance;
+}
+
 PotViewer::PotViewer():BWindow(BRect(-100,-100,-50,-50),"",B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,B_NOT_MOVABLE|B_AVOID_FOCUS){
 
 	AddChild(fText=new BStringView(Bounds(),"value","",B_FOLLOW_ALL_SIDES)); 
@@ -20,25 +29,23 @@ PotViewer::PotViewer():BWindow(BRect(-100,-100,-50,-50),"",B_BORDERED_WINDOW_LOO
 	Hide();
 }
 void	
-PotViewer::InitShow(APot* pot,float distance){
+PotViewer::InitShow(BView* pot,float distance){
 
 	if(Lock()){
 	
-	if(!IsHidden()) Hide();
+		if(!IsHidden()) Hide();
 	
-	BRect r(pot->Frame()); //float w,h;
+		BRect r(pot->Frame());
 	
-	r=pot->ConvertToScreen(pot->Bounds());
+		r=pot->ConvertToScreen(pot->Bounds());
+		
+		MoveTo(r.left,r.bottom + distance);
 	
-	MoveTo(r.left,r.bottom + distance);
-	
-//	pot->GetPreferredSize(&w,&h);
-	
-	ResizeTo(r.right-r.left,12);
-	
-	
-	Show();
-	Unlock();}
+		ResizeTo(r.right-r.left,12);
+		Show();
+		
+		Unlock();
+	}
 }
 
 void	

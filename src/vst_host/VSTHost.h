@@ -1,5 +1,6 @@
 /*
  * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com.
+ * extended by andrea.anzani@gmail.com
  * All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -44,18 +45,22 @@
 #define VST_MASTER_PRODUCT	0x21
 
 //vst actions
-#define VST_OPEN			0x00
-#define VST_CLOSE			0x01
-#define	VST_GET_PARAM_UNIT	0x06
-#define VST_GET_PARAM_STR 	0x07
-#define VST_GET_PARAM_NAME	0x08
-#define VST_SET_SAMPLE_RATE	0x0A
-#define VST_SET_BLOCK_SIZE	0x0B
-#define VST_STATE_CHANGED 	0x0C
-#define VST_GET_EFFECT_NAME	0x2D
-#define VST_GET_VENDOR_STR	0x2F
-#define VST_GET_PRODUCT_STR 0x30
-#define VST_GET_VENDOR_VER	0x31
+#define VST_OPEN			 0x00
+#define VST_CLOSE			 0x01
+#define VST_SET_PROGRAM		 0x02
+#define VST_GET_PROGRAM		 0x03
+#define VST_SET_PROGRAM_NAME 0x04
+#define VST_GET_PROGRAM_NAME 0x05
+#define	VST_GET_PARAM_UNIT	 0x06
+#define VST_GET_PARAM_STR 	 0x07
+#define VST_GET_PARAM_NAME	 0x08
+#define VST_SET_SAMPLE_RATE	 0x0A
+#define VST_SET_BLOCK_SIZE	 0x0B
+#define VST_STATE_CHANGED 	 0x0C
+#define VST_GET_EFFECT_NAME	 0x2D
+#define VST_GET_VENDOR_STR	 0x2F
+#define VST_GET_PRODUCT_STR  0x30
+#define VST_GET_VENDOR_VER	 0x31
 
 #define VST_FLAG_IS_SYNTH 		 1 << 8
 #define VST_FLAG_NOSOUND_IN_STOP 1 << 9

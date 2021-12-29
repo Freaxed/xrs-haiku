@@ -1,6 +1,5 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,13 +11,18 @@
 
 #include <Control.h>
 
-#define	SB_MSG	'sbmp'
+#define	SB_MSG	'sbmp'	//ReleaseMessage (mouse up)
 
 class APot : public BControl
 {
 public:
 	APot(BRect frame, const char *name,
-		BMessage *message,BMessage *satte,
+		BMessage *valueChanging ,BMessage *switchState,
+		int32 minValue, int32 maxValue,
+		BBitmap *p1 = NULL ,BBitmap *p2 = NULL);
+		
+	APot(const char *name,
+		BMessage *valueChanging ,BMessage *switchState,
 		int32 minValue, int32 maxValue,
 		BBitmap *p1 = NULL ,BBitmap *p2 = NULL);
 		
@@ -34,10 +38,24 @@ public:
 	virtual int32   ValueForAngle(float degrees) const;
 	virtual float   AngleForValue(int32 value) const;
 	
+			void	GetPreferredSize(float* _width,
+									float* _height) 
+			{
+						if (_width) *_width   = 40.0f;
+						if (_height) *_height = 40.0f;
+			}
+			
+			virtual	BSize				MinSize() { return BSize(40.0f, 40.0f); }
+			virtual	BSize				MaxSize() { return BSize(40.0f, 40.0f); }
+			void	FrameResized(float newWidth, float newHeight);
+									
+	
 	void SetReleaseMessage(BMessage *);
 	
 	void	SetOn(bool);
 	bool	IsOn();
+	
+	void	SetShowValue(bool show) { m_ShowValue = show;}
 
 	//events	
 	
@@ -69,13 +87,15 @@ protected:
 	
 private:
 	
-
+		void	Init(BMessage *message, BMessage *state,
+		             int32 minValue, int32 maxValue,
+		             BBitmap *p1 ,BBitmap *p2);
 	
-	int32 m_fMinValue, m_fMaxValue;
-	float m_fMinAngle, m_fMaxAngle;
-	float m_fDragAngle;
-			
-	bool state_on;
+	int32 		m_fMinValue, m_fMaxValue;
+	float 		m_fMinAngle, m_fMaxAngle;
+	float 		m_fDragAngle;
+	
+	float 		m_PenSize;
 	
 	BRect 		m_rectKnob;
 	
@@ -83,11 +103,12 @@ private:
 	BPoint 		mouse_start;
 	BPoint 		rel_mouse_start;
 	
-	BMessage	rel_msg;
-	BMessage	*switch_msg;
+	BMessage	m_ReleaseMessage; 			//when mouseup.
+	BMessage*	m_SwitchStateMessage;		//when right-click (if NULL function is disable)
 
-	BBitmap *tick;
-	BBitmap *pad,*padoff;
+	BBitmap*	pad;
+	BBitmap*	padoff;
+	bool		m_ShowValue;
 
 };
 

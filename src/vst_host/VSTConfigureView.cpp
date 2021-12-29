@@ -25,10 +25,10 @@
 //#include "VSTEnums.h"
 
 #define	X_WIN_ZOOM		'xwzo'
-
-
 const float kParameterWidth  = 60;
 const float kParameterHeight = 300;
+
+#define VST_
 
 VSTConfigureView::VSTConfigureView (VSTPlugin * plugin) :
 	BBox (BRect (0, 0, 10, 10), B_EMPTY_STRING, 0, B_WILL_DRAW),
@@ -61,32 +61,30 @@ VSTConfigureView::HasNativeUI()
 
 BMenu*	
 VSTConfigureView::GetMenu()	
-{	/*
+{
+	VSTEffect*	fEffect = fPlugin->Effect();
+	
 	char	program[32];
 	
-	fEffect->dispatcher (fEffect, effGetProgramName, 0, 0, program, 0);
-	
-	
+	fEffect->dispatcher (fEffect, VST_GET_PROGRAM_NAME, 0, 0, program, 0);
 	
 	BMenu* popup = new BMenu("Standard");
 	popup->SetFont(be_plain_font);
 
 	
-	int32 currentProgram = fEffect->dispatcher (fEffect, effGetProgram, 0, 0, 0, 0.f);
+	int32 currentProgram = fEffect->dispatcher (fEffect, VST_GET_PROGRAM, 0, 0, 0, 0.f);
 	int		progCount = fEffect->numPrograms;
 	char	name[32];
 	for (int prog = 0; prog < progCount; prog++)
 	{
-		fEffect->dispatcher (fEffect, effSetProgram, 0, prog, 0, 0.f);
-		fEffect->dispatcher (fEffect, effGetProgramName, 0, 0, name, 0);
+		fEffect->dispatcher (fEffect, VST_SET_PROGRAM,      0, prog, 0,    0.f);
+		fEffect->dispatcher (fEffect, VST_GET_PROGRAM_NAME, 0, 0,    name, 0);
 		popup->AddItem (new BMenuItem (name, new BMessage ('Prog')));
 	}
-	fEffect->dispatcher (fEffect, effSetProgram, 0, currentProgram, 0, 0.f);
+	fEffect->dispatcher (fEffect, VST_SET_PROGRAM, 0, currentProgram, 0, 0.f);
 	
 	popup->SetTargetForItems(this);
-	return popup;*/
-	return NULL;
-	
+	return popup;
 }
 
 /*

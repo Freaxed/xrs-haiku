@@ -12,25 +12,26 @@
 
 #include <Window.h>
 #include <StringView.h>
-#include "APot.h"
 
 
 class PotViewer: public BWindow {
 
-	public:
+
 				PotViewer();
-		void	InitShow(APot*,float distance = 0);
+		
+public:
+		static	PotViewer*	Get();
+		
+		void	InitShow(BView*,float distance = 0);
 		void	InitHide();
 		void	SetValue(long value);
 		
 		void	AllAttachted();
 
-	private:
+private:
 	
 		BStringView*	fText;
 };
-
-//extern PotViewer* potviewer;
 
 #endif
 

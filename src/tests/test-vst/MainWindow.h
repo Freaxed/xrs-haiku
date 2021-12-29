@@ -4,6 +4,9 @@
 #include <Window.h>
 #include "VSTHost.h"
 
+class BMenuBar;
+class BMenu;
+
 class MainWindow : public BWindow
 {
 public:
@@ -11,7 +14,11 @@ public:
 			void		MessageReceived(BMessage *msg);
 			bool		QuitRequested(void);
 			
+			void SetControls(BView* conf, bool scr);
+			void SetPrograms(const char *name,BMenu* prog);
+			
 private:
+			BMenuBar*	bar;
 };
 
 #endif

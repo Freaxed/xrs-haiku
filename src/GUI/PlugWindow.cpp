@@ -110,7 +110,7 @@ PlugWindow::SetPrograms(const char *name,BMenu* prog)
 	/* creazione del menu presez..*/
 	
 	
-	men->AddItem(presetz=new BMenu(T_VSTWIN_USER));
+	men->AddItem(presetz=new BMenu("User"));
 	men->AddSeparatorItem();
 	men->AddItem(new BMenuItem(T_MENU_SAVE_AS,new BMessage(X_SAVE_PRESET)));
 	//men->AddItem(new BMenuItem("Reload",new BMessage(X_RELOAD_PRESETS)));

@@ -1,5 +1,6 @@
 #include "App.h"
 #include "MainWindow.h"
+#include "VSTParamWindow.h"
 #include "VSTList.h"
 
 App::App(void)
@@ -15,8 +16,11 @@ App::App(void)
 	
 	VSTPlugin*	instance = x->InstantiatePlugin(x->GetPluginAt(1));
 	
-	MainWindow *mainwin = new MainWindow(instance);
-	mainwin->Show();
+//	MainWindow *mainwin = new MainWindow(instance);
+//	mainwin->Show();
+	
+	VSTParamWindow* vst = new VSTParamWindow(instance);
+	vst->Show();
 }
 
 
