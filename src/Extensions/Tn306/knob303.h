@@ -12,12 +12,21 @@
 
 class TNTrack;
 class BStringView;
+class TNKnob;
+
+
+
 
 class TB303Knobs: public BView
 {
+public:
+	typedef void (TB303Knobs::*update_value)(float);
+	
 private:
 		
-	APot *tune, *cutoff, *reso, *envmod, *decay, *accent, *delay, *feedbk, *dist,*tdelay;
+	//APot  *accent;
+	TNKnob *tune, *dist, *envmod, *decay, *cutoff, *reso, *delay, *feedbk, *tdelay;
+	
 	BStringView *label;
 	
 	TNTrack *fTrack;
@@ -48,8 +57,8 @@ private:
 
 protected:
 	void AttachedToWindow();
-	void MessageReceived(BMessage*);
 	APot * MakeController(BRect r,const char* n1,const char* n2,int min,int max ,int cur,const rgb_color col,int32);
+	TNKnob* MakeKnob(const char* title, update_value func);
 };
 
 #endif
