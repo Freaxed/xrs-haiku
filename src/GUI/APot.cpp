@@ -27,6 +27,14 @@ static float rads(float degrees);
 
 #define LZ	10
 
+class PotViewerDisplayValue : public DisplayValue {
+	public:
+		void	Show(BView* view, float position) { PotViewer::Get()->InitShow(view, position); }
+		void	ShowValue(int32 value) { PotViewer::Get()->SetValue(value); }
+		void	Hide() { PotViewer::Get()->InitHide(); }
+};
+
+PotViewerDisplayValue	gPotViewerDisplayValue;
 
 APot::APot(BRect frame, const char *name,
 	BMessage *message, BMessage *state,
@@ -58,7 +66,7 @@ APot::Init(BMessage *message, BMessage *state,
 		m_SwitchStateMessage = state;
 		distance = 0;
 		m_PenSize = 1.0;
-		m_ShowValue = true;
+		m_DisplayValue = &gPotViewerDisplayValue;
 		
 		SetValue(minValue);
 	
@@ -70,17 +78,33 @@ APot::Init(BMessage *message, BMessage *state,
 		pad=p1;
 		padoff=p2;
 		SetViewColor(B_TRANSPARENT_COLOR);
+		
+		SetSize(DEFAULT_SIZE);
 }
 
 void	
 APot::FrameResized(float newWidth, float newHeight)
 {
 	BRect b = Bounds();
-	m_PenSize = floor(newWidth / 10.0f);
+	m_PenSize = ((int32)(floor(newWidth / 10.0f)) / 2 ) * 2;
 	m_rectKnob.Set(0, 0, newWidth - 2*m_PenSize, newHeight- 2*m_PenSize);
 	m_rectKnob.OffsetBy(b.left + (b.Width() - m_rectKnob.Width())/2,b.top + (b.Height() - m_rectKnob.Height())/2);	
 	Invalidate();
 }
+
+void	
+APot::GetPreferredSize(float* _width, float* _height) 
+{
+			if (_width) *_width   = m_Size;
+			if (_height) *_height = m_Size;
+}
+			
+
+BSize				
+APot::MinSize() { return MaxSize(); }
+
+BSize				
+APot::MaxSize() { return BSize(m_Size, m_Size); }
 		             
 		             
 APot::~APot() {}
@@ -241,9 +265,9 @@ void APot::MouseDown(BPoint where)
 		ConvertToScreen(&mouse_start);
 		be_app->HideCursor();
 		
-		if (m_ShowValue) {
-			PotViewer::Get()->InitShow(this,distance);
-			PotViewer::Get()->SetValue(Value());
+		if (m_DisplayValue) {
+			m_DisplayValue->Show(this, distance);
+			m_DisplayValue->ShowValue(Value());
 		}
 		
 		Invalidate();
@@ -269,7 +293,7 @@ void APot::MouseMoved(BPoint where, uint32 /* transit */, const BMessage* /* dra
 		incr += SetAngle(m_fDragAngle);
 		if (incr != 0){
 			DrawKnob(Bounds());
-			if (m_ShowValue) PotViewer::Get()->SetValue(Value());
+			if (m_DisplayValue) m_DisplayValue->ShowValue(Value());
 		}
 		set_mouse_position((long)mouse_start.x,(long)mouse_start.y);
 		
@@ -292,7 +316,7 @@ void APot::MouseUp(BPoint where)
 
 		set_mouse_position((long)mouse_start.x,(long)mouse_start.y);
 		be_app->ShowCursor();
-		if (m_ShowValue) PotViewer::Get()->InitHide();
+		if (m_DisplayValue) m_DisplayValue->Hide();
 		Invalidate();
 		
 	}

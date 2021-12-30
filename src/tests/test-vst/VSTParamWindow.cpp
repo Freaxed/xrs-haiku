@@ -15,6 +15,7 @@
 #include <Box.h>
 #include "APot.h"
 #include "VSTKnob.h"
+#include "VSTParamsView.h"
 
 
 VSTParamWindow::VSTParamWindow(VSTPlugin* plugin)
@@ -22,10 +23,16 @@ VSTParamWindow::VSTParamWindow(VSTPlugin* plugin)
 {
 	BGridLayout* grid = BLayoutBuilder::Grid<>();
 	SetLayout(grid);
-	int count = plugin->ParametersCount();
+	/*int count = plugin->ParametersCount();
 
 	for (int p = 0; p < count; p++) {
 		grid->AddView(new VSTKnob(plugin->Parameter(p)), p%5, p/5);		
-	}
-
+	}*/
+	VSTParamsView* view = new VSTParamsView(plugin);
+	grid->AddView(view);
+	
+	float w,h;
+	view->GetPreferredSize(&w,&h);
+	printf("size %f %f\n", w, h);
+	ResizeTo(w, h);
 }

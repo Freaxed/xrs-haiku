@@ -87,7 +87,7 @@ Application XRS :
 	PositionView.cpp
 	XMatrix.cpp
 	PlugWindow.cpp
-	
+	ParameterValueKnob.cpp
 	
 	#src/GUI/track
 	JTrack.cpp

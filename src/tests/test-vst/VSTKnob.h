@@ -9,6 +9,7 @@ class VSTKnob : public ParameterValueKnob  {
 	public:
 				VSTKnob(VSTParameter*);
 	virtual		void		SetValue(float newValue);
+	virtual		void		ValueDisplay(float value, BString& display);
 	private:
 				VSTParameter*	fParameter;
 };

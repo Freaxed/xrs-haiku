@@ -13,6 +13,16 @@
 
 #define	SB_MSG	'sbmp'	//ReleaseMessage (mouse up)
 
+#define DEFAULT_SIZE	32.0f	//change it with SetSize(float)
+
+class DisplayValue {
+	public:
+		virtual void	Show(BView*, float position) = 0;
+		virtual void	ShowValue(int32 value) = 0;
+		virtual void	Hide() = 0;
+};
+
+
 class APot : public BControl
 {
 public:
@@ -39,23 +49,24 @@ public:
 	virtual float   AngleForValue(int32 value) const;
 	
 			void	GetPreferredSize(float* _width,
-									float* _height) 
-			{
-						if (_width) *_width   = 40.0f;
-						if (_height) *_height = 40.0f;
-			}
+									float* _height);
 			
-			virtual	BSize				MinSize() { return BSize(40.0f, 40.0f); }
-			virtual	BSize				MaxSize() { return BSize(40.0f, 40.0f); }
+			BSize	MinSize();
+
+			BSize	MaxSize();
+	
+			void	SetSize(float size) { m_Size = size; }
+			
 			void	FrameResized(float newWidth, float newHeight);
 									
+	
 	
 	void SetReleaseMessage(BMessage *);
 	
 	void	SetOn(bool);
 	bool	IsOn();
 	
-	void	SetShowValue(bool show) { m_ShowValue = show;}
+	void	SetDisplayValue(DisplayValue* displayer) { m_DisplayValue = displayer;}
 
 	//events	
 	
@@ -108,7 +119,8 @@ private:
 
 	BBitmap*	pad;
 	BBitmap*	padoff;
-	bool		m_ShowValue;
+	float		m_Size;
+	DisplayValue*	m_DisplayValue;
 
 };
 

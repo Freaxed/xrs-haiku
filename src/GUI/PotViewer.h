@@ -24,12 +24,13 @@ public:
 		
 		void	InitShow(BView*,float distance = 0);
 		void	InitHide();
-		void	SetValue(long value);
+		void	SetValue(int32 value);
+		void	SetValue(BString value);
 		
 		void	AllAttachted();
 
 private:
-	
+		void	SetText(BString text);
 		BStringView*	fText;
 };
 

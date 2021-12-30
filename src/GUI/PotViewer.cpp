@@ -1,6 +1,5 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,19 +28,18 @@ PotViewer::PotViewer():BWindow(BRect(-100,-100,-50,-50),"",B_BORDERED_WINDOW_LOO
 	Hide();
 }
 void	
-PotViewer::InitShow(BView* pot,float distance){
+PotViewer::InitShow(BView* pot, float distance){
 
 	if(Lock()){
 	
 		if(!IsHidden()) Hide();
-	
-		BRect r(pot->Frame());
-	
-		r=pot->ConvertToScreen(pot->Bounds());
+
+		BRect r = pot->ConvertToScreen(pot->Bounds());
 		
 		MoveTo(r.left,r.bottom + distance);
-	
-		ResizeTo(r.right-r.left,12);
+		
+		SetText("");
+		SetSizeLimits(r.right-r.left, 1000.0f, Size().Height(), Size().Height());
 		Show();
 		
 		Unlock();
@@ -55,16 +53,37 @@ if(!IsHidden()) Hide();
 Unlock();}
 }
 
+void
+PotViewer::SetValue(BString value) {
+	if(Lock()){
+		if(IsHidden()) 
+			return;
+		SetText(value);
+		Unlock();
+	}
+}
 		
 void	
-PotViewer::SetValue(long value){
+PotViewer::SetValue(int32 value){
 
 	if(Lock()){
-	if(IsHidden()) return;
-	BString s;
-	s << value;
-	fText->SetText(s.String());
-	Unlock();}
+		if(IsHidden()) 
+			return;
+	
+		BString s;
+		s << value;
+		SetText(s);
+		Unlock();
+	}
+}
+
+void	
+PotViewer::SetText(BString text)
+{
+	fText->SetText(text.String());
+	float h,w;
+	fText->GetPreferredSize(&w,&h);
+	ResizeTo(w, h);
 }
 		
 
