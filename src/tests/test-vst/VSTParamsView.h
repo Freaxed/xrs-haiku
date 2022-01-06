@@ -1,12 +1,16 @@
 #ifndef VSTPARAMSVIEW_H
 #define VSTPARAMSVIEW_H
 
-#include <Box.h>
+#include <View.h>
 #include "VSTHost.h"
 
-class VSTParamsView : public BBox {
+class VSTParamsView : public BView {
 public:
 		VSTParamsView(VSTPlugin* plugin);
+		
+		void AttachedToWindow();
 };
+
+
 
 #endif
