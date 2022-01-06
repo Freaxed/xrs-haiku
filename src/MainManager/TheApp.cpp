@@ -66,15 +66,23 @@ TheApp::~TheApp()
 		msucco->ReallyStop();	//stop the engine	
 		xhost->AllowLock(false);
 		 
-		 //msucco->Acquire("QuitRequest");
+		//fVManager->Dump();
+		 
+		 if(fValuableMonitor->Lock()) {
+		 	fValuableMonitor->Quit();
+		 }
+		 	
+		 delete fModel;
+	     
+	     if(fVManager->Lock())
+			fVManager->Quit();
 		 
 		 if(trackinfo->Lock())				
 			 trackinfo->Quit();
 		
 		 track_manager->Close();
 			 		
-		 jfm->CloseSong(currentSong);
-		
+		 jfm->CloseSong(currentSong);		
 		 
 			 
 		 if(mixerWin->Lock())
@@ -100,16 +108,7 @@ TheApp::~TheApp()
 		 if(mw->Lock()) 
 		 	mw->Quit();
 		 	
-		 fVManager->Dump();
-		 
-		 if(fValuableMonitor->Lock()) {
-		 	fValuableMonitor->Quit();
-		 }
-		 	
-		 delete fModel;
-	     
-	     if(fVManager->Lock())
-			fVManager->Quit();
+
 			
 		XrsMidiIn::Get()->Release();
 		XrsMidiOut::Get()->Release();
@@ -543,7 +542,9 @@ TheApp::QuitRequested()
 {
 	status_t	ask;
 	ask=jfm->AskForClose(currentSong);
-		
+	if (ask == B_OK) {
+		fVManager->Dump();
+	}	
 	return (ask==B_OK);
 	
 	
