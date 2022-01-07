@@ -22,7 +22,7 @@
 #include	"TextControlFloater.h"
 #include	"WindowManager.h"
 #include 	"VSTItem.h"
-#include 	"VSTConfigureView.h"
+#include 	"VSTParamsView.h"
 #include	"BzWindow.h"
 #include	"VstManager.h"
 
@@ -40,20 +40,19 @@ PlugWindow::PlugWindow(VSTItem* p,bool scroll) :
 	BWindow(BRect(250,30,280,60),"notset", B_FLOATING_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_NOT_ZOOMABLE),
 	big(true),plugin(p)
 {
-	if(p==NULL) return; //Who give us a null pointer??
+	if(p == NULL) 
+		return;
 	
-	
-	//scrool means:
-	// if true TRY to put a scrollbar (in no NativeUI)
-	// if false : never add a scroolbar
-	
+
 	VstManager::Get()->setPresetsPath(plugin);
-	config=(VSTConfigureView*)plugin->Configure();
-	scroll= !config->HasNativeUI() && scroll;
-	SetControls(config,scroll);
-	SetPrograms(plugin->EffectName(),config->GetMenu());
+
+	config = (VSTParamsView*)plugin->Configure();
+
+	SetControls(config, false);
 	
+	SetPrograms(plugin->EffectName(),config->CreateMenu());	
 }
+
 PlugWindow::~PlugWindow()
 {
 	if(config)
@@ -196,7 +195,7 @@ PlugWindow::MessageReceived(BMessage* msg)
 		BMenuItem	*item=presetz->ItemAt(pos);
 		if(VstManager::Get()->LoadPreset(plugin,item->Label(),&set)){
 			plugin->LoadPreset(&set);
-			if(config) config->ResetUI();
+			if(config) config->ResetUIFromPlugin();
 		}	
 	}
 	else
@@ -251,7 +250,7 @@ PlugWindow::LoadPref(BMessage* msg)
 			if(msg->FindBool("big",&b)==B_OK)
 				SetState(b,smallW);
 				
-			config->ResetUI();
+			config->ResetUIFromPlugin();
 			Unlock();
 			}
 		}

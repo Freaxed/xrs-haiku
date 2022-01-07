@@ -10,6 +10,7 @@ class VSTKnob : public ParameterValueKnob  {
 				VSTKnob(VSTParameter*);
 	virtual		void		SetValue(float newValue);
 	virtual		void		ValueDisplay(float value, BString& display);
+				void		LoadParameter();
 	private:
 				VSTParameter*	fParameter;
 };

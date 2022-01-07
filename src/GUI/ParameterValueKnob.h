@@ -12,10 +12,10 @@
 class BGroupLayout;
 class KnobDisplayValue;
 
-class ParameterValueKnob : public BBox, public DisplayValue {
+class ParameterValueKnob : public BBox, public AsyncDisplayValue {
 
 public:
-						ParameterValueKnob();
+						ParameterValueKnob(const char* name = "ParameterValueKnob");
 virtual		void		MessageReceived(BMessage *msg);
 virtual		void		AttachedToWindow();
 virtual		void		SetValue(float newValue);
@@ -32,12 +32,6 @@ private:
 		APot*			mPot;
 		BGroupLayout* 	vgr;
 		KnobDisplayValue*	mKnobDisplayValue;
-		
-private:
-		void	Show(BView* view, float position);
-		void	ShowValue(int32 value);
-		void	Hide();
-
 };
 
 

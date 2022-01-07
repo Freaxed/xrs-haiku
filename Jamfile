@@ -38,8 +38,10 @@ Application XRS :
 	
 	#src/media
 	VSTItem.cpp
-	VSTConfigureView.cpp
-	ParameterSlider.cpp
+	#VSTConfigureView.cpp
+	#ParameterSlider.cpp
+	VSTParamsView.cpp
+	VSTKnob.cpp
 	
 	#src/libfunky
 	Utils.cpp
@@ -88,6 +90,7 @@ Application XRS :
 	XMatrix.cpp
 	PlugWindow.cpp
 	ParameterValueKnob.cpp
+
 	
 	#src/GUI/track
 	JTrack.cpp

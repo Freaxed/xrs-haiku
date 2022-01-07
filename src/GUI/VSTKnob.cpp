@@ -2,7 +2,7 @@
 #include "VSTKnob.h"
 #include "VSTHost.h"
 
-VSTKnob::VSTKnob(VSTParameter* parameter):fParameter(parameter) {
+VSTKnob::VSTKnob(VSTParameter* parameter): ParameterValueKnob(parameter->Name()) , fParameter(parameter) {
 	SetLabelText(fParameter->Name());
 	SetValue(fParameter->Value());
 };
@@ -12,13 +12,16 @@ VSTKnob::SetValue(float newValue)
 {
 	fParameter->SetValue (newValue);
 	ParameterValueKnob::SetValue(newValue);
-	char	complete[128];
-	sprintf (complete, "%s %s", fParameter->CurrentValue(), fParameter->Unit());
-	//SetValueString (complete);
 }
 
 void
 VSTKnob::ValueDisplay(float value, BString& display)
 {
 	display << fParameter->CurrentValue() << " " << fParameter->Unit();
+}
+
+void		
+VSTKnob::LoadParameter()
+{
+	ParameterValueKnob::SetValue(fParameter->Value());
 }

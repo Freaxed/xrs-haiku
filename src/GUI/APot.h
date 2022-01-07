@@ -10,6 +10,7 @@
 #define _APot_h
 
 #include <Control.h>
+#include <Looper.h>
 
 #define	SB_MSG	'sbmp'	//ReleaseMessage (mouse up)
 
@@ -21,6 +22,35 @@ class DisplayValue {
 		virtual void	ShowValue(int32 value) = 0;
 		virtual void	Hide() = 0;
 };
+
+#define MSG_ASYNC_DV_SHOW  'aDVS'
+#define MSG_ASYNC_DV_VALUE 'aDVV'
+#define MSG_ASYNC_DV_HIDE  'aDVH'
+
+
+class AsyncDisplayValue : public DisplayValue {
+	public:
+				AsyncDisplayValue(BHandler* target) : mTarget(target) {
+					mDisplayValue.what = MSG_ASYNC_DV_VALUE;
+					mDisplayValue.AddInt32("be:value", 0L);
+					}
+				
+		virtual void	Show(BView*, float position) {
+							mTarget->Looper()->PostMessage(MSG_ASYNC_DV_SHOW, mTarget);
+						}
+		virtual void	ShowValue(int32 value) {
+							mDisplayValue.ReplaceInt32("be:value", value);
+							mTarget->Looper()->PostMessage(&mDisplayValue, mTarget);
+						}
+		virtual void	Hide()  {
+							mTarget->Looper()->PostMessage(MSG_ASYNC_DV_HIDE, mTarget);
+						}
+		
+	private:
+				BHandler* mTarget;
+				BMessage  mDisplayValue;
+};
+
 
 
 class APot : public BControl

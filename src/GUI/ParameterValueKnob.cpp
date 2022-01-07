@@ -14,10 +14,8 @@
 #define		FACTOR_F	((float)1000.0f)
 #define 	MSG_VALUE	'knob'
 
-
-
-ParameterValueKnob::ParameterValueKnob()
-					: BBox("ParameterValueKnob")
+ParameterValueKnob::ParameterValueKnob(const char* name)
+					: BBox(name), AsyncDisplayValue(this)
 {
 	
 	mPot 	   = new APot("pot", new BMessage(MSG_VALUE), NULL, 0, FACTOR_I);		
@@ -35,25 +33,6 @@ ParameterValueKnob::ParameterValueKnob()
 	SetValue(0.0f);
 	SetSpacing(0);
 
-}
-void				
-ParameterValueKnob::Show(BView* view, float position)
-{ 
-	PotViewer::Get()->InitShow(mLabel, position); 
-}
-
-void				
-ParameterValueKnob::ShowValue(int32 value)
-{ 
-	BString display;
-	ValueDisplay(value/ FACTOR_F, display);
-	PotViewer::Get()->SetValue(display);
-}
-
-void				
-ParameterValueKnob::Hide()
-{ 
-	PotViewer::Get()->InitHide(); 
 }
 
 void				
@@ -113,6 +92,26 @@ ParameterValueKnob::MessageReceived(BMessage *msg) {
 		{
 			float value = (float)mPot->Value() / FACTOR_F;
 			SetValue(value);
+		}
+		break;
+		case MSG_ASYNC_DV_SHOW:
+		{
+			PotViewer::Get()->InitShow(mLabel);
+		}
+		break;
+		case MSG_ASYNC_DV_VALUE:
+		{
+			int32 value;
+			if (msg->FindInt32("be:value", &value) == B_OK) {
+				BString display;
+				ValueDisplay((float)value / FACTOR_F, display);
+				PotViewer::Get()->SetValue(display);
+			}
+		}
+		break;
+		case MSG_ASYNC_DV_HIDE:
+		{
+			PotViewer::Get()->InitHide();
 		}
 		break;
 		default:

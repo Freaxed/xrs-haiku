@@ -8,7 +8,7 @@
  */
 
 #include "VSTItem.h"
-#include "VSTConfigureView.h"
+#include "VSTParamsView.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -618,7 +618,7 @@ status_t VSTItem::FilterFloat (float **input, float **output, int32 framecount, 
 
 BView * VSTItem::Configure ()
 {
-	return new VSTConfigureView(this);
+	return new VSTParamsView(this);
 }
 
 

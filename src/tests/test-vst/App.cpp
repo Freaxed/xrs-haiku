@@ -24,7 +24,6 @@ App::App(void)
 	
 	VSTPlugin* clone = x->InstantiatePlugin(x->GetPluginAt(minId));
 	(new VSTParamWindow(clone))->Show();
-	(new VSTParamWindow(clone))->Show();
 	
 }
 

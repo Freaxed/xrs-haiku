@@ -15,7 +15,7 @@
 class 	BMenu;
 class 	BMenuItem;
 class	VSTItem;
-class	VSTConfigureView;
+class	VSTParamsView;
 
 class PlugWindow : public BWindow
 {
@@ -39,9 +39,9 @@ class PlugWindow : public BWindow
 			BMenu*	presetz;
 			bool	big;
 			
-			BMenuBar *bar;
-			BMenuItem* nameMenu;
-			VSTConfigureView	*config;
+			BMenuBar *		bar;
+			BMenuItem* 		nameMenu;
+			VSTParamsView*	config;
 			float	smallW,smallH;
 			float	bigW,bigH;
 			
