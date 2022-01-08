@@ -319,16 +319,16 @@ SetVST(BMessage *msg,void *ck)
 					*/
 					
 					//if(i!=0)					
-					VSTItem* temp_plug=VstManager::Get()->CreateVst(i-1);
+					//VSTItem* temp_plug=VstManager::Get()->CreateVst(i-1);
 					//else
 					//	temp_plug=NULL;
 					
-					if(temp_plug!=NULL)	
-						mix->CreateVstWindow(temp_plug,k);
-					
-					XHost::Get()->SendMessage(X_LockSem,0);
-						efx->AddVST(temp_plug);
-					XHost::Get()->SendMessage(X_UnLockSem,0);
+//					if(temp_plug!=NULL)	
+//						mix->CreateVstWindow(temp_plug,k);
+//					
+//					XHost::Get()->SendMessage(X_LockSem,0);
+//						efx->AddVST(temp_plug);
+//					XHost::Get()->SendMessage(X_UnLockSem,0);
 					
 				
 				mix->Refresh();

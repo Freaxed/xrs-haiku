@@ -10,9 +10,9 @@
 #include "VSTInstrument.h"
 #include <stdio.h>
 
-VSTInstrumentPlugin::VSTInstrumentPlugin (const char *filename):VSTItem(filename)
+VSTInstrumentPlugin::VSTInstrumentPlugin (VSTPlugin* plug):VSTItem(plug)
 {
-	if (InitCheck()==B_OK)
+	//if (InitCheck()==B_OK)
 	{
 				
 		//StopAll
@@ -64,11 +64,19 @@ VSTInstrumentPlugin::VSTInstrumentPlugin (const char *filename):VSTItem(filename
 	}
 }
 
+VSTInstrumentPlugin::~VSTInstrumentPlugin() {	
+	delete note_list;
+	delete noteon_event;	
+	delete noteoff_event;
+	delete stopall_event;
+	delete stopall_list;
+}
+
 void
 VSTInstrumentPlugin::StopAll()
 {
 	//((AudioEffectX*)fEffect->object)->processEvents(stopall_list);
-	fEffect->dispatcher (fEffect, effProcessEvents, 0, 0,(void*)stopall_list, 0.);
+	Effect()->dispatcher (Effect(), effProcessEvents, 0, 0,(void*)stopall_list, 0.);
 }
 void
 VSTInstrumentPlugin::SendNote(long note,float vel,bool on)
@@ -90,6 +98,6 @@ VSTInstrumentPlugin::SendNote(long note,float vel,bool on)
 	else
 		noteon_event->midiData[0]=0x80;		// use 0x80 for note_off on the first channel (0);
 	
-	fEffect->dispatcher (fEffect, effProcessEvents, 0, 0,(void*)note_list, 0.);
+	Effect()->dispatcher (Effect(), effProcessEvents, 0, 0,(void*)note_list, 0.);
 }
 

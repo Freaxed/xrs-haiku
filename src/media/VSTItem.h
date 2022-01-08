@@ -40,7 +40,7 @@ class VSTItem : public VSTPlugin
 
 public:
 
-					   VSTItem(const char *path);
+					   VSTItem(VSTPlugin* templ);
 		 	virtual	  ~VSTItem();
 			
 	virtual 	BView *		Configure ();

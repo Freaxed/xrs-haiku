@@ -25,7 +25,7 @@
 
 #include "SamplerTrackBoost.h" //remove!
 #include "TNTrackBoost.h" //remove!
-//#include "VIWTrackBoost.h" //remove!
+#include "VIWTrackBoost.h" //remove!
 #include "JMDrumTrackBoost.h"  //remove! (why?)
 //#include "SFSTrackBoost.h"  //remove! (why?)
 
@@ -100,19 +100,19 @@ TrackManager::LoadInternalSamplerPlugin(int i)
 		
 		
 		//il VIW
-//		tb = new VIWTrackBoost();
-//		i = 4;
-//		
-//		list[tb->id]=tb;
-//		tb->Init();
-//
-//		m = new BMessage(ADD_TRACK);
-//		m->AddInt16("id",tb->id);
-//		
-//		if(tb->id<0 && tb->id>MAX_PLUG-1) 
-//			return;
-//	
-//		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+i));
+		tb = new VIWTrackBoost();
+		i = 4;
+		
+		list[tb->id]=tb;
+		tb->Init();
+
+		m = new BMessage(ADD_TRACK);
+		m->AddInt16("id",tb->id);
+		
+		if(tb->id<0 && tb->id>MAX_PLUG-1) 
+			return;
+	
+		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+i));
 
 		//il XFluidSynth
 		/*tb = new SFSTrackBoost();

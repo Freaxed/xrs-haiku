@@ -38,8 +38,6 @@ Application XRS :
 	
 	#src/media
 	VSTItem.cpp
-	#VSTConfigureView.cpp
-	#ParameterSlider.cpp
 	VSTParamsView.cpp
 	VSTKnob.cpp
 	
@@ -176,10 +174,10 @@ Application XRS :
 	synel.cpp
 	
 	# --- VIW ---
-	#VIWPanel.cpp  
-	#VIWTrackBoost.cpp  
-	#VIWTrack.cpp  
-	#VSTInstrument.cpp
+	VIWPanel.cpp  
+	VIWTrackBoost.cpp  
+	VIWTrack.cpp  
+	VSTInstrument.cpp
 
 	# JMDRUM
 	Drum.cpp

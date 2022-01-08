@@ -22,16 +22,16 @@
 	#include "VSTMIDIConsumer.h"
 #endif
 #include "Log.h"
-
+#include "vestige.h"
 
 static int32
 VHostCallback(VSTEffect* effect, int32 opcode, int32 index, int32 value,
 	void* ptr, float opt);
 	
 
-VSTItem::VSTItem(const char* path)
+VSTItem::VSTItem(VSTPlugin* templ)
 {
-	LoadModule(path, VHostCallback);
+	LoadModule(templ->Path(), VHostCallback);
 }
 
 VSTItem::~VSTItem()
@@ -46,7 +46,6 @@ VSTItem::~VSTItem()
 		
 		
 		LogDebug("Deleting VSTItem.. [%s]\n", EffectName());
-		UnLoadModule();
 
 }
 
@@ -99,102 +98,11 @@ long VSTItem::WantMidi ()
 	
 }
 
-
-enum
-{
-	audioMasterAutomate = 0,		// index, value, returns 0
-	audioMasterVersion,				// VST Version supported (for example 2200 for VST 2.2)
-	audioMasterCurrentId,			// Returns the unique id of a plug that's currently
-									// loading
-	audioMasterIdle,				// Call application idle routine (this will
-									// call effEditIdle for all open editors too) 
-	audioMasterPinConnected			// Inquire if an input or output is beeing connected;
-									// index enumerates input or output counting from zero,
-									// value is 0 for input and != 0 otherwise. note: the
-									// return value is 0 for <true> such that older versions
-									// will always return true.	
-};
-enum
-{
-	//---from here VST 2.0 extension opcodes------------------------------------------------------
-	// VstEvents + VstTimeInfo
-	audioMasterWantMidi = audioMasterPinConnected + 2,	// <value> is a filter which is currently ignored
-	audioMasterGetTime,				// returns const VstTimeInfo* (or 0 if not supported)
-									// <value> should contain a mask indicating which fields are required
-									// (see valid masks above), as some items may require extensive
-									// conversions
-	audioMasterProcessEvents,		// VstEvents* in <ptr>
-	audioMasterSetTime,				// VstTimenfo* in <ptr>, filter in <value>, not supported
-	audioMasterTempoAt,				// returns tempo (in bpm * 10000) at sample frame location passed in <value>
-
-	// parameters
-	audioMasterGetNumAutomatableParameters,
-	audioMasterGetParameterQuantization,	// returns the integer value for +1.0 representation,
-											// or 1 if full single float precision is maintained
-											// in automation. parameter index in <value> (-1: all, any)
-	// connections, configuration
-	audioMasterIOChanged,				// numInputs and/or numOutputs has changed
-	audioMasterNeedIdle,				// plug needs idle calls (outside its editor window)
-	audioMasterSizeWindow,				// index: width, value: height
-	audioMasterGetSampleRate,
-	audioMasterGetBlockSize,
-	audioMasterGetInputLatency,
-	audioMasterGetOutputLatency,
-	audioMasterGetPreviousPlug,			// input pin in <value> (-1: first to come), returns cEffect*
-	audioMasterGetNextPlug,				// output pin in <value> (-1: first to come), returns cEffect*
-
-	// realtime info
-	audioMasterWillReplaceOrAccumulate,	// returns: 0: not supported, 1: replace, 2: accumulate
-	audioMasterGetCurrentProcessLevel,	// returns: 0: not supported,
-										// 1: currently in user thread (gui)
-										// 2: currently in audio thread (where process is called)
-										// 3: currently in 'sequencer' thread (midi, timer etc)
-										// 4: currently offline processing and thus in user thread
-										// other: not defined, but probably pre-empting user thread.
-	audioMasterGetAutomationState,		// returns 0: not supported, 1: off, 2:read, 3:write, 4:read/write
-
-	// offline
-	audioMasterOfflineStart,
-	audioMasterOfflineRead,				// ptr points to offline structure, see below. return 0: error, 1 ok
-	audioMasterOfflineWrite,			// same as read
-	audioMasterOfflineGetCurrentPass,
-	audioMasterOfflineGetCurrentMetaPass,
-
-	// other
-	audioMasterSetOutputSampleRate,		// for variable i/o, sample rate in <opt>
-	audioMasterGetSpeakerArrangement,	// result in ret
-	audioMasterGetOutputSpeakerArrangement = audioMasterGetSpeakerArrangement,
-	audioMasterGetVendorString,			// fills <ptr> with a string identifying the vendor (max 64 char)
-	audioMasterGetProductString,		// fills <ptr> with a string with product name (max 64 char)
-	audioMasterGetVendorVersion,		// returns vendor-specific version
-	audioMasterVendorSpecific,			// no definition, vendor specific handling
-	audioMasterSetIcon,					// void* in <ptr>, format not defined yet
-	audioMasterCanDo,					// string in ptr, see below
-	audioMasterGetLanguage,				// see enum
-	audioMasterOpenWindow,				// returns platform specific ptr
-	audioMasterCloseWindow,				// close window, platform specific handle in <ptr>
-	audioMasterGetDirectory,			// get plug directory, FSSpec on MAC, else char*
-	audioMasterUpdateDisplay,			// something has changed, update 'multi-fx' display
-
-	//---from here VST 2.1 extension opcodes------------------------------------------------------
-	audioMasterBeginEdit,               // begin of automation session (when mouse down), parameter index in <index>
-	audioMasterEndEdit,                 // end of automation session (when mouse up),     parameter index in <index>
-	audioMasterOpenFileSelector,		// open a fileselector window with VstFileSelect* in <ptr>
-	
-	//---from here VST 2.2 extension opcodes------------------------------------------------------
-	audioMasterCloseFileSelector,		// close a fileselector operation with VstFileSelect* in <ptr>: Must be always called after an open !
-	audioMasterEditFile,				// open an editor for audio (defined by XML text in ptr)
-	audioMasterGetChunkFile,			// get the native path of currently loading bank or project
-										// (called from writeChunk) void* in <ptr> (char[2048], or sizeof(FSSpec))
-
-	//---from here VST 2.3 extension opcodes------------------------------------------------------
-	audioMasterGetInputSpeakerArrangement	// result a VstSpeakerArrangement in ret
-};
 static int32
 VHostCallback(VSTEffect* effect, int32 opcode, int32 index, int32 value,
 	void* ptr, float opt)
 {
-	intptr_t result = 0;
+	int32 result = 0;
 	
 	switch(opcode)
 	{
@@ -497,65 +405,66 @@ long audioMaster (VSTEffect *eff, long opCode, long index, long value, void *ptr
 
 void VSTItem::LoadPreset (BMessage *config)
 {	
-//	const float *	params;
-//	const void *	chunk;
-//	ssize_t		size;
-//	
-//   	if (fEffect->flags & effFlagsProgramChunks)
-//	{
-//		int	prog = 0;
-//		if (config->FindData ("chunk", B_RAW_TYPE, prog, &chunk, &size) == B_OK)
-//		{
-//			fEffect->dispatcher (fEffect, effSetChunk, 0, size, (void*) chunk, 0.f);
-//		}
-//	}
-//	else
-//	{
-//		int	prog = 0;
-//		if(config->FindData ("floats", B_RAW_TYPE, prog, (const void **) &params, &size) == B_OK)
-//		{
-//			int	count = (int)size / sizeof (float);
-//			for (int p = 0; p < count; p++)
-//			{
-//				fEffect->setParameter (fEffect, p, params[p]);
-//				//printf("Load Param %d value %f\n",p,params[p]);
-//			}
-//		}
-//	}
+	VSTEffect* fEffect = Effect();
+	const float *	params;
+	const void *	chunk;
+	ssize_t		size;
+	
+   	if (fEffect->flags & effFlagsProgramChunks)
+	{
+		int	prog = 0;
+		if (config->FindData ("chunk", B_RAW_TYPE, prog, &chunk, &size) == B_OK)
+		{
+			fEffect->dispatcher (fEffect, effSetChunk, 0, size, (void*) chunk, 0.f);
+		}
+	}
+	else
+	{
+		int	prog = 0;
+		if(config->FindData ("floats", B_RAW_TYPE, prog, (const void **) &params, &size) == B_OK)
+		{
+			int	count = (int)size / sizeof (float);
+			for (int p = 0; p < count; p++)
+			{
+				Parameter(p)->SetValue(params[p]);
+			}
+		}
+	}
 }
 
 
 void VSTItem::SavePreset (BMessage *config)
 {	
-//	
-//	if (fEffect->flags & effFlagsProgramChunks)
-//	{
-//		void *		chunk;
-//		ssize_t		size;
-//		size = fEffect->dispatcher (fEffect, effGetChunk, 0, 0, &chunk, 0.f);
-//		config->AddData ("chunk", B_RAW_TYPE, chunk, size);
-//	}
-//	else
-//	{
-//		int		count = fEffect->numParams;
-//		if (count > 0)
-//		{
-//			float *	params = new float[count];
-//			for (int p = 0; p < count; p++)
-//					params[p] ive= fEffect->getParameter (fEffect, p);
-//				config->AddData ("floats", B_RAW_TYPE, params, count * sizeof (float));
-//			delete[] params;
-//		}
-//	}
+	VSTEffect* fEffect = Effect();
+	
+	if (fEffect->flags & effFlagsProgramChunks)
+	{
+		void *		chunk;
+		ssize_t		size;
+		size = fEffect->dispatcher (fEffect, effGetChunk, 0, 0, &chunk, 0.f);
+		config->AddData ("chunk", B_RAW_TYPE, chunk, size);
+	}
+	else
+	{
+		int		count = ParametersCount();
+		if (count > 0)
+		{
+			float *	params = new float[count];
+			for (int p = 0; p < count; p++)
+					params[p] = Parameter (p)->Value();
+				config->AddData ("floats", B_RAW_TYPE, params, count * sizeof (float));
+			delete[] params;
+		}
+	}
 }
 status_t VSTItem::FilterFloat (float **input, float **output, int32 framecount, void *info)
 {
 	if(!IsActive()) 
 		return B_OK;	
 	
-	if (framecount != BlockSize())
+	if (framecount < BlockSize())
 	{
-		LogTrace("VSTItem updating block size from %ld to %ld", BlockSize(), framecount);		
+		LogTrace("VSTItem updating block size from %ld to %d", BlockSize(), framecount);		
 		SetBlockSize(framecount);
 	}
 	

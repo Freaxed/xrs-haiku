@@ -42,10 +42,10 @@ VstManager::VstManager()
 	fVstList = new VSTList();
 		
 		
-	for(int32 i=0;i<fVstList->CountPlugins();i++) {
-		LogDebug("Plugin");
-	}
-	
+//	for(int32 i=0;i<fVstList->CountPlugins();i++) {
+//		LogDebug("Plugin");
+//	}
+//	
 	
 	/* presets directory */
 		
@@ -62,6 +62,15 @@ VstManager::VstManager()
 	
 }
 
+void	
+VstManager::GetInstrumentVst(BList* outList) {
+	for(int32 i=0;i<fVstList->CountPlugins();i++) {
+		VSTPlugin* plug = fVstList->GetPluginAt(i);
+		if (plug->IsSynth())
+			outList->AddItem(plug);
+	}
+}
+
 
 VstManager::~VstManager()
 {
@@ -73,7 +82,7 @@ VstManager::~VstManager()
 }
 
 VSTItem*
-VstManager::CreateVst(int pos)
+VstManager::CreateVst(VSTPlugin* fromList)
 {
 	/*
 	if(pos > list.CountItems()-1) 
@@ -88,7 +97,7 @@ VstManager::CreateVst(int pos)
 	LogError("We have to send tempo to VST");	
 	return vst2;*/
 	
-	return new  VSTItem(fVstList->GetPluginAt(pos)->Path());
+	return new  VSTItem(fromList);
 }
 void
 VstManager::DeleteVst(VSTItem* plug)

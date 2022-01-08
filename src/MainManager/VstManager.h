@@ -27,14 +27,18 @@ class VstManager
 		
 		static	VstManager*	Get();
 		
-		VSTItem*	CreateVst(int pos);	
+		VSTItem*	CreateVst(VSTPlugin* fromList);
 		void		DeleteVst(VSTItem* plug);
+		//FIXME:
 		bool		SavePreset(VSTItem* plug,const char*name,BMessage* msg);
 		bool		LoadPreset(VSTItem* plug,const char*name,BMessage* msg);
 		
 		void		FillPresetsMenu(VSTItem* plug,BMenu*,uint32 msg);
 		void		setPresetsPath(VSTItem* plug);
+		// end FIXME
 		
+		void	GetInstrumentVst(BList*);
+//		void	GetInstrument
 			
 	private:
 	

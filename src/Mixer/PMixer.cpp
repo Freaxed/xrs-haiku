@@ -29,10 +29,10 @@ PMixer::PMixer(){
 	
 	//Lets try to add by code a VST 
 	// 26 = Delay
-	BusAt(1)->Effector()->AddVST(VstManager::Get()->CreateVst(26)); // Delay
-	BusAt(2)->Effector()->AddVST(VstManager::Get()->CreateVst(10)); // RoundPan
-	BusAt(3)->Effector()->AddVST(VstManager::Get()->CreateVst(6)); // SubSynth
-	BusAt(4)->Effector()->AddVST(VstManager::Get()->CreateVst(29)); // OverDrive
+//	BusAt(1)->Effector()->AddVST(VstManager::Get()->CreateVst(26)); // Delay
+//	BusAt(2)->Effector()->AddVST(VstManager::Get()->CreateVst(10)); // RoundPan
+//	BusAt(3)->Effector()->AddVST(VstManager::Get()->CreateVst(6)); // SubSynth
+//	BusAt(4)->Effector()->AddVST(VstManager::Get()->CreateVst(29)); // OverDrive
 	
 }
 
