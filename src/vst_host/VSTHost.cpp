@@ -298,6 +298,7 @@ VSTPlugin::VSTPlugin()
 	inputs = NULL;
 	outputs = NULL;
 	fParameters.MakeEmpty();
+	isSynth = false;
 }
 
 VSTPlugin::~VSTPlugin()
@@ -361,6 +362,8 @@ VSTPlugin::LoadModule(const char *path, audioMasterCallback hostCallback)
 	
 	fEffect->dispatcher(fEffect, VST_STATE_CHANGED, 0, 1, 0, 0);
 
+	isSynth = (fEffect->flags & VST_FLAG_IS_SYNTH);
+
 	ReAllocBuffers();
 
 	fActive = true;
@@ -370,7 +373,7 @@ VSTPlugin::LoadModule(const char *path, audioMasterCallback hostCallback)
 bool			
 VSTPlugin::IsSynth() 
 {
-	return (fEffect->flags & VST_FLAG_IS_SYNTH);
+	return isSynth;
 }
 
 int

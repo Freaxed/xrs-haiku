@@ -25,7 +25,7 @@
 #include 	"VSTParamsView.h"
 #include	"BzWindow.h"
 #include	"VstManager.h"
-
+#include <Alert.h>
 
 #include "locale.h"
 
@@ -43,8 +43,6 @@ PlugWindow::PlugWindow(VSTItem* p,bool scroll) :
 	if(p == NULL) 
 		return;
 	
-
-	VstManager::Get()->setPresetsPath(plugin);
 
 	config = (VSTParamsView*)plugin->Configure();
 
@@ -94,7 +92,7 @@ PlugWindow::SetControls(BView* conf,bool scr)
 }
 
 void
-PlugWindow::SetPrograms(const char *name,BMenu* prog)
+PlugWindow::SetPrograms(const char *name, BMenu* prog)
 {
 	if (NULL == prog)
 		return;
@@ -104,20 +102,12 @@ PlugWindow::SetPrograms(const char *name,BMenu* prog)
 	
 	BMenu	  *men=new BMenu(T_VSTWIN_PRESETS);
 	BMenuItem *prgs=new BMenuItem(prog);
-	//if(prog!=NULL) prgs->AddMenu(prog);
+
 	men->AddItem(prgs);
-	/* creazione del menu presez..*/
-	
-	
 	men->AddItem(presetz=new BMenu("User"));
 	men->AddSeparatorItem();
 	men->AddItem(new BMenuItem(T_MENU_SAVE_AS,new BMessage(X_SAVE_PRESET)));
-	//men->AddItem(new BMenuItem("Reload",new BMessage(X_RELOAD_PRESETS)));
-	
-	//men->SetRadioMode(true);
-	
-	/* caricamento presets list*/
-	//BList	*tlist=new BList(5);
+
 	VstManager::Get()->FillPresetsMenu(plugin,presetz,X_LOAD_PRESET);
 	
 	bar->AddItem(men);
@@ -179,7 +169,8 @@ PlugWindow::MessageReceived(BMessage* msg)
 		
 		if(VstManager::Get()->SavePreset(plugin,nome.String(),&set)){
 			presetz->AddItem(new BMenuItem(nome.String(),new BMessage(X_LOAD_PRESET)));
-		}
+		} else 
+			BAlert("Saving preset", "Error in saving preset!", "Ok");
 		
 	}
 	else
@@ -196,7 +187,8 @@ PlugWindow::MessageReceived(BMessage* msg)
 		if(VstManager::Get()->LoadPreset(plugin,item->Label(),&set)){
 			plugin->LoadPreset(&set);
 			if(config) config->ResetUIFromPlugin();
-		}	
+		}	else 
+			BAlert("Loading preset", "Error in loading preset!", "Ok");
 	}
 	else
 	if(msg->what==X_SAVE_LOST){
@@ -208,21 +200,6 @@ PlugWindow::MessageReceived(BMessage* msg)
 		} 
 	
 	}
-	/*else
-	if(msg->what==X_RELOAD_PRESETS)
-	{
-		
-		while(presetz->CountItems())
-		{
-			BMenuItem* item=presetz->ItemAt(0);
-			if(!item) break;
-			presetz->RemoveItem(item);
-			delete item;	
-		}
-		
-		MainManager::Get()->FillPresetsMenu(plugin,presetz,X_LOAD_PRESET);
-		
-	}*/
 	else BWindow::MessageReceived (msg); 
 	
 }

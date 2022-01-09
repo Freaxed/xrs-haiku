@@ -62,6 +62,7 @@ protected:
 	#endif
 
 		float*				outputs[VST_INSTRUMENTS_MAX_OUTPUT];
+		
 };
 
 

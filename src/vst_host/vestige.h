@@ -94,7 +94,7 @@
 #define effFlagsHasEditor 1
 #define effFlagsCanReplacing (1 << 4) // very likely
 #define effFlagsIsSynth (1 << 8) // currently unused
-#define effFlagsProgramChunks	32	// program data are handled in formatless chunks
+#define effFlagsProgramChunks	32
 
 
 #define effOpen 0

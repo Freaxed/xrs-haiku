@@ -180,6 +180,7 @@ private:
 		BList			fParameters;
 		float**			inputs;
 		float**			outputs;
+		bool			isSynth;
 };
 
 #endif //__VST_HOST_H__
