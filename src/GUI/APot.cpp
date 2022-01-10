@@ -291,10 +291,10 @@ void APot::MouseMoved(BPoint where, uint32 /* transit */, const BMessage* /* dra
 	
 		float incr = CalcAngleIncr(rel_mouse_start, where);
 		incr += SetAngle(m_fDragAngle);
-		if (incr != 0){
+		if (incr != 0)
 			DrawKnob(Bounds());
-			if (m_DisplayValue) m_DisplayValue->ShowValue(Value());
-		}
+		if (m_DisplayValue) m_DisplayValue->ShowValue(Value());
+
 		set_mouse_position((long)mouse_start.x,(long)mouse_start.y);
 		
 		
@@ -310,6 +310,8 @@ void APot::MouseUp(BPoint where)
 			
 			if (incr != 0)
 				DrawKnob(Bounds());
+			
+			if (m_DisplayValue) m_DisplayValue->ShowValue(Value());
 		}
 		
 		SetTracking(false);
@@ -359,7 +361,7 @@ float APot::KnobRadius() const {
 }
 
 float APot::GetDragAngle(BPoint prev, BPoint cur){
-	return -2*(cur.y - prev.y);
+	return -1*(cur.y - prev.y);
 }
 
 

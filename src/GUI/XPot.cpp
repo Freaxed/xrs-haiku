@@ -20,6 +20,14 @@ XPot::XPot(BRect frame, const char *name, ValuableID id, int32 min, int32 max,
 
 }
 
+XPot::XPot(const char *name, ValuableID id, int32 min, int32 max, 
+	 BBitmap *p1,BBitmap *p2)
+	: APot(name, NULL, NULL, min, max, p1, p2),
+	vID(id)
+{
+
+}
+
 XPot::~XPot() {}
 
 void XPot::DetachedFromWindow() {
@@ -49,7 +57,7 @@ void XPot::MessageReceived(BMessage* msg)
 	break;
 
 	default:
-		BControl::MessageReceived(msg);
+		APot::MessageReceived(msg);
 	break;
 	}
 }
