@@ -10,3 +10,4 @@ src/tests/test-vst/TestHost
 src/tests/test-vst/TestVSTGui
 (Objects*
 compile_commands.json
+src/tests/test-stereo-gui/StereoVolumeGUI
