@@ -11,12 +11,14 @@
 #define _VSTInstrument_H_
 
 #include "VSTItem.h"
+#include "vestige.h"
 
 class VSTInstrumentPlugin :  public VSTItem
 {
 public:
 
-				VSTInstrumentPlugin(const char*);
+				VSTInstrumentPlugin(VSTPlugin* plug);
+				~VSTInstrumentPlugin();
 	
 	void		SendNote(long,float,bool on=true);
 	void		StopAll();

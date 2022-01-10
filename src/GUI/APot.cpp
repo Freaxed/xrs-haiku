@@ -1,6 +1,5 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,56 +21,103 @@
 
 #include "PotViewer.h"
 
-static PotViewer *potviewer=NULL;
-
 static float rads(float degrees);
 
 #define MSG 'sett'
 
 #define LZ	10
 
+class PotViewerDisplayValue : public DisplayValue {
+	public:
+		void	Show(BView* view, float position) { PotViewer::Get()->InitShow(view, position); }
+		void	ShowValue(int32 value) { PotViewer::Get()->SetValue(value); }
+		void	Hide() { PotViewer::Get()->InitHide(); }
+};
+
+PotViewerDisplayValue	gPotViewerDisplayValue;
 
 APot::APot(BRect frame, const char *name,
-	BMessage *message,BMessage *state,
+	BMessage *message, BMessage *state,
 	int32 minValue, int32 maxValue,BBitmap *p1,BBitmap *p2)
-	: BControl(frame, name, NULL, message, B_NOT_RESIZABLE, B_FRAME_EVENTS | B_WILL_DRAW | B_NAVIGABLE),
-	m_fMinValue(minValue), m_fMaxValue(maxValue),
-	m_fMinAngle(-150), m_fMaxAngle(150), m_fDragAngle(0),
-	state_on(true),
-	switch_msg(state)
+	: BControl(frame, name, NULL, message, B_NOT_RESIZABLE, B_FRAME_EVENTS | B_WILL_DRAW | B_NAVIGABLE)
 {
-		
-	SetValue(minValue);
-	
-	BRect b = Bounds();
-	m_rectKnob.Set(0, 0, 20, 20);
-	m_rectKnob.OffsetBy(b.left + (b.Width() - m_rectKnob.Width())/2,b.top + (b.Height() - m_rectKnob.Height())/2);
-		
-	rel_msg.what = SB_MSG;
-	
-	pad=p1;
-	padoff=p2;
-	
-	SetViewColor(B_TRANSPARENT_COLOR);
-	
-	if(!potviewer) 
-		potviewer=new PotViewer();
-		
-	distance = 0;
-		
+	Init(message, state, minValue, maxValue, p1, p2);		
 }
 
+APot::APot(const char *name,
+	BMessage *message, BMessage *state,
+	int32 minValue, int32 maxValue,BBitmap *p1,BBitmap *p2)
+	: BControl(name, "", message, B_FRAME_EVENTS | B_WILL_DRAW | B_NAVIGABLE)
+{
+	Init(message, state, minValue, maxValue, p1, p2);		
+}
+
+void	
+APot::Init(BMessage *message, BMessage *state,
+             int32 minValue, int32 maxValue,
+             BBitmap *p1 = NULL ,BBitmap *p2 = NULL)
+{
+		SetEnabled(true);
+		m_fMinValue = minValue;
+		m_fMaxValue = maxValue;
+		m_fMinAngle = -150; 
+		m_fMaxAngle =  150; 
+		m_fDragAngle = 0;
+		m_SwitchStateMessage = state;
+		distance = 0;
+		m_PenSize = 1.0;
+		m_DisplayValue = &gPotViewerDisplayValue;
+		
+		SetValue(minValue);
+	
+		BRect b = Bounds();
+		FrameResized(b.Width(), b.Height());
+		
+		m_ReleaseMessage.what = SB_MSG;
+	
+		pad=p1;
+		padoff=p2;
+		SetViewColor(B_TRANSPARENT_COLOR);
+		
+		SetSize(DEFAULT_SIZE);
+}
+
+void	
+APot::FrameResized(float newWidth, float newHeight)
+{
+	BRect b = Bounds();
+	m_PenSize = ((int32)(floor(newWidth / 10.0f)) / 2 ) * 2;
+	m_rectKnob.Set(0, 0, newWidth - 2*m_PenSize, newHeight- 2*m_PenSize);
+	m_rectKnob.OffsetBy(b.left + (b.Width() - m_rectKnob.Width())/2,b.top + (b.Height() - m_rectKnob.Height())/2);	
+	Invalidate();
+}
+
+void	
+APot::GetPreferredSize(float* _width, float* _height) 
+{
+			if (_width) *_width   = m_Size;
+			if (_height) *_height = m_Size;
+}
+			
+
+BSize				
+APot::MinSize() { return MaxSize(); }
+
+BSize				
+APot::MaxSize() { return BSize(m_Size, m_Size); }
+		             
+		             
 APot::~APot() {}
 
 void 
 APot::SetOn(bool val){
-	state_on=val;
+	SetEnabled(val);
 	Invalidate();
 }
 
 bool
 APot::IsOn(){
-	return state_on;
+	return IsEnabled();
 }
 
 void APot::GetValueRange(int32 *min, int32 *max) const {
@@ -136,8 +182,9 @@ APot::AttachedToWindow(){
 
 void APot::Draw(BRect updateRect){
 	SetDrawingMode(B_OP_ALPHA);
+	SetPenSize(m_PenSize);
 	
-	if(!state_on && padoff!=NULL) 
+	if(!IsEnabled() && padoff!=NULL) 
 		DrawBitmap(padoff);
 	else 
 		if(pad!=NULL) 
@@ -146,8 +193,12 @@ void APot::Draw(BRect updateRect){
 	{
 		SetHighColor(ViewColor());
 		FillRect(updateRect);
-		SetHighColor(0,0,0);
-		StrokeEllipse(Bounds());
+		if (IsTracking())
+			SetHighColor(255,0,0);
+		else
+			SetHighColor(0,0,0);
+		
+		StrokeArc(Bounds().InsetByCopy(m_PenSize / 2.0f, m_PenSize / 2.0f ), -65, 305);
 	}		
 	
 	if(IsTracking()){
@@ -156,16 +207,7 @@ void APot::Draw(BRect updateRect){
 		BeginLineArray(1);
 		
 		AddLine(BPoint(0,0),BPoint(LZ,0),yellow);
-		/*AddLine(BPoint(0,0),BPoint(0,LZ),yellow);
-		
-		AddLine(BPoint(b.right,0),BPoint(b.right-LZ,0),yellow);
-		AddLine(BPoint(b.right,0),BPoint(b.right,b.top-LZ),yellow);
-		
-		AddLine(BPoint(0,b.bottom),BPoint(0,b.bottom-LZ),yellow);
-		AddLine(BPoint(0,b.bottom),BPoint(LZ,b.bottom),yellow);
-		
-		AddLine(BPoint(b.right,b.bottom),BPoint(b.right-LZ,b.bottom),yellow);
-		*/AddLine(BPoint(b.right,b.bottom),BPoint(b.right,b.bottom-LZ),yellow);
+		AddLine(BPoint(b.right,b.bottom),BPoint(b.right,b.bottom-LZ),yellow);
 		
 		EndLineArray();
 	
@@ -223,26 +265,24 @@ void APot::MouseDown(BPoint where)
 		ConvertToScreen(&mouse_start);
 		be_app->HideCursor();
 		
-		potviewer->InitShow(this,distance);
-		if(potviewer) potviewer->SetValue(Value());
+		if (m_DisplayValue) {
+			m_DisplayValue->Show(this, distance);
+			m_DisplayValue->ShowValue(Value());
+		}
 		
 		Invalidate();
 	}
 	
 	else
 		if (buttons & B_SECONDARY_MOUSE_BUTTON) {
-		
-		if(switch_msg!=NULL){
-		
-		state_on = !state_on;		
-		
-		Invalidate();
-		Window()->PostMessage(switch_msg,Parent());}
+			if(m_SwitchStateMessage!=NULL){
+				SetOn(!IsEnabled());		
+				Window()->PostMessage(m_SwitchStateMessage,Parent());
+			}
 		}
-}
+}	
 
-void APot::MouseMoved(BPoint where, uint32 /* transit */,
-	const BMessage* /* dragDropMsg */)
+void APot::MouseMoved(BPoint where, uint32 /* transit */, const BMessage* /* dragDropMsg */)
 {
 	
 	if(where == rel_mouse_start) return;
@@ -253,7 +293,7 @@ void APot::MouseMoved(BPoint where, uint32 /* transit */,
 		incr += SetAngle(m_fDragAngle);
 		if (incr != 0){
 			DrawKnob(Bounds());
-			if(potviewer) potviewer->SetValue(Value());
+			if (m_DisplayValue) m_DisplayValue->ShowValue(Value());
 		}
 		set_mouse_position((long)mouse_start.x,(long)mouse_start.y);
 		
@@ -276,19 +316,19 @@ void APot::MouseUp(BPoint where)
 
 		set_mouse_position((long)mouse_start.x,(long)mouse_start.y);
 		be_app->ShowCursor();
-		potviewer->InitHide();
+		if (m_DisplayValue) m_DisplayValue->Hide();
 		Invalidate();
 		
 	}
 	
-	Window()->PostMessage(&rel_msg);
+	Window()->PostMessage(&m_ReleaseMessage);
 	
 	
 }
 
 void
-APot::SetReleaseMessage(BMessage* x){
-	rel_msg=*x;
+APot::SetReleaseMessage(BMessage* release_message){
+	m_ReleaseMessage = (*release_message);
 }
 
 float APot::CalcAngleIncr(BPoint prev, BPoint cur){

@@ -22,10 +22,10 @@
 #include	"TextControlFloater.h"
 #include	"WindowManager.h"
 #include 	"VSTItem.h"
-#include 	"VSTConfigureView.h"
+#include 	"VSTParamsView.h"
 #include	"BzWindow.h"
 #include	"VstManager.h"
-
+#include <Alert.h>
 
 #include "locale.h"
 
@@ -40,20 +40,17 @@ PlugWindow::PlugWindow(VSTItem* p,bool scroll) :
 	BWindow(BRect(250,30,280,60),"notset", B_FLOATING_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_NOT_ZOOMABLE),
 	big(true),plugin(p)
 {
-	if(p==NULL) return; //Who give us a null pointer??
+	if(p == NULL) 
+		return;
 	
+
+	config = (VSTParamsView*)plugin->Configure();
+
+	SetControls(config, false);
 	
-	//scrool means:
-	// if true TRY to put a scrollbar (in no NativeUI)
-	// if false : never add a scroolbar
-	
-	VstManager::Get()->setPresetsPath(plugin);
-	config=(VSTConfigureView*)plugin->Configure();
-	scroll= !config->HasNativeUI() && scroll;
-	SetControls(config,scroll);
-	SetPrograms(plugin->name.String(),config->GetMenu());
-	
+	SetPrograms(plugin->EffectName(),config->CreateMenu());	
 }
+
 PlugWindow::~PlugWindow()
 {
 	if(config)
@@ -69,11 +66,6 @@ PlugWindow::QuitRequested()
 void
 PlugWindow::SetControls(BView* conf,bool scr)
 {
-
-
-
-
-
 	if(Lock())
 	{
 		bar=new BMenuBar(BRect(0,0,30,20),"Bar");
@@ -89,8 +81,7 @@ PlugWindow::SetControls(BView* conf,bool scr)
 			AddChild(new BScrollBar(BRect(conf->Bounds().Width()+1,bar->Frame().Height(),conf->Bounds().Width()+1+B_V_SCROLL_BAR_WIDTH,300),"scoller",conf,0,conf->Bounds().Height()+bar->				Frame().Height()-300,B_VERTICAL));	
 			
 		}
-			
-			
+		
 			AddChild(box);
 			Unlock();
 			
@@ -101,28 +92,22 @@ PlugWindow::SetControls(BView* conf,bool scr)
 }
 
 void
-PlugWindow::SetPrograms(const char *name,BMenu* prog)
+PlugWindow::SetPrograms(const char *name, BMenu* prog)
 {
+	if (NULL == prog)
+		return;
 	Lock();
 	bar->AddItem(nameMenu=new BMenuItem(name,new BMessage(X_WIN_ZOOM)));
 	nameMenu->SetTarget(this);
 	
 	BMenu	  *men=new BMenu(T_VSTWIN_PRESETS);
 	BMenuItem *prgs=new BMenuItem(prog);
-	//if(prog!=NULL) prgs->AddMenu(prog);
+
 	men->AddItem(prgs);
-	/* creazione del menu presez..*/
-	
-	
-	men->AddItem(presetz=new BMenu(T_VSTWIN_USER));
+	men->AddItem(presetz=new BMenu("User"));
 	men->AddSeparatorItem();
 	men->AddItem(new BMenuItem(T_MENU_SAVE_AS,new BMessage(X_SAVE_PRESET)));
-	//men->AddItem(new BMenuItem("Reload",new BMessage(X_RELOAD_PRESETS)));
-	
-	//men->SetRadioMode(true);
-	
-	/* caricamento presets list*/
-	//BList	*tlist=new BList(5);
+
 	VstManager::Get()->FillPresetsMenu(plugin,presetz,X_LOAD_PRESET);
 	
 	bar->AddItem(men);
@@ -180,11 +165,12 @@ PlugWindow::MessageReceived(BMessage* msg)
 		BMessage	set;
 		plugin->SavePreset(&set);
 		set.AddString("name",nome.String());
-		set.AddString("plugin_name",plugin->name.String());
+		set.AddString("plugin_name",plugin->EffectName());
 		
 		if(VstManager::Get()->SavePreset(plugin,nome.String(),&set)){
 			presetz->AddItem(new BMenuItem(nome.String(),new BMessage(X_LOAD_PRESET)));
-		}
+		} else 
+			BAlert("Saving preset", "Error in saving preset!", "Ok");
 		
 	}
 	else
@@ -200,8 +186,9 @@ PlugWindow::MessageReceived(BMessage* msg)
 		BMenuItem	*item=presetz->ItemAt(pos);
 		if(VstManager::Get()->LoadPreset(plugin,item->Label(),&set)){
 			plugin->LoadPreset(&set);
-			if(config) config->ResetUI();
-		}	
+			if(config) config->ResetUIFromPlugin();
+		}	else 
+			BAlert("Loading preset", "Error in loading preset!", "Ok");
 	}
 	else
 	if(msg->what==X_SAVE_LOST){
@@ -213,21 +200,6 @@ PlugWindow::MessageReceived(BMessage* msg)
 		} 
 	
 	}
-	/*else
-	if(msg->what==X_RELOAD_PRESETS)
-	{
-		
-		while(presetz->CountItems())
-		{
-			BMenuItem* item=presetz->ItemAt(0);
-			if(!item) break;
-			presetz->RemoveItem(item);
-			delete item;	
-		}
-		
-		MainManager::Get()->FillPresetsMenu(plugin,presetz,X_LOAD_PRESET);
-		
-	}*/
 	else BWindow::MessageReceived (msg); 
 	
 }
@@ -255,7 +227,7 @@ PlugWindow::LoadPref(BMessage* msg)
 			if(msg->FindBool("big",&b)==B_OK)
 				SetState(b,smallW);
 				
-			config->ResetUI();
+			config->ResetUIFromPlugin();
 			Unlock();
 			}
 		}

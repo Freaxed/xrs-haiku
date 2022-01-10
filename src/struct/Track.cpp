@@ -5,7 +5,7 @@
 
 extern XHost*	xhost;
    
-Track::Track ():Pannable()
+Track::Track ()
 {
 	on=true;
 	route_line=0;

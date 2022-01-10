@@ -25,6 +25,7 @@
 #include <Message.h>
 #include <File.h>
 #include <Application.h>
+#include "VstManager.h"
 
 /*Annotazioni:
 	possibilità di cambiare plug-in on the fly
@@ -33,16 +34,11 @@
 	
 */
 
-extern BList* vst_list; //god save me
 
 VIWTrackBoost::VIWTrackBoost():TrackBoost()
 {
-	list=new BList(5);
-		
-	for(int i=0;i<vst_list->CountItems();i++)
-		
-	 if( ((PlugInEntry*)(vst_list->ItemAt(i)))->isSynth==true)
-				list->AddItem(vst_list->ItemAt(i));
+	list = new BList(5);
+	VstManager::Get()->GetInstrumentVst(list);
 		
 	name << T_VIW_NAME;
 	id = MY_ID;
@@ -65,8 +61,8 @@ VIWTrackBoost::getPanel()
 
 
 void
-VIWTrackBoost::LoadTrackSettings(Track* trk,BMessage* data){
-		
+VIWTrackBoost::LoadTrackSettings(Track* trk, BMessage* data){
+/*		
 		VIWTrack*	st=(VIWTrack*)trk;
 		BMessage*		mes=new BMessage();
 		
@@ -108,11 +104,11 @@ VIWTrackBoost::LoadTrackSettings(Track* trk,BMessage* data){
 		
 		if(st->getWin()) st->getWin()->LoadPref(mes);
 		}
-
+*/
 }
 void			
 VIWTrackBoost::SaveTrackSettings(Track* trk,BMessage* data)
-{
+{/*
 		VIWTrack*	st=(VIWTrack*)trk;
 		BMessage*		mes;
 		
@@ -133,12 +129,12 @@ VIWTrackBoost::SaveTrackSettings(Track* trk,BMessage* data)
 			data->AddMessage("window_settings",mes);	
 			
 		}
-		
+	*/
 }
 
 int
 VIWTrackBoost::FindVSTi(const char* name)
-{
+{/*
 	BPath path;
 	for(int i=0;i<list->CountItems();i++){
 			PlugInEntry*	stru=(PlugInEntry*)list->ItemAt(i);
@@ -147,6 +143,6 @@ VIWTrackBoost::FindVSTi(const char* name)
 			//printf("ref.name %s\n",path.Leaf());
 			if(strcmp(name,path.Leaf())==0) return i;
 	}
-
+*/
 	return -1;
 }

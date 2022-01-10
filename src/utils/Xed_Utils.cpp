@@ -34,6 +34,7 @@
 #include <string.h>
 #include <TypeConstants.h>
 #include <Screen.h>
+#include "Log.h"
 
 //don't move.
 static	BList		*p_list;	
@@ -161,7 +162,7 @@ BPictureButton*
 XUtils::ToolBarButton(BRect buttonsize, int32 index, const char *tip, BMessage *msg, uint32 state, BView *view)
 {
 	BBitmap *icons = new BBitmap(GetBitmap(19)); 
-	BBitmap *up    = new BBitmap(GetBitmap(20)); //BTranslationUtilsXUtils::GetBitmapFile("./Skin/EmptyButton.png");
+	BBitmap *up    = new BBitmap(GetBitmap(20));
 	BBitmap *dis   = new BBitmap(up);
 
 	
@@ -430,16 +431,7 @@ XUtils::CheckIsBank(entry_ref *ref)
 	
 	return B_OK;
 }
-/*
-status_t
-XUtils::GetDefaultBankRef(entry_ref *rif)
-{
-	XUtils::GetBankRef("DefaultBank",rif);
-	BEntry e(rif,true);
-	e.GetRef(rif);
-	if(e.Exists()) return B_OK;
-			else return B_ERROR;
-}*/
+
 status_t
 XUtils::GetDefaultSongRef(entry_ref *rif)
 {
@@ -499,40 +491,40 @@ XUtils::StopIdleAlert(BAlert *al)
 }
 
 void
-XUtils::FillPresetsMenu(const char* name,BMenu* men,unsigned long msg){
+XUtils::FillPresetsMenu(const char* name, BMenu* men, unsigned long msg){
 
 	BDirectory	xdir;
 	BPath		xpath;
 	status_t	err;
+	LogDebug("Filling presets menu for [%s]", name);
 	
 	find_directory (B_USER_SETTINGS_DIRECTORY, &xpath, true);
 	xpath.Append ("XRSPresets");
 	xpath.Append (name);
 	
-	err=xdir.SetTo(xpath.Path());
-	if(err==B_ENTRY_NOT_FOUND) return;
+	err = xdir.SetTo(xpath.Path());
+	if(err == B_ENTRY_NOT_FOUND) {
+		LogError("No presets directory found [%s]", xpath.Path());
+		return;
+	}
 	
 	BEntry e;
 	entry_ref rif;
 
 	while(xdir.GetNextEntry(&e,true)==B_OK)
 	{
-		e.InitCheck();
-		
-		
+		e.InitCheck();		
 		if(e.IsFile()){
-		
-				e.GetRef(&rif);
-				men->AddItem(new BMenuItem(rif.name,new BMessage(msg)));
+			e.GetRef(&rif);
+			LogDebug("Found preset for [%s]. name [%s]", name, rif.name);
+			men->AddItem(new BMenuItem(rif.name,new BMessage(msg)));
 		}
-			
 		
 	}
-
 }
 
 bool			
-XUtils::SavePreset(const char* plugname,const char* presname,BMessage* msg){
+XUtils::SavePreset(const char* plugname, const char* presname, BMessage* msg, const char* mime){
 
 	BDirectory	xdir;
 	BPath		xpath;
@@ -544,37 +536,39 @@ XUtils::SavePreset(const char* plugname,const char* presname,BMessage* msg){
 	
 	err=xdir.SetTo(xpath.Path());
 	
-	if(err==B_ENTRY_NOT_FOUND){
-		create_directory(xpath.Path(),0777);
+	if(err == B_ENTRY_NOT_FOUND){
+		create_directory(xpath.Path(), 0777);
 		xdir.SetTo(xpath.Path());
+	} else if (err != B_OK) {
+		LogError("Error getting directory: [%s]", xpath.Path());
+		return false;
 	}
 	
 	BFile	*file=new BFile();
 	xpath.Append(presname);
-	printf("SAVE full filename %s\n",xpath.Path());
+	LogInfo("Saving preset for [%s] at path [%s]\n", plugname, xpath.Path());
 	
-	/* qua manca il controllo se il file esite già.. */
 
 	BEntry controllo_esiste(xpath.Path());
-	if(controllo_esiste.Exists()==true) {
-	
-		printf ("file error %ld\n",err);
+	if(controllo_esiste.Exists()) {	
+		LogError ("Preset already present! at path [%s]\n", xpath.Path());
 		delete file;
 		return false;
 	}
 	
-	err=file->SetTo(xpath.Path(),B_WRITE_ONLY|B_CREATE_FILE);
+	err = file->SetTo(xpath.Path(),B_WRITE_ONLY|B_CREATE_FILE);
 	
 	if(err!=B_OK) {
 	
-		printf ("file error %ld\n",err);
+		LogError ("Error in creating the file [%s] err %d\n", xpath.Path(), err);
 		delete file;
 		return false;
 	}
 	
 	msg->Flatten(file);
 	
-	//AddMime(file);
+	if (mime)
+		AddMime(file, mime);
 	delete file;
 	return true;
 	
@@ -582,7 +576,7 @@ XUtils::SavePreset(const char* plugname,const char* presname,BMessage* msg){
 }
 
 bool			
-XUtils::LoadPreset(const char* plugname,const char* presname,BMessage* msg){
+XUtils::LoadPreset(const char* plugname,const char* presname,BMessage* msg, const char* mime){
 
 	BDirectory	xdir;
 	BPath		xpath;
@@ -605,17 +599,36 @@ XUtils::LoadPreset(const char* plugname,const char* presname,BMessage* msg){
 		return false;
 	}
 	
-	//if(!CheckMimeType(file)) {
-//		printf ("wrong file type %d\n",err);
-//		delete file;
-//		return false;
-//	}
+	if(mime && !CheckMimeType(file, mime)) {
+		printf ("wrong file type %d\n",err);
+		delete file;
+		return false;
+	}
 		
 	msg->Unflatten(file);
 	
 	delete file;
 	return true;
 	
-	
 }
+void
+XUtils::AddMime(BFile* file, const char* MimeString)
+{
+	BNodeInfo	info;
+	info.SetTo(file);
+	info.SetType(MimeString);
+}
+
+bool
+XUtils::CheckMimeType(BFile* file, const char* MimeString)
+{
+	BNodeInfo	info;
+	status_t 	err;
+	err=info.SetTo(file);
+	char mime[B_MIME_TYPE_LENGTH];
+	err=info.GetType(mime);
+
+	return (strcmp(mime,MimeString) == 0);
+}
+
 		

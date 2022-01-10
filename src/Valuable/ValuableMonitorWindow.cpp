@@ -10,7 +10,7 @@
 #define H_LABEL 20
 
 ValuableMonitorWindow::ValuableMonitorWindow(void)
-	:	BWindow(BRect(100,100,500,400),"ValuableMonitorWindow",B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	:	BWindow(BRect(100,100,500,400),"ValuableMonitorWindow",B_FLOATING_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	fValuePanel = new BListView(BRect(0, 0, 400 - B_H_SCROLL_BAR_HEIGHT, 300 - B_V_SCROLL_BAR_WIDTH), "fValuePanel", B_SINGLE_SELECTION_LIST);
 	
@@ -104,6 +104,5 @@ BString ValuableMonitorWindow::GetValuableString(ValuableID vID, BMessage* input
 bool
 ValuableMonitorWindow::QuitRequested(void)
 {
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return true;
+	return false;
 }

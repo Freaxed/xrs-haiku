@@ -83,16 +83,17 @@ SamplerTrack::newVoice(Note* n,int VoiceTag){
 	
 	coef = coef / curSample->freq_divisor;
 		
-	if(coef!=1.) { 
-						Voice->refiller=new SampleRefiller(Voice->sample);
-						Resampler *arts=new Resampler(Voice->refiller,(const void*)Voice);
-						arts->setStep(coef);
-						arts->setChannels(Voice->sample->channels);
-						arts->setBits(16);
-						
-						
-						Voice->converter=arts;
-			}
+	if(coef!=1.) {	
+		
+		Voice->refiller = new SampleRefiller(Voice->sample);
+		Resampler *arts = new Resampler(Voice->refiller,(const void*)Voice);
+		arts->setStep(coef);
+		arts->setChannels(Voice->sample->channels);
+		arts->setBits(16);
+		
+		
+		Voice->converter=arts;
+	}
 					
 				
 	
@@ -137,8 +138,8 @@ SamplerTrack::ProcessVoice(XRSVoice v,float ** dest ,int32 sample_num){
 			else
 				data[1]=data[0];	
 							
-			dest[0][l] = (float)data[0]/32767.*GetLeft()*amp*curNote->GetRight();
-			dest[1][l] = (float)data[1]/32767.*GetRight()*amp*curNote->GetLeft();
+			dest[0][l] = (float)data[0]/32767.0f * Left() * amp * curNote->Right();
+			dest[1][l] = (float)data[1]/32767.0f * Right()* amp * curNote->Left();
 		}
 		
 		Voice->position +=length;
@@ -155,8 +156,8 @@ SamplerTrack::ProcessVoice(XRSVoice v,float ** dest ,int32 sample_num){
 		
 		for(int32 l=0;l<length;l++)
 		{
-			dest[0][l] *= GetLeft()*amp*curNote->GetRight();
-			dest[1][l] *= GetRight()*amp*curNote->GetLeft();
+			dest[0][l] *= Left() * amp * curNote->Right();
+			dest[1][l] *= Right()* amp * curNote->Left();
 		}
 		length = retz;
 	}

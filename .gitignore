@@ -4,4 +4,9 @@ src/Valuable/(Objects.xrs-valuable)/
 src/Valuable/Valuable
 src/Valuable/compile_commands.json
 *.log
-
+objects.x86_64*
+*_
+src/tests/test-vst/TestHost
+src/tests/test-vst/TestVSTGui
+(Objects*
+compile_commands.json

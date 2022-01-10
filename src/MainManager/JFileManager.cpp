@@ -248,8 +248,8 @@ JFileManager::SaveFile(entry_ref rif,Song* song,bool zip)
     		WriteFixed(TRACK_START,curType);
     		 
     		 
-    		WriteFixed(TRACK_VOLUME,(int64)(cur->getVolume() * 100));
-    		WriteFixed(TRACK_PANNER,(int64)(cur->getPan() * 100));
+    		WriteFixed(TRACK_VOLUME,(int64)(cur->Gain() * 100));
+    		WriteFixed(TRACK_PANNER,(int64)(cur->Pan() * 100));
     		
     		
     		if(cur->isNameLocked()) 
@@ -296,7 +296,7 @@ JFileManager::SaveFile(entry_ref rif,Song* song,bool zip)
     			    		else
     			    			WriteFixed(NOTE_ON,0);
     			    	
-    			    		WriteFixed(NOTE_VOLUME,(int64)(pat->getNoteAt(k)->getVolume()*100));
+    			    		WriteFixed(NOTE_VOLUME,(int64)(pat->getNoteAt(k)->Gain()*100));
     			    		WriteFixed(NOTE_NEWNOTE,pat->getNoteAt(k)->getNote());
     			    	
     			    	WriteFixed(NOTE_STOP,0);		
@@ -662,10 +662,10 @@ JFileManager::LoadFile(entry_ref rif,Song* song)
 					
 					break;
 					case TRACK_VOLUME:
-						song->getTrackAt(track_c)->setVolume((float)rt/(float)100);
+						song->getTrackAt(track_c)->SetGain((float)rt/(float)100);
 					break;
 					case TRACK_PANNER:
-						song->getTrackAt(track_c)->setPan((float)rt/(float)100);
+						song->getTrackAt(track_c)->SetPan((float)rt/(float)100);
 					break;
 					case TRACK_MUTE:
 						if(rt==0)
@@ -744,7 +744,7 @@ JFileManager::LoadFile(entry_ref rif,Song* song)
 										break;
 										case NOTE_VOLUME:
 										
-										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->setVolume((float)rt/100.);
+										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->SetGain((float)rt/100.);
 
 										break;
 										case NOTE_OCT:

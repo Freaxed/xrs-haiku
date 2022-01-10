@@ -10,7 +10,7 @@
 
 #include "Note.h"
 
-Note::Note ():Pannable()
+Note::Note ()
 {
 	value=false;
 	oct=0;

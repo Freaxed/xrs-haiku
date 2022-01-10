@@ -138,7 +138,7 @@ ValuableManager::RegisterValuableReceiver(ValuableID vID, BHandler* receiver, bo
 		}
 		
 		iter->second->lViews.AddItem((void*)receiver);
-		LogDebug("RegisterValuableReceiver: ValuableReceiver registered [%s] - called by [%s]", vID.String(), receiver->Name());
+		LogDebug("RegisterValuableReceiver: ValuableReceiver registered [%s] - called by [%s]. Views: %d", vID.String(), receiver->Name(), iter->second->lViews.CountItems());
 		
 		if (doUpdate) {
 			BMessenger(receiver).SendMessage(iter->second->mLastMessage);
@@ -153,7 +153,6 @@ ValuableManager::RegisterValuableReceiver(ValuableID vID, BHandler* receiver, bo
 
 bool	
 ValuableManager::UnregisterValuableReceiver(ValuableID vID, BHandler* receiver) {
-	
 	if (Lock()){
 		iterator iter = fRegisteredValuable.find(vID);
 		if(iter == fRegisteredValuable.end())
@@ -197,6 +196,8 @@ ValuableManager::AttachMonitorValuableManager(MonitorValuableManager* monitor) {
 
 void
 ValuableManager::Dump() {
+	//WARN: this could crash if the BHandler are already destroyed!
+	if (Lock()){
 		HDDEBUG("---------------------------------------------");
 		iterator iter = fRegisteredValuable.begin();
 		while(iter != fRegisteredValuable.end()){
@@ -213,5 +214,7 @@ ValuableManager::Dump() {
 			iter++;
 		}
 		HDDEBUG("---------------------------------------------");
+		Unlock();
+  } 
 }
 

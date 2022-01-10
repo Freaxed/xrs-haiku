@@ -17,7 +17,7 @@
 #include "PEffector.h"
 
 #include "VectorNew.h"
-#include "Pannable.h"
+
 
 class PBus: public PMixable  {
 

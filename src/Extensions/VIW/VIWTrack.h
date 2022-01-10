@@ -15,6 +15,7 @@
 
 class		VSTInstrumentPlugin;
 class		PlugWindow;
+class 		VSTPlugin;
 
 
 class VIWTrack: public Track
@@ -37,7 +38,7 @@ class VIWTrack: public Track
 	VSTInstrumentPlugin*	getViw(){return viw;};
 	PlugWindow*			getWin(){return win;};
 	void						setWin(PlugWindow* w){win=w;};
-	void						LoadVSTi(const char * path);
+	void						LoadVSTi(VSTPlugin* plugin);
 
  rgb_color	GetPreferredPadColor(){ rgb_color a={255,152,49,255}; return a;}
 	

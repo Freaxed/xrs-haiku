@@ -57,8 +57,8 @@ TNPanel::TNPanel(TNTrackBoost* booster):PlugPanel(),fBooster(booster)
 void
 TNPanel::AttachedToWindow()
 {
-	BBitmap	*tile=XUtils::MakeBitmapSkin("TNPanel");
-	knobs->SetViewBitmap(tile);
+	//BBitmap	*tile=XUtils::MakeBitmapSkin("TNPanel");
+	//knobs->SetViewBitmap(tile);
 	
 	men->SetTargetForItems(this);
 	presetz->SetTargetForItems(this);

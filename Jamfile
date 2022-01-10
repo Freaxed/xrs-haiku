@@ -24,6 +24,7 @@ local sourceDirs =
 	src/Extensions/Tn306
 	src/Extensions/VIW
 	src/Extensions/JMDrum/src
+	src/vst_host
 #	src/Extensions/XFluidSynth
 ;
 
@@ -37,8 +38,8 @@ Application XRS :
 	
 	#src/media
 	VSTItem.cpp
-	VSTConfigureView.cpp
-	ParameterSlider.cpp
+	VSTParamsView.cpp
+	VSTKnob.cpp
 	
 	#src/libfunky
 	Utils.cpp
@@ -86,7 +87,8 @@ Application XRS :
 	PositionView.cpp
 	XMatrix.cpp
 	PlugWindow.cpp
-	
+	ParameterValueKnob.cpp
+
 	
 	#src/GUI/track
 	JTrack.cpp
@@ -193,6 +195,11 @@ Application XRS :
 	#SFSTrackBoost.cpp
 	#SFWindow.cpp 
 	#XFSynth.cpp 
+	
+	#vst_host
+	VSTHost.cpp
+	VSTList.cpp
+	
 		
 	#: be translation game media midi midi2 tracker fluidsynth stdc++
 	: be localestub translation game media midi midi2 tracker stdc++

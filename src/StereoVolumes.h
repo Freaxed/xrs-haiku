@@ -9,16 +9,24 @@
 #include <SupportDefs.h>
 #include "Log.h"
 
+#define SV_LEFT		0
+#define SV_RIGHT	1
 
 class StereoVolumes {
 public:
-		StereoVolumes(){ fPan = 0 ; fGain = 100; updateVolumes(); }
+		StereoVolumes(){ fPan = 0 ; fGain = 1.0f; updateVolumes(); }
 
 	void SetGain(float gain){ fGain = gain; updateVolumes(); }
 	void SetPan(float pan)  { fPan  = pan ; updateVolumes(); }
+	
+	float Gain() { return fGain; }
+	float Pan()  { return fPan;  }
 
 
 	float getVolumeChannel(int8 ch) { return fVolumes[ch]; }
+	
+	float Left () { return fVolumes[SV_LEFT];  } 
+	float Right() { return fVolumes[SV_RIGHT]; } 
 
 private:
 

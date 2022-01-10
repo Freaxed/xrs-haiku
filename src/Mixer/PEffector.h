@@ -31,7 +31,7 @@ class PEffector: public PNode {
 			
 			void		AddVST(VSTItem *item){ fVstList.Add(item); }
 			VSTItem*	VSTAt(int i){ return fVstList[i]; }											 
-			uint32	CountEffects(){ return fVstList.Count(); }
+			uint32		CountEffects(){ return fVstList.Count(); }
 	
 	private:
 			Vector<VSTItem*>	fVstList;

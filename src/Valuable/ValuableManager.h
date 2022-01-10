@@ -43,7 +43,7 @@ class ValuableManager : public BLooper {
 		
 		void	MessageReceived(BMessage* msg);
 		
-		void	Dump();
+		void	Dump(); //WARN: this could crash if the BHandler are already destroyed!
 
 	
 		void	AttachMonitorValuableManager(MonitorValuableManager*);
@@ -85,7 +85,7 @@ bool ValuableManager::RegisterValuable(ValuableID vID, TYPE initialValue)
 	    vInfo->mLastMessage = new Valuable<TYPE>(vID, initialValue);
 	    fRegisteredValuable[vID] = vInfo;
 
-	    LogDebug("Registered Valuable [%s].", vID.String());
+	    LogDebug("Registered Valuable [%s]. Views: %d", vID.String(), vInfo->lViews.CountItems());
 	    
 	    if (fMonitor)
 	    	fMonitor->RegisterValuable(vID);
@@ -115,7 +115,7 @@ bool ValuableManager::RegisterValuable(ValuableID vID, TYPE initialValue1, TYPE 
 	    vInfo->mLastMessage = new Valuable<TYPE>(vID, initialValue1, initialValue2);
 	    fRegisteredValuable[vID] = vInfo;
 
-	    LogDebug("Registered Valuable [%s].", vID.String());
+	    LogDebug("Registered Valuable [%s]. Views: %d", vID.String(), vInfo->lViews.CountItems());
 	
 	    Unlock();
 	    return true;

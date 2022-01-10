@@ -15,6 +15,7 @@
 #include	<StringView.h>
 #include 	"XHost.h"
 #include 	"viw_locale.h"
+#include	"VstManager.h"
 
 #define	SET_VSTI	'stvs'
 #define	REMOVE_VSTI	'revs'
@@ -30,11 +31,11 @@ VIWPanel::VIWPanel(BList* vst):PlugPanel(){
 
 	menu->AddItem(new BMenuItem(T_VIW_NOVST,new BMessage(REMOVE_VSTI)));
 	BMessage*	info;
-	for(int i=0;i<vst->CountItems();i++){
-			PlugInEntry*	stru=(PlugInEntry*)vst->ItemAt(i);
-			info=new BMessage(SET_VSTI);
+	for(int16 i=0;i<vst->CountItems();i++){
+			VSTPlugin*	stru = (VSTPlugin*)vst->ItemAt(i);
+			info = new BMessage(SET_VSTI);
 			info->AddInt16("id",i);
-			menu->AddItem(new BMenuItem(stru->product.String(),info));
+			menu->AddItem(new BMenuItem(stru->EffectName(),info));
 	}
 	BRect r(sampler->Bounds());
 	r.InsetBy(4,4);
@@ -64,7 +65,7 @@ VIWPanel::Reset(Track* tr){
 				myTrack->getWin()->SetTitle(tr->getName());
 		
 		if(myTrack->getViw())
-			menu->Superitem()->SetLabel(myTrack->getViw()->productname.String());
+			menu->Superitem()->SetLabel(myTrack->getViw()->EffectName());
 				else
 			menu->Superitem()->SetLabel(T_VIW_NOVST);
 			
@@ -99,14 +100,14 @@ VIWPanel::MessageReceived(BMessage* msg)
 	
 	if(msg->what==SET_VSTI){
 		int k=msg->FindInt16("id");
-		PlugInEntry	*stru=(PlugInEntry*)vst_list->ItemAt(k);
-		//printf("loadin VSTI: %s\n",stru->ref.name);
-		myTrack->LoadVSTi(stru->ref.name);
+		VSTPlugin	*stru=(VSTPlugin*)vst_list->ItemAt(k);
+
+		myTrack->LoadVSTi(stru);
 		
 		if(myTrack->getViw())
-				menu->Superitem()->SetLabel(myTrack->getViw()->productname.String());
-				else
-				menu->Superitem()->SetLabel(T_VIW_NOVST);
+			menu->Superitem()->SetLabel(myTrack->getViw()->EffectName());
+		else
+			menu->Superitem()->SetLabel(T_VIW_NOVST);
 		
 	}
 	else

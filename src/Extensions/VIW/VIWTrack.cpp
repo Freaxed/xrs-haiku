@@ -37,7 +37,7 @@ VIWTrack::VIWTrack():Track()
 }	
 
 void
-VIWTrack::LoadVSTi(const char * path)
+VIWTrack::LoadVSTi(VSTPlugin* plugin)
 {
 	VSTInstrumentPlugin *m_plug;
 	
@@ -55,12 +55,12 @@ VIWTrack::LoadVSTi(const char * path)
 		delete m_plug;
 	}
 		
-	if(path!=NULL)
+	if(plugin!=NULL)
 	{
-		m_plug=new VSTInstrumentPlugin(path);
+		m_plug=new VSTInstrumentPlugin(plugin);
 		setWin(new PlugWindow(m_plug,true));
 		
-		XHost::Get()->SendMessage(X_RegWindow,(void*)getWin(),(void*)m_plug->name.String());
+		XHost::Get()->SendMessage(X_RegWindow,(void*)getWin(),(void*)m_plug->EffectName());
 		XHost::Get()->SendMessage(X_Switch,(void*)getWin());
 		
 		getWin()->SetTitle(getName());
@@ -132,8 +132,8 @@ VIWTrack::Process(float** buffer,int32 samples_num,int spiaz,float factor)
 		
 	for (int L=0; L< samples_num; L++) {
 			
-		buffer[0][spiaz+L]+=stream_s[0][L]*GetRight()*factor;
-		buffer[1][spiaz+L]+=stream_s[1][L]*GetLeft()*factor;
+		buffer[0][spiaz+L]+=stream_s[0][L]*Right()*factor;
+		buffer[1][spiaz+L]+=stream_s[1][L]*Left()*factor;
 	
 	}
 }
@@ -151,7 +151,7 @@ VIWTrack::newVoice(Note* n,int VoiceTag)
 	curNote->setValue(n->getValue());
 	curNote->setNote(n->getNote());
 	
-	viw->SendNote(curNote->getNote(),curNote->getVolume());
+	viw->SendNote(curNote->getNote(),curNote->Gain());
 	
 	return NULL; 
 }	
@@ -164,7 +164,7 @@ VIWTrack::stopVoice(int note)
 		return;
 	}
 	if(note<0 || note==curNote->getNote())	//Stop current note
-		viw->SendNote(curNote->getNote(),curNote->getVolume(),false);
+		viw->SendNote(curNote->getNote(),curNote->Gain(),false);
 	//else	viw->SendNote(note,100,false);
 	
 }
@@ -174,7 +174,7 @@ void VIWTrack::goOn()
 { 
 	if(viw==NULL) 
 		return; 
-	viw->SetStatus(true); 
+	//FIX viw->SetStatus(true); 
 }
 
 void 
@@ -184,6 +184,6 @@ VIWTrack::goOff()
 		return;
 	
 	stopVoice();
-	viw->SetStatus(false); 
+	//FIX viw->SetStatus(false); 
 }
 						  

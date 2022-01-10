@@ -66,15 +66,23 @@ TheApp::~TheApp()
 		msucco->ReallyStop();	//stop the engine	
 		xhost->AllowLock(false);
 		 
-		 //msucco->Acquire("QuitRequest");
+		//fVManager->Dump();
+		 
+		 if(fValuableMonitor->Lock()) {
+		 	fValuableMonitor->Quit();
+		 }
+		 	
+		 delete fModel;
+	     
+	     if(fVManager->Lock())
+			fVManager->Quit();
 		 
 		 if(trackinfo->Lock())				
 			 trackinfo->Quit();
 		
 		 track_manager->Close();
 			 		
-		 jfm->CloseSong(currentSong);
-		
+		 jfm->CloseSong(currentSong);		
 		 
 			 
 		 if(mixerWin->Lock())
@@ -100,16 +108,7 @@ TheApp::~TheApp()
 		 if(mw->Lock()) 
 		 	mw->Quit();
 		 	
-		 fVManager->Dump();
-		 
-		 if(fValuableMonitor->Lock()) {
-		 	fValuableMonitor->Quit();
-		 }
-		 	
-		 delete fModel;
-	     
-	     if(fVManager->Lock())
-			fVManager->Quit();
+
 			
 		XrsMidiIn::Get()->Release();
 		XrsMidiOut::Get()->Release();
@@ -524,7 +523,7 @@ TheApp::CopyPattern(Pattern* from,Pattern* to)
 		to->getNoteAt(i)->setValue(from->getNoteAt(i)->getValue());
 		to->getNoteAt(i)->setNote(from->getNoteAt(i)->getNote());
 		to->getNoteAt(i)->setOct(from->getNoteAt(i)->getOct());
-		to->getNoteAt(i)->setVolume(from->getNoteAt(i)->getVolume());	
+		to->getNoteAt(i)->SetGain(from->getNoteAt(i)->Gain());	
 	}
 }
 void
@@ -535,7 +534,7 @@ TheApp::ClearPattern(Pattern* to)
 		to->getNoteAt(i)->setValue(false);	
 		to->getNoteAt(i)->setNote(0);	
 		to->getNoteAt(i)->setOct(0);	
-		to->getNoteAt(i)->setVolume(0.8);	
+		to->getNoteAt(i)->SetGain(0.8);	
 	}
 }
 bool
@@ -543,7 +542,9 @@ TheApp::QuitRequested()
 {
 	status_t	ask;
 	ask=jfm->AskForClose(currentSong);
-		
+	if (ask == B_OK) {
+		fVManager->Dump();
+	}	
 	return (ask==B_OK);
 	
 	

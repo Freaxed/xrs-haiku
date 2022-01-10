@@ -15,8 +15,8 @@ class	BMenu;
 class	BFile;
 class 	VSTItem;
 
-#include	<Path.h>
 #include    <List.h>
+#include	"VSTList.h"
 
 class VstManager
 {
@@ -26,24 +26,23 @@ class VstManager
 		
 		static	VstManager*	Get();
 		
-		BList*		getList(){ return &list;}
-		VSTItem*	CreateVst(int pos);	
+		VSTItem*	CreateVst(VSTPlugin* fromList);
 		void		DeleteVst(VSTItem* plug);
+
 		bool		SavePreset(VSTItem* plug,const char*name,BMessage* msg);
 		bool		LoadPreset(VSTItem* plug,const char*name,BMessage* msg);
 		
 		void		FillPresetsMenu(VSTItem* plug,BMenu*,uint32 msg);
 		void		setPresetsPath(VSTItem* plug);
 		
+		void	GetInstrumentVst(BList*);
+		void	GetEffectVst(BList*);
+		
 			
 	private:
 	
 					VstManager();
-		BList		list;
-		BPath		vstpath;
-
-		void		AddMime(BFile* file);
-		bool		CheckMimeType(BFile* file);
+		VSTList*	fVstList;
 };
 
 #endif

@@ -13,7 +13,7 @@
 #include	"PlugWindow.h"
 #include 	"XHost.h"
 #include 	"locale.h"
-#include	"SourceItem.h"
+//#include	"SourceItem.h"
 #include	"AChannelSlider.h"
 #include 	"ValuableManager.h"
 #include	"Xed_Utils.h"
@@ -91,6 +91,15 @@ MixerWindow::MixerWindow() : XrsWindow(BRect(150,130,280,60),"", B_FLOATING_WIND
 	//windowmanager
 	WindowManager::Get()->RegisterMe(this,"Mixer");
 	vst_win = NULL;
+	
+	//TEMP
+	for (uint8 i=0;i<MIXERLINES_COUNT;i++) {
+		PEffector* fx = PMixer::Get()->BusAt(i)->Effector();
+		for (uint32 j=0; j<fx->CountEffects(); j++) {
+			VSTItem*	item = fx->VSTAt(j);
+			CreateVstWindow(item, i);
+		}
+	}
 }
 
 MixerWindow::~MixerWindow()
@@ -310,16 +319,16 @@ SetVST(BMessage *msg,void *ck)
 					*/
 					
 					//if(i!=0)					
-					VSTItem* temp_plug=VstManager::Get()->CreateVst(i-1);
+					//VSTItem* temp_plug=VstManager::Get()->CreateVst(i-1);
 					//else
 					//	temp_plug=NULL;
 					
-					if(temp_plug!=NULL)	
-						mix->CreateVstWindow(temp_plug,k);
-					
-					XHost::Get()->SendMessage(X_LockSem,0);
-						efx->AddVST(temp_plug);
-					XHost::Get()->SendMessage(X_UnLockSem,0);
+//					if(temp_plug!=NULL)	
+//						mix->CreateVstWindow(temp_plug,k);
+//					
+//					XHost::Get()->SendMessage(X_LockSem,0);
+//						efx->AddVST(temp_plug);
+//					XHost::Get()->SendMessage(X_UnLockSem,0);
 					
 				
 				mix->Refresh();
@@ -371,22 +380,22 @@ SetVST(BMessage *msg,void *ck)
 }
 
 void
-MixerWindow::CreateVstWindow(VSTItem* vst,int pos)
-{/*
-	if(vst==NULL || selected==NULL) return;
+MixerWindow::CreateVstWindow(VSTItem* vst, uint8 line)
+{
+	if(vst == NULL) 
+		return;
+		
+	BString reg("Line ");
+	reg << line << " - " << vst->EffectName();
 	
-	PlugWindow	*nw=new PlugWindow(vst);
-	selected->plugwin[pos]=nw;
-	nw->SetTitle(selected->line->getName());
+	PlugWindow	*nw = new PlugWindow(vst);
+	nw->SetTitle(reg.String());
 	nw->MoveTo(BAlert::AlertPosition(nw->Frame().Width(),nw->Frame().Height()));
 	nw->Show();
-
-	BString reg(selected->line->getName());
-	reg << " : " << vst->name.String();
 		
-	WindowManager::Get()->RegisterMe(nw,reg.String());	
-	*/
+	WindowManager::Get()->RegisterMe(nw, reg.String());	
 }
+
 void
 MixerWindow::DeleteVstWindow(int pos)
 {
@@ -639,33 +648,18 @@ MixerWindow::LoadSettings(BMessage*	data)
 	}
 */
 }
-int
-MixerWindow::FindVST(const char* name)
-{
-	for(int j=0;j<VstManager::Get()->getList()->CountItems();j++)
-	{
-			PlugInEntry *ple=(PlugInEntry*)(VstManager::Get()->getList()->ItemAt(j));
-			if(strcmp(name,ple->name.String())==0) return j;
-	}
-	return -1;
-}
+//int
+//MixerWindow::FindVST(const char* name)
+//{
+//	for(int j=0;j<VstManager::Get()->getList()->CountItems();j++)
+//	{
+//			PlugInEntry *ple=(PlugInEntry*)(VstManager::Get()->getList()->ItemAt(j));
+//			if(strcmp(name,ple->name.String())==0) return j;
+//	}
+//	return -1;
+//}
 
-// Deprecated!
-int
-MixerWindow::FindVSTOLD(const char* name)
-{
-	for(int j=0;j<VstManager::Get()->getList()->CountItems();j++)
-	{
-			PlugInEntry *ple=(PlugInEntry*)(VstManager::Get()->getList()->ItemAt(j));
-			
-			BPath p(ple->ref.name);
-			
-			printf("FindVST: [%s][%s]\n",name,p.Path());
-			
-			if(strcmp(name,p.Leaf())==0) return j;
-	}
-	return -1;
-}
+
 
 void
 MixerWindow::_postValue(int line)

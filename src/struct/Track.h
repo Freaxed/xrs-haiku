@@ -14,7 +14,7 @@
 #include "GlobalDef.h"
 #include "synthMessages.h"
 #include "XRSVoice.h"
-#include "Pannable.h"
+#include "StereoVolumes.h"
 
 #include <GraphicsDefs.h>
 #include <SupportDefs.h>
@@ -25,7 +25,7 @@ class Pattern;
 class Note;
 
 
-class Track: public Pannable
+class Track: public StereoVolumes
 {
 	public:
 	

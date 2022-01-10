@@ -36,9 +36,11 @@ class XUtils
 
 
 		static	void			FillPresetsMenu(const char* plugname,BMenu* men,unsigned long);
-		static	bool			SavePreset(const char* plugname,const char* presname,BMessage* msg);
-		static	bool			LoadPreset(const char* plugname,const char* presname,BMessage* msg);
+		static	bool			SavePreset(const char* plugname,const char* presname,BMessage* msg, const char* mime = NULL);
+		static	bool			LoadPreset(const char* plugname,const char* presname,BMessage* msg, const char* mime = NULL);
 		
+		static	void			AddMime(BFile* file, const char* MimeString);
+		static	bool			CheckMimeType(BFile* file, const char* MimeString);
 private:
 
 
