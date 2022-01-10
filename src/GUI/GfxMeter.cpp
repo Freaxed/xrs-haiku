@@ -22,8 +22,8 @@ GfxMeter::GfxMeter(BRect frame, ValuableID id):BView(frame,  id.String(),  B_FOL
 		,vID(id)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	ValuableManager::Get()->RegisterValuable(vID, 0.0f, 0.0f); //TODO move somewhere.!
-		
+	off = XUtils::GetBitmap(21);
+	on  = XUtils::GetBitmap(22);
 }
 
 GfxMeter::~GfxMeter() {
@@ -40,13 +40,10 @@ GfxMeter::DetachedFromWindow()
 void
 GfxMeter::AttachedToWindow()
 {	
-	off = XUtils::GetBitmap(21);
-	on = XUtils::GetBitmap(22);
-	
 	SetViewBitmap(off);
 	
 	r_bitmap = on->Bounds();
-	
+
 	r_up = r_bitmap;
 	r_up.OffsetBy(4,4);
 	
@@ -62,15 +59,17 @@ GfxMeter::AttachedToWindow()
 }
 void GfxMeter::Draw(BRect k)
 {
-	r_up.right = r_up.left + pixel_l * 100.0f;
-	r_bitmap.right = r_bitmap.left + pixel_l * 100.0f;
+	r_up.right     = r_up.left + pixel_l     ;
+	r_bitmap.right = r_bitmap.left + pixel_l ;
 	
 	DrawBitmapAsync(on,r_bitmap,r_up);
 	
-	r_down.right = r_down.left + pixel_r * 100.0f;
-	r_bitmap.right = r_bitmap.left + pixel_r * 100.0f;
+	r_down.right = r_down.left + pixel_r     ;
+	r_bitmap.right = r_bitmap.left + pixel_r ;
 	
-	DrawBitmap(on,r_bitmap,r_down);
+	DrawBitmapAsync(on,r_bitmap,r_down);
+	
+	Sync();
 		
 }
 	
@@ -88,8 +87,8 @@ void GfxMeter::MessageReceived(BMessage *msg){
 				if(pixel_l != value_l || 
 				   pixel_r != value_r )
 				{
-					pixel_l = value_l;
-					pixel_r = value_r;
+					pixel_l = value_l* width;
+					pixel_r = value_r* width;
 					Invalidate();
 				}
 			}			
