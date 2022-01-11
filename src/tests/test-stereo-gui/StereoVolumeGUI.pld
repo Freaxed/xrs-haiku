@@ -1,5 +1,5 @@
 NAME=StereoVolumeGUI
-TARGETNAME=StereoVolumeGUI
+TARGETNAME=StereoVolumeGUI.bin
 PLATFORM=HaikuGCC4
 SCM=git
 GROUP=Source files

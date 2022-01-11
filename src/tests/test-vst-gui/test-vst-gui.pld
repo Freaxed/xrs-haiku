@@ -1,5 +1,5 @@
 NAME=test-vst-gui
-TARGETNAME=TestVSTGui
+TARGETNAME=TestVSTGui.bin
 PLATFORM=HaikuGCC4
 SCM=git
 GROUP=Source files
