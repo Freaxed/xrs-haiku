@@ -40,7 +40,7 @@ AboutBox::WindowActivated(bool on)
 	BRect r(Bounds());
 	r.OffsetBy(centered_point);
 	
-	XUtils::CreateBootBitmap(&r,&shot,big_mode);
+	XUtils::CreateBootBitmap(&r,&shot, true);
 	
 	w->SetViewBitmap(shot);
 	MoveTo(centered_point);
