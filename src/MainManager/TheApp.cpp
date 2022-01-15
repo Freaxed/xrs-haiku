@@ -157,7 +157,6 @@ TheApp::PrepareToRun()
 	AddCommonFilter(win_manager);
 	
 	fVManager = ValuableManager::Get();
-	fVManager->Run();
 	
 	fModel = new BasicModelManager();
 	
