@@ -38,9 +38,6 @@ const 	rgb_color  	onc 	= {255,52,49};
 JTrack::JTrack(BRect rect,int16 n):TrackBlock(rect,""),id(n),model(0)
 {
 	SetViewColor(bkColor);
-	line_info=new BMessage(VERTICAL_CLICK);
-	line_info->AddInt16("id",0);
-	
 
 	AddChild(volpot=new APot(BRect(545,POT_Y,545+POT_H,POT_Y+POT_L),"pippo",new BMessage(TRACK_VOL),new BMessage(TRACK_ON),0, 100, XUtils::GetBitmap(0),XUtils::GetBitmap(1)));
 	AddChild(panpot=new APot(BRect(550+POT_H+3,POT_Y+3,550+POT_H+3+18,POT_Y+21),"pippo",new BMessage(TRACK_PAN),new BMessage(PAN_RESET),-100, 100,XUtils::GetBitmap(2),NULL));
@@ -129,12 +126,11 @@ JTrack::MessageReceived(BMessage* message)
 	break;
 	
 	case TRACK_ROUTELINE:
-		int32 val;
-		val=message->FindInt32("be:value");
-		line_info->ReplaceInt16("id",(int)val);
-		MixerWindow::Get()->PostMessage(line_info);
-		myTrack->setRouteLine(val);
-		myTrack->RouteLineChanged(val);
+		int32 value;
+		if (message->FindInt32("be:value", &value) == B_OK) {
+			myTrack->setRouteLine(value);
+			myTrack->RouteLineChanged(value);
+		}
 	break;
 	
 	case JMSG_NAME_SET:

@@ -60,7 +60,6 @@ class JTrack : public TrackBlock
 			int					_img;	
 			BPictureButton*		brez;
 			XDigit*				line_pos;
-			BMessage*			line_info;
 };
 
 #endif
