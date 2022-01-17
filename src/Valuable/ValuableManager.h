@@ -12,7 +12,7 @@
 class ValuableManager : public BLooper {
 
 	private:
-				ValuableManager():fMonitor(NULL) {	}
+				ValuableManager():fMonitor(NULL) {	Run(); }
 	public:
 				static ValuableManager* Get() 
 				{
