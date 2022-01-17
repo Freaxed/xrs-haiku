@@ -39,8 +39,8 @@ MainWindow::MessageReceived(BMessage *msg)
 	{
 		case 'xxxx': {
 			BMessage* x = new BMessage('yyyy');
-			x->AddFloat("max", (float)rand()/(float)RAND_MAX);
-			x->AddFloat("max", (float)rand()/(float)RAND_MAX);
+			x->AddFloat("max", (float)rand()/(float)RAND_MAX); //left?
+			x->AddFloat("max", (float)rand()/(float)RAND_MAX); //right?
 			PostMessage(x, peakV);//->Invalidate();
 			PostMessage(x, peakH);//->Invalidate();
 		}
