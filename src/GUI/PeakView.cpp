@@ -202,8 +202,9 @@ PeakView::FrameResized(float width, float height)
 void
 PeakView::Pulse()
 {
-	if (!fGotData)
-		return;
+
+//	if (!fGotData)
+//		return;
 
 	if (fBackBitmap == NULL)
 		return;
