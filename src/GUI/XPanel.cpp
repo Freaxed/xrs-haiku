@@ -197,7 +197,7 @@ XPanel::AttachedToWindow()
 	//meter
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	AddChild(Two = new ValuablePeakView(VID_MIXER_MAIN_MET, "PeakView"));
+	AddChild(Two = new ValuableHPeakView(VID_MIXER_MAIN_MET, "PeakView"));
 	Two->MoveTo(r.left, r.top);
 	Two->ResizeTo(r.Width(), r.Height());
 	
