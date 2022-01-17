@@ -46,8 +46,6 @@
 #include	"ValuableMonitorWindow.h"
 
 
-extern PotViewer* potviewer = NULL;
-
 #define SCREEN_TIME 0 //2000000
 
 TheApp::TheApp(const char * signature) :
@@ -118,14 +116,11 @@ TheApp::~TheApp()
 	
 	}
 	
-	if(potviewer && potviewer->Lock()){
-	
-		potviewer->Quit();
+	if(PotViewer::Get()->Lock()){	
+		PotViewer::Get()->Quit();
 	}
 	
-	delete a_mixer;
-
-	
+	delete a_mixer;	
 	delete track_manager;
 	delete vst_manager;
 	
@@ -424,7 +419,7 @@ TheApp::MessageReceived(BMessage* message)
 		{
 			for(int i=0;i<dinamic_clip->CountItems();i++)
 			{
-				delete dinamic_clip->ItemAt(i);	
+				delete (Pattern*)dinamic_clip->ItemAt(i);	
 			}
 			
 			dinamic_clip->MakeEmpty();
@@ -448,7 +443,7 @@ TheApp::MessageReceived(BMessage* message)
 		{
 			for(int i=0;i<dinamic_clip->CountItems();i++)
 			{
-				delete dinamic_clip->ItemAt(i);	
+				delete (Pattern*)dinamic_clip->ItemAt(i);	
 			}
 			
 			dinamic_clip->MakeEmpty();
@@ -533,7 +528,7 @@ TheApp::ClearPattern(Pattern* to)
 		to->getNoteAt(i)->setValue(false);	
 		to->getNoteAt(i)->setNote(0);	
 		to->getNoteAt(i)->setOct(0);	
-		to->getNoteAt(i)->SetGain(0.8);	
+		to->getNoteAt(i)->SetGain(0.8f);	
 	}
 }
 bool
