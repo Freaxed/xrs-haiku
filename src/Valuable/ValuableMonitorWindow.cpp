@@ -6,18 +6,32 @@
 #include <TextView.h>
 #include <ScrollView.h>
 #include <ListView.h>
+#include <GridLayout.h>
+#include <LayoutBuilder.h>
+#include <GroupLayout.h>
+#include <StringView.h>
 
 #define H_LABEL 20
 
 ValuableMonitorWindow::ValuableMonitorWindow(void)
 	:	BWindow(BRect(100,100,500,400),"ValuableMonitorWindow",B_FLOATING_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	fValuePanel = new BListView(BRect(0, 0, 400 - B_H_SCROLL_BAR_HEIGHT, 300 - B_V_SCROLL_BAR_WIDTH), "fValuePanel", B_SINGLE_SELECTION_LIST);
-	
-	fScrollView = new BScrollView("scroll", fValuePanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
+	BBox* defaultsBox = new BBox("Valuables");
+	defaultsBox->SetLabel("Valuables");
+	BGridView* defaultsGridView = new BGridView();
 
-	AddChild(fScrollView);
+	fValuePanel = new BListView(B_SINGLE_SELECTION_LIST);
 
+	BScrollView* scrollView = new BScrollView("ScrollView", fValuePanel,
+			0, false, true);
+	BLayoutBuilder::Grid<>(defaultsGridView)
+		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING)
+		.Add(scrollView, 0, 0);
+
+	defaultsBox->AddChild(defaultsGridView);
+
+	BLayoutBuilder::Group<>(this).Add(defaultsBox);
 }
 
 

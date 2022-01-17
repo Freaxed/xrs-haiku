@@ -31,7 +31,7 @@ private:
 	typedef std::map<ValuableID, BStringItem*>::iterator Iterator;
 	BSlider* volume;
 	
-	BScrollView*	fScrollView;
+//	BScrollView*	fScrollView;
 	BListView*	    fValuePanel;
 };
 

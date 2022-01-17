@@ -17,7 +17,6 @@ main() {
 	
 	
 	ValuableManager* vManager = ValuableManager::Get();
-	vManager->Run();
 		
 	
 	vManager->RegisterValuable("xrs.mixer.main.volume", 	   	80);
