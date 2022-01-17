@@ -61,7 +61,7 @@ Application XRS :
 	DrawingTidbits.cpp
 	VUView.cpp
 	PeakView.cpp
-	ValuablePeakView.cpp
+	VertPeakView.cpp
 	BasicModelManager.cpp
 	
 
@@ -97,8 +97,9 @@ Application XRS :
 	
 	#src/GUI/MixerUI/
 	MixerWindow.cpp
-	MixableBox.cpp
-	XChannelSlider.cpp
+	MixerLine.cpp
+	StereoVolumesView.cpp
+	#XChannelSlider.cpp
 	
 	#src/GUI/MediaBrowser
 	IconListItem.cpp

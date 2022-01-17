@@ -1,62 +1,13 @@
-/*
- * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Andrea Anzani <andrea.anzani@gmail.com>
- */
+#include "MixerWindow.h"
 
-#include	"MixerWindow.h"
-#include	"VSTItem.h"
-#include	"BzWindow.h"
-#include	"PlugWindow.h"
-#include 	"XHost.h"
-#include 	"locale.h"
-//#include	"SourceItem.h"
-#include	"AChannelSlider.h"
-#include 	"ValuableManager.h"
-#include	"Xed_Utils.h"
-#include 	"APot.h"
-#include	"Xed_Utils.h"
-#include	"MixableBox.h"
-#include 	"PBus.h"
-#include 	"PMixer.h"
-#include 	"VstManager.h"
-#include	"WindowManager.h"
-#include	"Configurator.h"
-
-#include	<StringView.h>
-#include 	<stdio.h>
-#include	<ScrollView.h>
-#include	<ListView.h>
-#include	<Button.h>
-#include	<PictureButton.h>
-#include	"CommonValuableID.h"
-
-#define	VERTICAL_SLIDE	'vers'
-#define	VST_STATE		'vsts'
-#define	VST_SELECT		'vstt'
-#define	SHOW_VST_WINDOW	'svsw'
-#define	SET_MIXER_SIZE	'smix'	
-
-//used by the hated BzWindow.
-
-bool 			SetVST(BMessage *msg,void *ck);
-
-/*typedef struct uiblock{
-	PBus*			bus;
-	PlugWindow*		plugwin[8];		
-};*/
-
-// uiblock *ui_list;
-// uiblock *selected;
-
-//rgb_color gray,white,black,darkgray;
-
-
-//#define	HVST	23
-
+#include <Application.h>
+#include <GridLayout.h>
+#include <LayoutBuilder.h>
+#include <GroupLayout.h>
+#include "MixerLine.h"
+#include "WindowManager.h"
+#include "CommonValuableID.h"
+#include "Log.h"
 
 MixerWindow*	
 MixerWindow::Get()
@@ -67,428 +18,54 @@ MixerWindow::Get()
 	return instance;
 }
 
-MixerWindow::MixerWindow() : XrsWindow(BRect(150,130,280,60),"", B_FLOATING_WINDOW,B_ASYNCHRONOUS_CONTROLS|B_NOT_ZOOMABLE|B_AVOID_FOCUS|B_NOT_RESIZABLE)
-{	
+MixerWindow::MixerWindow(void)
+	:	XrsWindow(BRect(150,130,280,60),"", B_FLOATING_WINDOW,B_ASYNCHRONOUS_CONTROLS|B_NOT_ZOOMABLE|B_AVOID_FOCUS|B_NOT_RESIZABLE)
+{
 	SetName("mixer_");
 	SetTitle("Mixer");
-
-	for (uint8 i=0;i<MIXERLINES_COUNT;i++) {
-		BString label = "Line ";
-		label << i;
+	
+	BGroupLayout* group = BLayoutBuilder::Group<>(B_HORIZONTAL);
+	SetLayout(group);
+	group->SetSpacing(5.0f);
+	
+	for (uint8 i=0; i<MIXERLINES_COUNT; i++) {
+		BString name("Line ");
+		name << i;
 		if (i == 0) 
-			label << " (Master)";
+			name = "Master";
 			
-		AddChild(new MixableBox(BPoint(120*i,0), label, VID_MIXER_LIN_VOL(i), VID_MIXER_LIN_PAN(i), VID_MIXER_LIN_MET(i)));
+		group->AddView(new MixerLine(name.String(), VID_MIXER_LIN_VOL(i), VID_MIXER_LIN_PAN(i), VID_MIXER_LIN_MET(i)));
 	}
-
-	ResizeTo(600,240);
-
-	expanded=(bool)Configurator::Get()->FloatKey("mixer_expanded",1);
-	
-	/* manca extra settaggio !*/
-	
+	BSize size(group->BasePreferredSize());
+	ResizeTo(size.Width(), size.Height());
 	
 	//windowmanager
 	WindowManager::Get()->RegisterMe(this,"Mixer");
-	vst_win = NULL;
-	
-	//TEMP
-	for (uint8 i=0;i<MIXERLINES_COUNT;i++) {
-		PEffector* fx = PMixer::Get()->BusAt(i)->Effector();
-		for (uint32 j=0; j<fx->CountEffects(); j++) {
-			VSTItem*	item = fx->VSTAt(j);
-			CreateVstWindow(item, i);
-		}
-	}
 }
 
 MixerWindow::~MixerWindow()
 {
-	if(vst_win && vst_win->Lock())
-		vst_win->Quit();
-	
 	WindowManager::Get()->UnregisterMe(this);
-	
-	for(int i=0;i<4;i++)
-	{
-		//Select(i);
-		for(int j=0;j<8;j++) 
-			DeleteVstWindow(j);
-	}
-	
-	//SaveConfig();
-	Config()->PutFloatKey("mixer_expanded",(float)expanded);	
-}
-
-bool
-MixerWindow::QuitRequested()
-{
-	WindowManager::Get()->Switch(this);
-	return false;
 }
 
 void
-MixerWindow::Refresh()
+MixerWindow::MessageReceived(BMessage *msg)
 {
-	int i = 0;
-//	for(i=0;i<4; i++) 
-//		if(&ui_list[i]==selected) break;
-//	selected=NULL;
-	//Select(i);
-}
-
-
-void
-MixerWindow::MessageReceived(BMessage* msg)
-{
-	int k;
-	
-	switch(msg->what){
-	
-	
-	case MSG_VALUABLE_CHANGED:
-		//printf("MixerWindow  %ld\n",(int32)bv);
-//		ui_list[0].slider->SetAllValue((int32)msg->FindFloat("valuable:value"));
-	break;
-	case SET_MIXER_SIZE:
+	switch (msg->what)
 	{
-		if(expanded)
-				ResizeBy(0,small-big);
-				
-		else
-				ResizeBy(0,big-small);	
-		expanded=!expanded;
-	}
-	break;
-	case SHOW_VST_WINDOW:
-		k=msg->FindInt16("id");
-		//if(selected->plugwin[k])
-		//	WindowManager::Get()->Switch(selected->plugwin[k]);
-	break;
-	case VERTICAL_CLICK:
-		k=msg->FindInt16("id");
-	break;
-	case VERTICAL_SLIDE:
-		//ASSERT(k>0)
-		k=msg->FindInt16("id");
-		//ui_list[k].line->setLeftRight((float)ui_list[k].slider->ValueFor(0)/100.,(float)ui_list[k].slider->ValueFor(1)/100.);
-	break;
-	case 'intm':
-		//ASSERT(k>0)
-		//k=msg->FindInt16("id");
-		//ui_list[k].slider->SetValueFor(0,(int32)(ui_list[k].line->GetLeft()*100.));
-		//ui_list[k].slider->SetValueFor(1,(int32)(ui_list[k].line->GetRight()*100.));
-	break;
-	
-	case VST_SELECT:
-		k=msg->FindInt16("id");
-		VSTSelect(k);
-	break;
-	case VST_STATE:
+		default:
 		{
-			VSTItem *plug;
-			k=msg->FindInt16("id");
-//			plug=selected->line->vst[k];
-				
+			BWindow::MessageReceived(msg);
+			break;
 		}
-	break;
-	case RESET_MIXER:
-		BMessage *data;
-		data=new BMessage();
-		msg->FindMessage("settings",data);
-		LoadSettings(data);
-	break;
-	default:
-	BWindow::MessageReceived(msg);
-	break;
 	}
-}
-void
-MixerWindow::VSTSelect(int i)
-{
-/*
-	if(vst_win==NULL)
-	{
-		vst_win=new BzWindow(BRect(200,200,400,600),"nome",B_MODAL_WINDOW,B_NOT_RESIZABLE);
-		BBox	 *box=new BBox(BRect(0,0,200,400),"nome");
-		box->SetBorder(B_PLAIN_BORDER);
-		vst_win->AddChild(box);
-		
-		box->AddChild(new BStringView(BRect(10,5,190,25),"ciao",T_MIXER_CHOOSE_VST));
-	
-		list=new BListView(BRect(10,30,190-B_V_SCROLL_BAR_WIDTH,350),"list"); //,"init",new BMessage(112));
-	
-	
-		list->AddItem(new BStringItem(T_MIXER_NONE));
-		for(int j=0;j<VstManager::Get()->getList()->CountItems();j++){
-			PlugInEntry *ple=(PlugInEntry*)(VstManager::Get()->getList()->ItemAt(j));
-			list->AddItem(new SourceItem(ple->name.String(),ple->ref));
-		}
-	
-	box->AddChild(new BScrollView("",list,B_FOLLOW_TOP|B_FOLLOW_LEFT,0,false,true));
-	
-	
-	BMessage *msg=new BMessage(112);
-	msg->AddPointer("list",list);
-	msg->AddPointer("line",selected->line);
-	msg->AddPointer("bus",selected->bus);
-	msg->AddInt16("id",i);
-	
-	ok = new BButton(BRect(10,360,100,380),"name",T_GEN_OK,msg);
-	box->AddChild(ok);
-	
-	msg=new BMessage(112);
-	msg->AddPointer("list",list);
-	msg->AddPointer("line",selected->line);
-	msg->AddPointer("bus",selected->bus);
-	msg->AddInt16("id",i);
-	list->SetInvocationMessage(msg);
-	
-	BMessage* msg2=new BMessage(113);
-	msg2->AddPointer("list",list);
-	
-	BButton		*close=new BButton(BRect(101,360,190,380),"name",T_GEN_CLOSE,msg2);
-	box->AddChild(close);
-	
-	this->AddToSubset(vst_win);
-	
-	vst_win->RedirectMessages(SetVST,(void*)this);
-	vst_win->MoveTo(BAlert::AlertPosition(vst_win->Frame().Width(),vst_win->Frame().Height()));
-	
-	}
-	
-	BMessage* msg=new BMessage(112);
-	msg->AddPointer("list",list);
-	msg->AddPointer("line",selected->line);
-	msg->AddPointer("bus",selected->bus);
-	msg->AddInt16("id",i);
-	ok->SetMessage(msg);
-	
-	msg=new BMessage(112);
-	msg->AddPointer("list",list);
-	msg->AddPointer("line",selected->line);
-	msg->AddPointer("bus",selected->bus);
-	msg->AddInt16("id",i);
-	list->SetInvocationMessage(msg);
-	
-	vst_win->Show();*/
 }
 
-bool
-SetVST(BMessage *msg,void *ck)
-{
-	MixerWindow*	mix=(MixerWindow*)ck;
-	BListView*		list;
-	OutputLine*		line;
-	PBus*			bus;
-	BStringItem*	sel;
-	PEffector *efx;
-	int k,i;
-	
-	
-			
-	switch(msg->what){
-	case 113:
-		msg->FindPointer("list",(void**)&list);
-		list->Window()->Hide();
-	break;
-	case 112:
-		debugger("add vst");
-		msg->FindPointer("list",(void**)&list);
-		msg->FindPointer("line",(void**)&line);
-		msg->FindPointer("bus",(void**)&bus);
-		efx=bus->Effector();
-		if(!efx) return false;
-		
-		k=msg->FindInt16("id");
-		i=list->CurrentSelection();
-		
-		if(i >= 0) {
-			sel=(BStringItem*)list->ItemAt(i);
-		
-			if(mix->Lock()){
-					
-					/*VSTItem	*temp_plug = efx->vst[k];
-				
-					XHost::Get()->SendMessage(X_LockSem,0);
-						line->vst[k]=NULL;
-					XHost::Get()->SendMessage(X_UnLockSem,0);
-					
-					mix->DeleteVstWindow(k);
-					VstManager::Get()->DeleteVst(temp_plug);
-					*/
-					
-					//if(i!=0)					
-					//VSTItem* temp_plug=VstManager::Get()->CreateVst(i-1);
-					//else
-					//	temp_plug=NULL;
-					
-//					if(temp_plug!=NULL)	
-//						mix->CreateVstWindow(temp_plug,k);
-//					
-//					XHost::Get()->SendMessage(X_LockSem,0);
-//						efx->AddVST(temp_plug);
-//					XHost::Get()->SendMessage(X_UnLockSem,0);
-					
-				
-				mix->Refresh();
-				mix->Unlock();
-				
-			}
-			list->Window()->Hide();
-		}
-		
-		/*if(i >= 0) {
-			sel=(BStringItem*)list->ItemAt(i);
-		
-			if(mix->Lock()){
-					
-					VSTItem	*temp_plug=line->vst[k];
-				
-					XHost::Get()->SendMessage(X_LockSem,0);
-						line->vst[k]=NULL;
-					XHost::Get()->SendMessage(X_UnLockSem,0);
-					
-					mix->DeleteVstWindow(k);
-					VstManager::Get()->DeleteVst(temp_plug);
-					
-					
-					if(i!=0)					
-						temp_plug=VstManager::Get()->CreateVst(i-1);
-					else
-						temp_plug=NULL;
-					
-					if(temp_plug!=NULL)	mix->CreateVstWindow(temp_plug,k);
-					
-					XHost::Get()->SendMessage(X_LockSem,0);
-							line->vst[k]=temp_plug;
-					XHost::Get()->SendMessage(X_UnLockSem,0);
-					
-				// opening the window
-				mix->Refresh();
-				mix->Unlock();
-				
-			}
-			list->Window()->Hide();
-		}*/
-		
-	break;
-	default:
-	return true;
-	}
-	return true;
-}
-
-void
-MixerWindow::CreateVstWindow(VSTItem* vst, uint8 line)
-{
-	if(vst == NULL) 
-		return;
-		
-	BString reg("Line ");
-	reg << line << " - " << vst->EffectName();
-	
-	PlugWindow	*nw = new PlugWindow(vst);
-	nw->SetTitle(reg.String());
-	nw->MoveTo(BAlert::AlertPosition(nw->Frame().Width(),nw->Frame().Height()));
-	nw->Show();
-		
-	WindowManager::Get()->RegisterMe(nw, reg.String());	
-}
-
-void
-MixerWindow::DeleteVstWindow(int pos)
-{
-	//if(selected==NULL) 
-	//	return;
-	
-	PlugWindow*	nw = NULL; //selected->plugwin[pos];
-	
-	if(nw == NULL) 
-		return;
-	
-	//selected->plugwin[pos] = NULL;
-	
-	WindowManager::Get()->UnregisterMe(nw);
-	
-	if(nw->Lock())
-	{
-		nw->Quit();
-	}
-	
-
-	
-}
-void
-MixerWindow::LoadVST(int k,OutputLine* line,int i)
-{
-	//TODO using new PMixer and VST
-	
-	/*					
-	VSTItem	*temp_plug=line->vst[k];
-				
-	XHost::Get()->SendMessage(X_LockSem,0);
-			line->vst[k]=NULL;
-	XHost::Get()->SendMessage(X_UnLockSem,0);
-					
-	DeleteVstWindow(k);
-	VstManager::Get()->DeleteVst(temp_plug);
-					
-					
-		if(i!=0)					
-			temp_plug=VstManager::Get()->CreateVst(i-1);
-				else
-			temp_plug=NULL;
-				
-			if(temp_plug!=NULL)	CreateVstWindow(temp_plug,k);
-					
-		XHost::Get()->SendMessage(X_LockSem,0);
-				line->vst[k]=temp_plug;
-		XHost::Get()->SendMessage(X_UnLockSem,0);
-	*/			
-		
-				
-}
-
-void
-MixerWindow::Reset()
-{
-	if(Lock()){
-	for(int i=0;i<5;i++)
-	{
-		
-		if(i==0){
-			
-//			obs_volumes->SetValue(80,T_MIXER_MASTER);
-			//ui_list[i].slider->SendValue(0,80);
-			//ValuableManager::Get()->UpdateValue("mixer.main", 80.0f);
-			
-			
-		}
-		else
-			{
-			//ui_list[i].line->setVolume(0.8);
-			//ui_list[i].line->setPan(0.0);
-			_postValue(i);
-			
-			
-			}
-	
-		//Select(i);
-		
-		for(int j=0;j<8;j++)
-		{
-			//LoadVST(j,ui_list[i].line,0);
-		}
-		
-	}
-	//Select(0);
-	Unlock();
-	}
-}
 void
 MixerWindow::SaveSettings(BMessage*	data)
-{/*
+{
+	debugger("TBD");
+	/*
 	data->AddInt16("version",1);
 	data->AddInt16("outputlines",5);
 	
@@ -531,6 +108,7 @@ MixerWindow::SaveSettings(BMessage*	data)
 void
 MixerWindow::LoadSettings(BMessage*	data)
 {
+	LogError("MixerWindow::LoadSettings not implemented");
 /*
 	// clear up vst stack!
 	Reset();
@@ -648,23 +226,10 @@ MixerWindow::LoadSettings(BMessage*	data)
 	}
 */
 }
-//int
-//MixerWindow::FindVST(const char* name)
-//{
-//	for(int j=0;j<VstManager::Get()->getList()->CountItems();j++)
-//	{
-//			PlugInEntry *ple=(PlugInEntry*)(VstManager::Get()->getList()->ItemAt(j));
-//			if(strcmp(name,ple->name.String())==0) return j;
-//	}
-//	return -1;
-//}
 
-
-
-void
-MixerWindow::_postValue(int line)
+bool
+MixerWindow::QuitRequested()
 {
-	BMessage *msg=new BMessage('intm');
-	msg->AddInt16("id",line);
-	PostMessage(msg);
+	WindowManager::Get()->Switch(this);
+	return false;
 }
