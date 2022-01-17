@@ -50,7 +50,7 @@ VstManager::GetEffectVst(BList* outList){
 	for(int32 i=0;i<fVstList->CountPlugins();i++) {
 		VSTPlugin* plug = fVstList->GetPluginAt(i);
 		if (!plug->IsSynth()) {
-			LogDebug("Adding VST Effecr to the list [%s]", plug->EffectName());
+			LogDebug("Adding VST Effect to the list [%s]", plug->EffectName());
 			outList->AddItem(plug);
 		}
 	}
