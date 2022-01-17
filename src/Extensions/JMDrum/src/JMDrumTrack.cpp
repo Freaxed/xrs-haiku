@@ -114,8 +114,8 @@ JMDrumTrack::ProcessVoice(XRSVoice voice,float ** buffer ,int32 samples_num)
 		if(drum->AmpEnvStage)
 		{
 			sl=(drum->GetSample()/32767.0);
-			buffer[0][i] = sl*Right() * n->Right();
-	 		buffer[1][i] = sl*Left()  * n->Left();
+			buffer[0][i] = sl*Left()   * n->Left();
+	 		buffer[1][i] = sl*Right()  * n->Right();
 		}
 		else
 		 goto uscita;

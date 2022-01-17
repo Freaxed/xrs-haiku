@@ -9,6 +9,12 @@
 #include <SupportDefs.h>
 #include "Log.h"
 
+// In a vanilla non-WAVE_FORMAT_EXTENSIBLE file the 1st channel 
+// is defined to be mapped to the left speaker, the 2nd channel 
+// to the right speaker
+
+// https://wavefilegem.com/how_wave_files_work.html
+
 #define SV_LEFT		0
 #define SV_RIGHT	1
 
@@ -25,8 +31,8 @@ public:
 
 	float getVolumeChannel(int8 ch) { return fVolumes[ch]; }
 	
-	float Left () { return fVolumes[SV_LEFT];  } 
-	float Right() { return fVolumes[SV_RIGHT]; } 
+	float Left () { return getVolumeChannel(SV_LEFT);  } 
+	float Right() { return getVolumeChannel(SV_RIGHT); } 
 
 private:
 
@@ -40,7 +46,7 @@ private:
 		if(fPan < 0) 
 			fVolumes[1] *= (1.0f + fPan);
 		
-		LogTrace("[StereoVolumes] fVolumes[%f,%f] fGain[%f] fPan[%f]", fVolumes[0], fVolumes[1], fGain, fPan);
+		LogTrace("[StereoVolumes] fVolumes(L,R)[%f,%f] fGain[%f] fPan[%f]", Left(), Right(), fGain, fPan);
 	}
 
 	float 	fVolumes[2];

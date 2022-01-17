@@ -132,8 +132,8 @@ VIWTrack::Process(float** buffer,int32 samples_num,int spiaz,float factor)
 		
 	for (int L=0; L< samples_num; L++) {
 			
-		buffer[0][spiaz+L]+=stream_s[0][L]*Right()*factor;
-		buffer[1][spiaz+L]+=stream_s[1][L]*Left()*factor;
+		buffer[0][spiaz+L]+=stream_s[0][L]*Left() *factor;
+		buffer[1][spiaz+L]+=stream_s[1][L]*Right()*factor;
 	
 	}
 }
