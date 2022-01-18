@@ -9,14 +9,21 @@
 
 #include "PEffector.h"
 #include "VSTItem.h"
+#include <List.h>
+#include "VstManager.h"
 
-PEffector::~PEffector(){ 
-};
 
 PEffector::PEffector():PNode(){
 	next = NULL; 
 	for(uint8 i=0; i<MAX_EFFECT; i++)
 		fVstStack[i] = NULL;
+
+	fFxList = VstManager::Get()->EffectVst();
+};
+
+PEffector::~PEffector()
+{
+	fFxList = NULL;
 };
 
 int		

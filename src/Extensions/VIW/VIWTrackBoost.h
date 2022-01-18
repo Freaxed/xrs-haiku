@@ -1,6 +1,5 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,7 +19,8 @@ class VIWTrackBoost : public TrackBoost
 {
 	public:
 			 VIWTrackBoost();
-			~VIWTrackBoost(){ delete list;}
+			~VIWTrackBoost(){};
+			
 	Track*		getTrack();
 	PlugPanel*	getPanel();
 	
@@ -31,6 +31,6 @@ class VIWTrackBoost : public TrackBoost
 	private:
 			VIWPanel*	panel;
 			int			FindVSTi(const char* leaf);
-			BList*		list;
+			const BList*		list;
 };
 #endif

@@ -23,7 +23,7 @@ class 	BPictureButton;
 class VIWPanel: public PlugPanel
 {
 	public:
-				VIWPanel(BList*);
+				VIWPanel(const BList*);
 	void 	Reset(Track* tr);
 	void	AttachedToWindow();
 	void	MessageReceived(BMessage *msg);
@@ -33,7 +33,7 @@ class VIWPanel: public PlugPanel
 		VIWTrack*	myTrack;
 		BMenu*	menu;
 		BMenuField*	field;
-		BList	*vst_list;
+		const BList	*vst_list;
 		BPictureButton*	brez;
 		BRect	but;
 		BBox *sampler;

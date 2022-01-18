@@ -37,8 +37,7 @@
 
 VIWTrackBoost::VIWTrackBoost():TrackBoost()
 {
-	list = new BList(5);
-	VstManager::Get()->GetInstrumentVst(list);
+	list = 	VstManager::Get()->InstrumentVst();
 		
 	name << T_VIW_NAME;
 	id = MY_ID;

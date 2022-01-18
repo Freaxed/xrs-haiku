@@ -32,6 +32,8 @@ VstManager::Get()
 VstManager::VstManager() 
 {
 	fVstList = new VSTList();
+	GetInstrumentVst(&fInstList);
+	GetEffectVst(&fFxList);
 }
 
 void	

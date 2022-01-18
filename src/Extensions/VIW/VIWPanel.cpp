@@ -21,7 +21,7 @@
 #define	REMOVE_VSTI	'revs'
 #define	SHOW_VSTI_WINDOW	'sviw'
 
-VIWPanel::VIWPanel(BList* vst):PlugPanel(){
+VIWPanel::VIWPanel(const BList* vst):PlugPanel(){
 
 	myTrack=NULL;
 	sampler= new BBox(BRect(8,18,172,50) ,"toolbar", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,

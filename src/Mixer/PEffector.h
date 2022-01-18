@@ -18,6 +18,7 @@
 #define	MAX_EFFECT	5
 
 class VSTItem;
+class BList;
 
 class PEffector: public PNode {
 
@@ -31,8 +32,11 @@ class PEffector: public PNode {
 			size_t	Process(float** data,size_t frames);
 
 			VSTItem*	VSTAt(uint8 i){ assert(i<MAX_EFFECT); return fVstStack[i]; }											 
+
 	
 	private:
 			VSTItem*				fVstStack[MAX_EFFECT];
+			const BList*					fFxList;
+			
 };
 #endif

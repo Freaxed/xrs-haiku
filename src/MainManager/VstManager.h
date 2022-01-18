@@ -35,14 +35,19 @@ class VstManager
 		void		FillPresetsMenu(VSTItem* plug,BMenu*,uint32 msg);
 		void		setPresetsPath(VSTItem* plug);
 		
-		void	GetInstrumentVst(BList*);
-		void	GetEffectVst(BList*);
+		const BList*		InstrumentVst() { return &fInstList; }
+		const BList*		EffectVst()     { return &fFxList;   }
 		
 			
 	private:
-	
+		
+		void		GetInstrumentVst(BList*);
+		void		GetEffectVst(BList*);
+		
 					VstManager();
 		VSTList*	fVstList;
+		BList		fFxList;
+		BList		fInstList;
 };
 
 #endif
