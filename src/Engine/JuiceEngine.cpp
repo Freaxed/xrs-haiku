@@ -307,24 +307,15 @@ JuiceEngine::UpdateMeters()
 	// and we should also do it with the right delay time.. (FIX)
 	for (uint8 i=0;i<MIXERLINES_COUNT;i++) 
 	{		
-		float meter_l = 0.0f;
-		float meter_r = 0.0f;
+		float maxs[2] = { 0.0f, 0.0f };
 					
 		if (PMixer::Get()->BusAt(i)->Used())
 		{
-			meter_l = PMixer::Get()->BusAt(i)->GetLastMaxValue(0);
-			meter_r = PMixer::Get()->BusAt(i)->GetLastMaxValue(1);
+			maxs[0] = PMixer::Get()->BusAt(i)->GetLastMaxValue(0);
+			maxs[1] = PMixer::Get()->BusAt(i)->GetLastMaxValue(1);
 		}
 		
-		if (meter_l != fPeakLeft[i] ||
-			meter_r != fPeakRight[i] ) 
-		{
-				ValuableManager::Get()->UpdateValue(VID_MIXER_LIN_MET(i), meter_r, meter_l);
-				
-				fPeakLeft[i]  = meter_l;
-				fPeakRight[i] = meter_r;
-		}
-		
+		ValuableManager::Get()->UpdateValue(VID_MIXER_LIN_MET(i), maxs[0], maxs[1]);
 	}	
 }
 
