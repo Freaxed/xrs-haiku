@@ -59,7 +59,6 @@ Application XRS :
 	DrawCentredText.cpp
 	SJFilter.cpp
 	DrawingTidbits.cpp
-	VUView.cpp
 	PeakView.cpp
 	VertPeakView.cpp
 	BasicModelManager.cpp

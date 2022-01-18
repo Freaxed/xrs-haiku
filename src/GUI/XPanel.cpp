@@ -21,7 +21,6 @@
 #include "WindowManager.h"
 #include "CommonValuableID.h"
 #include "ValuablePeakView.h"
-#include "VUView.h"
 
 #include <Application.h>
 
