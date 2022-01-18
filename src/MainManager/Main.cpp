@@ -15,18 +15,23 @@ void CheckLogLevel(char level) {
 	switch(level){
 		case 'o':
 			Logger::SetLevel(LOG_LEVEL_OFF);
+			printf("Log level set to OFF\n");
 		break;
 		case 'e':
 			Logger::SetLevel(LOG_LEVEL_ERROR);
+			printf("Log level set to ERROR\n");
 		break;
 		case 'i':
 			Logger::SetLevel(LOG_LEVEL_INFO);
+			printf("Log level set to INFO\n");
 		break;
 		case 'd':
 			Logger::SetLevel(LOG_LEVEL_DEBUG);
+			printf("Log level set to DEBUG\n");
 		break;
 		case 't':
 			Logger::SetLevel(LOG_LEVEL_TRACE);
+			printf("Log level set to TRACE\n");
 		break;
 		default:
 			LogFatal("Invalid log level, valid levels are: o, e, i, d, t");
@@ -42,7 +47,7 @@ main(int argc, const char** argv)
 	if (argc > 1) 
 		CheckLogLevel(argv[1][0]);
 	else
-		Logger::SetLevel(LOG_LEVEL_TRACE);
+		CheckLogLevel('i'); //INFO
 
 	XUtils::CheckMimeType(NULL);
 	

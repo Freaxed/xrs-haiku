@@ -205,7 +205,7 @@ ValuableManager::Dump() {
 			BMessage* msg = iter->second->mLastMessage;
 			ValuableID	id = iter->first;
 			LogDebug("> ValuableID [%s] : ", id.String());
-			msg->PrintToStream();
+			if (Logger::IsDebugEnabled()) msg->PrintToStream();
 			for (int i=0; i<vlist.CountItems(); i++)
 			{
 				BHandler* view = (BHandler*)vlist.ItemAt(i);

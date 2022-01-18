@@ -66,7 +66,7 @@ TheApp::~TheApp()
 		 
 		//fVManager->Dump();
 		 
-		 if(fValuableMonitor->Lock()) {
+		 if(fValuableMonitor && fValuableMonitor->Lock()) {
 		 	fValuableMonitor->Quit();
 		 }
 		 	
@@ -215,18 +215,14 @@ TheApp::PrepareToRun()
 	main_window->AddToSubset(mw);
 	main_window->Show();
 	
-	fValuableMonitor = new ValuableMonitorWindow();
-	fValuableMonitor->Show();
+	fValuableMonitor = NULL;
+	if (Logger::IsDebugEnabled()) {
+		fValuableMonitor = new ValuableMonitorWindow();
+		fValuableMonitor->Show();
+		fVManager->AttachMonitorValuableManager(fValuableMonitor);
+	}
 	
-	fVManager->AttachMonitorValuableManager(fValuableMonitor);
-//	obs_volumes->setTarget("master",(Pannable*)my_mixer->getLine(0));
-//	obs_volumes->Run();
 
-	
-	
-		
-	
-	
 	
 	DefaultSong(false);
 	
