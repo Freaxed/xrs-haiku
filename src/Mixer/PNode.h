@@ -35,8 +35,7 @@ class PNode {
 		};
 
 
-					 PNode(){ next=NULL; };
-			//virtual ~PNode() = 0;
+					 PNode(){ next=NULL; SetUsed(false); };
 			
 			virtual	int		PMessage(PNode::pnode_message msg,int val) {
 							if(next) 
@@ -53,8 +52,14 @@ class PNode {
 								return 0;
 			}
 			
+			void	SetUsed(bool u){ m_used = u; }
+			bool	Used(){ return m_used; }
+					
 			
 			PNode*	next;
+	
+	protected:
+		bool	  m_used;
 			
 		
 };

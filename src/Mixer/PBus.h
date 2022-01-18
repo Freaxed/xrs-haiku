@@ -30,19 +30,17 @@ class PBus: public PMixable  {
 
 
 			virtual	void	Process(PBus* caller,size_t frames);	//FIX change name!
-										
-					void	SetUsed(bool u){ m_used = u; }
-					bool	Used(){ return m_used; }
+					
+
 					
 					void	AddRouted(PBus* routed){ fRouted.Add(routed); }
-					//void	RemoveRouted(PBus* routed){ fRouted.Remove(routed); }
 					
 					PEffector*	Effector(){ return &fEffector; }
 	private:
 			
 			PEffector fEffector;
 			float	  panned[2];
-			bool	  m_used;
+			
 			
 			
 			VectorNew<PBus*>	fRouted;

@@ -13,9 +13,9 @@
 #define _PEffector_H_
 
 #include "PNode.h"
-#include "Vector.h"
+#include "assert.h"
 
-#define	MAX_EFFECT	8
+#define	MAX_EFFECT	5
 
 class VSTItem;
 
@@ -27,13 +27,12 @@ class PEffector: public PNode {
 			virtual ~PEffector();
 			
 			int		PMessage(PNode::pnode_message,int);
+
 			size_t	Process(float** data,size_t frames);
-			
-			void		AddVST(VSTItem *item){ fVstList.Add(item); }
-			VSTItem*	VSTAt(int i){ return fVstList[i]; }											 
-			uint32		CountEffects(){ return fVstList.Count(); }
+
+			VSTItem*	VSTAt(uint8 i){ assert(i<MAX_EFFECT); return fVstStack[i]; }											 
 	
 	private:
-			Vector<VSTItem*>	fVstList;
+			VSTItem*				fVstStack[MAX_EFFECT];
 };
 #endif

@@ -9,6 +9,7 @@
 
 #include "PMixable.h"
 #include <memory.h>
+#include <assert.h>
 
 PMixable::PMixable()
 {
@@ -39,10 +40,9 @@ PMixable::MixBuffer(float**from, size_t frames, int32 spiaz)
 	float min[2]={0.0,0.0};
 	float max[2]={0.0,0.0};
 	for(size_t i =0 ; i<frames ; i++) {
-		for(int8 c=0; c<NUM_CHANNELS;c++)
+		for(uint8 c=0; c<NUM_CHANNELS;c++)
 		{
 			stream[c][i + spiaz] += from[c][i] * getVolumeChannel(c);
-			
 			
 			if (min[c] > stream[c][i + spiaz])
 				min[c] = stream[c][i + spiaz];
@@ -50,8 +50,10 @@ PMixable::MixBuffer(float**from, size_t frames, int32 spiaz)
 				max[c] = stream[c][i + spiaz];
 		}
 	}
-	for(int8 c=0; c<NUM_CHANNELS;c++){
-			if (-max[c] > (min[c] + 1))
+
+	for(uint8 c=0; c<NUM_CHANNELS;c++)
+	{
+		if (-max[c] > (min[c] + 1))
 			max[c] = -min[c];
 		
 		fMaxValue[c]=max[c];
@@ -75,8 +77,8 @@ PMixable::MixBuffer(float**from, size_t frames, int32 spiaz)
 float	
 PMixable::GetLastMaxValue(int channel) 
 { 
-	//FIX channel>=0
-	return channel < NUM_CHANNELS ? fMaxValue[channel] : 0.0 ;
+	assert(channel < NUM_CHANNELS);
+	return fMaxValue[channel];
 }
 
 /*

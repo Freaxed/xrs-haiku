@@ -13,32 +13,36 @@
 PEffector::~PEffector(){ 
 };
 
-PEffector::PEffector():PNode(){ 
-	next=NULL; 
+PEffector::PEffector():PNode(){
+	next = NULL; 
+	for(uint8 i=0; i<MAX_EFFECT; i++)
+		fVstStack[i] = NULL;
 };
 
 int		
-PEffector::PMessage(PNode::pnode_message msg,int val){ 
+PEffector::PMessage(PNode::pnode_message msg,int val) { 
 	
 	if(msg == P_TEMPO) {
-	//for(int j=0;j<MAX_EFFECT;j++)
-	//	if(vst[j]!=NULL)
-	//		vst[j]->setBPM(val);
-	for(int i=0;i<fVstList.Count();i++)
-		fVstList[i]->setBPM(val);
-		
-		//debugger("FIX");
+		for(uint8 i=0; i<MAX_EFFECT; i++)
+			if (fVstStack[i])
+				fVstStack[i]->setBPM(val);
 	}
 	
 	return PNode::PMessage(msg,val);
 }
 
 size_t	
-PEffector::Process(float** data,size_t frames){ 
+PEffector::Process(float** data,size_t frames) { 
 	
-	for(int i=0;i<fVstList.Count();i++)
-		fVstList[i]->FilterFloat(data, data, frames, NULL);
-			
+	SetUsed(false);
+	for(uint8 i=0; i<MAX_EFFECT; i++) {
+		if (fVstStack[i] &&
+			fVstStack[i]->IsActive()) {
+			fVstStack[i]->FilterFloat(data, data, (int32)frames, NULL);
+			SetUsed(true);
+		}
+	}
+
 	return frames;
 }
 

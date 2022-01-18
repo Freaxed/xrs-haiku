@@ -1,6 +1,5 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,18 +26,12 @@ PBus::Process(PBus* caller,size_t frames)
 			SetUsed(true);
 	}
 	
-	if (fEffector.CountEffects() > 0)
-	{
-		//ClearBuffer(); if(used) dont have to clean but if not used already clean!
-		fEffector.Process(stream,frames);
-		SetUsed(true);			
-	}
+	fEffector.Process(stream,frames);
+	if(fEffector.Used()) SetUsed(true);			
 	
 	if (caller && Used())
 	{
-	 // printf("Caller section called!");
-	  caller->MixBuffer(stream,frames,0);
-	  //caller->SetUsed(true);
+	  caller->MixBuffer(stream, frames, 0);
 	}
 }
 
