@@ -32,6 +32,9 @@ class XHost{
 		void*		SendMessage(int msg, void* param, void* extra=NULL);
 		void		AllowLock(bool b){ lock=b; }
 		
+		void		LockEngine();
+		void		UnlockEngine();
+		
 	private:
 				XHost();
 		bool	lock;		 	

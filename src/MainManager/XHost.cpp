@@ -29,6 +29,18 @@ XHost::XHost()
 	lock = true;
 }
 
+void		
+XHost::LockEngine() 
+{
+	JuiceEngine::Get()->Lock();
+}
+
+void		
+XHost::UnlockEngine()
+{
+	JuiceEngine::Get()->Unlock();
+}
+		
 void*
 XHost::SendMessage(int msg,void* param, void* extra)
 {
