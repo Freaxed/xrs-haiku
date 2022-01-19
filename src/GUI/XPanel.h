@@ -12,7 +12,6 @@
 
 
 #include "GlobalDef.h"
-#include "VUView.h"
 
 #include <PopUpMenu.h>
 #include <View.h>
@@ -45,7 +44,6 @@ class XPanel : public BView
 	private:
 	
 		void	SelectTrack(int);
-		VUView* One;
 		PeakView* Two;
 	
 		XDigit				*curpat;
