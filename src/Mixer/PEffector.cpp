@@ -11,6 +11,7 @@
 #include "VSTItem.h"
 #include <List.h>
 #include "VstManager.h"
+#include "XHost.h"
 
 
 PEffector::PEffector():PNode(){
@@ -39,7 +40,7 @@ PEffector::PMessage(PNode::pnode_message msg,int val) {
 }
 
 size_t	
-PEffector::Process(float** data,size_t frames) { 
+PEffector::Process(float** data,size_t frames) {
 	
 	SetUsed(false);
 	for(uint8 i=0; i<MAX_EFFECT; i++) {
@@ -53,6 +54,37 @@ PEffector::Process(float** data,size_t frames) {
 	return frames;
 }
 
+VSTItem*	
+PEffector::CreateVstAtPosition(VSTPlugin* templ, uint8 pos)
+{
+	assert(pos < MAX_EFFECT);
+	
+	VSTItem* newPlugin = NULL;
+	
+	if (templ != NULL)
+		newPlugin =	VstManager::Get()->CreateVst( templ );
+	
+
+	VSTItem* toBeRemoved = _LockedSwap(newPlugin, pos);
+	
+	if (toBeRemoved != NULL)
+		VstManager::Get()->DeleteVst( toBeRemoved );
+
+	return newPlugin;
+}
+
+VSTItem*				
+PEffector::_LockedSwap(VSTItem* newPlugin, uint8 pos)
+{
+	XHost::Get()->LockEngine();
+	
+	VSTItem* toBeRemoved = fVstStack[pos];
+	fVstStack[pos] = newPlugin;
+	
+	XHost::Get()->UnlockEngine();
+	
+	return toBeRemoved;
+}
 
 
 //--

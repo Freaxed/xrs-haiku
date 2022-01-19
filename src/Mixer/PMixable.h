@@ -46,7 +46,6 @@ class PMixable: public PNode , public StereoVolumes {
 			float			lastop[NUM_CHANNELS];
 	private:
 	
-			BString		fName;
 			ValuableID	vID;
 			float		fMaxValue[NUM_CHANNELS];
 			

@@ -8,6 +8,7 @@
 #include "WindowManager.h"
 #include "CommonValuableID.h"
 #include "Log.h"
+#include "PMixer.h"
 
 MixerWindow*	
 MixerWindow::Get()
@@ -28,18 +29,13 @@ MixerWindow::MixerWindow(void)
 	SetLayout(group);
 	group->SetSpacing(5.0f);
 	
-	for (uint8 i=0; i<MIXERLINES_COUNT; i++) {
-		BString name("Line ");
-		name << i;
-		if (i == 0) 
-			name = "Master";
-			
-		group->AddView(new MixerLine(name.String(), VID_MIXER_LIN_VOL(i), VID_MIXER_LIN_PAN(i), VID_MIXER_LIN_MET(i)));
+	for (uint8 i=0; i<PMixer::Get()->CountBusses(); i++) {
+		PBus* bus = PMixer::Get()->BusAt(i);
+		group->AddView(new MixerLine(bus, VID_MIXER_LIN_VOL(i), VID_MIXER_LIN_PAN(i), VID_MIXER_LIN_MET(i)));
 	}
 	BSize size(group->BasePreferredSize());
 	ResizeTo(size.Width(), size.Height());
 	
-	//windowmanager
 	WindowManager::Get()->RegisterMe(this,"Mixer");
 }
 

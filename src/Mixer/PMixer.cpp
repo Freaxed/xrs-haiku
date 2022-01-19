@@ -22,17 +22,16 @@ PMixer::Get()
 
 
 PMixer::PMixer(){ 
+	
+	BusAt(0)->SetName("Line 0 (Master)");
+	
 	for(int i=1; i<MIXERLINES_COUNT; i++){
+		BString name("Line ");
+		name << i;
+		busses[i].SetName(name.String());
 		BusAt(0)->AddRouted(&busses[i]);	
 	}	
 	BusAt(0)->ClearBuffer();
-	
-	//Lets try to add by code a VST 
-	// 26 = Delay
-//	BusAt(1)->Effector()->AddVST(VstManager::Get()->CreateVst(26)); // Delay
-//	BusAt(2)->Effector()->AddVST(VstManager::Get()->CreateVst(10)); // RoundPan
-//	BusAt(3)->Effector()->AddVST(VstManager::Get()->CreateVst(6)); // SubSynth
-//	BusAt(4)->Effector()->AddVST(VstManager::Get()->CreateVst(29)); // OverDrive
 	
 }
 

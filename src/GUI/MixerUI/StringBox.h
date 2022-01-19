@@ -31,8 +31,6 @@ class StringBox : public BMenuField
 				
 				if (item->Message()) {
 					BMessage copy(*item->Message());
-					copy.PrintToStream();
-					printf(" %p\n", item->Target());
 					copy.AddMessage("extra", &fExtraInfo);
 					copy.AddPointer("box", this);
 					Looper()->PostMessage(&copy, item->Target());

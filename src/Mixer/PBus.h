@@ -36,13 +36,13 @@ class PBus: public PMixable  {
 					void	AddRouted(PBus* routed){ fRouted.Add(routed); }
 					
 					PEffector*	Effector(){ return &fEffector; }
+					
+					void	    SetName(const char* name) { fName = name; }
+					const char*	Name() { return fName.String(); }
 	private:
 			
-			PEffector fEffector;
-			float	  panned[2];
-			
-			
-			
+			PEffector 			fEffector;
 			VectorNew<PBus*>	fRouted;
+			BString				fName;
 };
 #endif

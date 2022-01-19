@@ -16,9 +16,9 @@
 #include "ValuablePeakView.h"
 #include "StringBox.h"
 #include "Xed_Utils.h"
+#include "PBus.h"
+#include "VSTHost.h"
 
-#define T_VIW_NAME			"VSTi Wrap"
-#define T_VIW_CANT_FIND		"Can't find VSTi :"
 #define T_VIW_NOVST			"<none>"
 
 #define	SET_VSTI	'stvs'
@@ -26,13 +26,13 @@
 #define	SHOW_VSTI_WINDOW	'sviw'
 
 
-MixerLine::MixerLine(const char* name, ValuableID volume, ValuableID pan, ValuableID meter) : BBox(name)
+MixerLine::MixerLine(PBus* bus, ValuableID volume, ValuableID pan, ValuableID meter) : BBox(bus->Name()), fBus(bus)
 {
 	BGroupLayout* hGroup = BLayoutBuilder::Group<>(B_HORIZONTAL);
 	
 	BGroupLayout* group = BLayoutBuilder::Group<>(B_VERTICAL);
 	group->SetSpacing(10.0f);
-	group->AddView(new BStringView("_line_name_", name))
+	group->AddView(new BStringView("_line_name_", bus->Name()))
 		 ->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
 		 
 	BGroupLayout* g1 = BLayoutBuilder::Group<>(B_HORIZONTAL);
@@ -43,7 +43,15 @@ MixerLine::MixerLine(const char* name, ValuableID volume, ValuableID pan, Valuab
 	group->AddItem(g1);
 	
 	fVSTMenu = new BMenu("Effects");
-	fVSTMenu->AddItem(new BMenuItem("mdaJX10", new BMessage(SET_VSTI)));
+	const BList*	vstList = fBus->Effector()->GetEffectsList();
+	for (uint8 i=0;i<vstList->CountItems();i++) {
+		BMessage* info = new BMessage(SET_VSTI);
+		info->AddInt16("vst:id", (int16)i);
+		VSTPlugin* plug = (VSTPlugin*)vstList->ItemAt(i);
+		fVSTMenu->AddItem(new BMenuItem(plug->EffectName(), info));
+	}
+	
+	
 
 	fPopUp = new BPopUpMenu("");
 	fPopUp->AddItem(fVSTMenu);
@@ -53,11 +61,11 @@ MixerLine::MixerLine(const char* name, ValuableID volume, ValuableID pan, Valuab
 	
 	//VST
 	BMessage extraInfo;
-	extraInfo.AddInt32("vst:position", -1);
+	extraInfo.AddInt8("vst:position", -1);
 	
 	for(uint8 i=0;i<MAX_VST;i++)
 	{
-		extraInfo.ReplaceInt32("vst:position", i);
+		extraInfo.ReplaceInt8("vst:position", i);
 		group->AddView(new StringBox("", fPopUp, &extraInfo));
 	}
 	
@@ -68,6 +76,10 @@ MixerLine::MixerLine(const char* name, ValuableID volume, ValuableID pan, Valuab
 	
 	hGroup->AddItem(group);
 	AddChild(hGroup->View());
+	
+	for (uint i=0;i<MAX_VST;i++) {
+		fPlugWindows[i] = NULL; 
+	}
 
 
 }
@@ -79,20 +91,68 @@ MixerLine::AttachedToWindow()
 	fVSTMenu->SetTargetForItems(this);
 }
 
+//		m_plug=new VSTInstrumentPlugin(plugin);
+//		setWin(new PlugWindow(m_plug,true));
+
+void		
+MixerLine::CreateVstWindow(VSTItem* item, uint8 position)
+{
+	assert(position < MAX_VST);
+	PlugWindow* prevWindow = fPlugWindows[position];
+	if (prevWindow && prevWindow->Lock())
+		prevWindow->Quit();
+	
+	fPlugWindows[position] = NULL;
+	
+	if (item) {
+		fPlugWindows[position] = new PlugWindow(item, true);
+		fPlugWindows[position]->Show();
+	}
+}
+
+
+void		
+MixerLine::CreateVstItem(VSTPlugin* templ, BMessage* msg)
+{
+	BMessage extra;
+	int8    position = -1;
+	if (msg->FindMessage("extra", &extra) == B_OK && 
+	    extra.FindInt8("vst:position", &position) == B_OK)
+	{
+		VSTItem* item = fBus->Effector()->CreateVstAtPosition(templ, position);
+		StringBox*	box = NULL;
+		if (msg->FindPointer("box", ((void**)&box)) == B_OK) {
+			box->UpdateLabel(templ == NULL ? NULL : templ->EffectName());
+		}
+		CreateVstWindow(item, position);
+	}	
+	else
+	{
+		LogError("Can't create VST from MixerLine: no extra info or vst:position!");
+		if (Logger::IsErrorEnabled()) {
+			msg->PrintToStream();
+		}
+	}
+}
+
 void	
 MixerLine::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
 		case REMOVE_VSTI:
+		{
+			CreateVstItem(NULL, msg);
+		}
+		break;
 		case SET_VSTI:
-			msg->PrintToStream();
 			{
-				BString truncatedLabel("very long string here to be placed");
-				StringBox*	box = NULL;
-				if (msg->FindPointer("box", ((void**)&box)) == B_OK) {
-					box->UpdateLabel(truncatedLabel.String());
-				}
+						
+				const BList*	vstList = fBus->Effector()->GetEffectsList();
+				int16 vstID = msg->FindInt16("vst:id");
+				VSTPlugin* plug = (VSTPlugin*)vstList->ItemAt(vstID);
+				
+				CreateVstItem(plug, msg);
 			}
 		break;
 		default:
