@@ -91,3 +91,8 @@ Logger::IsTraceEnabled()
 {
 	return IsLevelEnabled(LOG_LEVEL_TRACE);
 }
+bool
+Logger::IsErrorEnabled()
+{
+	return IsLevelEnabled(LOG_LEVEL_ERROR);
+}

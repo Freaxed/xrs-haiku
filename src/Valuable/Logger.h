@@ -64,6 +64,7 @@ public:
 	static	bool				IsInfoEnabled();
 	static	bool				IsDebugEnabled();
 	static	bool				IsTraceEnabled();
+	static	bool				IsErrorEnabled();
 
 private:
 	static	log_level			fLevel;
