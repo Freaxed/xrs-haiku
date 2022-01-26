@@ -71,7 +71,7 @@ SFWindow::Reset(const char *title)
 		field_chorus_type->Menu()->ItemAt(chorus_type)->SetMarked(true);
 		pot_chorus_level->SetValue(0);
 		pot_chorus_depth->SetValue(0);
-		digit_chorus_n->SetValue(0);				
+		digit_chorus_n->UpdateValue(0, true);				
 		pot_chorus_speed->SetValue(0);
 		
 		str_name->SetText(T_SFS_NO_SF2);
@@ -104,7 +104,7 @@ SFWindow::Reset(const char *title)
 		field_chorus_type->Menu()->ItemAt(chorus_type)->SetMarked(true);
 		pot_chorus_level->SetValue(ptheSynth->GetChorusLevel()*10);
 		pot_chorus_depth->SetValue(ptheSynth->GetChorusDepth()*10);
-		digit_chorus_n->SetValue(ptheSynth->GetChorusNr());				
+		digit_chorus_n->UpdateValue(ptheSynth->GetChorusNr(), true);				
 		pot_chorus_speed->SetValue(ptheSynth->GetChorusSpeed()*100.);
 	
 		Unlock();
@@ -118,10 +118,10 @@ SFWindow::Reset(const char *title)
 void
 SFWindow::info(void* data, char* name, int option)
 {
-	printf("name %s \t\t option %d\n",name,option);
-	fluid_settings_foreach_option((fluid_settings_t*)data,name,NULL,optioninfo);
-	int ret=fluid_settings_is_realtime((fluid_settings_t*)data,name);
-	printf("\t REALTIME %d\n",ret);
+//	printf("name %s \t\t option %d\n",name,option);
+//	fluid_settings_foreach_option((fluid_settings_t*)data,name,NULL,optioninfo);
+//	int ret=fluid_settings_is_realtime((fluid_settings_t*)data,name);
+//	printf("\t REALTIME %d\n",ret);
 		
 }
 void
@@ -351,7 +351,7 @@ SFWindow::InitGUI()
 	ir.right-=50; 
 	ir.bottom-=6;
 	sampler->AddChild(new BStringView(ir,"",T_SFS_NR));
-	sampler->AddChild(digit_chorus_n=new XDigit(BRect(120,5,120+36,5+21),"chorus",new BMessage('choX'),1,99));
+	sampler->AddChild(digit_chorus_n=new ADigit(BRect(120,5,120+36,5+21), new BMessage('choX'),1,99));
 	box->AddChild(sampler);
 	
 	

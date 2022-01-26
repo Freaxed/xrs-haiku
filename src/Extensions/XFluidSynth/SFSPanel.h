@@ -10,7 +10,7 @@
 
 //#include 	"fluidsynth.h"
 
-class		XDigit;
+class		ADigit;
 class		APot;
 class		SFSTrack;
 class		BPictureButton;
@@ -25,7 +25,7 @@ class SFSPanel: public PlugPanel
 		 	void	Refresh();
 		  
 	private:
-		XDigit*			ch;
+		ADigit*			ch;
 		APot*			reverb;
 		APot*			chorus;
 		SFSTrack*	myTrack;

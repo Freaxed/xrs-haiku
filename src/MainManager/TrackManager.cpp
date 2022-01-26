@@ -27,7 +27,7 @@
 #include "TNTrackBoost.h" //remove!
 #include "VIWTrackBoost.h" //remove!
 #include "JMDrumTrackBoost.h"  //remove! (why?)
-//#include "SFSTrackBoost.h"  //remove! (why?)
+#include "SFSTrackBoost.h"  //remove! (why?)
 
 #include <Application.h>
 #include <File.h>
@@ -115,7 +115,7 @@ TrackManager::LoadInternalSamplerPlugin(int i)
 		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+i));
 
 		//il XFluidSynth
-		/*tb = new SFSTrackBoost();
+		tb = new SFSTrackBoost();
 		i = 7;
 	
 		list[tb->id]=tb;
@@ -127,7 +127,7 @@ TrackManager::LoadInternalSamplerPlugin(int i)
 		if(tb->id<0 && tb->id>MAX_PLUG-1) 
 			return;
 	
-		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+ i ));*/
+		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+ i ));
 
 		
 		
