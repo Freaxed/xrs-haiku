@@ -1,13 +1,23 @@
 // license: public domain
 // authors: jonas.sundstrom@kirilla.com
 
-#include "ZipOMaticActivity.h"
+#include "Activity.h"
+
+Activity::Activity  (const char * a_name) : BBox(a_name)
+{
+	_Init();
+}
 
 Activity::Activity (BRect a_rect, const char * a_name, uint32 a_resizing_mode, uint32 a_flags)
-:	BBox 				(a_rect, a_name, a_resizing_mode, a_flags),
-	m_is_running		(false),
-	m_barberpole_bitmap	(NULL)
+:	BBox 				(a_rect, a_name, a_resizing_mode, a_flags)
 {
+	_Init();
+}
+
+void
+Activity::_Init() {
+	m_is_running = false;
+	m_barberpole_bitmap	= NULL;
 	m_pattern.data[0] = 0x0f;
 	m_pattern.data[1] = 0x1e;
 	m_pattern.data[2] = 0x3c;
@@ -18,6 +28,7 @@ Activity::Activity (BRect a_rect, const char * a_name, uint32 a_resizing_mode, u
 	m_pattern.data[7] = 0x87;
 	
 	CreateBitmap();
+	DrawIntoBitmap();
 };
 
 Activity::~Activity()
@@ -81,23 +92,13 @@ Activity::Pulse()
 void 
 Activity::Draw(BRect a_rect)
 {
+	// draw BBox outline
+	BBox::Draw(a_rect);
 	if (IsRunning())
 	{
-		// draw BBox outline
-		BBox::Draw(a_rect);
 		SetDrawingMode(B_OP_COPY);
 		DrawBitmap(m_barberpole_bitmap);
 	}
-	/*else
-	{
-		BBox::Draw(a_rect);
-		
-		float  string_width  =  StringWidth("Drop files to zip.");
-		float  view_width  =  Bounds().Width();
-
-		MovePenTo ((view_width/2)-(string_width/2),12);
-		DrawString("Drop files to zip.");
-	}*/
 }
 
 void Activity::DrawIntoBitmap (void)

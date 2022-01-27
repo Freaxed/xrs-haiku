@@ -85,8 +85,8 @@ void SFSTrack::Process(float** buffer,int32 samples_num,int spiaz,float factor)
 	
 	for (int L=0; L< samples_num; L++) {
 			
-		buffer[0][spiaz+L] += stream_l[L]*GetLeft();
-		buffer[1][spiaz+L] += stream_r[L]*GetRight();
+		buffer[0][spiaz+L] += stream_l[L]*Left();
+		buffer[1][spiaz+L] += stream_r[L]*Right();
 	
 	}
 }
@@ -100,9 +100,9 @@ SFSTrack::newVoice(Note* n,int VoiceTag){
 		ptheSynth->NoteOff(channel, curNote->getNote());
 		
 	curNote->setNote(n->getNote());
-	curNote->SetValue(n->GetValue(0));
+	curNote->SetGain(n->Gain());
 	
-	ptheSynth->NoteOn(channel, curNote->getNote(), curNote->GetValue(0));
+	ptheSynth->NoteOn(channel, curNote->getNote(), (int)(curNote->Gain() * 127.0f));
 	
 	return NULL; 
 		

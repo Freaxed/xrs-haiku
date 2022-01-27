@@ -8,9 +8,8 @@
 
 #include <Message.h>
 #include <String.h>
-//#include <ObjectList.h>
 
-#include "fluidsynth.h"
+#include <fluidlite.h>
 
 #define	BANK_PRESET	'pres'
 

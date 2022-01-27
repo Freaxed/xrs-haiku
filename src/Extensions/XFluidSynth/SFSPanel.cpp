@@ -60,7 +60,7 @@ SFSPanel::SFSPanel():PlugPanel(){
 	r.right-=50;
 	r.bottom-=6;
 	sampler->AddChild(new BStringView(r,"",T_SFS_CHANNEl));
-	sampler->AddChild(ch=new XDigit(BRect(120,5,120+36,5+21), "channel", new BMessage(SET_CHANNEL),1,16));
+	sampler->AddChild(ch=new ADigit(BRect(120,5,120+36,5+21), new BMessage(SET_CHANNEL),1,16));
 	
 	AddChild(sampler);
 	
@@ -84,7 +84,7 @@ SFSPanel::SFSPanel():PlugPanel(){
 	r.right-=50;
 	r.bottom-=6;
 	sampler->AddChild(new BStringView(r,"",T_SFS_CHORUS));
-	sampler->AddChild(chorus=new APot(BRect(156-22,26-22,156,26),"",new BMessage(SET_CHORUS),0,127,XUtils::GetBitmap(24),NULL));
+	sampler->AddChild(chorus=new APot(BRect(156-22,26-22,156,26),"", new BMessage(SET_CHORUS), NULL, 0,127,XUtils::GetBitmap(24),NULL));
 	//sampler->AddChild(chorus=new XDigit(BRect(120,5,120+36,5+21),new BMessage(SET_CHORUS),0,127));
 
 	AddChild(sampler);
@@ -108,7 +108,7 @@ SFSPanel::Reset(Track* tr){
 		if(Window()->Lock()){
 			
 			myTrack=(SFSTrack*)tr;
-			ch->SetValue(myTrack->GetChannel()+1,false);
+			ch->UpdateValue(myTrack->GetChannel()+1,false);
 			
 			if(ptheSynth->IsValid())			
 				menu->Superitem()->SetLabel(ptheSynth->GetChannelPresetName(myTrack->GetChannel()));

@@ -3,12 +3,12 @@
 #define _SFWindow_H
  
 #include <Window.h>
-#include "fluidsynth.h"
+#include <fluidlite.h>
 
 
 class APot;
 class BCheckBox;
-class XDigit;
+class ADigit;
 class BMenuField;
 class BStringView;
 
@@ -50,7 +50,7 @@ private:
 		
 		APot*	pot_gain;
 		
-		XDigit*		digit_chorus_n;
+		ADigit*		digit_chorus_n;
 		BMenuField*	field_chorus_type;
 				
 		BCheckBox	*ck_chorus;

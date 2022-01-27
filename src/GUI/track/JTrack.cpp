@@ -6,8 +6,6 @@
 #include 	"Track.h"
 #include 	"GfxMsg.h"
 #include 	"APot.h"
-#include 	"Xed_Utils.h"
-#include 	"Xed_blist.h"
 #include 	"TextControlFloater.h"
 #include 	"PianoControl.h"
 #include 	"VolView.h"
@@ -16,7 +14,7 @@
 #include	"MixerWindow.h"
 #include	"TrackManager.h"
 #include 	"ColorsDef.h"
-
+#include	"Xed_Utils.h"
 #include	<Entry.h>
 #include 	<stdio.h>
 #include 	<PictureButton.h>

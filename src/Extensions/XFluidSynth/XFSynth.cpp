@@ -3,10 +3,31 @@
 #include <Menu.h>
 #include <MenuItem.h>
 
+#include "Log.h"
+
 #define	MAXCHANNEL	16
 
 #define	SYN fSynth.synth
 #define IFS	if(fSynth.synth)
+
+void logFunc(int level, char *message, void *data)
+{
+	switch(level) {
+		case FLUID_PANIC:
+			LogFatal(message);
+		break;
+		case FLUID_ERR:
+			LogError(message);
+		break;
+		case FLUID_WARN:
+			LogInfo(message);
+		break;
+		case FLUID_DBG:
+			LogDebug(message);
+		break;
+	};
+}
+
 
 XFSynth::XFSynth(){
 
@@ -15,6 +36,11 @@ XFSynth::XFSynth(){
 		fSynth.sfont_id=-1;
 
 		settings = NULL;
+		
+		fluid_set_log_function(FLUID_PANIC, logFunc, NULL);
+		fluid_set_log_function(FLUID_ERR,   logFunc, NULL);
+		fluid_set_log_function(FLUID_WARN,  logFunc, NULL);
+		fluid_set_log_function(FLUID_DBG,   logFunc, NULL);
 }
 
 
@@ -67,11 +93,8 @@ void
 XFSynth::Init(){
 
 	settings = new_fluid_settings();
-	fluid_settings_setstr(settings, "synth.gain", "100.0");
-	fluid_settings_setstr(settings, "synth.polyphony", "128");
-	fluid_settings_setstr(settings, "synth.midi-channels", "16");
-	fluid_settings_setstr(settings, "audio.driver", "");
-	fluid_settings_setstr(settings, "synth.sample-rate", "44100");
+	fluid_settings_setnum(settings, (char*)"synth.sample-rate", 44100.0);
+	fluid_settings_setint(settings, (char*)"synth.polyphony", 256);
 }
 
 void

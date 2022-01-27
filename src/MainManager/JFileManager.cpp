@@ -404,14 +404,9 @@ JFileManager::LoadFile(entry_ref rif,Song* song)
 	if(fileversion<2) return B_ERROR;
 	if(SONG_START!=ReadFixed(&rt)) return B_ERROR;
 	
-	
-	 BAlert * al;
-	 BButton *theb;
-	 al=new BAlert("XRS ",T_DIALOG_LOADING_FILE, "...");
-	 XUtils::SetIdleAlert(al);
-	 theb=(al->ButtonAt(0));
-	 theb->Hide();
-	 al->Go(NULL);
+
+	BAlert* wait = XUtils::ShowIdleAlert(T_DIALOG_LOADING_FILE);
+
 	 
 	int track_c=0;
 	Track*	track_o;
@@ -820,10 +815,8 @@ JFileManager::LoadFile(entry_ref rif,Song* song)
 	//song->setModified(false);
 	printf("Song loaded.\n");	
 	delete file;
-	
-	 if(al->Lock())
-	   al->Quit();
 	  
+	XUtils::HideIdleAlert(wait);
 	
 	return B_OK;
 	

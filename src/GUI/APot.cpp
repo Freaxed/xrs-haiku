@@ -86,7 +86,7 @@ void
 APot::FrameResized(float newWidth, float newHeight)
 {
 	BRect b = Bounds();
-	m_PenSize = ((int32)(floor(newWidth / 10.0f)) / 2 ) * 2;
+	m_PenSize = (float)(((int32)(floor(newWidth / 10.0f)) / 2 ) * 2);
 	m_rectKnob.Set(0, 0, newWidth - 2*m_PenSize, newHeight- 2*m_PenSize);
 	m_rectKnob.OffsetBy(b.left + (b.Width() - m_rectKnob.Width())/2,b.top + (b.Height() - m_rectKnob.Height())/2);	
 	Invalidate();
@@ -295,7 +295,7 @@ void APot::MouseMoved(BPoint where, uint32 /* transit */, const BMessage* /* dra
 			DrawKnob(Bounds());
 		if (m_DisplayValue) m_DisplayValue->ShowValue(Value());
 
-		set_mouse_position((long)mouse_start.x,(long)mouse_start.y);
+		set_mouse_position((int32)mouse_start.x,(int32)mouse_start.y);
 		
 		
 	}
@@ -316,7 +316,7 @@ void APot::MouseUp(BPoint where)
 		
 		SetTracking(false);
 
-		set_mouse_position((long)mouse_start.x,(long)mouse_start.y);
+		set_mouse_position((int32)mouse_start.x,(int32)mouse_start.y);
 		be_app->ShowCursor();
 		if (m_DisplayValue) m_DisplayValue->Hide();
 		Invalidate();

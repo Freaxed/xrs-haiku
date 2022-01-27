@@ -30,8 +30,8 @@ class XUtils
 		static BPictureButton*	ToolBarButton(BRect buttonsize, int32 index, const char *tip, BMessage *msg, uint32 state, BView *view);
 		static BPictureButton*	EasyButton(BRect buttonsize, int32 index,BMessage *msg, BView *view);
 		
-		static void				SetIdleAlert(BAlert*);
-		static void				StopIdleAlert(BAlert*);
+		static BAlert*			ShowIdleAlert(const char* multilineText);
+		static void				HideIdleAlert(BAlert*);
 		static void				CreateBootBitmap(BRect* z,BBitmap** bitmap,bool mode);
 
 

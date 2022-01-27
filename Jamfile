@@ -25,7 +25,7 @@ local sourceDirs =
 	src/Extensions/VIW
 	src/Extensions/JMDrum/src
 	src/vst_host
-#	src/Extensions/XFluidSynth
+	src/Extensions/XFluidSynth
 ;
 
 local sourceDir ;
@@ -50,7 +50,7 @@ Application XRS :
 	Configurator.cpp
 	WindowManager.cpp
 	MeasureManager.cpp
-	ZipOMaticActivity.cpp
+	Activity.cpp
 	PotViewer.cpp
 	XDigit.cpp
 	ADigit.cpp
@@ -58,7 +58,6 @@ Application XRS :
 	Cursors.cpp
 	DrawCentredText.cpp
 	SJFilter.cpp
-	DrawingTidbits.cpp
 	PeakView.cpp
 	VertPeakView.cpp
 	BasicModelManager.cpp
@@ -190,11 +189,11 @@ Application XRS :
 
 	# ---  XFLUIDSYNTH ---
 	## SFSMain.cpp
-	#SFSPanel.cpp 
-	#SFSTrack.cpp
-	#SFSTrackBoost.cpp
-	#SFWindow.cpp 
-	#XFSynth.cpp 
+	SFSPanel.cpp 
+	SFSTrack.cpp
+	SFSTrackBoost.cpp
+	SFWindow.cpp 
+	XFSynth.cpp 
 	
 	#vst_host
 	VSTHost.cpp
@@ -202,6 +201,6 @@ Application XRS :
 	
 		
 	#: be translation game media midi midi2 tracker fluidsynth stdc++
-	: be localestub translation game media midi midi2 tracker stdc++
+	: be localestub translation game media midi midi2 tracker stdc++ fluidlite
 	: resources/XRS.rsrc resources/skin.rsrc  
 ;
