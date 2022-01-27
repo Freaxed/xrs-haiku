@@ -13,6 +13,8 @@ class Activity : public BBox
 	public:
 		Activity  (BRect a_rect, const char * a_name, uint32 a_resizing_mode, 
 					uint32 a_flags);
+		Activity  (const char * a_name);
+					
 		~Activity	();
 
 					void	Start		();
@@ -34,8 +36,11 @@ class Activity : public BBox
 		
 		BBitmap	*	m_barberpole_bitmap;
 		BView	*	m_barberpole_bitmap_view;
+		
+		
 
 	private:
+				void _Init();
 
 };
 

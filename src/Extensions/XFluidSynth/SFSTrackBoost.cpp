@@ -210,25 +210,17 @@ SFSTrackBoost::LoadSF(const char* filename)
 	}
 	else {
 	
-	BAlert * al;
-	BButton *theb;
-	BString text;
-	text << T_SFS_LOADING << "\n" << filename;
-	al=new BAlert("XRS",text.String(), "...");
-	XUtils::SetIdleAlert(al);
-	theb=(al->ButtonAt(0));
-	theb->Hide();
-	al->Go(NULL);
+		BAlert * al = XUtils::ShowIdleAlert(T_SFS_LOADING);
 	 
-		newsynth = theSynth.LoadFile(filename);
-				
-		if(al->Lock()) al->Quit();
+		newsynth = theSynth.LoadFile(filename);		
 		
 		XHost::Get()->SendMessage(X_LockSem,0);
 		
 		theSynth.ApplySynth(newsynth);
 		
 		XHost::Get()->SendMessage(X_UnLockSem,0);
+		
+		XUtils::HideIdleAlert(al);
 	}
 	
 	

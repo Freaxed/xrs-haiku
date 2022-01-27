@@ -8,7 +8,7 @@
  */
 
 #include "Xed_Utils.h"
-#include "ZipOMaticActivity.h"
+#include "Activity.h"
 #include "Utils.h" //libfunky
 #include "Log.h"
 
@@ -34,6 +34,7 @@
 #include <string.h>
 #include <TypeConstants.h>
 #include <Screen.h>
+#include <GroupLayout.h>
 #include "Log.h"
 
 //don't move.
@@ -467,27 +468,28 @@ XUtils::CheckMimeType(BApplication *app)
 		}
 
 }
-void
-XUtils::SetIdleAlert(BAlert *al)
+BAlert *
+XUtils::ShowIdleAlert(const char* multilineText)
 {
-	 BView *w=al->FindView("_tv_");
-	 
-	 BRect r2(w->Frame());
-	 r2.bottom = r2.top+20;
-	 r2.OffsetBy(0,w->Bounds().bottom+5);
-	 
-	 Activity *act;
-	 al->ChildAt(0)->AddChild(act=new Activity(r2,"_activity_",B_FOLLOW_NONE,B_WILL_DRAW));
-	 act->Start();
-	 al->ResizeBy(0,25);
+	BAlert * al = new BAlert("Wait", multilineText, "...");
+	
+	BGroupLayout* group = dynamic_cast<BGroupLayout*>(al->GetLayout());
+	BLayout* lay = dynamic_cast<BLayout*>(group->ItemAt(group->CountItems()-1));	
+	Activity *act = NULL;
+	lay->AddView(act = new Activity("_activity_"));
+	act->SetExplicitMinSize(BSize(10, 20));
+	
+	al->ButtonAt(0)->Hide();
+	
+	act->Start();
+	al->Go(NULL);
+	
+	return al;
 }
 void
-XUtils::StopIdleAlert(BAlert *al)
+XUtils::HideIdleAlert(BAlert *al)
 {
-	 BView *w=al->FindView("_activity_");
-	 if(!w) return;
-	 Activity *act=(Activity*)w;
-	 act->Stop();
+	if(al->Lock()) al->Quit();
 }
 
 void
