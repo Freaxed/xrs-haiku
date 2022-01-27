@@ -50,7 +50,7 @@ Application XRS :
 	Configurator.cpp
 	WindowManager.cpp
 	MeasureManager.cpp
-	ZipOMaticActivity.cpp
+	Activity.cpp
 	PotViewer.cpp
 	XDigit.cpp
 	ADigit.cpp
@@ -58,7 +58,6 @@ Application XRS :
 	Cursors.cpp
 	DrawCentredText.cpp
 	SJFilter.cpp
-	DrawingTidbits.cpp
 	PeakView.cpp
 	VertPeakView.cpp
 	BasicModelManager.cpp
