@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
+ * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -37,6 +37,8 @@ class TNTrack : public Track
 	
 	void 			Tune(int halfsteps) { tuneoffset=halfsteps; }
 	int 			getTune() { return tuneoffset;}
+	
+	TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
 
 	VCO303		vco;
 	VCF303 		vcf;

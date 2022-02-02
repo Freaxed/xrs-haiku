@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
+ * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,6 +24,11 @@
 class Pattern;
 class Note;
 
+enum TRACK_GEN_TYPE {
+	TT_FULL_PROCESS  = 0,
+	TT_VOICE_PROCESS = 1	
+};
+
 
 class Track: public StereoVolumes
 {
@@ -43,14 +48,14 @@ class Track: public StereoVolumes
 		
 		// new in Xrs1.3
 		
-		virtual	int			getProcessorType() { return 0; } //0=full process ; 1=voice process
-		virtual	XRSVoice	newVoice(Note* n,int VoiceTag){ return NULL; };		
+		virtual	TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
+		virtual	XRSVoice		newVoice(Note* n,int VoiceTag){ return NULL; };		
 		/*
 			sample_num è il numero di full_frame
 			se è 4, vuol dire che ci sono 4 frame per ogni canale.
 			restituisce il numero di full frame scritti.
 		*/
-		virtual int32		ProcessVoice(XRSVoice,float ** buffer ,int32 sample_num){ return -1; };
+		virtual uint32		ProcessVoice(XRSVoice,float ** buffer ,uint32 sample_num){ return -1; };
 		virtual	void		killVoice(XRSVoice){};
 		virtual	void		stopVoice(int num=-1){};
 		

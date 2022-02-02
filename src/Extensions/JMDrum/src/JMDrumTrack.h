@@ -18,7 +18,7 @@ class JMDrumTrack: public Track
 	virtual 	void			Reset();
 	virtual 	int32		ProcessVoice(XRSVoice,float ** buffer ,int32 sample_num); //,int spiaz);
 	virtual	void			killVoice(XRSVoice);
-	virtual 	int			getProcessorType() { return 1; } //0=full process ; 1=voice process
+	virtual 	TRACK_GEN_TYPE			getProcessorType() { return TT_VOICE_PROCESS; } //0=full process ; 1=voice process
 	
 	virtual	int			getModel();
 	virtual	void			goOn();
