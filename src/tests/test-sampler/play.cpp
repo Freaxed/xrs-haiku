@@ -12,38 +12,24 @@
 #include <Sample.h>
 #include <Path.h>
 #include <samplerate.h>
+#include "pitchtable.h"
+
 
 BSoundPlayer* 		fSoundPlayer = NULL;
 
 
 
-#define LogInfo(X...)    { printf(X); printf("\n"); }
-#define LogError(X...)   { printf(X); printf("\n"); }
-#define LogDetail(X...)  { printf(X); printf("\n"); }
 
 #define EXT_SAMPLE_TYPE 0
 
 void PlayBuffer(void* cookie, void* data, size_t size, const media_raw_audio_format& format);
 
+class Note { public:int note;  int getNote(){ return note;}; };
 
-Sample* sample = new Sample();
-
-struct Voice {
-	Voice() { position = 0; reverse = false; played = false; loop = false;}
-//private:
-	uint32 	position; //in fullframe
-	bool	played; //??
-// public:	
-
-	bool	reverse; //is this a voice property? or a sample property?
-	bool	loop;
-	uint32	get_position(uint32 fullframes)  //in fullframes
-	{		
-		return reverse ? (fullframes - 1) - position : position;
-	}
-};
-
+#include "SamplerVoice.h"
 #include "MediaFileLoader.h"
+
+
 
 status_t
 LoadFile(entry_ref *ref, Sample* samp)
@@ -64,12 +50,12 @@ LoadFile(entry_ref *ref, Sample* samp)
 	samp->name.SetTo(path.Leaf());
 	samp->path_name.SetTo(path.Path());
 	
-	samp->frames = ceil((float)sfinfo.frames * samp->freq_divisor);
-	samp->_totalbytes = samp->frames * sizeof(float) * samp->channels;	
+	samp->fullframes= ceil((float)sfinfo.frames * samp->freq_divisor);
+	samp->_totalbytes = samp->fullframes* sizeof(float) * samp->channels;	
 	samp->type = EXT_SAMPLE_TYPE;
 	
 	for (int m = 0 ; m < samp->channels ; m++) {
-		samp->wave_data[m] = new float[samp->frames];
+		samp->wave_data[m] = new float[samp->fullframes];
 	}
 		
 	if (samp->channels == 1)
@@ -95,7 +81,7 @@ LoadFile(entry_ref *ref, Sample* samp)
 }
 
 status_t
-InitPlayer(Voice* v)
+InitPlayer(SamplerVoice* v)
 {
 	int32 fSampleRate = 44100;
 	status_t err;
@@ -103,44 +89,43 @@ InitPlayer(Voice* v)
 	format.channel_count = 2;
 	format.frame_rate = fSampleRate;
 	format.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	
-
-	
+		
 	fSoundPlayer = new BSoundPlayer(&format, "SndFile test", &PlayBuffer, NULL, (void*)v);
 	err = fSoundPlayer->InitCheck();
 	if (err != B_OK) {
 		fprintf(stderr, "error in BSoundPlayer\n");
 		return err;
 	}
-
+	fSoundPlayer->SetVolume(1.0);
 	fSoundPlayer->SetHasData(true);
 	fSoundPlayer->Start();
 	return B_OK;
 }
 
-int
-GetNextDataFromVoice(Voice* v, Sample* sample, float* left, float* right)
+
+bool played = false;
+float amp = 1.0;
+
+int32	
+ProcessVoice(SamplerVoice* Voice, float* data, size_t sample_num)
 {
-	uint32 fullframes = (sample->frames);// / sample->channels);
-	if (v->played) {
-		*left = *right = 0.0f;
-		return 0;
+//	Note*	curNote		= NULL;	
+//	Sample* curSample	= Voice->sample;
+	
+	if (Voice->is_done()) { return 0; }
+	
+//	curNote = Voice->n;
+	
+	uint32 x = 0;
+	while(Voice->GetNextFrames(&data[x*2 + 0], &data[x*2 + 1]) && x < sample_num)
+	{
+		//data[x*2 + 0] *= Left() * amp * curNote->Left();
+		//data[x*2 + 1] *= Right()* amp * curNote->Right();
+		x++;
 	}
-	
-	//printf("Debug reverse: %d -> %d \n", v->position, v->reversePosition(sample->frames / sample->channels));
-	
-	*left   = sample->wave_data[0][v->get_position(fullframes)];
-	*right  = sample->wave_data[1][v->get_position(fullframes)];
-	v->position++;
-	
-	if(v->position >= fullframes) {
-		printf("played!\n");
-		v->played = !v->loop;
-		v->position = 0;
-	}
-		
-	return 0;
+	return x;
 }
+
 
 // frame: 	  a single audio value in specific time
 // fullframe: a set of audio values from all the channels in specific time
@@ -150,25 +135,19 @@ GetNextDataFromVoice(Voice* v, Sample* sample, float* left, float* right)
 void
 PlayBuffer(void* cookie, void* data, size_t size, const media_raw_audio_format& format)
 {
-	Voice* v  = (Voice*)(cookie);
-	uint32 fullframes = sample->frames;// / sample->channels;
-	uint32 length = MIN(fullframes-v->position, size/ (2*sizeof(float)));
-	
-	float* dest = (float*)data;
-	for(uint32 z=0; z<length; z++)	{
-		GetNextDataFromVoice(v, sample, &dest[z*2 + 0], &dest[z*2 + 1]);
-	}
+	memset(data, 0x00, size);
+	ProcessVoice((SamplerVoice*)(cookie), (float*)data, size / (2*sizeof(float)));
 }
 
 
 int
 main(int argc, char** argv) {
 	
-	Voice* v    = new Voice();
-	v->loop 	= false; // working!
-	v->reverse  = false; // working!!
+	Logger::SetLevel(LOG_LEVEL_TRACE);
 	
-	
+	TrackSampleRateBuffers	buffers;
+
+	Sample* sample	   = new Sample();
 	entry_ref ref;
 	BString	filename("crash.wav");
 	if (argc == 2)
@@ -179,14 +158,51 @@ main(int argc, char** argv) {
 		printf("Error loading file!\n");
 		return 1;
 	}
+	
+	Note note;
+	note.note = 60; //C-5!
+	SamplerVoice* v    = new SamplerVoice(&note, sample, buffers);
+	v->loop 	= false; // working!
+	v->reverse  = false;  // working!!
+	
 	if (InitPlayer(v) != B_OK){
 		printf("Error init player\n");
 	}
-	while (!v->played) {
+	while (!v->is_done()) {
 		sleep(1);
 		printf("ping\n");
 	}
 	printf("stop\n");
+	fSoundPlayer->SetHasData(false);
+	fSoundPlayer->Stop();
+
+
+	v->reverse  = true;
+	v->ResetPosition();
+	fSoundPlayer->SetHasData(true);
+	fSoundPlayer->Start();
+	while (!v->is_done()) {
+		sleep(1);
+		printf("ping\n");
+	}
+	printf("stop\n");
+	fSoundPlayer->SetHasData(false);
+	fSoundPlayer->Stop();
+	
+
+	
+	v->reverse  = false;
+	v->loop = true;
+	v->ResetPosition();
+	fSoundPlayer->SetHasData(true);
+	fSoundPlayer->Start();
+	int loop = 5;
+	while (loop--) {
+		sleep(1);
+		printf("ping %d)\n", loop);
+	}
+	printf("stop\n");
+	fSoundPlayer->SetHasData(false);
 	fSoundPlayer->Stop();
 	delete fSoundPlayer;
 	return 0;
