@@ -201,6 +201,6 @@ Application XRS :
 	
 		
 	#: be translation game media midi midi2 tracker fluidsynth stdc++
-	: be localestub translation game media midi midi2 tracker stdc++ fluidlite
+	: be localestub translation game media midi midi2 tracker stdc++ fluidlite sndfile samplerate
 	: resources/XRS.rsrc resources/skin.rsrc  
 ;

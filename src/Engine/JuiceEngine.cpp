@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
+ * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -158,8 +158,9 @@ JuiceEngine::SendTrackMessage(SynthMessage msg, float data){
 	CHECK_LOCK;
 	
 	if(fCurrentSong)
-	for(int y=0;y<fCurrentSong->getNumberTrack();y++)
+	for(int y=0;y<fCurrentSong->getNumberTrack();y++) {
 		fCurrentSong->getTrackAt(y)->Message(msg,data);
+	}
 
 }
 
@@ -190,6 +191,13 @@ JuiceEngine::Stopping(){
 	BufferPosition=0;
 	
 	SendTrackMessage(SystemStop,0);
+	if (fCurrentSong) {
+		int32 	numtracks = fCurrentSong->getNumberTrack();
+		while(numtracks--)	 
+		{
+			DeleteVoices((Track*)fCurrentSong->getTrackAt(numtracks));	
+		}
+	}
 
 	the_clock.ResetAndNotify(player->Latency());
 }
@@ -240,7 +248,7 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 				}
 				
 				// PROCESS
-				if(track->getProcessorType() == 1)  
+				if(track->getProcessorType() == TT_VOICE_PROCESS)  
 				{
 					//voice_list = active voice list
 					for(int i=0;i<track->voice_list.CountItems();i++)
