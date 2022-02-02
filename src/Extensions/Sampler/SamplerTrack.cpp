@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
+ * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,23 +11,24 @@
 #include "Pattern.h"
 #include "Note.h"
 #include "Sample.h"
-#include "samplefiller.h"
 #include <math.h>
 #include "XHost.h"
 #include "SamplerTrackBoost.h"
 #include "sampler_locale.h"
 
-#define THUMB	50;
 int vnum=0;
+
 #include "pitchtable.h"
 #include "SamplerVoice.h"
-
-//#define DECAY_LEN 10
 
 extern SamplerTrackBoost	*booster;
 
 
+/*
+1) plan: remove reverse.
+2) remove pitch
 
+*/
 
 void SamplerTrack::Message(SynthMessage msg, float data)
 {
@@ -49,134 +50,68 @@ void SamplerTrack::Message(SynthMessage msg, float data)
 
 
 XRSVoice	
-SamplerTrack::newVoice(Note* n,int VoiceTag){ 
+SamplerTrack::newVoice(Note* n,int VoiceTag)
+{ 
+	if(curSample == NULL) 
+		return NULL;
 	
-	
-	if(curSample==NULL) return NULL;
-	
-	SamplerVoice* Voice;
-  
-    Voice = new SamplerVoice;
-    Voice->n = n;
-	Voice->position = 0;
-	Voice->tag=vnum; //VoiceTag;
-	Voice->sample=curSample;
-	Voice->converter=NULL;
-	Voice->refiller=NULL;
-	Voice->reverse=isReversed();
-	float coef=1.;
-	
-	if(res_enable){
-		coef	= (float)( (float)(curSample->frames/curSample->channels) /   (float)(samplesperbeat*(numNotes/4)) );
-		coef	*=curSample->freq_divisor;
-		//printf("[%d] coef %f\n",curSample->channels,coef);
-		//coef = 0.537451;
-	}
-	else
-	if(n->getNote()!=60){
-	
-		coef=pitchtable[n->getNote()]/pitchtable[60];
-	}
-	// debug
-	if(coef==0) coef=1.;
-	
-	
-	coef = coef / curSample->freq_divisor;
-		
-	if(coef!=1.) {	
-		
-		Voice->refiller = new SampleRefiller(Voice->sample);
-		Resampler *arts = new Resampler(Voice->refiller,(const void*)Voice);
-		arts->setStep(coef);
-		arts->setChannels(Voice->sample->channels);
-		arts->setBits(16);
-		
-		
-		Voice->converter=arts;
-	}
-					
-				
-	
+	SamplerVoice* Voice = new SamplerVoice(n, curSample, mBuffers);
+	Voice->tag 		= vnum;
+	Voice->reverse	= reversed;
+	//Voice->loop		= true;
 		
 	vnum++;
 	return (XRSVoice)Voice;
 }
-		
-int32	
-SamplerTrack::ProcessVoice(XRSVoice v,float ** dest ,int32 sample_num){
 
-	SamplerVoice*	Voice=(SamplerVoice*)v;
-	int16 			data[2];
-		
-	/*
-	 annotazioni:
-	 lengh = quanto in questo process riempire di buffer (o tutto o di un tot da Voice->position)
-	  	    se è meno del previsto allora la voce verrà successivmente eliminata.
-	*/
-	curNote=Voice->n;
+uint32	
+SamplerTrack::ProcessVoice(XRSVoice v,float ** dest ,uint32 sample_num)
+{
+	SamplerVoice*	Voice = (SamplerVoice*)v;
+	if (Voice->is_done()) { return 0; }
 	
-	if(curSample==NULL || Voice->sample==NULL || Voice->sample!=curSample ) return 0;
+	curNote = Voice->GetNote();
 	
-	int32 fullframes= curSample->frames / curSample->channels;
-	int32 length= MIN(fullframes-Voice->position,(uint32)sample_num);
-	int32 position=0;
-	
-	if(Voice->converter==NULL){
+	if(curSample          == NULL || 
+	   Voice->GetSample() == NULL || 
+	   Voice->GetSample() != curSample ) 
+	   return 0;
 
-		for(int32 l=0;l<length;l++)
-		{
-			if(isReversed()) //reverse
-			  position=fullframes-Voice->position-l-1; //MA QUI E' GIUSTO? O VA IL -uno ???
-			else
-			  position=Voice->position+l;
-					
-			data[0]=curSample->wave_data[(position)*curSample->channels];
-			
-			if(curSample->channels==2)
-				//ANCHE QUI MI SA CHE SE è REVERSE è SBAGLIATO..!!  +1 DI COSA? 
-				data[1]=curSample->wave_data[(position)*curSample->channels+1];
-			else
-				data[1]=data[0];	
-							
-			dest[0][l] = (float)data[0]/32767.0f * Left() * amp * curNote->Left();
-			dest[1][l] = (float)data[1]/32767.0f * Right()* amp * curNote->Right();
-		}
-		
-		Voice->position +=length;
-		
-		if(Voice->position > fullframes)	length=0;
-	 	
-	}
-	
-	else
-	
+	uint32 x = 0;
+	while(Voice->GetNextFrames(&dest[0][x], &dest[1][x]) && x < sample_num)
 	{
-		int retz = Voice->converter->run(dest[0],dest[1],length);
-		if(retz!=length)  retz-=1; //pixel bug :) 
-		
-		for(int32 l=0;l<length;l++)
-		{
-			dest[0][l] *= Left() * amp * curNote->Left();
-			dest[1][l] *= Right()* amp * curNote->Right();
-		}
-		length = retz;
+		dest[0][x] *= Left() * amp * curNote->Left();
+		dest[1][x] *= Right()* amp * curNote->Right();
+		x++;
 	}
-		
-	return length;
-	
-}
-	
-void		
-SamplerTrack::killVoice(XRSVoice v){
 
-		SamplerVoice*	Voice=(SamplerVoice*)v;
-		
-		if(Voice->converter!=NULL) 
-		{
-			delete Voice->refiller;		
-			delete Voice->converter;
-		}
-		free(Voice);
+	return x;
+//	if (Voice->is_done()) return 0;
+//	
+//	curNote = Voice->n;
+//	
+//	if(curSample     == NULL || 
+//	   Voice->sample == NULL || 
+//	   Voice->sample != curSample ) 
+//	   return 0;
+//	
+//	uint32 x = 0;
+//	do 
+//	{
+//		dest[0][x] = curSample->wave_data[0][Voice->get_position()] * Left() * amp * curNote->Left();
+//		dest[1][x] = curSample->wave_data[1][Voice->get_position()] * Right()* amp * curNote->Right();
+//		x++;
+//		
+//	} while(Voice->move_position() && x < sample_num);
+//
+//	return x;
+}
+
+
+void		
+SamplerTrack::killVoice(XRSVoice v)
+{
+	free((SamplerVoice*)v);
 }
    
 SamplerTrack::SamplerTrack ():Track() 

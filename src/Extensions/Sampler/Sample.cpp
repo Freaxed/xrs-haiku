@@ -1,6 +1,5 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,30 +10,34 @@
 
 Sample::Sample()
 {	
-	path_name = NULL;
 	offset = 0;
-	wave_data = NULL;
+	wave_data[0] = wave_data[1] = NULL;
 	channels = UNDEFINED;
-	freq_divisor = 1.0;
 }
 
 Sample::~Sample()
 {
-	if (wave_data != NULL) 
-		free(wave_data);
+	if (wave_data[1] != NULL && wave_data[0] != wave_data[1]) {
+		delete[] wave_data[1];
+		wave_data[1] = NULL;
+	}
 	
-	if (path_name != NULL) 
-		free(path_name);
+	if (wave_data[0] != NULL) {
+		delete[] wave_data[0];
+		wave_data[0] = NULL;
+	}
+
 }
 
 void
 Sample::PrintToStream()
 {
 	printf("---------------------------\n");
-	printf("Sample Path : %s\n",path_name);
-	printf("Totatlbyte:	  %ld\n",_totalbytes);
+	printf("Sample Path : %s\n",path_name.String());
+	printf("Totatlbyte:	  %ud\n",_totalbytes);
 	printf("Channels:	  %d\n",channels);
-	printf("Total Frames: %ld\n",frames);
-	printf("freq_divisor: %f\n",freq_divisor);
+	printf("Channel[0]: %p\n", wave_data[0]);
+	printf("Channel[1]: %p\n", wave_data[1]);
+	//printf("Total Frames: %ud\n",frames);
 	printf("---------------------------\n");
 }

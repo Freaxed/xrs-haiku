@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
+ * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,7 +34,7 @@ class ExternalManager
 			int32		CountItems();
 			status_t	InitCheck();
 			void		Empty();
-			status_t	AddSample(entry_ref ref,int *pos=NULL);
+			status_t	AddSample(entry_ref ref, int *foundPos = NULL);
 			status_t	AddBankSample(BMessage*);
 			
 			entry_ref	the_ref; //ugly, fix!
@@ -43,12 +43,11 @@ class ExternalManager
 	private:
 	
 		//locked functions
-		status_t		LoadFile(entry_ref*, int *pos = NULL);
-		void*			MemoryResampler(void* data,uint32 frames ,int ch,uint32 freq);
-		
+		status_t		LoadFile(entry_ref*, Sample* sample);
+
 		status_t		_extractSample(entry_ref,int32);
 		
-		SampleList				samples_list;
-		status_t				lastStatus;
+		SampleList		samples_list;
+		status_t		lastStatus;
 };
 //.

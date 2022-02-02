@@ -7,6 +7,10 @@
 
 
 #include <SupportDefs.h>
+#include <sndfile.h>
+#include <samplerate.h>
+#include "Log.h"
+#include "StaticBuffer.h"
 
 
 
@@ -19,12 +23,12 @@ class MediaFileLoader
 			};
 			
 			float*	ReadBuffer() {
-				static	MediaFileLoader::StaticBuffer readBuffer;
+				static	StaticBuffer<BLOCK_SIZE> readBuffer;
 				return readBuffer.Buffer();
 			}
 			
 			float*	ConvertFreqBuffer() {
-				static	MediaFileLoader::StaticBuffer convertBuffer;
+				static	StaticBuffer<BLOCK_SIZE> convertBuffer;
 				return convertBuffer.Buffer();
 			}
 			
@@ -56,6 +60,8 @@ class MediaFileLoader
 				
 				freqFactor = targetFrequency / (float)sfinfo.samplerate;
 				
+				if (targetFrequency != (float)sfinfo.samplerate)
+					LogInfo("Converting samplerate from %f to %f", (float)sfinfo.samplerate, targetFrequency);
 	
 				return B_OK;
 			}
@@ -93,24 +99,7 @@ class MediaFileLoader
 			SNDFILE* 	audioFile;
 			SRC_STATE*	srcState;
 			
-			struct StaticBuffer {
-				public:
-				
-				float*		buffer;
-				
-				status_t	Check()  { return buffer ? B_OK : B_ERROR; }
-				float*		Buffer() { return buffer; }
-
-				
-				StaticBuffer() {
-					buffer = (float*)malloc(BLOCK_SIZE * sizeof (float));				
-					if (buffer == NULL) {
-	  					 LogError ("MediaFileLoader - Error : Out of memory.\n\n") ;
-					}
-					LogInfo("StaticBuffer ready!");
-				}
-			};
-			
+	
 			uint32	 	fullframes;
 			float		freqFactor;
 			

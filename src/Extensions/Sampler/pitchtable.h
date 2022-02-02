@@ -1,3 +1,6 @@
+#ifndef pitchtable_h_
+#define pitchtable_h_
+
 const float pitchtable[]={
 	8.175800f,  //0
 	8.661958f,	
@@ -139,4 +142,5 @@ const float pitchtable[]={
 	12543.855615f,
 
 };
+#endif //pitchtable_h_
 //--

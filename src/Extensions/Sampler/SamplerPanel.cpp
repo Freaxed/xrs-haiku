@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
+ * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -167,8 +167,8 @@ SamplerPanel::SetTrack(SamplerTrack *tr)
 	{
 		SetTitle(tr->getName());
 		my_sample=tr->getSample();
-		sw->Init(my_sample->channels,my_sample->wave_data,my_sample->frames,tr->isReversed());
-		//field->SetLabel(my_sample->name);
+		//sw->Init(my_sample->channels,my_sample->wave_data,my_sample->frames,tr->isReversed());
+
 		menu->Superitem()->SetLabel(my_sample->name);
 		shift->UpdateValue(tr->getResample(), true);
 		pit_ck->SetValue(tr->isResampleEnable());

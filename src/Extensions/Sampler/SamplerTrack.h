@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2006-2008, FunkyIdeaSoftware.
+ * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
 
 #include "Track.h"
 #include "resample.h"
+#include "TrackSampleRateBuffers.h"
 
 class Sample;
 
@@ -34,7 +35,7 @@ class SamplerTrack: public Track //, public Refiller
 		virtual 	int		getModel();	
 		//virtual	void		goOn();
 		
-				Sample*	getSample();
+				 Sample*	getSample();
 				void		setSample(Sample*);
 				
 
@@ -47,9 +48,9 @@ class SamplerTrack: public Track //, public Refiller
 		void		setBoostEnable(bool b){ boost_enable=b;};
 		bool		isBoostEnable(){ return boost_enable;}
 		
-		virtual 	int			getProcessorType() { return 1; } //0=full process ; 1=voice process
-		virtual	XRSVoice	newVoice(Note* n,int VoiceTag);
-		virtual 	int32		ProcessVoice(XRSVoice,float ** buffer ,int32 sample_num); //,int spiaz);
+		virtual TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
+		virtual	XRSVoice		newVoice(Note* n,int VoiceTag);
+		virtual uint32			ProcessVoice(XRSVoice,float ** buffer ,uint32 sample_num); //,int spiaz);
 		virtual	void			killVoice(XRSVoice);
 		virtual	void			Message(SynthMessage msg, float data);
 		virtual	bool			SupportPanNote(){ return true; }; //tmp
@@ -75,6 +76,7 @@ private:
 		float				numNotes;
 		bool				res_enable;
 		bool				boost_enable;
+		TrackSampleRateBuffers	mBuffers;
 };
 
 #endif
