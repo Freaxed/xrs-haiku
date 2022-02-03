@@ -13,12 +13,13 @@
 #include <Path.h>
 #include <samplerate.h>
 #include "pitchtable.h"
+#include "MediaFileSaver.h"
 
 
 BSoundPlayer* 		fSoundPlayer = NULL;
 
 
-
+MediaFileSaver		mFileWriter;
 
 #define EXT_SAMPLE_TYPE 0
 
@@ -50,7 +51,7 @@ LoadFile(entry_ref *ref, Sample* samp)
 	samp->name.SetTo(path.Leaf());
 	samp->path_name.SetTo(path.Path());
 	
-	samp->fullframes= ceil((float)sfinfo.frames * samp->freq_divisor);
+	samp->fullframes = ceil((float)sfinfo.frames * samp->freq_divisor);
 	samp->_totalbytes = samp->fullframes* sizeof(float) * samp->channels;	
 	samp->type = EXT_SAMPLE_TYPE;
 	
@@ -112,8 +113,6 @@ ProcessVoice(SamplerVoice* Voice, float* data, size_t sample_num)
 //	Note*	curNote		= NULL;	
 //	Sample* curSample	= Voice->sample;
 	
-	if (Voice->is_done()) { return 0; }
-	
 //	curNote = Voice->n;
 	
 	uint32 x = 0;
@@ -122,6 +121,10 @@ ProcessVoice(SamplerVoice* Voice, float* data, size_t sample_num)
 		//data[x*2 + 0] *= Left() * amp * curNote->Left();
 		//data[x*2 + 1] *= Right()* amp * curNote->Right();
 		x++;
+	}
+	if (Voice->IsDone() == false && x != sample_num)
+	{
+		LogError("ProcessVoice: Unexpected status!");
 	}
 	return x;
 }
@@ -135,8 +138,19 @@ ProcessVoice(SamplerVoice* Voice, float* data, size_t sample_num)
 void
 PlayBuffer(void* cookie, void* data, size_t size, const media_raw_audio_format& format)
 {
+	SamplerVoice* voice = (SamplerVoice*)(cookie);
 	memset(data, 0x00, size);
-	ProcessVoice((SamplerVoice*)(cookie), (float*)data, size / (2*sizeof(float)));
+	uint32 fullframes = size / (2*sizeof(float));
+	uint32 len = ProcessVoice(voice, (float*)data, fullframes);
+	if (voice->IsDone() == false && len != fullframes )
+	{
+		LogError("PlayBuffer: Unexpected status!");
+	}
+	//debug marker:
+	//((float*)data)[(fullframes-1) * 2 + 0] = 1.0f;
+	if (mFileWriter.Status() == B_OK) {
+		mFileWriter.WriteBlock((float*)data,  len);
+	}
 }
 
 
@@ -146,6 +160,11 @@ main(int argc, char** argv) {
 	Logger::SetLevel(LOG_LEVEL_TRACE);
 	
 	TrackSampleRateBuffers	buffers;
+	
+	if (mFileWriter.Open("output.wav") != B_OK){
+		printf("Error saving file!\n");
+		return 1;
+	}
 
 	Sample* sample	   = new Sample();
 	entry_ref ref;
@@ -159,6 +178,9 @@ main(int argc, char** argv) {
 		return 1;
 	}
 	
+//	sample->wave_data[0][sample->fullframes - 1] = 1.0f;
+//	sample->wave_data[0][0] = -1.0f;
+	
 	Note note;
 	note.note = 60; //C-5!
 	SamplerVoice* v    = new SamplerVoice(&note, sample, buffers);
@@ -168,7 +190,7 @@ main(int argc, char** argv) {
 	if (InitPlayer(v) != B_OK){
 		printf("Error init player\n");
 	}
-	while (!v->is_done()) {
+	while (!v->IsDone()) {
 		sleep(1);
 		printf("ping\n");
 	}
@@ -181,7 +203,7 @@ main(int argc, char** argv) {
 	v->ResetPosition();
 	fSoundPlayer->SetHasData(true);
 	fSoundPlayer->Start();
-	while (!v->is_done()) {
+	while (!v->IsDone()) {
 		sleep(1);
 		printf("ping\n");
 	}
