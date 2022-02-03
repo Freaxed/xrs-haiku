@@ -11,7 +11,6 @@
 #define _SAMPLERTRACK_H_
 
 #include "Track.h"
-#include "resample.h"
 #include "TrackSampleRateBuffers.h"
 
 class Sample;

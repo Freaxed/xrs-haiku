@@ -157,7 +157,6 @@ Application XRS :
 	SamplerTrackBoost.cpp
 	ExternalManager.cpp
 	SamplerTrack.cpp
-	resample.cc
 	SamplerPanel.cpp
 	SampleView.cpp
 	
