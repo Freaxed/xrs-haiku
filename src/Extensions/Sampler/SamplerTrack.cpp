@@ -68,7 +68,6 @@ uint32
 SamplerTrack::ProcessVoice(XRSVoice v,float ** dest ,uint32 sample_num)
 {
 	SamplerVoice*	Voice = (SamplerVoice*)v;
-	if (Voice->is_done()) { return 0; }
 	
 	curNote = Voice->GetNote();
 	

@@ -17,13 +17,9 @@
 
 struct SamplerVoice
 {
-	SamplerVoice(Note* note, Sample* sample, TrackSampleRateBuffers& buffers)
-		:mInBuffer(buffers.mInBuffer) ,mOutBuffer(buffers.mOutBuffer)
+	SamplerVoice(Note* note, Sample* sample, TrackSampleRateBuffers& buffers) : mBuffers(buffers)
 	{ 
-		assert(note && sample);
-		
-		
-		
+		assert(note && sample);		
 		
 		reverse = false; 
 		loop = false;
@@ -44,40 +40,64 @@ struct SamplerVoice
 			srcState = NULL;
 		}
 	}
+	
+	void ResetPosition() { //start back from zero.
+			position = 0; 
+			mOutPosition = 0;
+			mOutFrames = 0;
+			if (srcState != NULL) {
+				src_delete (srcState);
+				srcState = NULL;
+			}
+			int error = 0;
+			srcState = src_callback_new(SamplerVoice::src_callback, SRC_SINC_FASTEST,  2, &error, this);
+	} 
+	
+	bool GetNextFrames(float* left, float* right)
+	{
+		if (IsDone()) return false;
+		
+		uint32 max = mBuffers.mOutBuffer.kFrames / 2;
 
-	int					tag;
+		if (mOutPosition >= mOutFrames) {
+			mOutFrames = (uint32)src_callback_read (srcState, mFreqFactor, max, mBuffers.mOutBuffer.Buffer());
+			mOutPosition = 0;
+		}
+		
+		if (mOutPosition < mOutFrames) {
+			*left  = mBuffers.mOutBuffer.Buffer()[mOutPosition *2 + 0];
+			*right = mBuffers.mOutBuffer.Buffer()[mOutPosition *2 + 1];
+			mOutPosition++;
+		}
+
+		return !IsDone();
+	}
 	
-	
+	bool	IsDone() {
+		return (position >= fullframes);// && mOutPosition >= mOutFrames);
+	}
+				
+
+	int					tag;	
 	bool				reverse;
 	bool				loop;
 	
 	Note*				GetNote()   { return n;      }
 	Sample*				GetSample() { return sample; }
 	
-	void				ResetPosition() 
-						{ 
-							position = 0; 
-							mOutPosition = 0;
-							if (srcState != NULL) {
-								src_delete (srcState);
-								srcState = NULL;
-							}
-							int error = 0;
-							srcState = src_callback_new(SamplerVoice::src_callback, SRC_SINC_FASTEST,  2, &error, this);
-						} //start back from zero.
+
 	
 private:
-
-	StaticBuffer<2048>&	mOutBuffer;	//should be all used
-	StaticBuffer<2048>&	mInBuffer; 	//all used!	
 	
 	uint32 				position;
 	uint32				fullframes; //useless.. same as sample->fullframes..
 	Note*				n;
 	Sample*				sample;	
 	uint32				mOutPosition;
+	uint32				mOutFrames;
 	float				mFreqFactor;
-	TrackSampleRateBuffers*	mBuffers;
+	
+	TrackSampleRateBuffers&	mBuffers;
 	
 	SRC_STATE*	srcState;
 	
@@ -91,11 +111,11 @@ private:
 	{
 		SamplerVoice*	voice = (SamplerVoice*)cb_data;
 		
-		uint32  max   = voice->mInBuffer.kFrames / 2; //fullframes
-		float*	data  = voice->mInBuffer.Buffer();
+		uint32  max   = voice->mBuffers.mInBuffer.kFrames / 2; //fullframes
+		float*	data  = voice->mBuffers.mInBuffer.Buffer();
 		
 		uint32 	wrote = 0;
-		while(voice->GetNextFramesOld(&data[wrote*2 + 0], &data[wrote*2 + 1]) && wrote < max) {
+		while(voice->GetNextFramesFromSample(&data[wrote*2 + 0], &data[wrote*2 + 1]) && wrote < max) {
 			wrote++;
 		}		
 		/*
@@ -105,63 +125,26 @@ private:
 		*dataFloat = data;
 		return wrote;
 	}
-			
-public:
-	bool GetNextFrames(float* left, float* right)
+	
+	bool GetNextFramesFromSample(float* left, float* right)
 	{
-		if (is_done()) return false;
-		
-		uint32 max = mOutBuffer.kFrames / 2; //fullframes?;
-
-		if (mOutPosition == 0) {
-			mOutPosition = (uint32)src_callback_read (srcState, mFreqFactor, max, mOutBuffer.Buffer());
-		}
-		
-		if (mOutPosition != 0) {
-			*left  = mOutBuffer.Buffer()[mOutPosition*2 + 0];
-			*right = mOutBuffer.Buffer()[mOutPosition*2 + 1];
-			mOutPosition--; //are we thinking in frames or fullframes?
-		}
-
-		return !is_done();
-	}
-
-	bool GetNextFramesOld(float* left, float* right)
-	{
-		if (is_done()) return false;
+		if (IsDone()) return false;
 		
 		
 		*left  = sample->wave_data[0][get_position()];
 		*right = sample->wave_data[1][get_position()];
 		
 		position +=1;
-		if (loop && is_done()) {
-			ResetPosition();
+		if (loop && IsDone()) {
+			position = 0;
 		}
 		
-		return !is_done();
+		return !IsDone();
 		
 	}
 	
-//	bool GetNextFrames(float* left, float* right)
-//	{
-//		if (is_done()) return false;
-//		
-//		*left  = sample->wave_data[0][get_position()];
-//		*right = sample->wave_data[1][get_position()];
-//		
-//		position +=1;
-//		if (loop && is_done()) {
-//			ResetPosition();
-//		}
-//		
-//		return !is_done();
-//		
-//	}
 
-	bool	is_done() {
-		return (position >= fullframes && mOutPosition == 0);
-	}
+		
 };
 
 #endif
