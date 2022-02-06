@@ -18,7 +18,7 @@
 struct SamplerVoice
 {
 	SamplerVoice(Note* note, Sample* sample, TrackSampleRateBuffers& buffers) : mBuffers(buffers)
-	{ 
+	{
 		assert(note && sample);		
 		
 		reverse = false; 
@@ -41,16 +41,18 @@ struct SamplerVoice
 		}
 	}
 	
-	void ResetPosition() { //start back from zero.
-			position = 0; 
-			mOutPosition = 0;
-			mOutFrames = 0;
-			if (srcState != NULL) {
-				src_delete (srcState);
-				srcState = NULL;
-			}
-			int error = 0;
-			srcState = src_callback_new(SamplerVoice::src_callback, SRC_SINC_FASTEST,  2, &error, this);
+	void ResetPosition() 
+	{ 
+		//start back from zero.
+		position = 0; 
+		mOutPosition = 0;
+		mOutFrames = 0;
+		if (srcState != NULL) {
+			src_delete (srcState);
+			srcState = NULL;
+		}
+		int error = 0;
+		srcState = src_callback_new(SamplerVoice::src_callback, SRC_SINC_FASTEST,  2, &error, this);
 	} 
 	
 	bool GetNextFrames(float* left, float* right)
@@ -64,9 +66,10 @@ struct SamplerVoice
 			mOutPosition = 0;
 		}
 		
-		if (mOutPosition < mOutFrames) {
-			*left  = mBuffers.mOutBuffer.Buffer()[mOutPosition *2 + 0];
-			*right = mBuffers.mOutBuffer.Buffer()[mOutPosition *2 + 1];
+		if (mOutPosition < mOutFrames) 
+		{
+			*left  = mBuffers.mOutBuffer[mOutPosition *2 + 0];
+			*right = mBuffers.mOutBuffer[mOutPosition *2 + 1];
 			mOutPosition++;
 		}
 
@@ -112,17 +115,19 @@ private:
 		SamplerVoice*	voice = (SamplerVoice*)cb_data;
 		
 		uint32  max   = voice->mBuffers.mInBuffer.kFrames / 2; //fullframes
-		float*	data  = voice->mBuffers.mInBuffer.Buffer();
+		//float*	data  = voice->mBuffers.mInBuffer.Buffer();
 		
 		uint32 	wrote = 0;
-		while(voice->GetNextFramesFromSample(&data[wrote*2 + 0], &data[wrote*2 + 1]) && wrote < max) {
+		while(wrote < max &&
+		      voice->GetNextFramesFromSample(&voice->mBuffers.mInBuffer[wrote*2 + 0], 
+		                                     &voice->mBuffers.mInBuffer[wrote*2 + 1])) {
 			wrote++;
 		}		
 		/*
 			The callback function should return the number of frames it supplying to the converter. 
 			For multi channel files, this return value should be the number of floats divided by the number of channels.
 		*/
-		*dataFloat = data;
+		*dataFloat = voice->mBuffers.mInBuffer.Buffer();
 		return wrote;
 	}
 	

@@ -10,6 +10,7 @@
 #define _SAMPLE_H_
 
 #include <SupportKit.h>
+#include "FloatBuffer.h"
 
 enum
 {
@@ -26,7 +27,7 @@ class Sample
 		
 		void		PrintToStream();
 		
-		float*		wave_data[STEREO];
+		FloatBufferPtr		wave_data[STEREO];
 		
 		BString   	name;
 			
