@@ -56,11 +56,11 @@ LoadFile(entry_ref *ref, Sample* samp)
 	samp->type = EXT_SAMPLE_TYPE;
 	
 	for (int m = 0 ; m < samp->channels ; m++) {
-		samp->wave_data[m] = new float[samp->fullframes];
+		CREATE_BUFFER(samp->wave_data[m], samp->fullframes);
 	}
 		
 	if (samp->channels == 1)
-		samp->wave_data[1] = samp->wave_data[0];
+		WRAP_BUFFER(samp->wave_data[0], samp->wave_data[1], samp->fullframes);
 
 	/******/
 	
@@ -108,7 +108,7 @@ bool played = false;
 float amp = 1.0;
 
 int32	
-ProcessVoice(SamplerVoice* Voice, float* data, size_t sample_num)
+ProcessVoice(SamplerVoice* Voice, FloatBufferPtr data, size_t sample_num)
 {
 //	Note*	curNote		= NULL;	
 //	Sample* curSample	= Voice->sample;
@@ -116,7 +116,7 @@ ProcessVoice(SamplerVoice* Voice, float* data, size_t sample_num)
 //	curNote = Voice->n;
 	
 	uint32 x = 0;
-	while(Voice->GetNextFrames(&data[x*2 + 0], &data[x*2 + 1]) && x < sample_num)
+	while(x < sample_num && Voice->GetNextFrames(&data[x*2 + 0], &data[x*2 + 1]))
 	{
 		//data[x*2 + 0] *= Left() * amp * curNote->Left();
 		//data[x*2 + 1] *= Right()* amp * curNote->Right();
@@ -140,8 +140,11 @@ PlayBuffer(void* cookie, void* data, size_t size, const media_raw_audio_format& 
 {
 	SamplerVoice* voice = (SamplerVoice*)(cookie);
 	memset(data, 0x00, size);
+
 	uint32 fullframes = size / (2*sizeof(float));
-	uint32 len = ProcessVoice(voice, (float*)data, fullframes);
+	FloatBufferPtr	floatBuffer;
+	WRAP_BUFFER(data, floatBuffer, size / sizeof(float));
+	uint32 len = ProcessVoice(voice, floatBuffer, fullframes);
 	if (voice->IsDone() == false && len != fullframes )
 	{
 		LogError("PlayBuffer: Unexpected status!");
@@ -226,7 +229,11 @@ main(int argc, char** argv) {
 	printf("stop\n");
 	fSoundPlayer->SetHasData(false);
 	fSoundPlayer->Stop();
-	delete fSoundPlayer;
+	delete fSoundPlayer;	
+	delete sample;
+	
+	FloatBufferPtr test;
+	CREATE_BUFFER(test, 512);
 	return 0;
 }
 
