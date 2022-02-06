@@ -19,16 +19,15 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Box.h>
-#include <Slider.h>
-#include <TabView.h>
+
 
 
 class SamplerTrack;	
 class SamplerTrackBoost;
-class	 Sample;
+class Sample;
 class XDigit;
 
-class SamplerPanel: public PlugPanel{
+class SamplerPanel: public PlugPanel {
 
 	public:
 		SamplerPanel(SamplerTrackBoost*);
@@ -39,24 +38,23 @@ class SamplerPanel: public PlugPanel{
 		
 	private:
 		void	SetTrack(SamplerTrack *tr);
-		SamplerTrack*	sampTrack;
 		
-		Sample					*my_sample;
-		char txt[30];
-		//BStringView 			*text_info;
-		SamplerTrackBoost		*booster;
+		SamplerTrack*		sampTrack;		
+		Sample*				my_sample;
+		SamplerTrackBoost*	booster;
 		
 		//GUI
-		XDigit* 	depth;
-		XDigit*  	shift;	
-		SampleView*	sw;
-		BCheckBox*	rev;
-		BCheckBox*	pit_ck;
-		BCheckBox*	boost_ck;
-		BBox*		rev_box;
-		BBox*		pit_box;
-		BMenu		*menu;
-		BMenuField	*field;
+		XDigit* 		depth;
+		XDigit*  		shift;	
+		SampleView*		sw;
+		BCheckBox*		rev;
+		BCheckBox*		pit_ck;
+		BCheckBox*		boost_ck;
+		BCheckBox*		loop_ck;
+		BBox*			rev_box;
+		BBox*			pit_box;
+		BMenu*			menu;
+		BMenuField*		field;
 };
 
 #endif

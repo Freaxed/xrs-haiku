@@ -35,13 +35,13 @@ ExternalManager::~ExternalManager()
 void
 ExternalManager::Empty()
 {
-	Sample	*sample;	
+	Sample	*sample;
 	while(CountItems()){
 		sample = getSampleAt(0);
 		samples_list.Erase(0);
 		delete sample;
 	}
-	
+
 	samples_list.MakeEmpty();
 }
 
@@ -101,11 +101,11 @@ ExternalManager::LoadFile(entry_ref *ref, Sample* sample)
 	sample->type = EXT_SAMPLE_TYPE;
 	
 	for (int m = 0 ; m < sample->channels ; m++) {
-		sample->wave_data[m] = new float[frames];
+		CREATE_BUFFER(sample->wave_data[m], frames);
 	}
 		
 	if (sample->channels == 1)
-		sample->wave_data[1] = sample->wave_data[0];
+		WRAP_BUFFER(sample->wave_data[0], sample->wave_data[1], sample->fullframes);
 		
 	sample->fullframes = frames;
 

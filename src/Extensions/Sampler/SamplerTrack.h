@@ -46,6 +46,8 @@ class SamplerTrack: public Track //, public Refiller
 		bool		isResampleEnable();
 		void		setBoostEnable(bool b){ boost_enable=b;};
 		bool		isBoostEnable(){ return boost_enable;}
+		bool		IsLoopEnable() {return loop_enable;}
+		void		SetLoopEnable(bool b) {loop_enable = b;}
 		
 		virtual TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
 		virtual	XRSVoice		newVoice(Note* n,int VoiceTag);
@@ -56,7 +58,7 @@ class SamplerTrack: public Track //, public Refiller
 		virtual 	rgb_color	GetPreferredPadColor(){ rgb_color a={49,163,220,255}; return a;}
 		//		unsigned long 	read(unsigned char *buffer, unsigned long len,const void* cookie);
 		/*RAW*/
-		float	amp;
+		float	amp; //FIXME, encapsulate.
 		
 	protected:
 		virtual	const char*	getPreferredName();
@@ -75,6 +77,7 @@ private:
 		float				numNotes;
 		bool				res_enable;
 		bool				boost_enable;
+		bool				loop_enable;
 		TrackSampleRateBuffers	mBuffers;
 };
 

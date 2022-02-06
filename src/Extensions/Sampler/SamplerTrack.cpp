@@ -15,20 +15,12 @@
 #include "XHost.h"
 #include "SamplerTrackBoost.h"
 #include "sampler_locale.h"
-
-int vnum=0;
-
+#include "Log.h"
 #include "pitchtable.h"
 #include "SamplerVoice.h"
 
 extern SamplerTrackBoost	*booster;
 
-
-/*
-1) plan: remove reverse.
-2) remove pitch
-
-*/
 
 void SamplerTrack::Message(SynthMessage msg, float data)
 {
@@ -49,18 +41,16 @@ void SamplerTrack::Message(SynthMessage msg, float data)
 }
 
 
-XRSVoice	
-SamplerTrack::newVoice(Note* n,int VoiceTag)
+XRSVoice
+SamplerTrack::newVoice(Note* n, int VoiceTag)
 { 
 	if(curSample == NULL) 
 		return NULL;
 	
 	SamplerVoice* Voice = new SamplerVoice(n, curSample, mBuffers);
-	Voice->tag 		= vnum;
 	Voice->reverse	= reversed;
-	//Voice->loop		= true;
-		
-	vnum++;
+	Voice->loop		= loop_enable;
+
 	return (XRSVoice)Voice;
 }
 
@@ -77,33 +67,13 @@ SamplerTrack::ProcessVoice(XRSVoice v,float ** dest ,uint32 sample_num)
 	   return 0;
 
 	uint32 x = 0;
-	while(Voice->GetNextFrames(&dest[0][x], &dest[1][x]) && x < sample_num)
+	while(x < sample_num && Voice->GetNextFrames(&dest[0][x], &dest[1][x]))
 	{
 		dest[0][x] *= Left() * amp * curNote->Left();
 		dest[1][x] *= Right()* amp * curNote->Right();
 		x++;
 	}
-
 	return x;
-//	if (Voice->is_done()) return 0;
-//	
-//	curNote = Voice->n;
-//	
-//	if(curSample     == NULL || 
-//	   Voice->sample == NULL || 
-//	   Voice->sample != curSample ) 
-//	   return 0;
-//	
-//	uint32 x = 0;
-//	do 
-//	{
-//		dest[0][x] = curSample->wave_data[0][Voice->get_position()] * Left() * amp * curNote->Left();
-//		dest[1][x] = curSample->wave_data[1][Voice->get_position()] * Right()* amp * curNote->Right();
-//		x++;
-//		
-//	} while(Voice->move_position() && x < sample_num);
-//
-//	return x;
 }
 
 
@@ -122,7 +92,8 @@ SamplerTrack::SamplerTrack ():Track()
 	numNotes=16;
 	res_enable=false;
 	amp=1.;
-	boost_enable=false;
+	boost_enable = false;
+	loop_enable  = false;
 	ResetName();
 	//cit=false; //can we make a fast-fast decay
 }

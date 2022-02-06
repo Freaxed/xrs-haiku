@@ -22,23 +22,18 @@
 #define	REMOVE		'remv'
 #define	REMOVEALL	'rema'
 #define	LOADEXT		'loae'
-#define 	REL_MSG 	'note'
-#define 	REV_ON		'reo'
+#define REL_MSG 	'note'
+#define REV_ON		'reo'
 #define	PIT_ON 		'pio'
 #define	BOOST_ON 	'boo'
 #define	MOD			'mod'
-
-//const 	rgb_color  	red 	={253,148,106,255};
-//const 	rgb_color  	cacca 	={80,80,250,255};
+#define LOOP_ON		'loop'
 
 
-SamplerPanel::SamplerPanel(SamplerTrackBoost* sb) :
-	PlugPanel(),sampTrack(NULL),booster(sb)
-	{
-	
-	
-	
-	
+
+SamplerPanel::SamplerPanel(SamplerTrackBoost* sb):
+			  PlugPanel(), sampTrack(NULL), booster(sb)
+{
 	
 	BBox *sam_box= new BBox(BRect(10,150+17,171,210+17) ,"toolbar", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 			B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP, B_FANCY_BORDER);		
@@ -96,16 +91,22 @@ SamplerPanel::SamplerPanel(SamplerTrackBoost* sb) :
 	
 	r=(pit_box->Bounds());
 	r.InsetBy(4,4);
-	r.right-=50;
-	r.top+=2;
+	r.right -= 75;
+	r.top += 2;
 		
-	pit_box->AddChild(rev=new BCheckBox(r,"rev_check",T_SAMPLER_REVERSE,new BMessage(TRACK_REV)));
+	pit_box->AddChild(rev = new BCheckBox(r,"rev_check",T_SAMPLER_REVERSE,new BMessage(TRACK_REV)));
 	rev->SetValue(0);
 	rev->SetFontSize(12);
+	rev->ResizeToPreferred();
+	r.OffsetBy(r.Width(), 0);
+	pit_box->AddChild(loop_ck = new BCheckBox(r,"loop_check","Loop", new BMessage(LOOP_ON)));
+	loop_ck->SetValue(0);
+	loop_ck->SetFontSize(12);
+	loop_ck->ResizeToPreferred();
 	AddChild(pit_box);
 		
 	
-	sw=new SampleView(BRect(1,1,159,58));
+	sw=new SampleView(BRect(1,1,159,58), XUtils::GetBitmap(18));
 	sam_box->AddChild(sw);
 
 	sampler->AddChild(field);
@@ -121,13 +122,13 @@ SamplerPanel::SamplerPanel(SamplerTrackBoost* sb) :
 }
 
 void
-SamplerPanel::Reset(Track* trk){
-
+SamplerPanel::Reset(Track* trk)
+{
 	//qui magari un bel check dell'ID ??
 	PlugPanel::Reset(trk);
 	SetTrack((SamplerTrack*)trk);	
-	
 }
+
 void
 SamplerPanel::AttachedToWindow()
 {
@@ -138,49 +139,46 @@ SamplerPanel::AttachedToWindow()
 	rev->SetTarget(this);
 	menu->SetTargetForItems(this);
 	boost_ck->SetTarget(this);
-	
-	field->SetDivider(0);//field->Bounds().Width()-25);
-	sw->SetViewBitmap(XUtils::GetBitmap(18));
+	loop_ck->SetTarget(this);
+	field->SetDivider(0);
 }
 void
 SamplerPanel::SetTrack(SamplerTrack *tr)
 {
 	if(!Window()) return;
 	
-	sampTrack=tr;
+	sampTrack = tr;
 	
 	if(Window()->Lock()){
-	if(tr==NULL || tr->getSample()==NULL)
-	{
 		
-		sw->Init(0,NULL,0,0);
-		shift->UpdateValue(16, true);
-		pit_ck->SetValue(false);
-		boost_ck->SetValue(false);
-		//field->SetLabel("No sample selected");
-		menu->Superitem()->SetLabel(T_SAMPLER_NOSELECTED);
-		depth->UpdateValue(1, true);
-		Window()->Unlock();
-		return;
-	}
-	else
-	{
-		SetTitle(tr->getName());
-		my_sample=tr->getSample();
-		//sw->Init(my_sample->channels,my_sample->wave_data,my_sample->frames,tr->isReversed());
-
-		menu->Superitem()->SetLabel(my_sample->name);
-		shift->UpdateValue(tr->getResample(), true);
-		pit_ck->SetValue(tr->isResampleEnable());
-		boost_ck->SetValue(tr->isBoostEnable());
-		rev->SetValue(tr->isReversed());
-		depth->UpdateValue((int32)tr->amp, true);
-		sw->SetAmp(tr->amp);
-
-		
-	}
+		if(tr == NULL || tr->getSample() == NULL)
+		{
+			
+			sw->Init(NULL, false, false);
+			shift->UpdateValue(16, true);
+			pit_ck->SetValue(false);
+			boost_ck->SetValue(false);
+			loop_ck->SetValue(false);
+			menu->Superitem()->SetLabel(T_SAMPLER_NOSELECTED);
+			depth->UpdateValue(1, true);
+		}
+		else
+		{
+			SetTitle(tr->getName());
+			my_sample=tr->getSample();
+			sw->Init(my_sample, tr->isReversed(), 1.0f);
 	
-	Window()->Unlock();
+			menu->Superitem()->SetLabel(my_sample->name);
+			shift->UpdateValue(tr->getResample(), true);
+			pit_ck->SetValue(tr->isResampleEnable());
+			boost_ck->SetValue(tr->isBoostEnable());
+			loop_ck->SetValue(tr->IsLoopEnable());
+			rev->SetValue(tr->isReversed());
+			depth->UpdateValue((int32)tr->amp, true);
+			sw->SetBoost(tr->amp);		
+		}
+		
+		Window()->Unlock();
 	}
 }
 
@@ -190,14 +188,17 @@ SamplerPanel::MessageReceived(BMessage* message)
 	
 	switch(message->what)
 	{
-		
+		case LOOP_ON:
+			if(sampTrack == NULL) return;
+			sampTrack->SetLoopEnable((bool)loop_ck->Value());
+		break;
 		case BOOST_ON:
 			if(sampTrack==NULL) return;
 			sampTrack->setBoostEnable((bool)boost_ck->Value());						
 			if(!boost_ck->Value()) 
 			{
 				sampTrack->amp=1.0;
-				sw->SetAmp(sampTrack->amp);
+				sw->SetBoost(sampTrack->amp);
 				return;
 			}
 			//else continue (without break!)
@@ -207,7 +208,7 @@ SamplerPanel::MessageReceived(BMessage* message)
 			if(!sampTrack->isBoostEnable()) return;
 			
 			sampTrack->amp=(float)depth->GetValue();
-			sw->SetAmp(sampTrack->amp);
+			sw->SetBoost(sampTrack->amp);
 			
 		break;
 		

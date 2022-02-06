@@ -17,8 +17,8 @@ class TrackSampleRateBuffers {
 
 
 public:
-	StaticBuffer<2048>	mInBuffer; 	//all used!
-	StaticBuffer<2048>	mOutBuffer;	//should be all used
+	StaticBuffer<2048>	mInBuffer;
+	StaticBuffer<2048>	mOutBuffer;
 };
 
 

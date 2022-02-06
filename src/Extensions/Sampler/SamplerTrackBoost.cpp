@@ -481,7 +481,7 @@ SamplerTrackBoost::MakeMenu()
 		
 		
 				
-		for(int zip=0;zip<getEXTM()->CountItems();zip++)
+		for(int16 zip=0;zip<getEXTM()->CountItems();zip++)
 		{
 			info=new BMessage(TRACK_SAMP_EXT);
 			info->AddInt16("sample",zip);
