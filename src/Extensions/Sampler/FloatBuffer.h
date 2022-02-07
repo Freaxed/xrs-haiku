@@ -5,7 +5,7 @@
 #ifndef FloatBuffer_H_
 #define FloatBuffer_H_
 
-#define BOUND_CHECK 0
+#define BOUND_CHECK 1
 
 
 
@@ -69,7 +69,7 @@ public:
 	float   operator [](int i) const
 	{
 		if (i < 0 || i >= NbFrames) {
-			printf("Security error: buffer out of bounds! (%d not in 0-%d)", i, NbFrames);
+			printf("Security error: buffer out of bounds! (%d not in 0-%d)\n", i, NbFrames);
 			debugger("buffer out of bounds!");
 		}
 
@@ -79,7 +79,7 @@ public:
 	float & operator [](int i)
 	{
 		if (i < 0 || i >= NbFrames) {
-			printf("Security error: buffer out of bounds! (%d not in 0-%d)", i, NbFrames);
+			printf("Security error: buffer out of bounds! (%d not in 0-%d)\n", i, NbFrames);
 			debugger("buffer out of bounds!");
 		}
 

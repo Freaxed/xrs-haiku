@@ -57,9 +57,9 @@ ExternalManager::AddSample(entry_ref ref, int *pos)
 	if(pos!=NULL) {
 		
 		for(int i=0;i<samples_list.Count();i++)
-			if(strcmp((samples_list[i])->name,ref.name)==0)
+			if(strcmp((samples_list[i])->GetName(), ref.name)==0)
 			{
-					LogInfo("Samples %s already foud at position %d\n",ref.name,i);
+					LogInfo("Samples %s already foud at position %d\n",ref.name, i);
 					*pos=i;
 					return B_OK;
 			}
@@ -90,24 +90,13 @@ ExternalManager::LoadFile(entry_ref *ref, Sample* sample)
 	
 	/* SAMPLE SetUp */
 	
-	sample->channels = sfinfo.channels;
-	sample->freq_divisor= 44100.0f / (float)sfinfo.samplerate;
+	float freq_divisor = 44100.0f / (float)sfinfo.samplerate;
 
-	sample->name.SetTo(path.Leaf());
-	sample->path_name.SetTo(path.Path());
-	
-	uint32 frames = ceil((float)sfinfo.frames * sample->freq_divisor);
-	sample->_totalbytes = frames * sizeof(float) * sample->channels;	
-	sample->type = EXT_SAMPLE_TYPE;
-	
-	for (int m = 0 ; m < sample->channels ; m++) {
-		CREATE_BUFFER(sample->wave_data[m], frames);
-	}
-		
-	if (sample->channels == 1)
-		WRAP_BUFFER(sample->wave_data[0], sample->wave_data[1], sample->fullframes);
-		
-	sample->fullframes = frames;
+	int channels = sfinfo.channels;
+	uint32 fullframes = ceil((float)sfinfo.frames * freq_divisor);
+
+	sample->SetPath(path);
+	sample->CreateBuffer(fullframes, channels);
 
 	/******/
 	
@@ -118,8 +107,8 @@ ExternalManager::LoadFile(entry_ref *ref, Sample* sample)
 		float *buf = loader.ConvertFreqBuffer();
 		for (int k = 0 ; k < readcount ; k++)
 		{
-			for (int m = 0 ; m < sample->channels ; m++) {
-				sample->wave_data[m][position] = buf[k* sample->channels + m];
+			for (int m = 0 ; m < channels ; m++) {
+				sample->wave_data[m][position] = buf[k* channels + m];
 			}
 			position++;
 		};

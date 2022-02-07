@@ -286,7 +286,7 @@ SamplerTrackBoost::LoadTrackSettings(Track* trk,BMessage* data){
 	{
 		//tr->setSample(s);
 		_secureSetSample(tr,s);
-		tr->setName(tr->getSample()->name);
+		tr->setName(tr->getSample()->GetName());
 	}
 	else
 	{
@@ -302,7 +302,7 @@ void
 SamplerTrackBoost::SaveTrackSettings(Track* trk,BMessage* data){
 
 	SamplerTrack* tr=dynamic_cast<SamplerTrack *>(trk);
-	if(tr->getSample()) data->AddString("sample_name",BString(tr->getSample()->name));
+	if(tr->getSample()) data->AddString("sample_name",BString(tr->getSample()->GetName()));
 	data->AddBool("resample_enable",tr->isResampleEnable());	
     data->AddInt16("resample",tr->getResample());
 	data->AddInt16("ampboost",(int)tr->amp);
@@ -327,11 +327,11 @@ SamplerTrackBoost::SaveBoosterSettings(BMessage* data){
    		{
    			if(zipped && getEXTM()->getSampleAt(j)->type==1)
    			{
-   				ext->AddString("Sample_path",getEXTM()->getSampleAt(j)->name);
-   				data->AddString("collect",getEXTM()->getSampleAt(j)->path_name);
+   				ext->AddString("Sample_path",getEXTM()->getSampleAt(j)->GetName());
+   				data->AddString("collect",getEXTM()->getSampleAt(j)->GetFullPath());
    			}
    			else
-   			 	ext->AddString("Sample_path",getEXTM()->getSampleAt(j)->path_name);
+   			 	ext->AddString("Sample_path",getEXTM()->getSampleAt(j)->GetFullPath());
    				
    				
    			ext->AddInt16("Sample_type",getEXTM()->getSampleAt(j)->type);
@@ -417,7 +417,7 @@ SamplerTrackBoost::RemoveSample(Sample* s)
 	int32 sam_say;
 	BString text;
 	text=T_SAMPLER_REMOVE_SAMPLE_1;
-	text << "\n" << s->name << "\n" << T_SAMPLER_REMOVE_SAMPLE_2;
+	text << "\n" << s->GetName() << "\n" << T_SAMPLER_REMOVE_SAMPLE_2;
 		
 	sam=new BAlert("XRS",text.String(),T_GEN_REMOVE,T_GEN_NO);
 	sam_say=sam->Go();
@@ -486,7 +486,7 @@ SamplerTrackBoost::MakeMenu()
 			info=new BMessage(TRACK_SAMP_EXT);
 			info->AddInt16("sample",zip);
 			kikko=getEXTM()->getSampleAt(zip);
-			item=new BMenuItem(kikko->name, info);
+			item=new BMenuItem(kikko->GetName(), info);
 			//item->SetTarget(fw);
 			item->SetTarget(panel);
 			
@@ -573,8 +573,7 @@ SamplerTrackBoost::FindSample(const char* sam)
 	
 	for(int i=0;i<getEXTM()->CountItems();i++)
 	{
-		//strcpy(base,(getEXTM()->getSampleAt(i)->name));
-		if(strcmp((getEXTM()->getSampleAt(i)->name),sam) == 0) 
+		if(strcmp((getEXTM()->getSampleAt(i)->GetName()),sam) == 0) 
 			 k = getEXTM()->getSampleAt(i);
 	}
 	

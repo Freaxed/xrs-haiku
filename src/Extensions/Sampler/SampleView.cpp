@@ -56,14 +56,14 @@ SampleView::Draw(BRect b)
 		SetHighColor(238,235,227);
 		float value;
 		float zero = Bounds().Height() / 2.0f;
-		int	  incx=(int)((float)mSample->fullframes/(float)Bounds().Width());
+		int	  incx=(int)((float)mSample->GetFullframes()/(float)Bounds().Width());
 		BPoint previous(0, zero);
 		for(int i=0; i < Bounds().IntegerWidth(); i++)
 		{
 			if(!mReversed)
 				value = mSample->wave_data[0][i * incx] * mBoost;
 			else
-				value = mSample->wave_data[0][mSample->fullframes - ( i * incx)] * mBoost;
+				value = mSample->wave_data[0][mSample->GetFullframes() - ( i * incx) - 1] * mBoost;
 
 			BPoint next((float)i, (float)((zero) + (zero*value)));
 		 	StrokeLine(previous, next);

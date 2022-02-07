@@ -101,8 +101,10 @@ SamplerTrack::SamplerTrack ():Track()
 const char*
 SamplerTrack::getPreferredName()
 {
-	if(curSample!=NULL) return curSample->name;
-	else return T_SAMPLER_UNSET;
+	if (curSample) 
+		return curSample->GetName();
+	
+	return T_SAMPLER_UNSET;
 }
 SamplerTrack::~SamplerTrack(){
 

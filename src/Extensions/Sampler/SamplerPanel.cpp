@@ -168,7 +168,7 @@ SamplerPanel::SetTrack(SamplerTrack *tr)
 			my_sample=tr->getSample();
 			sw->Init(my_sample, tr->isReversed(), 1.0f);
 	
-			menu->Superitem()->SetLabel(my_sample->name);
+			menu->Superitem()->SetLabel(my_sample->GetName());
 			shift->UpdateValue(tr->getResample(), true);
 			pit_ck->SetValue(tr->isResampleEnable());
 			boost_ck->SetValue(tr->isBoostEnable());

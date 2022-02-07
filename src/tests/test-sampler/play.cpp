@@ -45,22 +45,14 @@ LoadFile(entry_ref *ref, Sample* samp)
 	
 	/* SAMPLE SetUp */
 	
-	samp->channels = sfinfo.channels;
-	samp->freq_divisor= 44100.0f / (float)sfinfo.samplerate;
+	
+	float freq_divisor = 44100.0f / (float)sfinfo.samplerate;
 
-	samp->name.SetTo(path.Leaf());
-	samp->path_name.SetTo(path.Path());
-	
-	samp->fullframes = ceil((float)sfinfo.frames * samp->freq_divisor);
-	samp->_totalbytes = samp->fullframes* sizeof(float) * samp->channels;	
-	samp->type = EXT_SAMPLE_TYPE;
-	
-	for (int m = 0 ; m < samp->channels ; m++) {
-		CREATE_BUFFER(samp->wave_data[m], samp->fullframes);
-	}
-		
-	if (samp->channels == 1)
-		WRAP_BUFFER(samp->wave_data[0], samp->wave_data[1], samp->fullframes);
+	int channels = sfinfo.channels;
+	uint32 fullframes = ceil((float)sfinfo.frames * freq_divisor);
+
+	samp->SetPath(path);
+	samp->CreateBuffer(fullframes, channels);
 
 	/******/
 	
@@ -71,8 +63,8 @@ LoadFile(entry_ref *ref, Sample* samp)
 		float *buf = loader.ConvertFreqBuffer();
 		for (int k = 0 ; k < readcount ; k++)
 		{
-			for (int m = 0 ; m < samp->channels ; m++) {
-				samp->wave_data[m][position] = buf[k* samp->channels + m];
+			for (int m = 0 ; m < channels ; m++) {
+				samp->wave_data[m][position] = buf[k* channels + m];
 			}
 			position++;
 		};
@@ -232,8 +224,8 @@ main(int argc, char** argv) {
 	delete fSoundPlayer;	
 	delete sample;
 	
-	FloatBufferPtr test;
-	CREATE_BUFFER(test, 512);
+//	FloatBufferPtr test;
+//	CREATE_BUFFER(test, 512);
 	return 0;
 }
 

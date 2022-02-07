@@ -25,7 +25,7 @@ struct SamplerVoice
 		loop = false;
 		this->n 	 = note;
 		this->sample = sample;
-		fullframes = sample->fullframes;
+		fullframes = sample->GetFullframes();
 
 		mFreqFactor = pitchtable[60] / pitchtable[note->getNote()] ;
 		
@@ -77,7 +77,7 @@ struct SamplerVoice
 	}
 	
 	bool	IsDone() {
-		return (position >= fullframes);// && mOutPosition >= mOutFrames);
+		return (position >= fullframes);
 	}
 				
 
@@ -114,8 +114,7 @@ private:
 	{
 		SamplerVoice*	voice = (SamplerVoice*)cb_data;
 		
-		uint32  max   = voice->mBuffers.mInBuffer.kFrames / 2; //fullframes
-		//float*	data  = voice->mBuffers.mInBuffer.Buffer();
+		uint32  max   = voice->mBuffers.mInBuffer.kFrames / 2;
 		
 		uint32 	wrote = 0;
 		while(wrote < max &&

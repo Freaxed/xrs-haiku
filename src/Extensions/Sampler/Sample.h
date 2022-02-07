@@ -10,6 +10,7 @@
 #define _SAMPLE_H_
 
 #include <SupportKit.h>
+#include <Path.h>
 #include "FloatBuffer.h"
 
 enum
@@ -27,20 +28,32 @@ class Sample
 		
 		void		PrintToStream();
 		
+		void		CreateBuffer(uint32 fullframes, int channels);
+		
+		uint32		GetFullframes() {return fullframes; }
+		
+		void		SetPath(BPath path) { mPath = path; }
+		
+		const char*		GetFullPath() { return mPath.Path(); }
+		const char*		GetName()	  { return mPath.Leaf(); }
+		
+		
 		FloatBufferPtr		wave_data[STEREO];
 		
-		BString   	name;
+		
 			
-		uint32		_totalbytes;
-		uint32		fullframes; //number of frames per channel!
 		uint32		offset;		
 		int			modifier;
-		float 		freq_divisor;
+
 		int			type;	// 0 is BANK Samples
 							// 1 is External Sample //
-		BString		path_name;
+		
+		
+		
+private:
+		uint32		fullframes;
 		int			channels;
-
+		BPath		mPath;
 };
 
 #endif
