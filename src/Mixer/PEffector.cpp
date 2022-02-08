@@ -22,6 +22,22 @@ PEffector::PEffector():PNode(){
 	fFxList = VstManager::Get()->EffectVst();
 };
 
+void	
+PEffector::SaveSettings(BMessage* fxs) {
+	for(uint8 i=0; i<MAX_EFFECT; i++) {
+		BMessage effect;
+		if (fVstStack[i] != NULL) {
+			effect.AddInt16("Position", (uint8)i);
+			effect.AddString("Type", "VST"); //by default
+			effect.AddString("Path", fVstStack[i]->Path());
+			BMessage effectData;
+			fVstStack[i]->SavePreset(&effectData);
+			effect.AddMessage("Settings", &effectData);
+			fxs->AddMessage("Effect", &effect);
+		}		
+	}
+}
+
 PEffector::~PEffector()
 {
 	fFxList = NULL;

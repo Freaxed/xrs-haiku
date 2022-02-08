@@ -13,7 +13,8 @@
 #define _PEffector_H_
 
 #include "PNode.h"
-#include "assert.h"
+#include <assert.h>
+#include <Message.h>
 
 #define	MAX_EFFECT	5
 
@@ -32,7 +33,7 @@ class PEffector: public PNode {
 
 			size_t	Process(float** data,size_t frames);
 
-			//VSTItem*	VSTAt(uint8 i){ assert(i<MAX_EFFECT); return fVstStack[i]; }
+			void	SaveSettings(BMessage* msg);
 			
 			VSTItem*		CreateVstAtPosition(VSTPlugin* templ, uint8 pos); 	
 														 
