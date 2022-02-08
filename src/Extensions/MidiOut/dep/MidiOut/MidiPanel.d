@@ -1,2 +1,0 @@
-./obj.x86//MidiPanel.o : 
-dep//MidiOut/MidiPanel.d ./obj.x86//MidiPanel.o : ./src/MidiPanel.cpp src/MidiPanel.h   ../../MainManager/PlugPanel.h ../../locale.h ../../GUI/XDigit.h   src/MidiOutTrack.h ../../struct/Track.h ../../defs/GlobalDef.h   ../../defs/synthMessages.h ../../struct/XRSVoice.h   ../../XRS_Pro/Valuable/Pannable.h ../../XRS_Pro/Valuable/Valuable.h   midiout_locale.h ../../utils/Xed_Utils.h ../../GUI/APot.h   GeneralMidi.h
