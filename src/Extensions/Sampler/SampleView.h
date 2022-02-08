@@ -32,6 +32,9 @@ class SampleView : public BView
 		float	 mBoost;
 		BBitmap* mViewBitmap;
 		Sample*	 mSample;
+/* 		int		 mStart;
+		int		 mEnd; */
+		float	 mIncX;
 		
 };
 

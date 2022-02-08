@@ -15,7 +15,7 @@
 
 
 SampleView::SampleView(BRect vframe, BBitmap* viewBitmap):
-	BView(vframe,"x",0,B_WILL_DRAW|B_FRAME_EVENTS),
+	BView(vframe, "sampleView", 0, B_WILL_DRAW|B_FRAME_EVENTS),
 	mReversed(false),
 	mBoost(1.0f),
 	mViewBitmap(viewBitmap),
@@ -27,9 +27,14 @@ SampleView::SampleView(BRect vframe, BBitmap* viewBitmap):
 void
 SampleView::Init(Sample* sample, bool reversed, float boost)
 {
-	mReversed = reversed;
-	mBoost 	  = boost;
 	mSample   = sample;
+	if (mSample) {
+		mIncX = ((float)mSample->GetFullframes()/(float)Bounds().Width()) - 0.01; //Move on FrameResized!
+		mReversed = reversed;
+		mBoost 	  = boost;
+		// mStart	  = (int)(0 * mIncX); //FIX
+		// mEnd	  = (int)((sample->GetFullframes() - 1 ) * mIncX); //FIX
+	}
 	Invalidate();
 }
 
@@ -49,26 +54,33 @@ void
 SampleView::Draw(BRect b)
 {	
 	if (mViewBitmap)
-		DrawBitmap(mViewBitmap);
+		DrawBitmapAsync(mViewBitmap);
 		
 	
 	if (mSample) {
 		SetHighColor(238,235,227);
 		float value;
 		float zero = Bounds().Height() / 2.0f;
-		int	  incx=(int)((float)mSample->GetFullframes()/(float)Bounds().Width());
 		BPoint previous(0, zero);
-		for(int i=0; i < Bounds().IntegerWidth(); i++)
+		for(int i=b.left; i <= b.right; i++)
 		{
+			int index = (int)floor(((float)i * mIncX));
+
 			if(!mReversed)
-				value = mSample->wave_data[0][i * incx] * mBoost;
+				value = mSample->wave_data[0][index] * mBoost;
 			else
-				value = mSample->wave_data[0][mSample->GetFullframes() - ( i * incx) - 1] * mBoost;
+				value = mSample->wave_data[0][mSample->GetFullframes() - 1 - index] * mBoost;
 
 			BPoint next((float)i, (float)((zero) + (zero*value)));
 		 	StrokeLine(previous, next);
  	     	previous = next;
-	 	}		
-	}  
+	 	}	
+	 	// if (mStart >= b.left && mStart <= b.right)
+	 	// {
+	 	// 	SetHighColor(255, 0, 0);
+	 	// 	StrokeLine(BPoint(mStart, b.top), BPoint(mStart, b.bottom));
+	 	// }
+	} 	
+	Sync();
 }
 
