@@ -7,3 +7,4 @@ objects.x86_64*
 (Objects*
 
 src/tests/test-sampler/output.wav
+*.kdev4
