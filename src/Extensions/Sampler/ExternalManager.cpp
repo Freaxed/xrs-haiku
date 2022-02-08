@@ -8,7 +8,6 @@
  */
 
 #include 	"ExternalManager.h"
-#include 	"file_msg.h"
 #include	"XHost.h"
 #include 	"Sample.h"
 #include 	"MediaFileLoader.h"
