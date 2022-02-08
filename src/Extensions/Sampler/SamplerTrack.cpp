@@ -27,7 +27,7 @@ void SamplerTrack::Message(SynthMessage msg, float data)
 	
 	switch(msg) {
 		case TempoChange: 
-			samplesperbeat=(int32)data;
+			samplesperbeat = data;
 		break;
 		case SystemStop:
 			//kill dei looper!
@@ -46,8 +46,9 @@ SamplerTrack::newVoice(Note* n, int VoiceTag)
 { 
 	if(curSample == NULL) 
 		return NULL;
+		
 	
-	SamplerVoice* Voice = new SamplerVoice(n, curSample, mBuffers);
+	SamplerVoice* Voice = new SamplerVoice(n, curSample, mBuffers, res_enable ? numNotes : 0, samplesperbeat);
 	Voice->reverse	= reversed;
 	Voice->loop		= loop_enable;
 

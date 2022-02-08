@@ -157,6 +157,8 @@ JuiceEngine::SendTrackMessage(SynthMessage msg, float data){
 	
 	CHECK_LOCK;
 	
+	LogTrace("SendTrackMessage: SynthMessage[%d] - data[%f]", msg, data);
+	
 	if(fCurrentSong)
 	for(int y=0;y<fCurrentSong->getNumberTrack();y++) {
 		fCurrentSong->getTrackAt(y)->Message(msg,data);

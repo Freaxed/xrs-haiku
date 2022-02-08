@@ -17,7 +17,7 @@
 
 struct SamplerVoice
 {
-	SamplerVoice(Note* note, Sample* sample, TrackSampleRateBuffers& buffers) : mBuffers(buffers)
+	SamplerVoice(Note* note, Sample* sample, TrackSampleRateBuffers& buffers, int stretchNotes, float samplesperbeat) : mBuffers(buffers)
 	{
 		assert(note && sample);		
 		
@@ -27,7 +27,11 @@ struct SamplerVoice
 		this->sample = sample;
 		fullframes = sample->GetFullframes();
 
-		mFreqFactor = pitchtable[60] / pitchtable[note->getNote()] ;
+		if (stretchNotes > 0) {
+			mFreqFactor = (float)(  (float)(samplesperbeat*(stretchNotes/4)) / (float)(fullframes)  );
+		} else {
+			mFreqFactor = pitchtable[60] / pitchtable[note->getNote()] ;
+		}
 		
 		
 		srcState = NULL;
