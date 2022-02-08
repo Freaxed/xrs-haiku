@@ -5,20 +5,15 @@
 
 class MixerWindow : public XrsWindow
 {
-
 public:
-			static MixerWindow*	Get();
+			static	MixerWindow*	Get();
 				
-						~MixerWindow();
+							~MixerWindow();
 			
-			void		MessageReceived(BMessage *msg);
-			bool		QuitRequested(void);
-			
-			void		SaveSettings(BMessage*	data);
-			void		LoadSettings(BMessage*	data);
+					bool	QuitRequested(void);
 			
 private:
-						MixerWindow(void);
+							MixerWindow(void);
 };
 
 #endif //MIXERWINDOW_H

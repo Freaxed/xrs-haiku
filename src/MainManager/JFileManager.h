@@ -37,18 +37,15 @@ class JFileManager
 	status_t	LoadFile(entry_ref,Song*);	//The name    ??
 	
 	
-	Song*		EmptySong();
+	Song*			EmptySong();
 	void			CloseSong(Song*);	
 	
 	void			Init();
 	
-	status_t	Load();
+	status_t		Load();
 	void			Save(Song*,bool);
 	void			SaveReq(entry_ref,const char*,Song*);
-	
-	/* Zip */
-	void			Zip(Song*);
-	void			DoZip(entry_ref,const char*,Song*);
+
 	
 	status_t	RenderAsWave(BMessage *setting);
 	void			ExportWave(BMessage *info);
@@ -95,10 +92,6 @@ class JFileManager
 		BMessage*		compatible; //for loading 1.2 files..
 		entry_ref sl;
 		
-		/* zip */
-		status_t	ZipStart (const char*,const char*);
-		thread_id	PipeCommand (int argc, const char **argv, int & in, int & out, int & err, const char **envp); 
-
 
 };
 

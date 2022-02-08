@@ -125,8 +125,6 @@ MainWindow::CreateMenu(){
 	menuFile->AddItem(saveas_item=new BMenuItem(T_MENU_SAVE_AS,new BMessage(MENU_SAVEAS)));
 	menuFile->AddItem(new BMenuItem(T_MENU_EXPORT_AS_WAVE,new BMessage(MENU_EXPORT)));
 	menuFile->AddSeparatorItem();
-	menuFile->AddItem(new BMenuItem(T_MENU_COLLECT_AS_ZIP,new BMessage(MENU_ZIP)));
-	menuFile->AddSeparatorItem();
 	menuFile->AddItem(new BMenuItem(T_MENU_ABOUT,new BMessage(B_ABOUT_REQUESTED)));
 	menuFile->AddSeparatorItem();
 	menuFile->AddItem(quit_item=new BMenuItem(T_MENU_QUIT,new BMessage(B_QUIT_REQUESTED),'Q'));	//Un po' brutale..

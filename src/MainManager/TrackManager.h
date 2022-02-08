@@ -31,7 +31,7 @@ public:
 				~TrackManager();
 				
 	static TrackManager*	Get();	
-	Track*			getTrack(int);
+	Track*			getTrack(int16);
 	
 	JTrack*			MakeJTrack(Track*, BRect rect, int16 n);		
 	JTrack*			getJTrack();
@@ -39,14 +39,14 @@ public:
 	
 	bool			Load(Track*,int,BFile*,int32,int32); //tenuto per compatibilità (?)
 	
-	void			SaveBoosterSettings(int i,BMessage*);
+	void			SaveBoosterSettings(int16 i, BMessage*);
 	void			SaveTrackSettings(Track*,BMessage*);
 	
 	void			LoadBoosterSettings(BMessage*);
 	void			LoadTrackSettings(Track*,BMessage*);
 	
 	
-	Track*			SendRef(entry_ref,int,BMessage *m=NULL);
+	Track*			SendRef(entry_ref,int16,BMessage *m=NULL);
 	bool			RefReceived(entry_ref,JTrack*,BMessage *g=NULL);	
 	bool			isBoosterValid(int);
 	
@@ -67,7 +67,6 @@ public:
 	void			Close();
 	
 	void			GetXRSDirectoryEntry(entry_ref*,const char*);
-	void			ErrorMsg(const char *msg,const char *txt);
 	BMenu*			getMenu() {return myMenu;}
 	
 	void			ShowTrackInfo();
@@ -75,22 +74,19 @@ public:
 	protected:
 	friend class TracksPanel;	
 			
-			TracksPanel*	curPanel;
+		TracksPanel*	curPanel;
 	
 	
 	private:
 					TrackManager();
-		void		LoadPlugin(const char *name,int i);
-		void		LoadInternalSamplerPlugin(int i);
+		void		LoadAllTrackBoost();
+		status_t	RegisterTrackBoost(TrackBoost* boost);
 		
 		//fix.. please rename these!!
 		
-		BMenu		*myMenu;
-		JTrack		*j;
-		Track		*t;
-		TrackBoost	*list[MAX_PLUG];	
-		image_id 	image_ar[MAX_PLUG];
-		JTrack		*curJTrack;
+		BMenu*		myMenu;
+		TrackBoost* list[MAX_PLUG];	
+		JTrack*		curJTrack;
 		
 		Song*		curSong;
 		BView*		current;

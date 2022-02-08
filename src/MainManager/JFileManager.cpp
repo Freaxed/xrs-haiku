@@ -165,186 +165,186 @@ JFileManager::SaveReq(entry_ref ref, const char* file_name,Song* s)
 	}
 }
 
-status_t
-JFileManager::SaveFile(entry_ref rif,Song* song,bool zip)
-{
+// status_t
+// JFileManager::SaveFile(entry_ref rif,Song* song,bool zip)
+// {
 	
-	status_t error;
-	int i,j,k;
+// 	status_t error;
+// 	int i,j,k;
 	
-	file=new BFile();
+// 	file=new BFile();
 				  
-    char	title[10]="ClapLost ";
+//     char	title[10]="ClapLost ";
     	
-    error=file->SetTo(&rif,B_CREATE_FILE|B_READ_WRITE);
-    if(error) return error;
+//     error=file->SetTo(&rif,B_CREATE_FILE|B_READ_WRITE);
+//     if(error) return error;
     	
-    error=file->InitCheck();
-    if(error) return error;
+//     error=file->InitCheck();
+//     if(error) return error;
 
     	
     	
-    	WriteFixed(FILE_VERSION,FILE_VERSION_INT);
-       	WriteFixed(SONG_START,0);
+//     	WriteFixed(FILE_VERSION,FILE_VERSION_INT);
+//        	WriteFixed(SONG_START,0);
    
-    	WriteVar(SONG_TITLE,title,10);
-    	WriteVar(SONG_DESC,(void*)song->getDescription(),song->getSizeDescription());
+//     	WriteVar(SONG_TITLE,title,10);
+//     	WriteVar(SONG_DESC,(void*)song->getDescription(),song->getSizeDescription());
     
-    	if(song->popupdesc)
-    		WriteFixed(SONG_POPUP_DESC,1);
-    	else
-    		WriteFixed(SONG_POPUP_DESC,0);
+//     	if(song->popupdesc)
+//     		WriteFixed(SONG_POPUP_DESC,1);
+//     	else
+//     		WriteFixed(SONG_POPUP_DESC,0);
 	    	
  	   	
-    	Track*		cur;
-    	Pattern* 	pat;
-    	BMessage*	m_data;
-    	int64	ap;
+//     	Track*		cur;
+//     	Pattern* 	pat;
+//     	BMessage*	m_data;
+//     	int64	ap;
     	
-    	WriteFixed(SONG_TIME,song->getTempo());
-    	if(song->getSequence()->all)
-    		WriteFixed(SONG_PLAY_ALL,song->getTempo());
+//     	WriteFixed(SONG_TIME,song->getTempo());
+//     	if(song->getSequence()->all)
+//     		WriteFixed(SONG_PLAY_ALL,song->getTempo());
     	
     	   	
-    	//Mixer (OutputLines & VSTi)
-    	song->mixer_settings->MakeEmpty();
-    	MixerWindow::Get()->SaveSettings(song->mixer_settings);
-    	WriteFixed(MIXER_SETTINGS,song->mixer_settings->FlattenedSize());
-		song->mixer_settings->Flatten(file);   	
+//     	//Mixer (OutputLines & VSTi)
+//     	song->mixer_settings->MakeEmpty();
+//     	MixerWindow::Get()->SaveSettings(song->mixer_settings);
+//     	WriteFixed(MIXER_SETTINGS,song->mixer_settings->FlattenedSize());
+// 		song->mixer_settings->Flatten(file);   	
     	
-    	int curType;    	
+//     	int curType;    	
     	
-    	int32 n=(int32)song->getNumberNotes();
-    	WriteFixed(SONG_NUM_NOTES,n);
+//     	int32 n=(int32)song->getNumberNotes();
+//     	WriteFixed(SONG_NUM_NOTES,n);
     	    	
-    	for(int i=0;i<MAX_PLUG;i++)
-		{
-			if(tm->isBoosterValid(i))
-			{
-				 //WriteFixed(SONG_TRACKBOOST,i);
-				m_data=new BMessage();
-				if(zip) m_data->AddBool("zipped",true);
+//     	for(int i=0;i<MAX_PLUG;i++)
+// 		{
+// 			if(tm->isBoosterValid(i))
+// 			{
+// 				 //WriteFixed(SONG_TRACKBOOST,i);
+// 				m_data=new BMessage();
+// 				if(zip) m_data->AddBool("zipped",true);
 				
-				tm->SaveBoosterSettings(i,m_data);
-    			WriteFixed(BOOSTER_SETTINGS,m_data->FlattenedSize());
-				m_data->Flatten(file);   	
-				if(zip)
-					CollectData(m_data,rif);
+// 				tm->SaveBoosterSettings(i,m_data);
+//     			WriteFixed(BOOSTER_SETTINGS,m_data->FlattenedSize());
+// 				m_data->Flatten(file);   	
+// 				if(zip)
+// 					CollectData(m_data,rif);
 				
-			}
-		}	
+// 			}
+// 		}	
     	
-    	for(j=0;j<song->getNumberTrack();j++)
-    	{
+//     	for(j=0;j<song->getNumberTrack();j++)
+//     	{
     	
-    		// Track Saving
-    		// Common track properties (vol/pan/name/pattern)
-    		// & Specific Type-depended info (with a BMessage)
+//     		// Track Saving
+//     		// Common track properties (vol/pan/name/pattern)
+//     		// & Specific Type-depended info (with a BMessage)
     		
-    		cur=song->getTrackAt(j);
-    		curType=cur->getModel();
+//     		cur=song->getTrackAt(j);
+//     		curType=cur->getModel();
     		
     		   		    		
-    		WriteFixed(TRACK_START,curType);
+//     		WriteFixed(TRACK_START,curType);
     		 
     		 
-    		WriteFixed(TRACK_VOLUME,(int64)(cur->Gain() * 100));
-    		WriteFixed(TRACK_PANNER,(int64)(cur->Pan() * 100));
+//     		WriteFixed(TRACK_VOLUME,(int64)(cur->Gain() * 100));
+//     		WriteFixed(TRACK_PANNER,(int64)(cur->Pan() * 100));
     		
     		
-    		if(cur->isNameLocked()) 
-    		{
-    			// first you set the new name.   			
-				WriteVar(TRACK_NAME,(void*)cur->getName(),strlen(cur->getName()));
+//     		if(cur->isNameLocked()) 
+//     		{
+//     			// first you set the new name.   			
+// 				WriteVar(TRACK_NAME,(void*)cur->getName(),strlen(cur->getName()));
 				
-				// second you lock that name
-				ap=1;
-    			WriteFixed(TRACK_NAME_SET,ap);
-			}
+// 				// second you lock that name
+// 				ap=1;
+//     			WriteFixed(TRACK_NAME_SET,ap);
+// 			}
 			
-			ap = cur->isOn() ? 1 : 0 ;
+// 			ap = cur->isOn() ? 1 : 0 ;
     		
-    		WriteFixed(TRACK_MUTE,ap);
-    		WriteFixed(TRACK_OUTPUT_LINE,cur->getRouteLine());	
+//     		WriteFixed(TRACK_MUTE,ap);
+//     		WriteFixed(TRACK_OUTPUT_LINE,cur->getRouteLine());	
 		 	
-		 	// salvataggio MIDI-IN??
-		 	WriteFixed(TRACK_MIDI_IN_CH,cur->GetMidiInCh());
+// 		 	// salvataggio MIDI-IN??
+// 		 	WriteFixed(TRACK_MIDI_IN_CH,cur->GetMidiInCh());
 		 	
-		 	ap = cur->IsMidiInEnable() ? 1 : 0 ;
+// 		 	ap = cur->IsMidiInEnable() ? 1 : 0 ;
 		 	
-		 	WriteFixed(TRACK_MIDI_IN_EN,ap);
+// 		 	WriteFixed(TRACK_MIDI_IN_EN,ap);
 		 	
 		 	
-     		m_data=new BMessage();
-    		tm->SaveTrackSettings(cur,m_data);
-    		WriteFixed(TRACK_SETTINGS,m_data->FlattenedSize());
-			m_data->Flatten(file); 	
+//      		m_data=new BMessage();
+//     		tm->SaveTrackSettings(cur,m_data);
+//     		WriteFixed(TRACK_SETTINGS,m_data->FlattenedSize());
+// 			m_data->Flatten(file); 	
      		
-    		 for(i=0;i<song->getNumberMeasure();i++)
-    		 {
+//     		 for(i=0;i<song->getNumberMeasure();i++)
+//     		 {
     	
-    			 WriteFixed(PATTERN_START,0);
+//     			 WriteFixed(PATTERN_START,0);
     			
-    			 pat=cur->getPatternAt(i); 
+//     			 pat=cur->getPatternAt(i); 
     			
-    			 for(k=0;k<pat->getNumberNotes();k++)
-    			 {
-    			    	WriteFixed(NOTE_START,0);
+//     			 for(k=0;k<pat->getNumberNotes();k++)
+//     			 {
+//     			    	WriteFixed(NOTE_START,0);
     			    	
-    			    		if(pat->getNoteAt(k)->getValue())
-    			    			WriteFixed(NOTE_ON,1);
-    			    		else
-    			    			WriteFixed(NOTE_ON,0);
+//     			    		if(pat->getNoteAt(k)->getValue())
+//     			    			WriteFixed(NOTE_ON,1);
+//     			    		else
+//     			    			WriteFixed(NOTE_ON,0);
     			    	
-    			    		WriteFixed(NOTE_VOLUME,(int64)(pat->getNoteAt(k)->Gain()*100));
-    			    		WriteFixed(NOTE_NEWNOTE,pat->getNoteAt(k)->getNote());
+//     			    		WriteFixed(NOTE_VOLUME,(int64)(pat->getNoteAt(k)->Gain()*100));
+//     			    		WriteFixed(NOTE_NEWNOTE,pat->getNoteAt(k)->getNote());
     			    	
-    			    	WriteFixed(NOTE_STOP,0);		
-    			}		
+//     			    	WriteFixed(NOTE_STOP,0);		
+//     			}		
     			
-    			 WriteFixed(PATTERN_STOP,0);
+//     			 WriteFixed(PATTERN_STOP,0);
     		  			
-    		 }
+//     		 }
          		
-      	WriteFixed(TRACK_STOP,curType);
-	} 
+//       	WriteFixed(TRACK_STOP,curType);
+// 	} 
     
     
-    // Playlist:
+//     // Playlist:
     
-    	WriteFixed(PL_START,1);
+//     	WriteFixed(PL_START,1);
     	
-    	WriteFixed(PL_LOOP_ENABLE,(int)song->getSequence()->loop_enable);
-    	WriteFixed(PL_LOOP_POINT1,song->getSequence()->loop_points[0]);
-    	WriteFixed(PL_LOOP_POINT2,song->getSequence()->loop_points[1]);
+//     	WriteFixed(PL_LOOP_ENABLE,(int)song->getSequence()->loop_enable);
+//     	WriteFixed(PL_LOOP_POINT1,song->getSequence()->loop_points[0]);
+//     	WriteFixed(PL_LOOP_POINT2,song->getSequence()->loop_points[1]);
     	
-    	for(int p=0;p<song->getSequence()->getMaxSeq()+1;p++)
-    	{
+//     	for(int p=0;p<song->getSequence()->getMaxSeq()+1;p++)
+//     	{
     		
-    			WriteFixed(PL_POS_START,p);
-    			/*Inserire altro ciclo loop*/
-    			for(int jx=0;jx<song->getSequence()->getMaxPat();jx++)
-    			{
-    				int y=song->getSequence()->ItemAt(p,jx);
-    				if(y>=0)	WriteFixed(PL_POS_PAT,jx);
+//     			WriteFixed(PL_POS_START,p);
+//     			/*Inserire altro ciclo loop*/
+//     			for(int jx=0;jx<song->getSequence()->getMaxPat();jx++)
+//     			{
+//     				int y=song->getSequence()->ItemAt(p,jx);
+//     				if(y>=0)	WriteFixed(PL_POS_PAT,jx);
     				
-    			}
-    			WriteFixed(PL_POS_STOP,0);
-    	}
+//     			}
+//     			WriteFixed(PL_POS_STOP,0);
+//     	}
     	
-    	WriteFixed(PL_STOP,1);
+//     	WriteFixed(PL_STOP,1);
     		
-    	WriteFixed(SONG_STOP,0);
+//     	WriteFixed(SONG_STOP,0);
     	
-    	AddMime(file);
+//     	AddMime(file);
     	
-    	delete file;
+//     	delete file;
 	
-	return B_OK;
+// 	return B_OK;
 	
-	printf("File Saved!\n");
+// 	printf("File Saved!\n");
 	
-}
+// }
 
 status_t
 JFileManager::Load()
@@ -850,136 +850,7 @@ JFileManager::Save(Song* s,bool saveas)
 	
 }
 
-void
-JFileManager::Zip(Song* s)
-{
-	entry_ref sl;
-	if(!filepanel)
-	filepanel=new BFilePanel(B_SAVE_PANEL,NULL,NULL,0,false,NULL,NULL,true);
-	filepanel->SetMessage(new BMessage('zipo'));
-	filepanel->Show();
 	
-	//
-	
-}
-void
-JFileManager::DoZip(entry_ref ref, const char* file_name,Song* s)
-{
-	BEntry e(&ref);
-	BPath p(&e);
-	//BEntry* zip;
-	
-	entry_ref rif;
-	entry_ref songfile;
-	
-	BString	outzip;
-	//choosing the name:
-	BString	songName=file_name;
-	songName.RemoveLast(".zip");
-	
-	if(s->getEntry()!=NULL)
-	{
-		BPath p(s->getEntry());
-		songName=p.Leaf();	
-	}
-		
-	printf("Estimated name  : %s \n",songName.String());
-	
-		
-	p.Append(file_name);
-	
-	get_ref_for_path(p.Path(),&rif);
-	
-	printf("Zipping  : %s \n",p.Path());
-	outzip=p.Path();
-	
-	/* Algo to Zip */
-	/*
-		steps:
-			1) create a dir in a temporaly directory
-			2) save in that directory the song
-			3) Ask every Booster to 'Zip' in the specific directory
-				(NOTE: a bool in TrackBoosterSave) COLLECT AS SIMLINK
-			4) launch the script to zip the folder ('with comments!')
-			5) enjoy
-	*/
-	
-	//1) FIX ME!!!!!!!!!!
-		BPath path;
-		BDirectory dir;
-		
-		if (find_directory(B_SYSTEM_TEMP_DIRECTORY, & path) == B_OK)
-			dir.SetTo(path.Path());
-		else 
-			return; //??
-		
-		path.Append(songName.String());
-		rmdir(path.Path());
-		
-		dir.CreateDirectory(songName.String(),&dir); //the song need to be saved?
-		
-	//2)
-		dir.GetEntry(&e);
-		p.SetTo(&e);
-		printf("Zipping  : %s \n",p.Path());
-		p.Append(songName.String());
-		printf("Zipping  : %s \n",p.Path());
-	
-		get_ref_for_path(p.Path(),&songfile);
-		
-		SaveFile(songfile,s,true);
-	//3)?
-		
-	//4)
-		BEntry old(outzip.String());
-		old.Remove(); //this should remove the file?
-		ZipStart(outzip.String(),songName.String());
-		rmdir(path.Path());
-	//5) :=)
-				
-	if(filepanel!=NULL) 
-	{
-		delete filepanel;
-		filepanel=NULL;
-	}
-}
-
-void		
-JFileManager::CollectData(BMessage* msg,entry_ref ref)
-{
-	//
-
-	BEntry e(&ref);
-	e.GetParent(&e);
-	
-	BPath p(&e);
-	
-	BPath targetdir;
-	BPath targetname;
-	
-	BString filename;
-	int i=0;
-	
-		
-	while(msg->FindString("collect",i,&filename)==B_OK)
-	{
-		targetname.SetTo(filename.String());
-		targetdir.SetTo(p.Path());
-		targetdir.Append(targetname.Leaf());
-		//targetname.SetTo(targetname.Leaf());
-		printf("COLLECT: from: %s to %s\n",filename.String(),targetdir.Path());
-		/* here create the link*/
-		BDirectory d(p.Path());
-		BSymLink* link=new BSymLink();
-		d.CreateSymLink(targetname.Leaf(),filename.String(), link);
-		i++;
-	}
-	
-	// reduce file size :)
-	msg->RemoveName("zipped");
-	msg->RemoveName("collect");
-}
-		
 void
 JFileManager::WriteFixed(int64 code ,int64 data)
 {
@@ -1361,9 +1232,8 @@ void
 JFileManager::AddMime(BFile*	 file)
 {
 	BNodeInfo	info;
-	status_t err;
-	err=info.SetTo(file);
-	err=info.SetType("audio/XRS-File");
+	info.SetTo(file);
+	info.SetType("audio/XRS-File");
 }
 status_t
 JFileManager::AskForClose(Song* s)
@@ -1406,118 +1276,7 @@ JFileManager::AnalizeError(BMessage* msg)
 	}
 }
 
-status_t
-JFileManager::ZipStart(const char* destzip,const char* filename)
-{
-	
-	thread_id m_zip_process_thread_id;
 
-	BString	directory_name="";
-		
-	//directory_name="./";
-	//directory_name += filename;
-	//directory_name << "/" << filename ;
-	
-	BPath path;
-	if (find_directory(B_SYSTEM_TEMP_DIRECTORY, & path) == B_OK)
-	chdir (path.Path());
-	else return B_ERROR; //??
-	
-	path.Append(filename);
-	BDirectory dir(path.Path());
-	BEntry entry;
-	dir.Rewind();
-	
-	
-	int32  argc  =  3 + dir.CountEntries()  ;
-    
-    const char ** argv =	 new const char * [argc + 1];
-	
-	argv[0]	=	strdup("/bin/zip");
-	argv[1]	=	strdup("-Dm");
-	argv[2]	=	strdup(destzip);
-	
-	int pos=3;
-	
-	while (dir.GetNextEntry(&entry) == B_OK)
-	{
-		BPath p;
-		entry.GetPath(&p);
-		directory_name ="./";
-	    directory_name += filename;
-	    directory_name << "/" << p.Leaf() ;
-	    argv[pos] =	strdup(directory_name.String());
-	    pos++;
-	}
-		
-	// files to zip
-	
-	argv[argc]	=	NULL;
-	
-	printf("Ready to execute : ");
-	for(int i=0;i<argc;i++)
-		printf("%s ",argv[i]);
-	printf("\n");
-	
-	int m_std_in,m_std_out,m_std_err;
-	
-	m_zip_process_thread_id  =  PipeCommand (argc, argv, m_std_in, m_std_out, m_std_err,NULL); 
-	
-	//printf("load_image() thread_id: %ld\n", m_zip_process_thread_id);
-	
-	delete [] argv;
-
-	if (m_zip_process_thread_id < 0)
-		return (m_zip_process_thread_id); 
-    
-    status_t  status  =  B_OK;
-    //resume_thread (m_zip_process_thread_id); 
-    wait_for_thread (m_zip_process_thread_id, & status);
-	
-	close(m_std_in);
-	close(m_std_out);
-	close(m_std_err);
-		
-	return B_OK;
-}
-
-thread_id
-JFileManager::PipeCommand (int argc, const char **argv, int & in, int & out, int & err, const char **envp) 
-{ 
-	// This function written by Peter Folk <pfolk@uni.uiuc.edu>
-	// and published in the BeDevTalk FAQ 
-	// http://www.abisoft.com/faq/BeDevTalk_FAQ.html#FAQ-209
-
-    // Save current FDs 
-    int old_in  =  dup(0); 
-    int old_out  =  dup(1); 
-    int old_err  =  dup(2); 
-    
-    int filedes[2]; 
-    
-    /* Create new pipe FDs as stdin, stdout, stderr*/ 
-    pipe(filedes);  dup2(filedes[0],0); close(filedes[0]); 
-    in=filedes[1];  // Write to in, appears on cmd's stdin 
-    pipe(filedes);  dup2(filedes[1],1); close(filedes[1]); 
-    out=filedes[0]; // Read from out, taken from cmd's stdout 
-    pipe(filedes);  dup2(filedes[1],2); close(filedes[1]); 
-    err=filedes[0]; // Read from err, taken from cmd's stderr 
-         
-      // "load" command. 
-    thread_id ret  =  load_image(argc, argv, (const char **)environ); 
-    // thread ret is now suspended. 
-
-	 // Restore old FDs 
-    close(0); dup(old_in); close(old_in); 
-    close(1); dup(old_out); close(old_out); 
-    close(2); dup(old_err); close(old_err); 
-    
-    /* Theoretically I should do loads of error checking, but 
-       the calls aren't very likely to fail, and that would 
-       muddy up the example quite a bit.  YMMV. */ 
-
-    return ret; 
-} 
 void
 JFileManager::Comatible12(Track* tr,int32 va,int32 rt)
 { //->
@@ -1596,3 +1355,158 @@ JFileManager::Comatible12(Track* tr,int32 va,int32 rt)
 	}
 }
 
+//
+// NEW VERSION All BMessage Based!
+#include "PMixer.h"
+status_t
+JFileManager::SaveFile(entry_ref rif,Song* song, bool zip)
+{
+	status_t error;
+		
+	BFile* file =new BFile();
+   	
+    if ((error = file->SetTo(&rif,B_CREATE_FILE|B_READ_WRITE) != B_OK)) {
+		LogError("Can't create file! (SetTo)");
+		return error;
+	}
+   	
+    if (( error = file->InitCheck() != B_OK)) {
+    	LogError("Can't create file! (InitCheck)");
+		return error;
+	}
+
+	//TODO MOVE TO THE SONG CLASS??!?
+	BMessage songInfo;
+	songInfo.AddInt64  ( "Version" 		, FILE_VERSION_INT);
+    songInfo.AddString ( "Title"   		, "");
+	songInfo.AddString ( "Description"	, song->getDescription());
+	songInfo.AddBool   ( "DescPopUp"    , song->popupdesc);
+	songInfo.AddInt64  ( "BeatPerMinute", song->getTempo());
+	songInfo.AddBool   ( "PlayAll"      , song->getSequence()->all);
+ 	songInfo.AddInt64  ( "NumNotes"		, song->getNumberNotes());
+
+	//saving Mixer information.
+	BMessage mixer;
+	for (uint8 i=0; i<PMixer::Get()->CountBusses(); i++) {
+		BMessage mixerLine;
+		PBus* bus = PMixer::Get()->BusAt(i);
+		mixerLine.AddFloat("Gain", bus->Gain());
+		mixerLine.AddFloat("Pan",  bus->Pan());
+		BMessage fxs;
+		bus->Effector()->SaveSettings(&fxs);
+		mixerLine.AddMessage("Effects", &fxs);
+
+		mixer.AddMessage("Line", &mixerLine);
+	}
+	songInfo.AddMessage("Mixer", &mixer);
+
+
+	//Saving tracks info
+	TrackManager*	trackManager = TrackManager::Get();
+	
+	BMessage	boostsSettings;
+	for(int16 i=0;i<MAX_PLUG;i++)
+	{
+		if(trackManager->isBoosterValid(i))
+		{
+			BMessage boost;
+			boost.AddInt16("id", i);
+			
+			trackManager->SaveBoosterSettings(i, &boost);
+			boostsSettings.AddMessage("BoostSettings", &boost);		
+		}
+	}
+
+	songInfo.AddMessage("Boosts", &boostsSettings);
+    
+	BMessage tracksSettings;
+	for(int j=0;j<song->getNumberTrack();j++)
+	{
+	
+		// Track Saving
+		BMessage track;
+
+		Track* cur = song->getTrackAt(j);
+		
+		track.AddInt16("Type", cur->getModel());				
+		track.AddFloat("Gain", cur->Gain());
+		track.AddFloat("Pan",  cur->Pan());					
+		
+		if(cur->isNameLocked()) 
+		{
+			track.AddString("Name",		  cur->getName());		
+			track.AddBool  ("NameLocked", true);
+		}
+		
+		track.AddBool ("Mute", 		!cur->isOn());
+		track.AddInt16("OutputLine", cur->getRouteLine());
+		track.AddInt16("MidiIn", 	 cur->GetMidiInCh());
+		track.AddInt16("MidiEnale",  cur->IsMidiInEnable());
+
+		BMessage settings;
+		trackManager->SaveTrackSettings(cur, &settings);
+		track.AddMessage("settings", &settings);
+		
+		BMessage patterns;
+		for(int i=0; i<song->getNumberMeasure(); i++)
+		{
+			BMessage pattern;
+		
+			Pattern* pat = cur->getPatternAt(i); 
+		
+			for(int k=0;k<pat->getNumberNotes();k++)
+			{
+				BMessage note;
+				note.AddBool( "Value", pat->getNoteAt(k)->getValue());
+				note.AddFloat("Gain",  pat->getNoteAt(k)->Gain());
+				note.AddFloat("Pan",   pat->getNoteAt(k)->Pan());
+				note.AddInt16("Note",  pat->getNoteAt(k)->getNote());
+
+				pattern.AddMessage("Note", &note);
+			}		
+		
+			patterns.AddMessage("Pattern", &pattern);
+		}
+		
+		track.AddMessage("Patterns",&patterns);
+
+		tracksSettings.AddMessage("TrackSettings", &track);
+	}
+
+	songInfo.AddMessage("TracksSettings", &tracksSettings);
+    
+    
+    // Playlist: 
+	BMessage playlist;
+
+	//TODO: move into Sequence class!!
+
+	playlist.AddBool("Enable", song->getSequence()->loop_enable);
+	playlist.AddInt16("Point", song->getSequence()->loop_points[0]);
+	playlist.AddInt16("Point", song->getSequence()->loop_points[1]);
+    	
+	for(int p=0;p<song->getSequence()->getMaxSeq()+1;p++)
+	{
+		BMessage sequence;
+		/*Inserire altro ciclo loop*/
+		for(int16 jx=0;jx<song->getSequence()->getMaxPat();jx++)
+		{
+			int y = song->getSequence()->ItemAt(p,jx);
+			if ( y >= 0 )
+				sequence.AddInt16("Pattern", jx);
+		}
+		playlist.AddMessage("Sequence", &sequence);
+	}
+    	
+    songInfo.AddMessage("Playlist", &playlist);
+	songInfo.Flatten(file);	
+
+    AddMime(file);
+    	
+//    file->Close();
+    delete file;
+	
+	LogInfo("File Saved!\n");
+
+	return B_OK;	
+}

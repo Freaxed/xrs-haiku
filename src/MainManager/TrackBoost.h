@@ -34,6 +34,7 @@ class TrackBoost
 	BString	name;
 	int16	id;		// Ask Me to assign
 	
+	const char*			Name() {return name.String();}
 	virtual	Track*		getTrack() { return NULL;}
 	virtual	PlugPanel*	getPanel(){return NULL;}
 	

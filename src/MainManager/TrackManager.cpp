@@ -42,10 +42,8 @@ TrackManager::TrackManager()
 {
 	curSong=NULL;
 	curPanel=NULL;
-	for(int i=0;i<MAX_PLUG;i++)
-	{
-		 image_ar[i]=0;
-	}
+	for (int i=0;i<MAX_PLUG;i++)
+		list[i] = NULL;
 }
 
 TrackManager*
@@ -59,194 +57,82 @@ TrackManager::Get()
 
 TrackManager::~TrackManager()
 {
-	for(int i=0;i<MAX_PLUG;i++)
-	{
-		 if(image_ar[i]!=0) unload_add_on(image_ar[i]);
-	}
-	
+	//TODO: delete all the tracks!
 }
 
-void
-TrackManager::LoadInternalSamplerPlugin(int i)
+status_t		
+TrackManager::RegisterTrackBoost(TrackBoost* boost)
 {
-		//TOGLIERE GLI INCLUDE
-		TrackBoost * tb = new SamplerTrackBoost();
-		list[tb->id]=tb;
-		tb->Init();
+		int16	id = boost->id;
+		if(id < 0 && id > MAX_PLUG-1) {
+			LogError("Invalid TrackBooster id (%d) (%s)", id, boost->Name());
+			return B_ERROR;
+		}
+
+		list[id] = boost;		
+		boost->Init();
 
 		BMessage *m = new BMessage(ADD_TRACK);
-		m->AddInt16("id",tb->id);
-		
-		if(tb->id<0 && tb->id>MAX_PLUG-1) 
-			return;
+		m->AddInt16("id", id);
 	
-		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+i));
-		
-		
-		//il TNT
-		tb = new TNTrackBoost();
-		i = 2;
-		
-		list[tb->id]=tb;
-		tb->Init();
+		myMenu->AddItem(new BMenuItem( boost->Name(), m, '1' + (char)id ) );
 
-		m = new BMessage(ADD_TRACK);
-		m->AddInt16("id",tb->id);
-		
-		if(tb->id<0 && tb->id>MAX_PLUG-1) 
-			return;
-	
-		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+i));
-		
-		
-		//il VIW
-		tb = new VIWTrackBoost();
-		i = 4;
-		
-		list[tb->id]=tb;
-		tb->Init();
 
-		m = new BMessage(ADD_TRACK);
-		m->AddInt16("id",tb->id);
+		BView *v=(BView*)boost->getPanel();
+		if(v)
+		{
+			TrackInfoWindow::Get()->AddChild(v);
+			v->Hide();
+		}
 		
-		if(tb->id<0 && tb->id>MAX_PLUG-1) 
-			return;
-	
-		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+i));
 
-		//il XFluidSynth
-		tb = new SFSTrackBoost();
-		i = 7;
-	
-		list[tb->id]=tb;
-		tb->Init();
-
-		m = new BMessage(ADD_TRACK);
-		m->AddInt16("id",tb->id);
-		
-		if(tb->id<0 && tb->id>MAX_PLUG-1) 
-			return;
-	
-		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+ i ));
-
-		
-		
-		//il JMDRUM
-		tb = new JMDrumTrackBoost();
-		i = 8;
-		
-		list[tb->id]=tb;
-		tb->Init();
-
-		m = new BMessage(ADD_TRACK);
-		m->AddInt16("id",tb->id);
-		
-		if(tb->id<0 && tb->id>MAX_PLUG-1) 
-			return;
-	
-		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+ i ));
+		LogInfo("TrackBooster [%s] loaded.", boost->Name());
+		return B_OK;
 }
 
 void
-TrackManager::LoadPlugin(const char *name,int i)
+TrackManager::LoadAllTrackBoost()
 {
-	entry_ref hope;
-	GetXRSDirectoryEntry(&hope,"Extensions");
-	BPath sup(name); 
-	BPath  *p=new BPath(new  BEntry(&hope) );
-	p->Append(sup.Leaf());	
-	//get_ref_for_path(p->Path(),&hope);
-	
-	image_ar[i]= load_add_on (p->Path());
-	
-	if (image_ar[i] > 0)
-	{
-		// the file is indeed an addon, but is it a VST plugin?
-		//printf ("OK! VST Plugin?... ");
-		TrackBoost * tb;
-		TrackBoost * (*main_plugin) ();
-		if (get_image_symbol (image_ar[i], "main_plugin", B_SYMBOL_TYPE_TEXT, (void**) &main_plugin) == B_OK)
-		{	// Chances are now that this is a VST plugin, but is it supported?...
-									//printf ("Yes!\n");
-		tb = (*main_plugin) ();
-		printf ("Found XRS-Extension... %10s (id: %2d)\n",tb->name.String(),tb->id);
-		
-	
-		list[tb->id]=tb;
-		tb->Init();
-		
-		
-		
-		BMessage *m=new BMessage(ADD_TRACK);
-		m->AddInt16("id",tb->id);
-		
-		if(tb->id<0 && tb->id>MAX_PLUG-1) return;
-		
-		
-	
-		myMenu->AddItem(new BMenuItem(tb->name.String(),m,'1'+i));
-	
-		
-		
-		
-		
-		
-		}
-	}
+	RegisterTrackBoost ( new SamplerTrackBoost());
+	RegisterTrackBoost ( new TNTrackBoost());
+	RegisterTrackBoost ( new VIWTrackBoost());
+	RegisterTrackBoost ( new SFSTrackBoost());
+	RegisterTrackBoost ( new JMDrumTrackBoost());
 }
+
+
 Track*
-TrackManager::getTrack(int p)
+TrackManager::getTrack(int16 id)
 {
-	if(list[p]==NULL)
+	if(!isBoosterValid(id))
 	{
-		char x[103];
-		sprintf(x,"getTrack() with id  %2d",p);
-		ErrorMsg("Strange error appear!! PLEASE report this bug! (oxygenum@tiscali.it)",x);
+		LogError("Not track for ID %d", id);
 		return NULL;
 	}
-	Track *trk=	list[p]->getTrack();
-	
-	return trk;
+	return list[id]->getTrack();
 }
 
 
 bool
-TrackManager::isBoosterValid(int pos)
+TrackManager::isBoosterValid(int id)
 {
-	if(list[pos]==NULL) return false;
-	
-	return true;
+	return list[id] != NULL;
 }
 
 
 void
-TrackManager::SaveBoosterSettings(int i,BMessage* data)
+TrackManager::SaveBoosterSettings(int16 i, BMessage* data)
 {
-	data->AddInt16("id",i);
+	data->AddInt16("id", i);
 	list[i]->SaveBoosterSettings(data);
 }
 
 void
-TrackManager::SaveTrackSettings(Track* trk,BMessage* data)
+TrackManager::SaveTrackSettings(Track* trk, BMessage* data)
 {
 	list[trk->getModel()]->SaveTrackSettings(trk,data);
 }
-bool
-TrackManager::Load(Track* cur,int t,BFile* file,int32 va,int32 rt)
-{
-	bool ret=false;
-	
-	/*if(t>=MAX_PLUG)
-	{
-		char x[103];
-		sprintf(x,"tm->Load with id  %2d\0",t);
-		ErrorMsg("Strange error appears!! PLEASE report this bug! (oxygenum@tiscali.it)",x);
-			
-		return false;
-	}	*/
-	//ret=list[t]->Load(cur,t,file,va,rt);
-	return ret;
-}
+
 	
 void
 TrackManager::LoadBoosterSettings(BMessage* data)
@@ -261,15 +147,17 @@ TrackManager::LoadTrackSettings(Track* trk,BMessage* data)
 }
 
 Track*
-TrackManager::SendRef(entry_ref ref, int id,BMessage *m)
+TrackManager::SendRef(entry_ref ref, int16 id, BMessage *msg)
 {
-	if(list[id]==NULL) 	return NULL;
+	if(!isBoosterValid(id))
+		return NULL;
 	
-	Track* t=getTrack(id);
+	Track* track = getTrack(id);
 	
-	if(list[id]->RefReceived(ref,t,m)!=B_OK) return NULL;
+	if ( list[id]->RefReceived(ref, track, msg) != B_OK ) 
+		return NULL;
 	
-	return t;
+	return track;
 }
 void
 TrackManager::ShowTrackInfo()
@@ -277,22 +165,24 @@ TrackManager::ShowTrackInfo()
 	WindowManager::Get()->Switch(TrackInfoWindow::Get());
 }
 JTrack*
-TrackManager::MakeJTrack(Track* trk,BRect rect,int16 pos)
+TrackManager::MakeJTrack(Track* trk, BRect rect, int16 pos)
 {
-	return new JTrack(rect,pos);//,trk->getModel());
+	return new JTrack(rect, pos);
 }
 
 void
 TrackManager::Reset(Song* s)
 {
-	if(curJTrack!=NULL) curJTrack->Deselect();
+	if(curJTrack != NULL) 
+		curJTrack->Deselect();
 	
-	curJTrack=NULL;
-	curSong=s;
+	curJTrack = NULL;
+	curSong = s;
 	
-	for(int i=0;i<MAX_PLUG;i++)
+	for(int i=0; i < MAX_PLUG; i++)
 	{
-		if(list[i]!=NULL) list[i]->Reset();
+		if(isBoosterValid(i)) 
+			list[i]->Reset();
 	}
 	
 	
@@ -302,103 +192,84 @@ void
 TrackManager::Restart()
 {
 	TrackInfoWindow::Get()->Lock();
-	if(curJTrack!=NULL) curJTrack->Deselect();
-	curJTrack=NULL;
+	if(curJTrack != NULL) 
+		curJTrack->Deselect();
+	
+	curJTrack = NULL;
 	
 	for(int i=0;i<MAX_PLUG;i++)
 	{
-		if(list[i]!=NULL) list[i]->Restart();
+		if(isBoosterValid(i)) 
+			list[i]->Restart();
 	}	
+
 	TrackInfoWindow::Get()->Unlock();
-	curSong=NULL;
+	
+	curSong = NULL;
+	
 	WindowManager::Get()->Hide(TrackInfoWindow::Get());
 	
 }
 void
 TrackManager::Close()
 {
-
-	
-	
-	
 	for(int i=0;i<MAX_PLUG;i++)
 	{
-		 if(list[i]!=NULL) delete list[i];
+		if(isBoosterValid(i)) 
+			delete list[i];
 	}
-
-	
 }
 
 void
 TrackManager::Init()
 {
-	curJTrack=NULL;
+	curJTrack = NULL;
+	current   = NULL;
+
+	myMenu = new BMenu(T_MENU_EXTENSION);
+	for(int i=0;i<MAX_PLUG;i++) 
+		list[i] = NULL;
 	
-	myMenu=new BMenu(T_MENU_EXTENSION);
-	for(int i=0;i<MAX_PLUG;i++) list[i]=NULL;
 	
-	
-	LoadInternalSamplerPlugin(0); //"Sampler"
-	/*LoadPlugin("Tn306",1);
-	LoadPlugin("MidiOut",2);
-	LoadPlugin("3Osc",3);
-	LoadPlugin("VIW",4);
-	LoadPlugin("Generix",5);
-	LoadPlugin("XFluidSynth",7);
-	LoadPlugin("JMDrum",8);
-	*/
-	current=NULL;
-	
-	for(int i=0;i<MAX_PLUG;i++)
-	
-	if(list[i]!=NULL){
-	
-			printf("Added panel for %d\n",i);			
-			BView *v=(BView*)list[i]->getPanel();
-			if(v){
-			TrackInfoWindow::Get()->AddChild(v);
-			v->Hide();
-			}
-		}
+	LoadAllTrackBoost();
 		
 	WindowManager::Get()->Show(TrackInfoWindow::Get());
 	WindowManager::Get()->Hide(TrackInfoWindow::Get());
-		
-	
 }
 
 status_t
 TrackManager::SelectTrack(JTrack* x) {
 
-	if(curJTrack==x ) return B_ERROR;
+	if ( curJTrack == x ) 
+		return B_ERROR;
 	
-	if(curJTrack!=NULL) {
+	if(curJTrack != NULL) 
 		curJTrack->Deselect();
-	}
 	else	
 		 WindowManager::Get()->Show(TrackInfoWindow::Get());
 	
-	curJTrack=x;
-	if(curJTrack!=NULL) 	
+	curJTrack = x;
+
+	if(curJTrack != NULL) 	
 	{
 		curJTrack->Select();
-		if(list[x->getTrack()->getModel()]!=NULL)
-		
-		if(list[x->getTrack()->getModel()]->getPanel()!=NULL)
-		{
-			PlugPanel	*v=list[x->getTrack()->getModel()]->getPanel();
-			if(TrackInfoWindow::Get()->Lock()){
-				if(current) current->Hide();
-				current=(BView*)v;
-				current->Show();
-				TrackInfoWindow::Get()->Unlock();
-				TrackInfoWindow::Get()->UpdateIfNeeded();
-				TrackInfoWindow::Get()->Activate();
-				v->Reset(x->getTrack());
-				TrackInfoWindow::Get()->SetTrack(x->getTrack());
-				TrackInfoWindow::Get()->UpdateIfNeeded();
+		if(list[x->getTrack()->getModel()] != NULL) {		
+			if(list[x->getTrack()->getModel()]->getPanel() != NULL)
+			{
+				PlugPanel	*v=list[x->getTrack()->getModel()]->getPanel();
+				if(TrackInfoWindow::Get()->Lock()){
+					if(current) current->Hide();
+					current=(BView*)v;
+					current->Show();
+					TrackInfoWindow::Get()->Unlock();
+					TrackInfoWindow::Get()->UpdateIfNeeded();
+					TrackInfoWindow::Get()->Activate();
+					v->Reset(x->getTrack());
+					TrackInfoWindow::Get()->SetTrack(x->getTrack());
+					TrackInfoWindow::Get()->UpdateIfNeeded();
+				}
+				
 			}
-			
 		}
 	}
 	else
@@ -437,21 +308,13 @@ TrackManager::GetXRSDirectoryEntry(entry_ref * ref,const char* folder)
 {	
 	XUtils::GetXRSDirectoryEntry(ref,folder);
 }
-void
-TrackManager::ErrorMsg(const char *msg,const char *txt)
-{
-	char pippo[strlen(msg)+strlen(txt)+2];
-	
-	strcpy(pippo,msg);
-	strcat(pippo,"\n");
-	strcat(pippo,txt); 
-	(new BAlert("XRS ", pippo, "Ok!",NULL,NULL,B_WIDTH_AS_USUAL,B_WARNING_ALERT))->Go();	
-}
+
 
 void
 TrackManager::getAllMyTrack(BList* l, int id)
 {
-	if(curSong==NULL) return ;
+	if(curSong == NULL) 
+		return;
 	
 	for(int i=0;i<curSong->getNumberTrack();i++)
 	{

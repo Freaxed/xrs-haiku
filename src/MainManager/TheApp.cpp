@@ -260,7 +260,7 @@ TheApp::LoadSong(entry_ref ref){
 		}
 	
 		//fix me
-		mixerWin->LoadSettings(currentSong->mixer_settings);
+//		mixerWin->LoadSettings(currentSong->mixer_settings);
 			
 		jfm->AnalizeError(currentSong->mixer_settings);
 			
@@ -357,14 +357,7 @@ TheApp::MessageReceived(BMessage* message)
 		main_window->PostMessage(message);
 	break;
 	
-	case MENU_ZIP:
-		jfm->Zip(currentSong);
-	break;
-	
-	case 'zipo':
-		if(message->FindRef("directory",&ref)==B_OK)
-			jfm->DoZip(ref,message->FindString("name"),currentSong);
-	break;			
+		
 	case B_SAVE_REQUESTED:
 		if(message->FindRef("directory",&ref)==B_OK)
 		{
@@ -591,10 +584,6 @@ TheApp::CloseSong(Song *s)
 void
 TheApp::AboutRequested()
 {
-	
-	AboutBox *ab=new AboutBox(true);
-	ab->Show();
-		
-	printf("Written by Anzani Andrea\nSend comments to : oxygenum@tiscali.it\nFreeware\n");
+	(new AboutBox(true))->Show();
 }
 //-

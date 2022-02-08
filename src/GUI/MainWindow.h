@@ -20,7 +20,7 @@ class Pattern;
 class TickView;
 class Track;
 
-#define	MENU_ZIP	'zipp'
+
 
 class MainWindow : public XrsWindow
 {
