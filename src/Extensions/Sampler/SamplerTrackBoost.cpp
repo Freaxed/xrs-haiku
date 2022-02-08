@@ -492,17 +492,7 @@ SamplerTrackBoost::MakeMenu()
 			
 			menu->AddItem(item);
 			
-		}
-		
-		/*menu->AddSeparatorItem();
-		info=new BMessage(EXT_SAMPLE);
-		info->AddInt16("id",h);
-		item=new BMenuItem("Load External Sample...", info);
-		item->SetTarget(Window());
-		menu->AddItem(item);*/
-		
-		//popup->AddItem(new BitmapMenuItem("","TrackModePianoOff",NULL));
-		
+		}		
 }
 
 void
