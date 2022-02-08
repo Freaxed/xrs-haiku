@@ -6,3 +6,4 @@ objects.x86_64*
 *_
 (Objects*
 
+src/tests/test-sampler/output.wav
