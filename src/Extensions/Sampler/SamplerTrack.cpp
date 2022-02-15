@@ -78,6 +78,7 @@ SamplerTrack::ProcessVoice(XRSVoice v,float ** dest ,uint32 sample_num)
 }
 
 
+
 void		
 SamplerTrack::killVoice(XRSVoice v)
 {
@@ -126,5 +127,47 @@ bool	SamplerTrack::isResampleEnable() { return res_enable; }
 int		SamplerTrack::getResample(){ return (int)(numNotes);}
 void	SamplerTrack::setResample(int val){	numNotes=(float)val; }
 
+
+void				
+SamplerTrack::SaveCustomSettings(BMessage& track)
+{
+	if(getSample()) 
+		track.AddString("SamplePath", getSample()->GetFullPath());
+		
+	track.AddBool("ResampleEnabled",isResampleEnable());	
+    track.AddInt16("Resample", getResample());
+	
+	track.AddFloat("Boost", amp);
+	
+	track.AddBool("BoostEnabled",isBoostEnable());
+	track.AddBool("Reversed",isReversed());
+	
+	track.AddBool("Loop", IsLoopEnable());
+}
+
+void				
+SamplerTrack::LoadCustomSettings(BMessage& track)
+{
+	assert(booster);
+	BString path;
+	if (track.FindString("SamplePath", &path) == B_OK)
+	{
+		Sample *s = booster->FindSample(BPath(path.String()).Leaf());
+		if(s)
+		{
+			booster->_secureSetSample(this, s);
+			setName(getSample()->GetName());
+		}
+	}
+
+
+	setResampleEnable(track.GetBool("ResampleEnabled", false));
+	setResample(track.GetInt16("Resample", 16));
+	amp = track.GetFloat("Boost", 1.0f);
+	setBoostEnable(track.GetBool("BoostEnabled", false));
+	setReversed(track.GetBool("Reversed", false));
+	SetLoopEnable(track.GetBool("Loop", false));
+}
+	
 
 //__

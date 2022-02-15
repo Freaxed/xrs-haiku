@@ -122,10 +122,10 @@ SamplerPanel::SamplerPanel(SamplerTrackBoost* sb):
 }
 
 void
-SamplerPanel::Reset(Track* trk)
+SamplerPanel::ResetToTrack(Track* trk)
 {
 	//qui magari un bel check dell'ID ??
-	PlugPanel::Reset(trk);
+	PlugPanel::ResetToTrack(trk);
 	SetTrack((SamplerTrack*)trk);	
 }
 

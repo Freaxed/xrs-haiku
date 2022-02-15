@@ -10,13 +10,16 @@
 #include <Box.h>
 #include <Menu.h>
 #include <PopUpMenu.h>
+#include <List.h>
 #include "PlugWindow.h"
 #include "ValuableManager.h"
+
 
 #define MAX_VST 5
 
 class PBus;
 class VSTPlugin;
+class StringBox;
 
 class MixerLine : public BBox
 {
@@ -25,14 +28,18 @@ public:
 		
 		void	MessageReceived(BMessage* msg);
 		void 	AttachedToWindow();
+		void	ResetUI();
 
 private:
 		void		CreateVstItem(VSTPlugin* templ, BMessage* msg);
 		void		CreateVstWindow(VSTItem*, uint8 position);
+		void		UpdateItem(VSTItem*, uint8 position);
+
 		BPopUpMenu*	fPopUp;
 		BMenu*		fVSTMenu;
 		PBus*		fBus;
-		PlugWindow* fPlugWindows[5];
+		PlugWindow* fPlugWindows[MAX_VST];
+		StringBox*	fBoxsList[MAX_VST];
 };
 
 

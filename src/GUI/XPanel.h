@@ -33,7 +33,7 @@ class XPanel : public BView
 						
  		void		MessageReceived(BMessage* message);
 		void		AttachedToWindow();
-		void		Reset(Song *,TracksPanel*);
+		void		ResetToSong(Song *,TracksPanel*);
 		void		KeyDown(const char *bytes,int32);
 		void		KeyUp(const char *bytes,int32);
 		bool		isAllPat();

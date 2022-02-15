@@ -15,21 +15,26 @@ class JMDrumTrack: public Track
 	
 						JMDrumTrack();
 						~JMDrumTrack();
-	virtual 	void			Reset();
-	virtual 	int32		ProcessVoice(XRSVoice,float ** buffer ,int32 sample_num); //,int spiaz);
-	virtual	void			killVoice(XRSVoice);
-	virtual 	TRACK_GEN_TYPE			getProcessorType() { return TT_VOICE_PROCESS; } //0=full process ; 1=voice process
+
+	uint32			ProcessVoice(XRSVoice,float ** buffer ,uint32 sample_num);
+	void			killVoice(XRSVoice);
+	TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
 	
 	virtual	int			getModel();
-	virtual	void			goOn();
-	virtual	void			goOff();
-	virtual 	void 			Message(SynthMessage msg, float data);
+	virtual	void		goOn();
+	virtual	void		goOff();
+	virtual void 		Message(SynthMessage msg, float data);
 
-	virtual	bool			SupportPanNote(){ return true; }; //tmp
+	virtual	bool		SupportPanNote(){ return true; }; //tmp
 	virtual rgb_color	GetPreferredPadColor(){ rgb_color a={166,164,188,255}; return a;}
 
-	virtual	XRSVoice		newVoice(Note* n,int VoiceTag);
-	virtual	void				stopVoice(int note=-1);
+	virtual	XRSVoice	newVoice(Note* n,int VoiceTag);
+	virtual	void		stopVoice(int note=-1);
+	
+	
+	void				SaveCustomSettings(BMessage& msg);
+	void				LoadCustomSettings(BMessage& msg);
+	
 	
 protected:
 		virtual 	const char*	getPreferredName();

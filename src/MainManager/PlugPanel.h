@@ -5,14 +5,15 @@
 #include	<Window.h>
 #include	<String.h>
 #include	"locale.h"
+#include	"Log.h"
 
 class	Track;
 
 class PlugPanel : public BBox
 {
 	public:
-				PlugPanel(BRect r=BRect(0,0,180,230)):BBox(r,""),curTrack(NULL){};
-	virtual void 	Reset(Track* tr){curTrack=tr;};
+						PlugPanel(BRect r=BRect(0,0,180,230)):BBox(r,""),curTrack(NULL){};				
+		virtual void 	ResetToTrack(Track* tr){curTrack=tr;};
 	
 	protected:
 			void	SetTitle(const char* txt){
@@ -26,11 +27,13 @@ class PlugPanel : public BBox
 			
 			}
 	virtual	void	Hide(){
-			Reset(NULL);
+			ResetToTrack(NULL);
 			BBox::Hide();
 	}
-		private:
+	
+	private:
 			Track*	curTrack;		
+			
 	
 };
 #endif

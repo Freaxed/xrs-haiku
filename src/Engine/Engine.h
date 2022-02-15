@@ -38,7 +38,8 @@
 #define	 _ME_	__PRETTY_FUNCTION__
 
 
-#define CHECK_LOCK if(!IsLocked()) debugger("Function called but not locked!");
+#define CHECK_LOCK		 if (!IsLocked() ) debugger("Function called but not locked!");
+#define CHECK_PLAYING	 if ( IsPlaying()) debugger("Function called but not stopped!");
 #define IF_LOCK if(Lock()) {
 #define UNLOCK Unlock(); }
 
@@ -62,9 +63,9 @@ class Engine: public BLooper {
 		void			ReallyStart();// starts the audio flow
 	
 	public:
-			status_t	Acquire(const char *who );
-			status_t	Release(const char *who );		
-			status_t	AcquireEtc(const char *who );
+			bool		LockEngine   (const char *who);
+			bool		UnlockEngine (const char *who);		
+			//status_t	AcquireEtc(const char *who); //just try, timeout = 0;
 	
 	protected: 
 	
@@ -75,22 +76,18 @@ class Engine: public BLooper {
 		BSoundPlayer*			player;
 	
 	private:
-	
+
+			bool		Lock()	 { return BLooper::Lock();}
+			status_t	LockWithTimeout(bigtime_t timeout) {return BLooper::LockWithTimeout(timeout);}
+			void 		Unlock() { return BLooper::Unlock();}
 	
 			void			DoStart();
 			void			DoStop();
-		
-			sem_id					stresaforo;	
-			bool					isPlaying;
-			bool					loop_enable;
-
-
-									
-			
-			BString					fName;
+			bool			isPlaying;
+			bool			loop_enable;
+			BString			fName;
 	
 	static	void FillBuffer(void * cookie,void * data,	size_t size,const media_raw_audio_format & format);
-			void ProcessBuffer(void * data,	size_t size);
 
 	//Pre-buffer system 
 	
@@ -103,6 +100,7 @@ class Engine: public BLooper {
 	 void		_prepare();
 	 void		_finalize();
 	 void		_clearBuffers();
+	 BString	prevLocker;
 			
 };
 

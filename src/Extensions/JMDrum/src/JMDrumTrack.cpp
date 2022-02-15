@@ -41,12 +41,12 @@ JMDrumTrack::JMDrumTrack():Track()
 			memset(&values,0,sizeof(values));
 		*/	
 		
-		for (int i = 0; i<info->numParameters; i++)
+		for (int i = 0; i<info->numParameters; i++) {
 			ParameterTweak(i, info->Parameters[i]->DefValue,Vals,&values);
-				
+		}
 		
-			ResetName();
-			cit=false;
+		ResetName();
+		cit=false;
 
 	/*
 	float StartSpeed;	// Speed at which the Oscillator will run.
@@ -100,38 +100,29 @@ void JMDrumTrack::Message(SynthMessage msg, float data)
 
 }
 
-int32
-JMDrumTrack::ProcessVoice(XRSVoice voice,float ** buffer ,int32 samples_num)
+uint32			
+JMDrumTrack::ProcessVoice(XRSVoice voice, float** buffer, uint32 samples_num)
 {
-	float sl=0;
-	Drum*	drum=(Drum*)voice;
-	int i;
-	
+	Drum*	drum = (Drum*) voice;
 	Note *n=(Note*)drum->cookie; //quick hack
-	
+	uint32 i = 0;
 	for(i=0;i<samples_num;i++)
 	{
 		if(drum->AmpEnvStage)
 		{
-			sl=(drum->GetSample()/32767.0);
+			float sl=(drum->GetSample()/32767.0f); //? are we sure?
 			buffer[0][i] = sl*Left()   * n->Left();
 	 		buffer[1][i] = sl*Right()  * n->Right();
 		}
 		else
-		 goto uscita;
-				
+		 break;				
 	}
-	
-	uscita:
 	return i;
-			
 }
 
 XRSVoice	
 JMDrumTrack::newVoice(Note* n,int VoiceTag)
-{
-	
-	
+{	
 	Drum *d=new Drum();
 	
 	
@@ -159,8 +150,6 @@ JMDrumTrack::killVoice(XRSVoice voice)
 	delete drum;
 }
 
-void 
-JMDrumTrack::Reset(){}
 
 JMDrumTrack::~JMDrumTrack(){ delete Vals;}
 
@@ -177,4 +166,22 @@ JMDrumTrack::getPreferredName() {
 void JMDrumTrack::stopVoice(int note){}
 void JMDrumTrack::goOn(){}
 void JMDrumTrack::goOff(){}
+
+void
+JMDrumTrack::SaveCustomSettings(BMessage& msg)
+{
+	for(int i=0;i<16;i++)
+		msg.AddInt16("Vals", Vals[i]);
+}
+
+void
+JMDrumTrack::LoadCustomSettings(BMessage& msg)
+{
+	int16 v;
+	for(int i=0;i<16;i++)
+	{
+		 msg.FindInt16("Vals",i,&v);
+		 ParameterTweak(i,v, Vals,&values);
+	}
+}
 //--

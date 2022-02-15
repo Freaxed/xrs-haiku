@@ -30,6 +30,11 @@ class PMixer {
 			void	ResetBuffers();			
 			uint8	CountBusses() { return 	MIXERLINES_COUNT;}	
 
+			void	ValuableChanged(BMessage* msg); //Mixer related, triggered by JuiceEngine!
+
+			void	SaveSettings(BMessage& msg);
+			void	LoadSettings(BMessage& msg);
+
 	// from the mixer everythings start and
 	// everythings end.
 

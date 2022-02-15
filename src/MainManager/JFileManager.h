@@ -36,9 +36,8 @@ class JFileManager
 	status_t	SaveFile(entry_ref,Song*,bool zip=false); 	//The name	??
 	status_t	LoadFile(entry_ref,Song*);	//The name    ??
 	
-	
 	Song*			EmptySong();
-	void			CloseSong(Song*);	
+//	void			CloseSong(Song*);	
 	
 	void			Init();
 	
@@ -57,18 +56,16 @@ class JFileManager
 		
 	status_t	AskForClose(Song*);
 	
-	void			AnalizeError(BMessage*);
+	void		AnalizeError(BMessage*);
 	BMessage*	ErrorsLog(){ return errors_log;}
 	
 	
 	private:
 					JFileManager();
 	
-		void		CollectData(BMessage*,entry_ref);
 		void		ErrorMsg(const char *msg,const char *txt);
-		void		WriteFixed(int64,int64);
+
 		int64		ReadFixed(int64*);
-		void		WriteVar(int64,void*,int64);
 		int64		ReadVar(void*);
 		
 		void		Comatible12(Track*,int32 va,int32 rt);
@@ -86,16 +83,12 @@ class JFileManager
 		BDirectory 	*dir;
 
 		BCheckBox	*chek;
-		//bool		allpat;
-		//int		poz;
+
 		BMessage*		errors_log;
 		BMessage*		compatible; //for loading 1.2 files..
 		entry_ref sl;
-		
-
 };
 
-//deprecated extern JFileManager*	jfm;
 
 #endif
 //--

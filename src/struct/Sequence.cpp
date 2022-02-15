@@ -114,26 +114,91 @@ Sequence::getMaxSeq() {
 }
 
 void
-Sequence::setItemAt(int col, int raw, bool c)
+Sequence::setItemAt(int col, int row, bool c)
 {
-	const media_timed_event *mev=matrix2->FindFirstMatch(col*10000+raw,BTimedEventQueue::B_AT_TIME,true);
+	const media_timed_event *mev = matrix2->FindFirstMatch(col*10000+row,BTimedEventQueue::B_AT_TIME,true);
 	if(mev!=NULL) 
 	{
 		matrix2->RemoveEvent(mev);
 		return;
 	}
-	media_timed_event nmev(col*10000+raw,BTimedEventQueue::B_USER_EVENT);
+	media_timed_event nmev(col*10000 + row,BTimedEventQueue::B_USER_EVENT);
 	matrix2->AddEvent(nmev);
 			
 }
 
 int
-Sequence::ItemAt(int col, int raw)
+Sequence::ItemAt(int col, int row)
 {	
-	const media_timed_event *mev=matrix2->FindFirstMatch(col*10000+raw,BTimedEventQueue::B_AT_TIME,true);
+	const media_timed_event *mev = matrix2->FindFirstMatch(col*10000+row,BTimedEventQueue::B_AT_TIME,true);
 	
-	if(mev==NULL) return -1;
-	//if(mev->event_time >= d*10000+10000) return -1;
-	//return (int)(mev->event_time - d*10000);
-	return raw;
+	if ( mev == NULL) 
+		return -1;
+
+	return row;
+}
+
+#include <assert.h>
+
+void 
+Sequence::LoadSettings(BMessage& playlist)
+{
+	assert(names.CountItems() == 1);
+	
+	BMessage	measures;
+	playlist.FindMessage("Measures", &measures);
+	int maxPat = measures.GetInt16("NumMeasures", 1);
+	
+	int i=0;
+	BMessage measure;
+	while(measures.FindMessage("Measure", i, &measure) == B_OK)
+	{
+		if (i == 0){
+			SetMeasureName(measure.GetString("Name", "?"), 0);
+		} else {
+			AddMeasure(measure.GetString("Name", "?"));
+		}
+		
+		//TODO load the patterns..
+		int col = 0;
+		int16 val = -1;
+		while(measure.FindInt16("Pattern", col++, &val) == B_OK)
+		{
+			setItemAt(val, i, true);
+		}
+		
+		i++;
+	}
+	
+	loop_enable = playlist.GetBool("Enable", false);
+	loop_points[0] = playlist.GetInt16("Point", 0, 0);
+	loop_points[1] = playlist.GetInt16("Point", 1, 0);
+
+}
+
+void 
+Sequence::SaveSettings(BMessage& playlist)
+{
+	BMessage	measures;
+	measures.AddInt16("NumMeasures", MaxPat);
+	for (int i=0; i<MaxPat; i++) {
+		BMessage measure;
+		BString* name = GetMeasureName(i);
+		assert(name);
+		measure.AddString("Name", name->String());
+		
+		for(int p=0; p < getMaxSeq() + 1; p++) //WHY +1??
+		{
+			if ( ItemAt(p, i) >= 0 )
+				measure.AddInt16("Pattern", p);
+		}
+		
+		measures.AddMessage("Measure", &measure);
+	}
+	
+	playlist.AddMessage("Measures", &measures);	
+	playlist.AddBool("Enable", loop_enable);
+	playlist.AddInt16("Point", loop_points[0]);
+	playlist.AddInt16("Point", loop_points[1]);
+	playlist.AddInt16("MaxSeq", getMaxSeq());;
 }

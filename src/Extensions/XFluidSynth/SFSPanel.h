@@ -19,7 +19,7 @@ class SFSPanel: public PlugPanel
 {
 	public:
 				SFSPanel();
-	virtual void 	Reset(Track* tr);
+	virtual void 	ResetToTrack(Track* tr);
 	virtual void	AttachedToWindow();
 	virtual void	MessageReceived(BMessage *msg);
 		 	void	Refresh();

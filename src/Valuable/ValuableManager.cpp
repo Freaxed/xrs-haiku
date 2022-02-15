@@ -34,6 +34,7 @@ ValuableManager::MessageReceived(BMessage* msg) {
 				LogDebug("Check [%s] to %d ", vID.String(), typeFound);
 			}
 		}
+		break;
 		//Single int32 value coming from haiku widgets directly..
 		case MSG_BEVALUE32_TO_VALUABLE:
 			BString vID;
@@ -125,24 +126,44 @@ ValuableManager::RegisterValuableReceiver(ValuableID vID, BHandler* receiver, bo
 			
 		if(iter == fRegisteredValuable.end())
 		{
-			LogDebug("RegisterValuableReceiver: No Valuable registered [%s] - called by [%s]", vID.String(), receiver->Name());
+			LogDebug("RegisterValuableReceiver: No Valuable registered [%s]", vID.String());
 			Unlock();
 			return false;
 		}
 		
 		if (iter->second->lViews.HasItem((void*)receiver))
 		{
-			LogDebug("RegisterValuableReceiver: ValuableReceiver already registered [%s] - called by [%s]", vID.String(), receiver->Name());
+			LogDebug("RegisterValuableReceiver: ValuableReceiver already registered [%s]", vID.String());
 			Unlock();
 			return false;
 		}
 		
 		iter->second->lViews.AddItem((void*)receiver);
-		LogDebug("RegisterValuableReceiver: ValuableReceiver registered [%s] - called by [%s]. Views: %d", vID.String(), receiver->Name(), iter->second->lViews.CountItems());
+		LogDebug("RegisterValuableReceiver: ValuableReceiver registered [%s]. Views: %d", vID.String(), iter->second->lViews.CountItems());
 		
 		if (doUpdate) {
 			BMessenger(receiver).SendMessage(iter->second->mLastMessage);
 		}
+					
+		Unlock();
+		return true;
+	}	
+	return false;
+}
+
+bool	
+ValuableManager::GetInternalLastMessage(ValuableID vID, BMessage& fValue){
+	if (Lock()) {
+		iterator iter = fRegisteredValuable.find(vID);
+			
+		if(iter == fRegisteredValuable.end())
+		{
+			LogDebug("GetInternalLastMessage: No Valuable registered [%s]", vID.String());
+			Unlock();
+			return false;
+		}
+				
+		fValue = *iter->second->mLastMessage;
 					
 		Unlock();
 		return true;
@@ -157,19 +178,19 @@ ValuableManager::UnregisterValuableReceiver(ValuableID vID, BHandler* receiver) 
 		iterator iter = fRegisteredValuable.find(vID);
 		if(iter == fRegisteredValuable.end())
 		{
-			LogDebug("UnregisterValuableReceiver: No Valuable registered [%s] - called by [%s]", vID.String(), receiver->Name());
+			LogDebug("UnregisterValuableReceiver: No Valuable registered [%s]", vID.String());
 			Unlock();
 			return false;
 		}
 		if (iter->second->lViews.HasItem((void*)receiver) == false)
 		{
-			LogDebug("UnregisterValuableReceiver: ValuableReceiver doesn't have registered [%s] - called by [%s]", vID.String(), receiver->Name());
+			LogDebug("UnregisterValuableReceiver: ValuableReceiver doesn't have registered [%s]", vID.String());
 			Unlock();
 			return false;
 		}
 		
 		iter->second->lViews.RemoveItem(receiver);
-		LogDebug("UnregisterValuableReceiver: ValuableReceiver unregistered [%s] - called by [%s]", vID.String(), receiver->Name());
+		LogDebug("UnregisterValuableReceiver: ValuableReceiver unregistered [%s]", vID.String());
 
 		Unlock();
 		return true;
@@ -192,7 +213,10 @@ ValuableManager::AttachMonitorValuableManager(MonitorValuableManager* monitor) {
 	Unlock();
 	}
 }
-
+void
+ValuableManager::UpdateValue(BMessage& fValue) {
+	PostMessage(&fValue);
+}
 
 void
 ValuableManager::Dump() {

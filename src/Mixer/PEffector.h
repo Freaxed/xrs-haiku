@@ -33,13 +33,16 @@ class PEffector: public PNode {
 
 			size_t	Process(float** data,size_t frames);
 
-			void	SaveSettings(BMessage* msg);
+			void	SaveSettings(BMessage& msg);
+			void	LoadSettings(BMessage& msg);
 			
 			VSTItem*		CreateVstAtPosition(VSTPlugin* templ, uint8 pos); 	
-														 
-			const BList*	GetEffectsList() { return fFxList; }
+			VSTItem*		GetVstAtPosition(uint8 pos);
+			//VSTPlugin list: template list!
+			const BList*	GetEffectsList() { return fFxList; } 
 	
 	private:
+			VSTPlugin*				FindVST(const char* name);
 			VSTItem*				_LockedSwap(VSTItem* newPlugin,  uint8 pos);
 			VSTItem*				fVstStack[MAX_EFFECT];
 			const BList*			fFxList;

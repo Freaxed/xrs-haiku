@@ -29,9 +29,7 @@ class NotifierLoopClock : public LoopClock, public  Tickable {
 				
 				
 			//starting events..
-			void	TickedHigh(uint64 time,int16 beat,int16 tick) {
-				printf("time %ld - beat %d - tick %d\n");
-			}
+			void	TickedHigh(uint64 time,int16 beat,int16 tick) {}
 	
 			//stopping events..
 			void	TickedLow(uint64 time,int16 beat,int16 tick) {}

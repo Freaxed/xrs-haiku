@@ -31,9 +31,11 @@ TrackInfoWindow::TrackInfoWindow():XrsWindow(BRect(640+0,230+0,640+179,230+280),
 {	
 	SetName("trackinfo_");
 	BString title(T_TRACKINFO_TITLE);
-	title << " " << T_TRACKINFO_NOTRACK;
+	//title << " " << T_TRACKINFO_NOTRACK;
 	
 	SetTitle(title.String());
+	
+	//AddChild(new BBox(BRect(0,0,180,281), ""));
 	
 	BBox*	bot=new BBox(BRect(0,230,180,281),"");
 	

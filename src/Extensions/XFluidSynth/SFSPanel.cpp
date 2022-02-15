@@ -93,14 +93,14 @@ SFSPanel::SFSPanel():PlugPanel(){
 void
 SFSPanel::Refresh() {
 	if(myTrack)
-		Reset(myTrack);
+		ResetToTrack(myTrack);
 
 }
 
 
 
 void
-SFSPanel::Reset(Track* tr){
+SFSPanel::ResetToTrack(Track* tr){
 	if(tr){
 	
 		SetTitle(tr->getName());
@@ -124,7 +124,7 @@ SFSPanel::Reset(Track* tr){
 	else
 		myTrack=NULL;
 	
-	PlugPanel::Reset(tr);
+	PlugPanel::ResetToTrack(tr);
 	
 	
 };

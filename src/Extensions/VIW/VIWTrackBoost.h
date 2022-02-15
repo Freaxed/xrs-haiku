@@ -14,6 +14,7 @@
 
 class 	VIWTrack;
 class	VIWPanel;
+class   VSTPlugin;
 
 class VIWTrackBoost : public TrackBoost
 {
@@ -23,14 +24,11 @@ class VIWTrackBoost : public TrackBoost
 			
 	Track*		getTrack();
 	PlugPanel*	getPanel();
-	
-	
-	void			SaveTrackSettings(Track*,BMessage*);
-	void			LoadTrackSettings(Track* trk,BMessage* data);
+
+	VSTPlugin*	FindVSTi(const char* effectName);
 	
 	private:
-			VIWPanel*	panel;
-			int			FindVSTi(const char* leaf);
+			VIWPanel*	panel;			
 			const BList*		list;
 };
 #endif

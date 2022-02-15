@@ -49,7 +49,7 @@ MainWindow::Get()
 
 
 MainWindow::MainWindow() :
-	XrsWindow(BRect(WINDOW_X_POS,WINDOW_Y_POS,WINDOW_X_POS+WINDOW_XL,WINDOW_Y_POS+WINDOW_YL),"Main", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_OUTLINE_RESIZE|B_WILL_ACCEPT_FIRST_CLICK) //|B_AVOID_FOCUS)
+	XrsWindow(BRect(WINDOW_X_POS,WINDOW_Y_POS,WINDOW_X_POS+WINDOW_XL,WINDOW_Y_POS+WINDOW_YL),"XRS", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_OUTLINE_RESIZE|B_WILL_ACCEPT_FIRST_CLICK) //|B_AVOID_FOCUS)
 
 {
 	SetName("");
@@ -99,27 +99,18 @@ MainWindow::MainWindow() :
 void
 MainWindow::CreateMenu(){
 
-	BMenu		*menuEdit;
-	BMenu		*menuNew;
-	BMenu		*edit_track,*edit_mea;
-	BMenuItem	*edit_prefs;
+	BMenu* menuEdit;
+	BMenu* edit_track;
+	BMenu* edit_mea;
+	BMenuItem*	edit_prefs;	
+	BMenuItem*	quit_item;
 	
-	BMenuItem	*quit_item;
-	
-	BRect dummy(0, 0, 0, 0);
-	menuBar = new BMenuBar(dummy, "Full Menu Bar");
-	
-	
+	menuBar = new BMenuBar(BRect(0,0,0,0), "Full Menu Bar");
+
 	menuBar->AddItem(menuFile=new BMenu(T_MENU_FILE));
 	menuBar->AddItem(menuEdit=new BMenu(T_MENU_EDIT));
-	
-	menuFile->AddItem(menuNew=new BMenu(T_MENU_NEW));
-	menuNew->AddItem(new BMenuItem(T_MENU_DEFAULT,new BMessage(MENU_NEW_DEFAULT)));
-	menuNew->AddItem(new BMenuItem(T_MENU_EMPTY,new BMessage(MENU_NEW_EMPTY),'N'));
-	
-	menuFile->AddItem(new BMenuItem(T_MENU_OPEN,new BMessage(MENU_OPEN),'O'));
-	//menuFile->AddItem(openRecent=new BMenu("Open recent"));
-	
+	menuFile->AddItem(new BMenuItem(T_MENU_EMPTY,new BMessage(MENU_NEW_EMPTY),'N'));
+	menuFile->AddItem(new BMenuItem(T_MENU_OPEN, new BMessage(MENU_OPEN),     'O'));
 	menuFile->AddSeparatorItem();
 	menuFile->AddItem(save_item=new BMenuItem(T_MENU_SAVE,new BMessage(MENU_SAVE),'S'));
 	menuFile->AddItem(saveas_item=new BMenuItem(T_MENU_SAVE_AS,new BMessage(MENU_SAVEAS)));
@@ -128,19 +119,13 @@ MainWindow::CreateMenu(){
 	menuFile->AddItem(new BMenuItem(T_MENU_ABOUT,new BMessage(B_ABOUT_REQUESTED)));
 	menuFile->AddSeparatorItem();
 	menuFile->AddItem(quit_item=new BMenuItem(T_MENU_QUIT,new BMessage(B_QUIT_REQUESTED),'Q'));	//Un po' brutale..
-	
 	menuFile->SetEnabled(true);
-	
+
 	menuFile->SetTargetForItems(be_app);
-	menuNew->SetTargetForItems(be_app);
 	quit_item->SetTarget(this);
-	
-	
-	//BMenu *add_menu;
-	
+
 	menuEdit->AddItem(edit_track=new BMenu(T_MENU_TRACK));
 	menuEdit->AddItem(edit_mea=new BMenu(T_MENU_MEASURE));
-	
 	menuEdit->AddItem(new BMenuItem(T_MENU_PLAYLIST,new BMessage(EDIT_MSG)));
 	menuEdit->AddSeparatorItem();
 	menuEdit->AddItem(new BMenuItem(T_MENU_SONG_SETTINGS,new BMessage(MENU_SETTINGS)));
@@ -153,7 +138,6 @@ MainWindow::CreateMenu(){
 	edit_track->AddItem(paste=new BMenuItem(T_MENU_PASTE,new BMessage(MENU_PASTE),'V'));
 	edit_track->AddSeparatorItem();
 	edit_track->AddItem(rename=new BMenuItem(T_GEN_RENAME,new BMessage(MENU_RENAME)));
-
 	edit_mea->AddItem(mea_copy=new BMenuItem(T_MENU_CUT,new BMessage(MENU_MEA_CUT),'X',B_SHIFT_KEY));
 	edit_mea->AddItem(mea_cut=new BMenuItem(T_MENU_COPY,new BMessage(MENU_MEA_COPY),'C',B_SHIFT_KEY));
 	edit_mea->AddItem(mea_paste=new BMenuItem(T_MENU_PASTE,new BMessage(MENU_MEA_PASTE),'V',B_SHIFT_KEY));
@@ -197,12 +181,7 @@ MainWindow::QuitRequested()
 void
 MainWindow::Saved()
 {
-	entry_ref ref;
-	curSong->getEntry()->GetRef(&ref);
-	
-	SetTitle(ref.name);
-	//save_item->SetEnabled(false);
-		
+	ResetTitle();		
 }
 void
 MainWindow::Init()
@@ -228,26 +207,35 @@ MainWindow::Init()
 }
 
 void
-MainWindow::Reset(Song* s,bool juicereset)
+MainWindow::ResetTitle()
 {
-		fPanel->Reset(s,fTracksPanel);
-		fTracksPanel->Reset(s);
+	BString title(DEFAULT_TITLE);
+	
+	if(curSong && curSong->getEntry() != NULL)
+	{
+			entry_ref t;
+			curSong->getEntry()->GetRef(&t);
+			title += " - ";
+			title += t.name;
+	} 
+	
+	SetTitle(title.String());
+	LogTrace("MainWindow, title set to [%s]", title.String());
+}
 
-		if(s->getEntry()!=NULL) {
-					
-				entry_ref t;
-				s->getEntry()->GetRef(&t);
-				SetTitle(t.name);
-		} else
-		
-		SetTitle(DEFAULT_TITLE);
-			
-		
-		ticks->SetNumberNotes(s->getNumberNotes());
-		curSong=s;
-		
-		PlayButtonOn(JuiceEngine::Get()->IsPlaying());
-		
+void
+MainWindow::ResetToSong(Song* s)
+{
+	LogTrace("Resetting MainWindow to new Song...");
+	curSong = s;
+
+	fPanel->ResetToSong(curSong, fTracksPanel);
+	fTracksPanel->ResetToSong(curSong);
+
+	ResetTitle();	
+	
+	ticks->SetNumberNotes(curSong->getNumberNotes());		
+	PlayButtonOn(JuiceEngine::Get()->IsPlaying());		
 }
 void
 MainWindow::WindowActivated(bool active)
@@ -346,9 +334,9 @@ MainWindow::MessageReceived(BMessage* message)
 				int pos=curSong->getIndexOfTrack(trk);
 				XrsMidiIn::Get()->UnregisterCh(trk,trk->GetMidiInCh());
 				XHost::Get()->SendMessage(X_LockSem,0);
-				XHost::Get()->AllowLock(false);
+//				XHost::Get()->AllowLock(false);
 					curSong->RemoveTrack(trk);
-				XHost::Get()->AllowLock(true);
+//				XHost::Get()->AllowLock(true);
 				XHost::Get()->SendMessage(X_UnLockSem,0);
 				fTracksPanel->RemoveTrackAt(pos);
 				fTracksPanel->resetPattern(); //UI Refresh!

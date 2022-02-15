@@ -28,8 +28,8 @@ class PlugWindow : public BWindow
 			virtual bool 	QuitRequested();
 			void			SetState(bool,float force=-1);
 			bool			GetState() { return big;}
-			void			SavePref(BMessage*);
-			void			LoadPref(BMessage*);		
+			void			SaveSettings(BMessage& m);
+			void			LoadSettings(BMessage& msg);		
 			virtual void	MessageReceived(BMessage*);
 			void			SetPrograms(const char *name,BMenu*);
 			void			SetControls(BView*,bool);

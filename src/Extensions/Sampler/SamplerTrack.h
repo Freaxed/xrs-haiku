@@ -17,9 +17,7 @@ class Sample;
 
 #define	 FRAMES_NUM	1024
 
-
-
-class SamplerTrack: public Track //, public Refiller
+class SamplerTrack: public Track
 {
 	public:
 	
@@ -29,35 +27,38 @@ class SamplerTrack: public Track //, public Refiller
 				bool		isReversed();
 				void		setReversed(bool);
 	
-			
-		//virtual	void		Reset();
-		virtual 	int		getModel();	
-		//virtual	void		goOn();
+
+			 	int		getModel();	
+
 		
-				 Sample*	getSample();
-				void		setSample(Sample*);
+			Sample*		getSample();
+			  void		setSample(Sample*);
+				
+				
+		void				SaveCustomSettings(BMessage& msg);
+		void				LoadCustomSettings(BMessage& msg);
 				
 
 		//protected??
 		
 		void		setResample(int);
-		int		getResample();
+		int			getResample();
 		void		setResampleEnable(bool);
 		bool		isResampleEnable();
 		void		setBoostEnable(bool b){ boost_enable=b;};
 		bool		isBoostEnable(){ return boost_enable;}
+		
 		bool		IsLoopEnable() {return loop_enable;}
 		void		SetLoopEnable(bool b) {loop_enable = b;}
 		
-		virtual TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
-		virtual	XRSVoice		newVoice(Note* n,int VoiceTag);
-		virtual uint32			ProcessVoice(XRSVoice,float ** buffer ,uint32 sample_num); //,int spiaz);
-		virtual	void			killVoice(XRSVoice);
-		virtual	void			Message(SynthMessage msg, float data);
-		virtual	bool			SupportPanNote(){ return true; }; //tmp
-		virtual 	rgb_color	GetPreferredPadColor(){ rgb_color a={49,163,220,255}; return a;}
-		//		unsigned long 	read(unsigned char *buffer, unsigned long len,const void* cookie);
-		/*RAW*/
+		TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
+		XRSVoice		newVoice(Note* n,int VoiceTag);
+		uint32			ProcessVoice(XRSVoice,float ** buffer ,uint32 sample_num); //,int spiaz);
+		void			killVoice(XRSVoice);
+		void			Message(SynthMessage msg, float data);
+		bool			SupportPanNote(){ return true; }; //tmp
+		rgb_color	GetPreferredPadColor(){ rgb_color a={49,163,220,255}; return a;}
+
 		float	amp; //FIXME, encapsulate.
 		
 	protected:

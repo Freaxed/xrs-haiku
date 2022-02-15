@@ -30,37 +30,33 @@ class TrackBoost
 			 TrackBoost();
 	virtual	~TrackBoost(){};
 	
-	//char	name[100];	//Better a BString!
-	BString	name;
-	int16	id;		// Ask Me to assign
+
 	
-	const char*			Name() {return name.String();}
+	
 	virtual	Track*		getTrack() { return NULL;}
 	virtual	PlugPanel*	getPanel(){return NULL;}
 	
-	virtual	bool			Load(Track* cur,int t,BFile* file,int32 va,int32 rt) {return true;}
-		
-	virtual	void			SaveBoosterSettings(BMessage*){};
-	virtual	void			SaveTrackSettings(Track*,BMessage*){};
-	virtual	void			LoadBoosterSettings(BMessage*){};
-	virtual	void			LoadTrackSettings(Track*,BMessage*){};
+	virtual	void		SaveBoosterSettings(BMessage*){};
+	virtual	void		SaveTrackSettings(Track*,BMessage*){};
+	virtual	void		LoadBoosterSettings(BMessage*){};
+	virtual	void		LoadTrackSettings(Track*,BMessage*){};
 	
 	virtual	status_t	RefReceived(entry_ref,Track*,BMessage *m=NULL){ return B_OK; };
 	
-	
-	//new in xrs 1.4
-	
-	/*maybe that in a separate file??*/
-			int64		ReadFixed(int64*,BFile* file);
 			
-	virtual	void		Init(){};  //only one time, when the boost is created 
-	virtual	void		Reset(){};				//each time a new song is ready
-	virtual	void		Restart() {};			//EACH TIME A song is going to be close.
+	virtual	void		Init()   		{};	// only one time, when the boost is created 
+	virtual	void		ResetToSong()   {};	// each time a new song is ready
+//	virtual	void		Restart() {};	// EACH TIME A song is going to be close.
 
 
-		Track*				getCurrentTrack();
-		//TrackManager*		tm;
+			Track*		getCurrentTrack();
 			
+			int16		Id()   { return id;				}
+			const char*	Name() { return name.String();  }
+
+	protected:
+		BString	name;	// at least protected?
+		int16	id;		// Ask Me to assign
 };
 #endif
 

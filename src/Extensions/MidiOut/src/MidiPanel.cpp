@@ -92,7 +92,7 @@ MidiPanel::MidiPanel():PlugPanel(){
 }
 
 void
-MidiPanel::Reset(Track* tr){
+MidiPanel::ResetToTrack(Track* tr){
 	if(tr){
 		SetTitle(tr->getName());
 		if(Window()->Lock()){

@@ -23,7 +23,7 @@ class BString;
 class Song 
 {
 	public:
-					Song ();
+					 Song();
 					~Song();
 					
 		void			Init();
@@ -41,7 +41,7 @@ class Song
 		size_t		getNoteSize(); //in frame	
 					
 		void		setTempo(int32 bpm); //in bpm 
-		int32			getTempo();
+		int32		getTempo();
 						
 		BEntry*		getEntry();
 		void		setEntry(BEntry*);
@@ -62,19 +62,21 @@ class Song
 
 		bool			popupdesc;
 		
-		BMessage*		mixer_settings;
-		
-		const char*		getDescription() {return description.String(); };
-		void			setDescription(const char*d ){description.SetTo(d);};
-		size_t			getSizeDescription(){return description.Length();};
+		const char*		getDescription() 			 { return description.String(); };
+		void			setDescription(const char*d ){ description.SetTo(d);        };
+		size_t			getSizeDescription()         { return description.Length(); };
 			
+//TEMP: this is where we save the full information of a file:
+
+		BMessage		fullFile;
+
 	private:
 
 			BList			trk;
 			BString			description;
 			Sequence*		sequence;
 			size_t			note_size;
-			int32				tempo_bpm;
+			int32			tempo_bpm;
 			BEntry*			file_entry;	
 			bool			modified;
 			int				num_notes;

@@ -13,6 +13,7 @@
 #include "GlobalDef.h"
 #include "XRSVoice.h"
 #include "Vector.h"
+#include <Message.h>
 
 class Note;
 
@@ -28,6 +29,9 @@ class Pattern
 		void 	setNumberNotes(int);
 		
 		XRSVoice	lastVoice;	
+		
+		void LoadSettings(BMessage& msg);
+		void SaveSettings(BMessage& msg);
 	
 	private:
 		

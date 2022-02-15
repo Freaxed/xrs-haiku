@@ -87,18 +87,7 @@ JuiceEngine::ValuableChanged(BMessage* msg) {
 				SetBPM(bpm);
 		} else
 		if (vID.Compare(BASE_VID_MIXER_LINE, BASE_VID_MIXER_LINE.Length()) == 0) {
-			
-			int32 value;
-			if (msg->FindInt32(VAL_DATA_KEY, 0, &value) != B_OK){
-				return;
-			}
-			
-			uint8 busKey = vID.ByteAt(BASE_VID_MIXER_LINE.Length()) - '0';
-			if(vID.FindFirst(BASE_VID_VOLUME, BASE_VID_MIXER_LINE.Length() + 1) != B_ERROR) {
-				PMixer::Get()->BusAt(busKey)->SetGain((float)value/100.0f);
-			} else if(vID.FindFirst(BASE_VID_PAN, BASE_VID_MIXER_LINE.Length() + 1) != B_ERROR) {
-				PMixer::Get()->BusAt(busKey)->SetPan((float)value/100.0f);
-			}	
+			PMixer::Get()->ValuableChanged(msg);
 		}
 	}
 }
@@ -122,13 +111,13 @@ void JuiceEngine::TickedLow(uint64 time,int16 beat,int16 tick){}
 void
 JuiceEngine::ResetSong(Song* song)
 {
-	IF_LOCK
+	CHECK_LOCK
 	
 	fCurrentSong = song;
 	SendTrackMessage(SystemReset,0);
 	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, song->getTempo()); //huge bug: it's not syncronous!
+	LogInfo("*** FIX HERE BPM ****");
 
-	UNLOCK
 }
 
 void	
@@ -151,13 +140,23 @@ JuiceEngine::GetBPM() {
 	else
 		return 0;	
 }
-
+const char*	SynthMessageStr[8] = {
+	"TempoChange",	 // samples per sixteenth note
+	"NoteChange",  	 // change pitch of next note (float freq)
+	"NoteOn",		 	 // trigger note (float velocity)
+	"NoteOff",	 	 // release note (float aftertouch?)
+	"NoteSlide",	 	 // slide to next note (none)
+	"SystemReset",	 // Make a Reset!
+	"SystemStop",		 // Stop song
+	"SystemStart"		 // Start song
+	
+};
 void		
 JuiceEngine::SendTrackMessage(SynthMessage msg, float data){
 	
 	CHECK_LOCK;
 	
-	LogTrace("SendTrackMessage: SynthMessage[%d] - data[%f]", msg, data);
+	LogTrace("SendTrackMessage: SynthMessage[%s][%d] - data[%f]", SynthMessageStr[msg], msg, data);
 	
 	if(fCurrentSong)
 	for(int y=0;y<fCurrentSong->getNumberTrack();y++) {
@@ -177,11 +176,11 @@ JuiceEngine::Starting(){
 	the_clock.SendValue(P1, MeasureManager::Get()->_getCurPat());
 	the_clock.SendValue(P2, MeasureManager::Get()->_getCurPos());
 	
-	Acquire("JuiceEngine::Starting");
+	LockEngine("JuiceEngine::Starting");
 
    	MeasureManager::Get()->SetPosition(0);
    	
-   	Release("JuiceEngine::Startig");
+    UnlockEngine("JuiceEngine::Startig");
 		
 	SendTrackMessage(SystemStart,0);
 
@@ -195,7 +194,7 @@ JuiceEngine::Stopping(){
 	SendTrackMessage(SystemStop,0);
 	if (fCurrentSong) {
 		int32 	numtracks = fCurrentSong->getNumberTrack();
-		while(numtracks--)	 
+		while (numtracks--)
 		{
 			DeleteVoices((Track*)fCurrentSong->getTrackAt(numtracks));	
 		}
@@ -211,9 +210,9 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 
 	PMixer::Get()->ResetBuffers();
 	
-	if(!fCurrentSong)
+	if(!IsPlaying() || !fCurrentSong)
 	{
-		memset(buffer,0,size);
+		memset(buffer, 0, size);
 		return;
 	}
 			
@@ -253,13 +252,13 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 				if(track->getProcessorType() == TT_VOICE_PROCESS)  
 				{
 					//voice_list = active voice list
-					for(int i=0;i<track->voice_list.CountItems();i++)
+					for(int i=0; i<track->voice_list.CountItems();i++)
 					{
 						a_bus->SetUsed(true);
 						
-						XRSVoice v=(XRSVoice)track->voice_list.ItemAt(i);
-						int32 ret=track->ProcessVoice(v,stream_note, buflen); 
-								
+						XRSVoice v = (XRSVoice)track->voice_list.ItemAt(i);
+						uint32 ret=track->ProcessVoice(v,stream_note, buflen); 
+	
 						if (ret>0)
 							a_bus->MixBuffer(stream_note,ret,frames-len);
 						else	
@@ -332,6 +331,7 @@ JuiceEngine::UpdateMeters()
 void
 JuiceEngine::process_row(int32 row)
 {
+	
 	if(!IsPlaying()) return;
 		
 	int32 	numtracks=fCurrentSong->getNumberTrack();	
@@ -353,12 +353,11 @@ JuiceEngine::process_row(int32 row)
 			
 			while(z!=-1)
 			{
-				
 				Pattern* pat=track->getPatternAt(z);
 				if(!pat) return;		
-				
+
 				Note *n=pat->getNoteAt(row);
-					
+		
 				if(n->getValue() && track->isOn())
 				{
 					//Cut_it_self
@@ -366,9 +365,10 @@ JuiceEngine::process_row(int32 row)
 						DeleteVoices(track);
 						clear=true;
 					}
-				
-					XRSVoice v=track->newVoice(n,z);
-					if(v!=NULL)	AddVoice(track ,v);
+									
+					XRSVoice v = track->newVoice(n,z);
+					if(v != NULL)	
+						AddVoice(track ,v);
 				}		
 				z=MeasureManager::Get()->SubStep();
 			} //end multi pattern!
@@ -400,6 +400,7 @@ JuiceEngine::AddVoice(Track* track ,XRSVoice v) { track->voice_list.AddItem((voi
 void
 JuiceEngine::RemoveVoices(Track* track){
 	
+	LogTrace("JuiceEngine::RemoveVoices");
 	for(int i=0;i<rem_list.CountItems();i++){
 		track->voice_list.RemoveItem(rem_list.ItemAt(i));
 		track->killVoice(rem_list.ItemAt(i));
@@ -411,7 +412,8 @@ JuiceEngine::RemoveVoices(Track* track){
 //delete all the voice in the rem_voice
 void
 JuiceEngine::DeleteVoices(Track* track){
-
+	
+	LogTrace("JuiceEngine::DeleteVoices");
 	for(int i=0;i<track->voice_list.CountItems();i++){
 		track->killVoice(track->voice_list.ItemAt(i));
 	}

@@ -37,7 +37,7 @@ class TracksPanel : public TrackList
 			void		ScrollTo(BPoint p);
 		
 			status_t		Init(BView*);
-				void		Reset(Song *);
+				void		ResetToSong(Song *);
 				int			getNumberJTrack();			
 				void		RemoveTrackAt(int id);
 				void		RemoveTrack(int);

@@ -24,7 +24,7 @@ class VIWPanel: public PlugPanel
 {
 	public:
 				VIWPanel(const BList*);
-	void 	Reset(Track* tr);
+	void 	ResetToTrack(Track* tr);
 	void	AttachedToWindow();
 	void	MessageReceived(BMessage *msg);
 	

@@ -32,7 +32,7 @@ class SamplerPanel: public PlugPanel {
 	public:
 		SamplerPanel(SamplerTrackBoost*);
 
-	 void Reset(Track*);
+	 void ResetToTrack(Track*);
 	 void MessageReceived(BMessage* message);
 	 void AttachedToWindow();
 		

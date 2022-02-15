@@ -60,10 +60,37 @@ TrackManager::~TrackManager()
 	//TODO: delete all the tracks!
 }
 
+void
+TrackManager::SaveBoosterSettings(BMessage& boostsSettings)
+{
+	for(int16 i=0;i<MAX_PLUG;i++)
+	{
+		if(isBoosterValid(i))
+		{
+			BMessage boost;
+			SaveBoosterSettings(i, &boost);
+			boostsSettings.AddMessage("BoostSettings", &boost);		
+		}
+	}
+}
+
+void
+TrackManager::LoadBoosterSettings(BMessage& msg)
+{
+	int i=0;
+	BMessage boost;
+	while(msg.FindMessage("BoostSettings", i, &boost) == B_OK)
+	{
+		LoadBoosterSettings(&boost);
+		i++;
+	}
+}
+
+
 status_t		
 TrackManager::RegisterTrackBoost(TrackBoost* boost)
 {
-		int16	id = boost->id;
+		int16	id = boost->Id();
 		if(id < 0 && id > MAX_PLUG-1) {
 			LogError("Invalid TrackBooster id (%d) (%s)", id, boost->Name());
 			return B_ERROR;
@@ -123,7 +150,8 @@ TrackManager::isBoosterValid(int id)
 void
 TrackManager::SaveBoosterSettings(int16 i, BMessage* data)
 {
-	data->AddInt16("id", i);
+	data->AddInt16 ("id", i);
+	data->AddString("Name", list[i]->Name());
 	list[i]->SaveBoosterSettings(data);
 }
 
@@ -137,8 +165,10 @@ TrackManager::SaveTrackSettings(Track* trk, BMessage* data)
 void
 TrackManager::LoadBoosterSettings(BMessage* data)
 {
-	int i=data->FindInt16("id");
-	if(isBoosterValid(i)) list[i]->LoadBoosterSettings(data);
+	WindowManager::Get()->Hide(TrackInfoWindow::Get());
+	int16 i = data->GetInt16("id", -1);
+	if(isBoosterValid(i)) 
+		list[i]->LoadBoosterSettings(data);
 }
 void
 TrackManager::LoadTrackSettings(Track* trk,BMessage* data)
@@ -171,45 +201,43 @@ TrackManager::MakeJTrack(Track* trk, BRect rect, int16 pos)
 }
 
 void
-TrackManager::Reset(Song* s)
+TrackManager::ResetToSong(Song* s)
 {
-	if(curJTrack != NULL) 
-		curJTrack->Deselect();
-	
-	curJTrack = NULL;
 	curSong = s;
+	
+	SelectTrack(NULL);	
 	
 	for(int i=0; i < MAX_PLUG; i++)
 	{
 		if(isBoosterValid(i)) 
-			list[i]->Reset();
+			list[i]->ResetToSong();
 	}
 	
 	
 }
 
-void
-TrackManager::Restart()
-{
-	TrackInfoWindow::Get()->Lock();
-	if(curJTrack != NULL) 
-		curJTrack->Deselect();
-	
-	curJTrack = NULL;
-	
-	for(int i=0;i<MAX_PLUG;i++)
-	{
-		if(isBoosterValid(i)) 
-			list[i]->Restart();
-	}	
-
-	TrackInfoWindow::Get()->Unlock();
-	
-	curSong = NULL;
-	
-	WindowManager::Get()->Hide(TrackInfoWindow::Get());
-	
-}
+//void
+//TrackManager::Restart()
+//{
+//	TrackInfoWindow::Get()->Lock();
+//	if(curJTrack != NULL) 
+//		curJTrack->Deselect();
+//	
+//	curJTrack = NULL;
+//	
+//	for(int i=0;i<MAX_PLUG;i++)
+//	{
+//		if(isBoosterValid(i)) 
+//			list[i]->Restart();
+//	}	
+//
+//	TrackInfoWindow::Get()->Unlock();
+//	
+//	curSong = NULL;
+//	
+//	WindowManager::Get()->Hide(TrackInfoWindow::Get());
+//	
+//}
 void
 TrackManager::Close()
 {
@@ -240,14 +268,12 @@ TrackManager::Init()
 status_t
 TrackManager::SelectTrack(JTrack* x) {
 
-	if ( curJTrack == x ) 
+	if ( curJTrack == x && x != NULL) 
 		return B_ERROR;
 	
 	if(curJTrack != NULL) 
 		curJTrack->Deselect();
-	else	
-		 WindowManager::Get()->Show(TrackInfoWindow::Get());
-	
+
 	curJTrack = x;
 
 	if(curJTrack != NULL) 	
@@ -256,25 +282,38 @@ TrackManager::SelectTrack(JTrack* x) {
 		if(list[x->getTrack()->getModel()] != NULL) {		
 			if(list[x->getTrack()->getModel()]->getPanel() != NULL)
 			{
+
 				PlugPanel	*v=list[x->getTrack()->getModel()]->getPanel();
 				if(TrackInfoWindow::Get()->Lock()){
-					if(current) current->Hide();
+					if(current) 
+						current->Hide();
 					current=(BView*)v;
 					current->Show();
+					LogTrace("1Before Lock");
 					TrackInfoWindow::Get()->Unlock();
-					TrackInfoWindow::Get()->UpdateIfNeeded();
-					TrackInfoWindow::Get()->Activate();
-					v->Reset(x->getTrack());
+					//TrackInfoWindow::Get()->UpdateIfNeeded();
+					//TrackInfoWindow::Get()->Activate();
+					LogTrace("2Before Lock");
+					v->ResetToTrack(x->getTrack());
 					TrackInfoWindow::Get()->SetTrack(x->getTrack());
-					TrackInfoWindow::Get()->UpdateIfNeeded();
+					//TrackInfoWindow::Get()->UpdateIfNeeded();
+					LogTrace("3Before Lock");
 				}
+				LogTrace("After Lock");
 				
 			}
 		}
 	}
 	else
 	{
-		WindowManager::Get()->Switch(TrackInfoWindow::Get());
+ 		WindowManager::Get()->Hide(TrackInfoWindow::Get());
+		if(TrackInfoWindow::Get()->Lock()){
+			if(current) 
+			   current->Hide();
+			   
+			current = NULL;
+			TrackInfoWindow::Get()->Unlock();
+		}
 	}	
 	
 			
@@ -288,13 +327,14 @@ TrackManager::RefReceived(entry_ref ref,JTrack *trk,BMessage *g){
 	Track*	x=trk->getTrack();
 	if(list[x->getModel()]->RefReceived(ref,x,g)==B_OK)
 			RefreshSelected();
-		
+	return true;
 }
 void
 TrackManager::ResetPanel(Track* x){
 
-	PlugPanel	*v=list[x->getModel()]->getPanel();
-	if(v) v->Reset(x);
+	if (!x) return;
+	PlugPanel	*v= list[x->getModel()]->getPanel();
+	if(v) v->ResetToTrack(x);
 
 }
 Track*

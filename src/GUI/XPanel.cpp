@@ -67,24 +67,19 @@ XPanel::isAllPat(){
 	return all_bt->Value();
 }
 
-
-/*Pattern*
-XPanel::currentPattern(){
-	return curSong->getTrackAt(0)->getPatternAt(curPattern);
-}*/
-
 void
 XPanel::ResetMeasureCount(){
 	curpat->SetMax(curSong->getNumberMeasure());
 }
 
 void
-XPanel::Reset(Song* s,TracksPanel* f)
+XPanel::ResetToSong(Song* s, TracksPanel* f)
 {
 	curSong = s;
 	tp = f;
 	
 	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, curSong->getTempo()); //To be removed!
+	LogTrace("******* TO BE REMOVED *************");
 	
 	curpat->UpdateValue(1, true);
 	all_bt->SetValue(MeasureManager::Get()->GetPatternMode());

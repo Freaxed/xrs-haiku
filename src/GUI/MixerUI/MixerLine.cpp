@@ -18,6 +18,7 @@
 #include "Xed_Utils.h"
 #include "PBus.h"
 #include "VSTHost.h"
+#include "VSTItem.h"
 
 #define T_VIW_NOVST			"<none>"
 
@@ -66,7 +67,8 @@ MixerLine::MixerLine(PBus* bus, ValuableID volume, ValuableID pan, ValuableID me
 	for(uint8 i=0;i<MAX_VST;i++)
 	{
 		extraInfo.ReplaceInt8("vst:position", i);
-		group->AddView(new StringBox("", fPopUp, &extraInfo));
+		fBoxsList[i] = new StringBox("", fPopUp, &extraInfo);
+		group->AddView(fBoxsList[i]);
 	}
 	
 	ValuableVPeakView* peak = new ValuableVPeakView(meter, "_peak_");
@@ -91,8 +93,25 @@ MixerLine::AttachedToWindow()
 	fVSTMenu->SetTargetForItems(this);
 }
 
-//		m_plug=new VSTInstrumentPlugin(plugin);
-//		setWin(new PlugWindow(m_plug,true));
+void	
+MixerLine::ResetUI()
+{
+	// let's synch bus effects with the line
+	PEffector* effector = fBus->Effector();
+	for (uint i=0;i<MAX_VST;i++) {
+		VSTItem* item = effector->GetVstAtPosition(i);
+		UpdateItem(item, i);
+	}
+	
+}
+
+void		
+MixerLine::UpdateItem(VSTItem* item, uint8 position)
+{
+	StringBox*	box = fBoxsList[position];
+	box->UpdateLabel(item == NULL ? NULL : item->EffectName());
+	CreateVstWindow(item, position);
+}
 
 void		
 MixerLine::CreateVstWindow(VSTItem* item, uint8 position)
@@ -120,11 +139,7 @@ MixerLine::CreateVstItem(VSTPlugin* templ, BMessage* msg)
 	    extra.FindInt8("vst:position", &position) == B_OK)
 	{
 		VSTItem* item = fBus->Effector()->CreateVstAtPosition(templ, position);
-		StringBox*	box = NULL;
-		if (msg->FindPointer("box", ((void**)&box)) == B_OK) {
-			box->UpdateLabel(templ == NULL ? NULL : templ->EffectName());
-		}
-		CreateVstWindow(item, position);
+		UpdateItem(item, position);
 	}	
 	else
 	{

@@ -31,6 +31,7 @@ class	TrackInfoWindow : public XrsWindow
 			bool	QuitRequested();
 			void	MessageReceived(BMessage*);
 			void	SetTrack(Track* tr);
+
 				
 		
 	private:

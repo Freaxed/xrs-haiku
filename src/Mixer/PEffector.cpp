@@ -12,6 +12,7 @@
 #include <List.h>
 #include "VstManager.h"
 #include "XHost.h"
+#include "Log.h"
 
 
 PEffector::PEffector():PNode(){
@@ -23,19 +24,63 @@ PEffector::PEffector():PNode(){
 };
 
 void	
-PEffector::SaveSettings(BMessage* fxs) {
+PEffector::SaveSettings(BMessage& fxs) {
 	for(uint8 i=0; i<MAX_EFFECT; i++) {
-		BMessage effect;
+		BMessage effect;		
+		effect.AddInt16("Position", (uint8)i);
 		if (fVstStack[i] != NULL) {
-			effect.AddInt16("Position", (uint8)i);
 			effect.AddString("Type", "VST"); //by default
 			effect.AddString("Path", fVstStack[i]->Path());
+			effect.AddString("EffectName", fVstStack[i]->EffectName());
 			BMessage effectData;
 			fVstStack[i]->SavePreset(&effectData);
 			effect.AddMessage("Settings", &effectData);
-			fxs->AddMessage("Effect", &effect);
-		}		
+		}
+		fxs.AddMessage("Effect", &effect);				
 	}
+}
+
+void
+PEffector::LoadSettings(BMessage& msg)
+{
+	int i = 0;
+	BMessage effect;
+	while (msg.FindMessage("Effect", i++, &effect) == B_OK)
+	{
+		uint8 position = effect.GetInt16("Position", MAX_EFFECT);
+		if (position >= MAX_EFFECT)
+			break;
+
+		VSTPlugin* plugin = NULL;
+		BString effectName;
+		
+		if (effect.FindString("EffectName", &effectName) == B_OK)
+			plugin = FindVST(effectName.String());		
+
+		VSTItem* newItem = CreateVstAtPosition(plugin, position);
+		if (newItem) {
+			BMessage effectData;
+			effect.FindMessage("Settings", &effectData);
+			newItem->LoadPreset(&effectData);
+		}
+			
+	}
+}
+
+VSTPlugin*				
+PEffector::FindVST(const char* name)
+{
+	//Search for the effect
+	for(int i=0;i<fFxList->CountItems();i++)
+	{
+		VSTPlugin* plug = (VSTPlugin*)fFxList->ItemAt(i);
+		if (strcmp(plug->EffectName(), name) == 0)
+		{
+			return plug;									
+		}
+	}
+
+	return NULL;
 }
 
 PEffector::~PEffector()
@@ -71,14 +116,16 @@ PEffector::Process(float** data,size_t frames) {
 }
 
 VSTItem*	
-PEffector::CreateVstAtPosition(VSTPlugin* templ, uint8 pos)
+PEffector::CreateVstAtPosition(VSTPlugin* plugin, uint8 pos)
 {
 	assert(pos < MAX_EFFECT);
+
+	LogInfo("Loading vst at position %d (%s)", pos, plugin ? plugin->EffectName() : "NULL");
 	
 	VSTItem* newPlugin = NULL;
 	
-	if (templ != NULL)
-		newPlugin =	VstManager::Get()->CreateVst( templ );
+	if (plugin != NULL)
+		newPlugin =	VstManager::Get()->CreateVst( plugin );
 	
 
 	VSTItem* toBeRemoved = _LockedSwap(newPlugin, pos);
@@ -87,6 +134,13 @@ PEffector::CreateVstAtPosition(VSTPlugin* templ, uint8 pos)
 		VstManager::Get()->DeleteVst( toBeRemoved );
 
 	return newPlugin;
+}
+
+VSTItem*		
+PEffector::GetVstAtPosition(uint8 pos)
+{
+	assert(pos < MAX_EFFECT);
+	return fVstStack[pos];
 }
 
 VSTItem*				

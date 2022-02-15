@@ -13,14 +13,6 @@
 #include <math.h>
 #include <stdio.h>
 
-/* Version 2
-	
-	26/July/2002 Petch birday happy all the world. 
-		
-		Nu' giuiello.
-				
-*/
-
 #define PUMP_UP_FACTOR 3.0f
 
 TNTrack::TNTrack():Track()
@@ -87,7 +79,7 @@ TNTrack::Message(SynthMessage msg, float data)
 			note_length=(int32)data;
 			break;
 		case SystemStop:
-			stopVoice();
+			stopVoice(); Reset();
 			break;
 		case SystemReset:
 			Reset();
@@ -111,12 +103,12 @@ static float notefreq(int halftone)
 XRSVoice
 TNTrack::newVoice(Note* n,int VoiceTag)
 { 
-	curNote=n;
+	curNote = n;
 	current_note_length=note_length/8;
 	output->Message(NoteChange, notefreq(tuneoffset+curNote->getNote()));
 	output->Message(NoteOn, 10); // accent or whatever
-	return NULL; 
-}		
+	return NULL;
+}
 
 void
 TNTrack::stopVoice(int note)
@@ -134,4 +126,36 @@ void
 TNTrack::goOff()
 { 
 	stopVoice();
+}
+
+				
+void				
+TNTrack::SaveCustomSettings(BMessage& msg)
+{
+	msg.AddString("TNName","TN306");
+
+	msg.AddFloat("TNCutoff",	 vcf.getCutoff());
+	msg.AddFloat("TNResonance",  vcf.getResonance());
+	msg.AddFloat("TNEnvMod",	 vcf.getEnvmod());
+	msg.AddFloat("TNDecay",	     vcf.getDecay());		
+	//dly
+	msg.AddFloat("TNDelay",	 	 dly.getVol());
+	msg.AddFloat("TNFeedback",	 dly.getFeedback());
+	msg.AddFloat("TNDistortion", dly.getDistort());
+	//seq
+	msg.AddInt16("TNTune",		 getTune());
+}
+
+void
+TNTrack::LoadCustomSettings(BMessage& msg)
+{
+	vcf.Cutoff(msg.GetFloat("TNCutoff", 0.0f));
+	vcf.Resonance(msg.FindFloat("TNResonance", 0.0f));
+	vcf.Envmod(msg.FindFloat("TNEnvMod", 0.0f));
+	vcf.Decay(msg.FindFloat("TNDecay", 0.0f));
+	dly.Vol(msg.FindFloat("TNDelay", 0.0f));
+	dly.Distort(msg.FindFloat("TNDistortion", 0.0f));
+	dly.Feedback(msg.FindFloat("TNFeedback", 0.0f));
+
+	Tune(msg.GetInt16("TNTune", 0));	
 }

@@ -506,7 +506,7 @@ XUtils::FillPresetsMenu(const char* name, BMenu* men, unsigned long msg){
 	
 	err = xdir.SetTo(xpath.Path());
 	if(err == B_ENTRY_NOT_FOUND) {
-		LogError("No presets directory found [%s]", xpath.Path());
+		LogDebug("No presets directory found [%s]", xpath.Path());
 		return;
 	}
 	

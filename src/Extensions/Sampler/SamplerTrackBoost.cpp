@@ -65,11 +65,7 @@ SamplerTrackBoost::~SamplerTrackBoost()
 	delete extm;
 }
 
-void
-SamplerTrackBoost::Reset()
-{
-	MakeMenu();
-}
+
 
 void SamplerTrackBoost::RemoveAll()
 {
@@ -96,22 +92,24 @@ void SamplerTrackBoost::RemoveAll()
 				
 	}
 	
-	extm->Empty();
+	extm->MakeEmpty();
 	
 	MakeMenu();
 	
 	TrackManager::Get()->refreshAllMyTrack(0);
 }
+//void
+//SamplerTrackBoost::Restart()
+//{
+////	LogTrace("SamplerTrackBoost RESTART called");	
+////	MakeMenu();
+//}
+
 void
-SamplerTrackBoost::Restart()
+SamplerTrackBoost::ResetToSong()
 {
-	//	cancellare i samples dalla memoria.
-	//	cancellare il menu
-	//	ricreare il menu
-	//	altro?
-	
-	//printf("TrackBoost Restart?\n");	
-	extm->Empty();
+//	LogTrace("SamplerTrackBoost RESET called");
+//	MakeMenu();
 }
 
 Track*
@@ -138,240 +136,63 @@ SamplerTrackBoost::_checkPath(const char* p)
 	if(e.Exists()) 
 		return B_OK;
 	
-	printf("[%s] doesn't exists !\n",p);
+	LogError("[%s] does not exists !\n", p);
 	return B_ERROR;
 }
 
+
+void			
+SamplerTrackBoost::SaveBoosterSettings(BMessage* data)
+{
+	BMessage ext;
+   		
+	for(int j=0;j<getEXTM()->CountItems();j++) {
+		ext.AddString("SamplePath", getEXTM()->getSampleAt(j)->GetFullPath());
+	}
+   		
+    data->AddMessage("SamplesList", &ext);
+}
+
 void
-SamplerTrackBoost::LoadBoosterSettings(BMessage* data){
-
-	int i=0;
-	int b=0;
-	BString		path;
-	entry_ref	ref;
-	BMessage	*newdata=new BMessage();
+SamplerTrackBoost::LoadBoosterSettings(BMessage* data)
+{
+	extm->MakeEmpty();
 	
-		
-	if(data->FindMessage("samples_list",newdata)!=B_OK) return;	
+	BMessage	sampleList;
+	if (data->FindMessage("SamplesList", &sampleList) != B_OK) 
+		return;	
 	
-		
-	while(newdata->FindString("Sample_path",i,&path)==B_OK)
+	int i = 0;
+	BString path;
+	while(sampleList.FindString("SamplePath", i++, &path) == B_OK)
 	{
-		
-				
-				{// da rendere una funzione!!
-				
-				
-				
-				int16 type=-1;
-				int32 offset=0;
-				
-				status_t error;
-				
-				entry_ref ref;	
-				//bool	nodir=true;
-				
-				error=newdata->FindInt16("Sample_type",i,&type);
-				
-				if(error!=B_OK) 
-					type=1;
-				else
-					if(type==0)
-					{
-					 newdata->FindInt32("Sample_offset",b,&offset);
-					 b++;
-					} 
-				// ricerca del sample:
-				
-				BEntry entry;
-				entry.SetTo(path.String());
+		BEntry entry;
+		entry.SetTo(path.String());
 							
-				error=_checkPath(path.String());
-				//printf("Checking path #%s# %ld \n",path.String(),path.Length());
-				if(error==B_OK)
-					_loadSampler(path.String(),type,offset);
-				else
-				
-				{
-					BPath  	  p;
-					BPath	  p2;
-					BEntry	  e;
-					entry_ref hope;
-					
-					data->FindRef("Song_ref",&hope);
-					e.SetTo(&hope);
-					e.GetParent(&e);
-					p.SetTo(&e);
-					p2.SetTo(path.String());
-					p.Append(p2.Leaf());
-								
-					error=_checkPath(p.Path());
-					if(error==B_OK)
-						_loadSampler(p.Path(),type,offset);
-					else
-					{
-						TrackManager::Get()->GetXRSDirectoryEntry(&hope,"Samples");
-						e.SetTo(&hope);
-						p.SetTo(&e);
-						p2.SetTo(path.String());
-						p.Append(p2.Leaf());
-						error=_checkPath(p.Path());
-						if(error==B_OK)
-							_loadSampler(p.Path(),type,offset);
-						else
-						{
-							BString error_s;
-							error_s.SetTo(T_SAMPLER_CANT_FIND);
-							error_s << p.Leaf() <<" \n";
-							data->AddString("error",error_s.String());
-						
-						}
-						
-					}
-					
-				}
-				i++;
-				}
-			}
-
+		if ( _checkPath(path.String()) == B_OK )
+			_loadSampler(path.String());
+	}
+	MakeMenu();
+	LogTrace("LoadBoosterSettings, loaded %d samples", i-1);
 }
 
 status_t
-SamplerTrackBoost::_loadSampler(const char* filename,int type,int32 offset)
+SamplerTrackBoost::_loadSampler(const char* filename)
 {
-	status_t error=B_ERROR;
-	entry_ref ref;
+	entry_ref ref;	
+	get_ref_for_path(filename, &ref);	
 	
-	get_ref_for_path(filename,&ref);
-	
-	printf("LOAD Sample type : %d  Offset %ld \n",type,offset);
-	
-	if(type==1)
-		error=extm->AddSample(ref);
-	else 
-	if(type==0)
-		error=extm->ExtractSample(ref,offset);
-						
-	return error;	
-}
-void
-SamplerTrackBoost::LoadTrackSettings(Track* trk,BMessage* data){
-
-	SamplerTrack* tr=dynamic_cast<SamplerTrack *>(trk);
-	tr->setResampleEnable(data->FindBool("resample_enable"));
-	tr->setResample(data->FindInt16("resample"));
-	tr->amp=data->FindInt16("ampboost");
-	BString name;
-	data->FindString("sample_name",&name);
-	
-	bool b;
-	
-	
-	if(data->FindBool("boost_enable",&b)==B_OK)
-		tr->setBoostEnable(b);
-	else
-		tr->setBoostEnable(false);
-	
-	if(data->FindBool("reverse",&b)==B_OK)
-		tr->setReversed(b);
-	else
-		tr->setReversed(false);
-	
-	if(name.Length()<=0) return;
-	
-	
-	Sample *s=FindSample(name.String());
-	
-	if(s)
-	{
-		//tr->setSample(s);
-		_secureSetSample(tr,s);
-		tr->setName(tr->getSample()->GetName());
-	}
-	else
-	{
-			// non so se è bello metterlo qui!
-			BString error(T_SAMPLER_CANT_FIND);
-			error += name;
-			error += '\n';
-			data->AddString("error",error.String());
-	}
-}
-	
-void
-SamplerTrackBoost::SaveTrackSettings(Track* trk,BMessage* data){
-
-	SamplerTrack* tr=dynamic_cast<SamplerTrack *>(trk);
-	if(tr->getSample()) data->AddString("sample_name",BString(tr->getSample()->GetName()));
-	data->AddBool("resample_enable",tr->isResampleEnable());	
-    data->AddInt16("resample",tr->getResample());
-	data->AddInt16("ampboost",(int)tr->amp);
-	data->AddBool("boost_enable",tr->isBoostEnable());
-	data->AddBool("reverse",tr->isReversed());
-    	
+	int pos = -1;					
+	status_t error = extm->AddSample(ref, &pos);
+	LogInfo("Loading Sample [%s] at position [%d]", ref.name, pos);
+	return error;
 }
 
-void			
-SamplerTrackBoost::SaveBoosterSettings(BMessage* data){
-
-	bool zipped=false;
-	
-	if(data->FindBool("zipped",&zipped)==B_OK) 
-		zipped=true;
-	 else
-	    zipped=false;
-	
-	BMessage* ext=new BMessage();
-   		
-   		for(int j=0;j<getEXTM()->CountItems();j++)
-   		{
-   			if(zipped && getEXTM()->getSampleAt(j)->type==1)
-   			{
-   				ext->AddString("Sample_path",getEXTM()->getSampleAt(j)->GetName());
-   				data->AddString("collect",getEXTM()->getSampleAt(j)->GetFullPath());
-   			}
-   			else
-   			 	ext->AddString("Sample_path",getEXTM()->getSampleAt(j)->GetFullPath());
-   				
-   				
-   			ext->AddInt16("Sample_type",getEXTM()->getSampleAt(j)->type);
-   			
-   			if(getEXTM()->getSampleAt(j)->type==BANK_SAMPLE_TYPE)
-   			   			ext->AddInt32("Sample_offset",getEXTM()->getSampleAt(j)->offset);
-
-   		}
-   		
-    data->AddMessage("samples_list",ext);
-}
 
 ExternalManager*
 SamplerTrackBoost::getEXTM()
 {
 	return extm;
-}
-
-void
-SamplerTrackBoost::_addMD5(const char* filename,BMessage *msg)
-{/*
-  FILE *inFile = fopen (filename, "rb");
-  MD5_CTX mdContext;
-  int bytes;
-  unsigned char data[1024];
-
-  if (inFile == NULL) {
-    printf ("_addMD5: %s can't be opened.\n", filename);
-    return;
-  }
-
-  MD5Init (&mdContext);
-  while ((bytes = fread (data, 1, 1024, inFile)) != 0)
-    MD5Update (&mdContext, data, bytes);
-  MD5Final (&mdContext);
-  
-  
-  msg->AddString("md5",(const char*)mdContext.digest);
-  
-  fclose (inFile);*/
 }
 
 status_t
@@ -461,38 +282,19 @@ SamplerTrackBoost::RemoveSample(Sample* s)
 void
 SamplerTrackBoost::MakeMenu()
 {
+	menu->RemoveItems(0, menu->CountItems(), true);
 	
-	BMenuItem	*t;
-	BMenuItem * item;
-	Sample*        kikko;
-	int32 		max;
-	BMessage *info;
-	
-
-		max=menu->CountItems();
+	LogTrace("Making Sample menu.. %d samples", getEXTM()->CountItems());
 		
-		for(int j=0;j<max;j++){
-		
-		t=menu->ItemAt(0);
-		if(t==NULL) break;
-		menu->RemoveItem(t);
-		delete t;
-		}
-		
-		
-				
-		for(int16 zip=0;zip<getEXTM()->CountItems();zip++)
-		{
-			info=new BMessage(TRACK_SAMP_EXT);
-			info->AddInt16("sample",zip);
-			kikko=getEXTM()->getSampleAt(zip);
-			item=new BMenuItem(kikko->GetName(), info);
-			//item->SetTarget(fw);
-			item->SetTarget(panel);
-			
-			menu->AddItem(item);
-			
-		}		
+	for(int16 i=0; i < getEXTM()->CountItems(); i++)
+	{
+		BMessage *info = new BMessage(TRACK_SAMP_EXT);
+		info->AddInt16("sample",i);
+		BMenuItem* item = new BMenuItem(getEXTM()->getSampleAt(i)->GetName(), info);
+		item->SetTarget(panel);		
+		menu->AddItem(item);
+		LogTrace("Adding new Sample menu at position %d", i);
+	}		
 }
 
 void

@@ -43,46 +43,58 @@ class Track: public StereoVolumes
 		virtual void		goOff(){}
 		virtual	void		Reset();
 		virtual	void 		Message(SynthMessage msg, float data);
-		virtual	void		Process(float**,int32,int,float factor=1.0);
+
 		virtual int			getModel();	
 		
-		// new in Xrs1.3
 		
-		virtual	TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
-		virtual	XRSVoice		newVoice(Note* n,int VoiceTag){ return NULL; };		
+		virtual	TRACK_GEN_TYPE	getProcessorType() = 0;
+
+		//Voice process
 		/*
 			sample_num è il numero di full_frame
 			se è 4, vuol dire che ci sono 4 frame per ogni canale.
-			restituisce il numero di full frame scritti.
+			restituisce il numero di full frame scritti. (-1 per dire ho finito, cancellami la voice)
 		*/
-		virtual uint32		ProcessVoice(XRSVoice,float ** buffer ,uint32 sample_num){ return -1; };
-		virtual	void		killVoice(XRSVoice){};
-		virtual	void		stopVoice(int num=-1){};
+		virtual uint32			ProcessVoice(XRSVoice,float ** buffer ,uint32 sample_num){ return -1; };
+		virtual	XRSVoice		newVoice(Note* n, int VoiceTag) { return NULL; }
+		virtual	void			killVoice(XRSVoice){};
+		virtual	void			stopVoice(int num=-1){};
+
+		//Stream process
+		virtual	void			Process(float**,int32,int,float factor=1.0);		
+		virtual	bool			HasData(){ return true;}; //may I ask 'process' ?
 		
 		//New in XRS 1.4
 
-		virtual	bool			HasData(){ return true;}; //may I ask 'process' ?
-		virtual	void			RouteLineChanged(int line){};
+		
+		virtual	void		RouteLineChanged(int line){};
 		
 		//tmp
-		virtual	bool			SupportPanNote(){ return false; };
-		virtual	bool			SupportSustainNote(){ return false;};
+		virtual	bool		SupportPanNote(){ return false; };
+		virtual	bool		SupportSustainNote(){ return false;};
+
+
+		void				SaveSettings(BMessage& msg);
+		void				LoadSettings(BMessage& msg);
+		
+		virtual	void		SaveCustomSettings(BMessage& msg) = 0;
+		virtual	void		LoadCustomSettings(BMessage& msg) = 0;
 		
 		//Measures
 
-		Pattern*		getPatternAt(int);
+		Pattern*			getPatternAt(int);
 		void				moveToPattern(int);
 		
 		bool				isOn();
 		void				setOn(bool);
-		int				getRouteLine(){ return route_line; };
+		int					getRouteLine(){ return route_line; };
 		void				setRouteLine(int r){ route_line=r;};
 		
 		void				AddMeasure(int val,int);
 		void				RemoveMeasure(int num);
 		void				setName(const char*);
 		void				LockName(bool b);
-		const char*		getName();
+		const char*			getName();
 		void				ResetName();
 		bool				isNameLocked();
 		void				setNumberNotes(int);

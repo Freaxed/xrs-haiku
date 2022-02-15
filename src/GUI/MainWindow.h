@@ -24,17 +24,14 @@ class Track;
 
 class MainWindow : public XrsWindow
 {
-
-
-
 	 public:
 						
-						~MainWindow();
-						
-				static	MainWindow*	Get();
+							~MainWindow();						
+				static		MainWindow*	Get();
+				
 				void		Close();
 				void		MessageReceived(BMessage* message);
-				void		Reset(Song*,bool juicereset=true);
+				void		ResetToSong(Song*);
 				void		Init();
 				bool		QuitRequested();
 				void		WindowActivated(bool active);
@@ -56,6 +53,8 @@ class MainWindow : public XrsWindow
 			status_t			AskRemove(const char*);
 			void				CreateMenu();
 			void				UpdateRecents();
+
+			void				ResetTitle();
 			
 			XPanel 			*fPanel;
 			Song			*curSong;

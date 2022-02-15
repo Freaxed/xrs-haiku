@@ -68,7 +68,7 @@ TNPanel::AttachedToWindow()
 }
 
 void
-TNPanel::Reset(Track *track)
+TNPanel::ResetToTrack(Track *track)
 {
 	fTrack = dynamic_cast<TNTrack*>(track);
 	
@@ -80,7 +80,7 @@ TNPanel::Reset(Track *track)
 			Window()->Unlock();
 		}
 	}
-	PlugPanel::Reset(track);
+	PlugPanel::ResetToTrack(track);
 }
 
 void
@@ -139,7 +139,7 @@ TNPanel::MessageReceived(BMessage* msg)
 			if(XUtils::LoadPreset(PRESET_DIRECTORY,item->Label(),&set)){
 				if(set.FindInt16("revision")==PRESET_REVISION){
 					fBooster->LoadTrackSettings((Track*)fTrack,&set);
-					Reset((Track*)fTrack);
+					ResetToTrack((Track*)fTrack);
 				}
 			}	
 		}

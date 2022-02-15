@@ -36,9 +36,10 @@ public:
 	JTrack*			MakeJTrack(Track*, BRect rect, int16 n);		
 	JTrack*			getJTrack();
 	
-	
-	bool			Load(Track*,int,BFile*,int32,int32); //tenuto per compatibilità (?)
-	
+
+	void			SaveBoosterSettings(BMessage& msg);
+	void			LoadBoosterSettings(BMessage& msg);
+
 	void			SaveBoosterSettings(int16 i, BMessage*);
 	void			SaveTrackSettings(Track*,BMessage*);
 	
@@ -61,9 +62,9 @@ public:
 	void			refreshAllMyTrack(int id);
 	void			ResetPanel(Track*);
 	void			RefreshSelected();
-	void			Reset(Song*);
+	void			ResetToSong(Song*);
 	void			Init();
-	void			Restart();
+	//void			Restart();
 	void			Close();
 	
 	void			GetXRSDirectoryEntry(entry_ref*,const char*);

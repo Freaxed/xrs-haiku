@@ -29,11 +29,12 @@ ExternalManager::ExternalManager()
 
 ExternalManager::~ExternalManager()
 {
-	Empty();
+	MakeEmpty();
 }
 void
-ExternalManager::Empty()
+ExternalManager::MakeEmpty()
 {
+	LogDebug("ExternalManager::MakeEmpty()");
 	Sample	*sample;
 	while(CountItems()){
 		sample = getSampleAt(0);
@@ -52,21 +53,22 @@ ExternalManager::InitCheck(){
 status_t
 ExternalManager::AddSample(entry_ref ref, int *pos)
 {
-
-	if(pos!=NULL) {
-		
-		for(int i=0;i<samples_list.Count();i++)
-			if(strcmp((samples_list[i])->GetName(), ref.name)==0)
-			{
-					LogInfo("Samples %s already foud at position %d\n",ref.name, i);
-					*pos=i;
-					return B_OK;
-			}
-	}
+	assert(pos != NULL);
 	
+	for(int i=0;i<samples_list.Count();i++)
+	{
+		if(strcmp((samples_list[i])->GetName(), ref.name) == 0)
+		{
+			LogInfo("Samples %s already foud at position %d\n",ref.name, i);
+			*pos=i;
+			return B_OK;
+		}
+	}
+
 	Sample* sample = new Sample();
 	lastStatus  = LoadFile(&ref, sample);
 	if (lastStatus != B_OK) {
+		LogError("Can't open sample file [%s]", ref.name);
 		delete sample;
 		return lastStatus;
 	}
@@ -113,120 +115,6 @@ ExternalManager::LoadFile(entry_ref *ref, Sample* sample)
 		};
 	};
 	
-	return B_OK;
-}
-
-
-
-status_t
-ExternalManager::AddBankSample(BMessage* message)
-{
-	entry_ref	ref;
-	
-	message->FindRef("refs", &ref);
-	
-	int32 spiaz=message->FindInt32("spiaz");
-	//int32 size=message->FindInt32("size");
-	
-	lastStatus=ExtractSample( ref,spiaz );
-	return lastStatus;
-}
-
-status_t
-ExternalManager::ExtractSample(entry_ref ref ,int32 spiaz )
-{
-	//Lock the main thread:
-	XHost::Get()->SendMessage(X_LockSem,0);
-	lastStatus = _extractSample(ref,spiaz);
-	//Unlock the main thread:
-	XHost::Get()->SendMessage(X_UnLockSem,0);
-	return lastStatus;	
-}
-
-status_t
-ExternalManager::_extractSample(entry_ref ref ,int32 spiaz )
-{	
-/*
-	status_t error;
-			
-	BEntry controllo_esiste(&ref);
-	if(controllo_esiste.Exists()==false) return B_ENTRY_NOT_FOUND;
-	
-	
-	BFile *file=new BFile();
-    	
-    	error=file->SetTo(&ref,B_READ_ONLY);
-    		if(error) return error;
-    	error=file->InitCheck();
-    		if(error) return error;
-	
-	//error=file->GetSize(&file_size);
-    	//	if(error) return error;
-	
-	Sample* samp=new Sample();
-	
-	int64 msg=-1;
-	int64 val=0;
-	char title[30];
-	char space=' ';
-	
-	
-	
-	file->Seek(spiaz,SEEK_SET);
-	
-	while(msg!=SAMPLE_STOP)
-			{
-				file->Read(&msg,sizeof(int64));
-				file->Read(&val,sizeof(int64));
-				
-				
-				switch(msg){
-				case SAMPLE_NAME:
-					
-					file->Read(title,val);
-					memset(sample->name,space,30);
-					memcpy(sample->name,title,val);
-					sample->name[val]='\0';
-				
-					
-					break;
-				case SAMPLE_DATA:
-					
-					sample->wave_data=(short*)malloc(val);
-					sample->_totalbytes=val;
-					sample->frames=val/2;
-					sample->channels=2;
-					sample->type=BANK_SAMPLE_TYPE;
-					file->Read((void*)sample->wave_data,val);
-					break;
-					
-					break;
-				default:
-					if(msg>=800)
-					{
-						//printf("Unknown code :%lld\n",msg);
-						file->Seek(val,SEEK_CUR);
-					}
-				break;
-				}
-	
-	}
-	
-
-	
-	samples_list.Add(samp);	 
-	
-	BEntry e(&ref);
-	BPath p(&e);
-	
-	sample->path_name=(char*)malloc(B_PATH_NAME_LENGTH);
-	memcpy( sample->path_name, p.Path(), strlen(p.Path() ) );
-	sample->path_name[strlen(p.Path() )]='\0';
-	sample->offset=spiaz;
-	
-	printf("External File loaded! [%s]\n",sample->path_name);	
-	
-	delete file;*/
 	return B_OK;
 }
 

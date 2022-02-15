@@ -62,7 +62,7 @@ TB303Knobs::Reset(TNTrack *track)
 		 dist->SetValue(fTrack->dly.getDistort());
 	   feedbk->SetValue(fTrack->dly.getFeedback());
     	 tune->SetValue((float)(12 + fTrack->getTune())/24.0f);
-	   tdelay->SetValue(fTrack->dly.getTimeDelay() * (1.0f/0.6f));
+	   tdelay->SetValue( (fTrack->dly.getTimeDelay() - 0.25f) / (2.0f));
 	  
 	  Window()->Unlock();
 	}
@@ -82,7 +82,7 @@ void TB303Knobs::do_decay(float d)     {  if (fTrack) fTrack->vcf.Decay(d); }
 void TB303Knobs::do_delay(float d)     {  if (fTrack) fTrack->dly.Vol(d); }
 void TB303Knobs::do_feedbk(float d)    {  if (fTrack) fTrack->dly.Feedback(d); }
 void TB303Knobs::do_dist(float d)      {  if (fTrack) fTrack->dly.Distort(d); } //
-void TB303Knobs::do_timedelay(float d) {  if (fTrack) fTrack->dly.TimeDelay(d * 0.6f); } //
+void TB303Knobs::do_timedelay(float d) {  if (fTrack) fTrack->dly.TimeDelay((d * 2.0f ) + 0.25f);}
 
 void TB303Knobs::AttachedToWindow()
 {

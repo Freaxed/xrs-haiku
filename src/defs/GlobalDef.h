@@ -14,8 +14,6 @@
 #define	MAX_LFO_PHASE	256
 
 #define	UNSET_TYPE				-1
-#define	BANK_SAMPLE_TYPE		0
-#define EXT_SAMPLE_TYPE			1
 #define	SYNTH_SAMPLE_TYPE		2
 
 

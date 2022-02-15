@@ -110,11 +110,11 @@ JFileManager::EmptySong()
 	return i;
 }
 
-void
-JFileManager::CloseSong(Song* s)
-{	
-	delete s;
-}
+//void
+//JFileManager::CloseSong(Song* s)
+//{	
+//	delete s;
+//}
 
 JFileManager::~JFileManager()
 {
@@ -125,226 +125,37 @@ JFileManager::~JFileManager()
 	if(filtro!=NULL) delete filtro;
 }
 void
-JFileManager::SaveReq(entry_ref ref, const char* file_name,Song* s)
+JFileManager::SaveReq(entry_ref ref, const char* file_name, Song* s)
 {
 	BEntry e(&ref);
-	BPath p(&e);
-	
+	BPath  p(&e);
 	BEntry* zip;
 	
 	entry_ref rif;
-	//bool p_r;
-	
-	status_t er;
-	
 	
 	p.Append(file_name);
 	
-	er=get_ref_for_path(p.Path(),&rif);
-	
-	printf("Do you want to load : %s  status : %s \n",p.Path(),strerror(er));
-	
-	
-	
-	
+	status_t er = get_ref_for_path(p.Path(), &rif);
 			
-			SaveFile(rif,s);
-			if(s->getEntry()==NULL) s->setEntry(new BEntry(&rif));
-			else {
-				zip=s->getEntry();
-				zip->SetTo(&rif);
-				s->setEntry(zip);
-			   }
-			//s->setModified(false);
-		
-		
-	if(filepanel!=NULL) 
+	SaveFile(rif, s);
+	if(s->getEntry() == NULL)
 	{
+		s->setEntry(new BEntry(&rif));
+	}
+	else 
+	{
+		zip = s->getEntry();
+		zip->SetTo(&rif);
+		s->setEntry(zip);
+	}
+	
+		
+	if ( filepanel != NULL) {
 		delete filepanel;
-		filepanel=NULL;
+		filepanel = NULL;
 	}
 }
 
-// status_t
-// JFileManager::SaveFile(entry_ref rif,Song* song,bool zip)
-// {
-	
-// 	status_t error;
-// 	int i,j,k;
-	
-// 	file=new BFile();
-				  
-//     char	title[10]="ClapLost ";
-    	
-//     error=file->SetTo(&rif,B_CREATE_FILE|B_READ_WRITE);
-//     if(error) return error;
-    	
-//     error=file->InitCheck();
-//     if(error) return error;
-
-    	
-    	
-//     	WriteFixed(FILE_VERSION,FILE_VERSION_INT);
-//        	WriteFixed(SONG_START,0);
-   
-//     	WriteVar(SONG_TITLE,title,10);
-//     	WriteVar(SONG_DESC,(void*)song->getDescription(),song->getSizeDescription());
-    
-//     	if(song->popupdesc)
-//     		WriteFixed(SONG_POPUP_DESC,1);
-//     	else
-//     		WriteFixed(SONG_POPUP_DESC,0);
-	    	
- 	   	
-//     	Track*		cur;
-//     	Pattern* 	pat;
-//     	BMessage*	m_data;
-//     	int64	ap;
-    	
-//     	WriteFixed(SONG_TIME,song->getTempo());
-//     	if(song->getSequence()->all)
-//     		WriteFixed(SONG_PLAY_ALL,song->getTempo());
-    	
-    	   	
-//     	//Mixer (OutputLines & VSTi)
-//     	song->mixer_settings->MakeEmpty();
-//     	MixerWindow::Get()->SaveSettings(song->mixer_settings);
-//     	WriteFixed(MIXER_SETTINGS,song->mixer_settings->FlattenedSize());
-// 		song->mixer_settings->Flatten(file);   	
-    	
-//     	int curType;    	
-    	
-//     	int32 n=(int32)song->getNumberNotes();
-//     	WriteFixed(SONG_NUM_NOTES,n);
-    	    	
-//     	for(int i=0;i<MAX_PLUG;i++)
-// 		{
-// 			if(tm->isBoosterValid(i))
-// 			{
-// 				 //WriteFixed(SONG_TRACKBOOST,i);
-// 				m_data=new BMessage();
-// 				if(zip) m_data->AddBool("zipped",true);
-				
-// 				tm->SaveBoosterSettings(i,m_data);
-//     			WriteFixed(BOOSTER_SETTINGS,m_data->FlattenedSize());
-// 				m_data->Flatten(file);   	
-// 				if(zip)
-// 					CollectData(m_data,rif);
-				
-// 			}
-// 		}	
-    	
-//     	for(j=0;j<song->getNumberTrack();j++)
-//     	{
-    	
-//     		// Track Saving
-//     		// Common track properties (vol/pan/name/pattern)
-//     		// & Specific Type-depended info (with a BMessage)
-    		
-//     		cur=song->getTrackAt(j);
-//     		curType=cur->getModel();
-    		
-    		   		    		
-//     		WriteFixed(TRACK_START,curType);
-    		 
-    		 
-//     		WriteFixed(TRACK_VOLUME,(int64)(cur->Gain() * 100));
-//     		WriteFixed(TRACK_PANNER,(int64)(cur->Pan() * 100));
-    		
-    		
-//     		if(cur->isNameLocked()) 
-//     		{
-//     			// first you set the new name.   			
-// 				WriteVar(TRACK_NAME,(void*)cur->getName(),strlen(cur->getName()));
-				
-// 				// second you lock that name
-// 				ap=1;
-//     			WriteFixed(TRACK_NAME_SET,ap);
-// 			}
-			
-// 			ap = cur->isOn() ? 1 : 0 ;
-    		
-//     		WriteFixed(TRACK_MUTE,ap);
-//     		WriteFixed(TRACK_OUTPUT_LINE,cur->getRouteLine());	
-		 	
-// 		 	// salvataggio MIDI-IN??
-// 		 	WriteFixed(TRACK_MIDI_IN_CH,cur->GetMidiInCh());
-		 	
-// 		 	ap = cur->IsMidiInEnable() ? 1 : 0 ;
-		 	
-// 		 	WriteFixed(TRACK_MIDI_IN_EN,ap);
-		 	
-		 	
-//      		m_data=new BMessage();
-//     		tm->SaveTrackSettings(cur,m_data);
-//     		WriteFixed(TRACK_SETTINGS,m_data->FlattenedSize());
-// 			m_data->Flatten(file); 	
-     		
-//     		 for(i=0;i<song->getNumberMeasure();i++)
-//     		 {
-    	
-//     			 WriteFixed(PATTERN_START,0);
-    			
-//     			 pat=cur->getPatternAt(i); 
-    			
-//     			 for(k=0;k<pat->getNumberNotes();k++)
-//     			 {
-//     			    	WriteFixed(NOTE_START,0);
-    			    	
-//     			    		if(pat->getNoteAt(k)->getValue())
-//     			    			WriteFixed(NOTE_ON,1);
-//     			    		else
-//     			    			WriteFixed(NOTE_ON,0);
-    			    	
-//     			    		WriteFixed(NOTE_VOLUME,(int64)(pat->getNoteAt(k)->Gain()*100));
-//     			    		WriteFixed(NOTE_NEWNOTE,pat->getNoteAt(k)->getNote());
-    			    	
-//     			    	WriteFixed(NOTE_STOP,0);		
-//     			}		
-    			
-//     			 WriteFixed(PATTERN_STOP,0);
-    		  			
-//     		 }
-         		
-//       	WriteFixed(TRACK_STOP,curType);
-// 	} 
-    
-    
-//     // Playlist:
-    
-//     	WriteFixed(PL_START,1);
-    	
-//     	WriteFixed(PL_LOOP_ENABLE,(int)song->getSequence()->loop_enable);
-//     	WriteFixed(PL_LOOP_POINT1,song->getSequence()->loop_points[0]);
-//     	WriteFixed(PL_LOOP_POINT2,song->getSequence()->loop_points[1]);
-    	
-//     	for(int p=0;p<song->getSequence()->getMaxSeq()+1;p++)
-//     	{
-    		
-//     			WriteFixed(PL_POS_START,p);
-//     			/*Inserire altro ciclo loop*/
-//     			for(int jx=0;jx<song->getSequence()->getMaxPat();jx++)
-//     			{
-//     				int y=song->getSequence()->ItemAt(p,jx);
-//     				if(y>=0)	WriteFixed(PL_POS_PAT,jx);
-    				
-//     			}
-//     			WriteFixed(PL_POS_STOP,0);
-//     	}
-    	
-//     	WriteFixed(PL_STOP,1);
-    		
-//     	WriteFixed(SONG_STOP,0);
-    	
-//     	AddMime(file);
-    	
-//     	delete file;
-	
-// 	return B_OK;
-	
-// 	printf("File Saved!\n");
-	
-// }
 
 status_t
 JFileManager::Load()
@@ -353,518 +164,134 @@ JFileManager::Load()
 	entry_ref sl;
 	XUtils::GetXRSDirectoryEntry(&sl,"Songs");
 	
-	if(!openpanel) 
-		openpanel=new BFilePanel(B_OPEN_PANEL,&be_app_messenger,&sl,0,false,new BMessage(X_REFS_RECEIVED),NULL,true,true);	
+	if (!openpanel) 
+		openpanel = new BFilePanel(B_OPEN_PANEL, &be_app_messenger, &sl,0,false,new BMessage(X_REFS_RECEIVED),NULL,true,true);	
 	
 	openpanel->SetRefFilter(filtro);
 	openpanel->Show();
 	return B_OK;
 }
 
-
-//void
-//JFileManager::setRef(entry_ref ref)
-//{
-//	BPath p(&ref);
-//	if(p.GetParent(&p)==B_OK)	get_ref_for_path(p.Path(),&sl);	
-//	printf("current : %s\n",sl.name);
-//}
+#include "PMixer.h"
 
 status_t
-JFileManager::LoadFile(entry_ref rif,Song* song)
+JFileManager::LoadFile(entry_ref rif, Song* song)
 {
+	errors_log->MakeEmpty(); //?
+	BMessage errors;
 	
 	status_t error;
-	char	title[100];
-	//char	Filename[100];
-	char	base[SAMPLE_NAME_L];
-	//char	path[B_PATH_NAME_LENGTH];
-	entry_ref ref;
-	bool	have_seq=false;
 	
-	errors_log->MakeEmpty();
+	BMessage songInfo;
 	
-	
-	file=new BFile();
-    	
-    error=file->SetTo(&rif,B_READ_ONLY);
-    	if(error) return error;
-    error=file->InitCheck();
-    	if(error) return error;
-
-	file->Seek(0,SEEK_SET);
-
-			
-	int64 rt,va=0;
-	int64 fileversion;
-
-	if(FILE_VERSION!=ReadFixed(&rt)) return B_ERROR;
-	printf("File version : %lld\n",rt);
-	fileversion=rt;
-	if(fileversion<2) return B_ERROR;
-	if(SONG_START!=ReadFixed(&rt)) return B_ERROR;
-	
-
-	BAlert* wait = XUtils::ShowIdleAlert(T_DIALOG_LOADING_FILE);
-
-	 
-	int track_c=0;
-	Track*	track_o;
-	int pat_c=0;
-	int cur_pos=0;
-	int note_c=0;
-
-	int track_id=0;
-	BMessage	*d_msg;
-	BString	error_str;
-	
-	while(va!=SONG_STOP)
+	if (BEntry(&rif).Exists())
 	{
-		va=ReadFixed(&rt);
-		switch(va){
-		
-			case 	SONG_NUM_NOTES:
-				song->setNumberNotes(rt);
-			break;
-			case	SONG_POPUP_DESC:
-				if(rt==0) song->popupdesc=false; 
-					else 	song->popupdesc=true;
-			break;
-			case SONG_TITLE:
-				file->Read(title,rt);
-				title[rt]='\0';
-			break;
-			case SONG_DESC:
+		BFile* file = new BFile();   	
+	    if ((error = file->SetTo(&rif, B_READ_ONLY) == B_OK) && 
+	        (error = file->InitCheck() == B_OK)) 
+	    {
+				file->Seek(0, SEEK_SET);			
+				if ((error = songInfo.Unflatten(file)) != B_OK)
 				{
-				char ptr[rt+1];
-				file->Read(ptr,rt);
-				ptr[rt]='\0';
-				song->setDescription((const char*)ptr);
+					LogError("Can't decode the file! [%s]", rif.name);
+					delete file;
+					return error;
 				}
-			break;
-			
-			/* very old file type?? 
-			case BANK_NAME:
-				//printf("Found a bank! %d\n",rt);
-				//tm->Load(NULL,0,file,va,rt)	;			
-			break;
-			case EXT_LIST_START:
-				//printf("Found an external list of samples! \n");
-				//tm->Load(NULL,0,file,va,rt)	;
-			break;*/
-			
-			case PL_START:
-				have_seq=true;
-				while(va!=PL_STOP)
-				{
-					va=ReadFixed(&rt);
-					switch(va){
-						case PL_LOOP_ENABLE:
-						song->getSequence()->loop_enable=(bool)rt;
-						break;
-						case PL_LOOP_POINT1:
-						song->getSequence()->loop_points[0]=rt;
-						break;
-						case PL_LOOP_POINT2:
-						song->getSequence()->loop_points[1]=rt;
-						break;
-						case PL_POS_START:
-							
-							cur_pos=rt;
-							while(va!=PL_POS_STOP)
-							{
-								va=ReadFixed(&rt);
-								switch(va){
-									case PL_POS_PAT:
-									song->getSequence()->setItemAt(cur_pos,rt,true);
-									break;
-								default:
-									if(va>=2000) file->Seek(rt,SEEK_CUR);
-								break;
-								}
-							}
-						break;
-						default:
-							if(va>=2000) file->Seek(rt,SEEK_CUR);
-						break;
-					}
+				if (songInfo.GetInt64("Version", -1) != FILE_VERSION_INT) {
+					errors.AddString("error", "Invalid file version!");
+					LogError("Invalid file version!", rif.name);
+					delete file;
+					return B_ERROR;
 				}
-			break;
-			case SONG_VST_START:
-			{
-				// only for compatibily purpose with 1.2
 				
-				BMessage	temp_line;  // proprietà linea corrente
-				BMessage	vst;	    // preset vst corrente
-				
-				d_msg=song->mixer_settings;
-				d_msg->MakeEmpty();
-				d_msg->AddInt16("version",0);
-										
-				int  pos=0;
-				
-				//debugger("mixer");
-				temp_line.MakeEmpty();
-				
-				while(va!=SONG_VST_STOP){
-									
-					va=ReadFixed(&rt);
-					
-					switch(va){
-						
-						case SONG_VST_NAME:
-							file->Read(title,rt);
-							title[rt]='\0';
-							
-							vst.AddInt16("position",pos);
-							vst.AddString("leaf",BString(title));
-							pos++;
-						break;
-					
-						case SONG_VST_DATA:
-							{
-							 BMessage newdata;
-							 newdata.Unflatten(file);
-							 printf("Data\n");
-							 vst.AddBool("active",newdata.FindBool("active"));
-							 vst.AddMessage("preset",&newdata);
-							 newdata.MakeEmpty();
-							 vst.AddMessage("window",&newdata);
-							 						 
-							 /* aggiunta di 2 bmessage */
-							}
-						break;
-						
-						case SONG_VST_LINE:
-							/* chiudere la precedente??*/
-							if(!temp_line.IsEmpty())
-							{
-								d_msg->AddMessage("line_settings",&temp_line);
-								d_msg->AddMessage("vst_settings",&vst);
-								vst.MakeEmpty();	
-								pos=0;
-							}
-							
-							temp_line.MakeEmpty();
-							temp_line.AddInt16("id",rt+1);
-							temp_line.AddFloat("vol",0.8);
-							temp_line.AddFloat("pan",0.0);
-						
-						break;
-						
-						case SONG_VST_GLOBAL:
-							/* chiudere la precedente??*/
-							if(!temp_line.IsEmpty())
-							{
-								d_msg->AddMessage("line_settings",&temp_line);
-								d_msg->AddMessage("vst_settings",&vst);
-								vst.MakeEmpty();
-								pos=0;
-							}
-							
-							temp_line.MakeEmpty();
-							temp_line.AddInt16("id",0);
-							temp_line.AddFloat("vol",0.8);
-							temp_line.AddFloat("pan",0.0);
-							
-						break;
-						
-						default:
-							if(va>=2000) 
-								file->Seek(rt,SEEK_CUR);
-						break;
-					}
-				}
-							
-			if(!temp_line.IsEmpty())
-			{
-				d_msg->AddMessage("line_settings",&temp_line);
-				d_msg->AddMessage("vst_settings",&vst);
-				vst.MakeEmpty();
-			}
-			
-			}	
-				
-			break;
-			case MIXER_SETTINGS:
-				
-				song->mixer_settings->MakeEmpty();
-				song->mixer_settings->Unflatten(file);
-		   			
-			break;	
-			case SONG_TIME:
-				song->setTempo((int)rt);
-			break;
-			case SONG_PLAY_ALL:
-				song->getSequence()->all=true;
-				break;
-			
-			case SONG_TRACKBOOST: //DEPRECATED!!
-				// tm->Load(NULL,rt,file,va,rt);
-				// here we shold enable a false-function in order to
-				// load version 2 files
-				// but only version 2!
-				
-				//if(fileversion!=2)
-				
-				printf("SONG_TRACKBOOST %lld\n",rt);
-				if(rt==0)
-				{
-				
-				d_msg=new BMessage();
-				d_msg->Unflatten(file);
-				
-				BMessage *newmess=new BMessage();
-				newmess->AddMessage("samples_list",d_msg);
-				newmess->AddRef("Song_ref",&rif);
-				newmess->PrintToStream();
-				tm->LoadBoosterSettings(newmess);
-				AnalizeError(newmess);
-				delete d_msg;
-				delete newmess;
-				}
-				break;
-			case BOOSTER_SETTINGS:
-				d_msg=new BMessage();
-				d_msg->Unflatten(file);
-				d_msg->AddRef("Song_ref",&rif);
-				tm->LoadBoosterSettings(d_msg);
-				AnalizeError(d_msg);
-				delete d_msg;
-			break;
-			case TRACK_START:
-				
-				track_o=tm->getTrack(rt);
-				track_id=rt;
-				track_c=song->MeltTrack(track_o);
-				
-				while(va!=TRACK_STOP)
-				{
-					va=ReadFixed(&rt);
-					switch(va){
+		} 
+		else  
+		{
+	    	LogError("Can't read file! [%s]", rif.name);
+	    	delete file;
+			return error;
+		}
+		delete file;
+	}
 
-					case TRACK_NAME:
-						file->Read(base,rt);
-						base[rt]='\0';
-						printf("Loading Track name %s\n",base);
-						song->getTrackAt(track_c)->setName(base);
-					break;
-					case TRACK_NAME_SET:
-						if(rt)
-						song->getTrackAt(track_c)->LockName(true);
-						else
-						song->getTrackAt(track_c)->LockName(false);
-					
-					break;
-					case TRACK_VOLUME:
-						song->getTrackAt(track_c)->SetGain((float)rt/(float)100);
-					break;
-					case TRACK_PANNER:
-						song->getTrackAt(track_c)->SetPan((float)rt/(float)100);
-					break;
-					case TRACK_MUTE:
-						if(rt==0)
-						song->getTrackAt(track_c)->setOn(false);
-							else
-						song->getTrackAt(track_c)->setOn(true);
-					break;
-					case TRACK_FX1_LINE: //for 1.2
-						song->getTrackAt(track_c)->setRouteLine(rt+1);
-					break;
-					case TRACK_FX1:		//for 1.2
-						if(rt==0)
-							song->getTrackAt(track_c)->setRouteLine(0);
-					break;
-					case TRACK_OUTPUT_LINE:
-						song->getTrackAt(track_c)->setRouteLine(rt);
-					break;
-					case TRACK_MIDI_IN_EN:
-						if(rt==0)
-							song->getTrackAt(track_c)->SetMidiInEnable(false);
-						else
-							song->getTrackAt(track_c)->SetMidiInEnable(true);
-					break;
-					case TRACK_MIDI_IN_CH:
-						song->getTrackAt(track_c)->SetMidiInCh(rt);
-					break;
-					//
-					//deprecated just for compatibility with 1.2
-					
-					//sampler
-					case TRACK_RESAMPLE_EN:
-					case TRACK_AMPBOOST:
-					case TRACK_RESAMPLE:
-					case TRACK_REVERSED:
-					case TRACK_SAMPLE:
-					
-					//tn303
-					case TRACK_SPECIFIC_DATA_START:
-				
-					Comatible12(song->getTrackAt(track_c),va,rt);
-					break;
-					///end deprecated
-					case TRACK_SETTINGS:
-						d_msg=new BMessage();
-						d_msg->Unflatten(file);
-						tm->LoadTrackSettings(song->getTrackAt(track_c),d_msg);
-						AnalizeError(d_msg);
-						delete d_msg;
-					break;
-					case PATTERN_START:
-				
-						song->AddMeasure();
-						
-						while(va!=PATTERN_STOP)
-						{
-							va=ReadFixed(&rt);
-							switch(va){
-							
-							case NOTE_START:
-								while(va!=NOTE_STOP)
-								{
-									va=ReadFixed(&rt);
-									switch(va){
-									
-										case NOTE_ON:
-										if(rt==0)
-										{
-										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->setValue(false);
-										// printf("-");
-										}
-										else
-										{
-										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->setValue(true);
-										//printf("*");
-										}
-										break;
-										case NOTE_VOLUME:
-										
-										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->SetGain((float)rt/100.);
+	LogTrace("LoadFile: applying global song info..");
+	song->setDescription(songInfo.GetString( "Description", ""));
+	song->popupdesc = songInfo.GetBool("DescPopUp", false);
+	song->setTempo(songInfo.GetInt64("BeatPerMinute", 120));
+	song->getSequence()->all = songInfo.GetBool("PlayAll", false);
+	song->setNumberNotes(songInfo.GetInt64("NumNotes", 16));
+	
+		// Il giro deve essere: dalla song devo salvare il numero di "Measure" e il nome.
+	// poi aggiungendo le traccie si dovrebbe creare tutto automaticamente..
 
-										break;
-										case NOTE_OCT:
-										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->setOct(rt);
-										break;
-										
-										case NOTE_NOTE:
-										// song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->setNote(rt);
-										 //old message :
-										 // 1) pulire i primi due bit di oct
-										 // 2) ricalcolare in base MIDI
-										 {
-										 int oc=song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->getOct();
-										 
-										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->setOct(oc&8);
-										 
-										 oc=oc&7;
-										 
-										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->setNote(rt+oc*12+60);
-										
-										}
-										break;
-										case NOTE_NEWNOTE:
-										 song->getTrackAt(track_c)->getPatternAt(pat_c)->getNoteAt(note_c)->setNote(rt);
-										break;
-										default:
-										//printf("3 Unknown message! %lld\n",va);
-										if(va>=2000) file->Seek(rt,SEEK_CUR);
-										break;																			
-									}
-								}
-								note_c++;
-							break;
-							
-							default:
-							if(va>=2000) file->Seek(rt,SEEK_CUR);
-							
-							break;
-							}
-						}
-						note_c=0;
-						pat_c++;
-					break;
-					default:
-					//printf("1 Unknown message! %lld\n",va);
-					//printf("DEBUG: track id %d\n",track_id);
-					//bool ing=tm->Load(track_o,track_id,file,va,rt);
-					if(va>=2000) file->Seek(rt,SEEK_CUR);
-					
-					break;
-					}
-				}
-				//track_c++;
-				song->setNumberMeasure(pat_c);
-				pat_c=0;
-			break;
-			
-			default:
-			if(va>=2000) file->Seek(rt,SEEK_CUR);
-			
-			break;
+	    // Playlist: 
+	LogTrace("LoadFile: applying playlist setting..");
+	BMessage playlist;
+	songInfo.FindMessage("Playlist", &playlist);
+	song->getSequence()->LoadSettings(playlist);
+	
+
+	LogTrace("LoadFile: applying mixer settings..");	
+	BMessage mixer;
+	songInfo.FindMessage("Mixer", &mixer);
+	PMixer::Get()->LoadSettings(mixer);
+
+	TrackManager*	trackManager = TrackManager::Get();
+	
+	LogTrace("LoadFile: applying tracks setting..");
+	
+	BMessage	boostsSettings;
+	songInfo.FindMessage("Boosts", &boostsSettings);
+	trackManager->LoadBoosterSettings(boostsSettings);
+	
+	BMessage tracksSettings;
+	songInfo.FindMessage("TracksSettings", &tracksSettings);
+	int i=0;
+	BMessage track;
+	while(tracksSettings.FindMessage("TrackSettings", i, &track) == B_OK) {
+		int type = track.GetInt16("Type", -1);
+		if (type >= 0) {
+			Track* cur = trackManager->getTrack(type); //create a track
+			song->AddTrack(cur); //create track & sequence linked to measures
+			cur->LoadSettings(track);	 //load the settings	
+		}
+
+		i++;
 	}
 	
-}		
-
-	if(!have_seq)	{
-		//printf("Song without a sequnece!\n");
-		song->getSequence()->Reset();
-		song->getSequence()->all=true;
-		}
-	//printf("Song is Ok? %s\n",song->getBKM()->the_ref.name);
 	song->setEntry(new BEntry(&rif));
-	//song->setModified(false);
-	printf("Song loaded.\n");	
-	delete file;
-	  
-	XUtils::HideIdleAlert(wait);
+	LogInfo("\nSong loaded.\n");	
+  
+	//XUtils::HideIdleAlert(wait);
 	
 	return B_OK;
 	
 }
 
 void
-JFileManager::Save(Song* s,bool saveas)
+JFileManager::Save(Song* s, bool saveas)
 {
-
 	entry_ref ref;
-
-	if(s->getEntry()==NULL || saveas==true )
-		
-		{
-
-			entry_ref sl;
-			XUtils::GetXRSDirectoryEntry(&sl,"Songs");
-			if(!filepanel)
-				filepanel=new BFilePanel(B_SAVE_PANEL,NULL,&sl,0,false,NULL,NULL,true);
-			filepanel->SetRefFilter(filtro);
-			filepanel->Show();
+	if(s->getEntry() == NULL || saveas==true )
+	{
+		entry_ref sl;
+		XUtils::GetXRSDirectoryEntry(&sl, "Songs");
+		if(!filepanel)
+			filepanel = new BFilePanel(B_SAVE_PANEL,NULL,&sl,0,false,NULL,NULL,true);
+		filepanel->SetRefFilter(filtro);
+		filepanel->Show();
 			
-	 	}
-	 else
-	 	{
-	 		//printf("Second case!\n");
-	 		s->getEntry()->GetRef(&ref);
-	 		SaveFile(ref,s);
-	 		//s->setModified(false);
-	 	}
+ 	}
+	else
+	{
+		s->getEntry()->GetRef(&ref);
+		SaveFile(ref,s);
+	}
 	
 }
 
 	
-void
-JFileManager::WriteFixed(int64 code ,int64 data)
-{
-	file->Write(&code,sizeof(int64));
-	file->Write(&data,sizeof(int64));
-	return;
-}
 
-void
-JFileManager::WriteVar(int64 code ,void* data,int64 size)
-{
-	WriteFixed(code,size);
-	file->Write(data,size);		
-}
 int64
 JFileManager::ReadFixed(int64 *data)
 {
@@ -1279,80 +706,7 @@ JFileManager::AnalizeError(BMessage* msg)
 
 void
 JFileManager::Comatible12(Track* tr,int32 va,int32 rt)
-{ //->
-	int tracktype=tr->getModel();
-	if(tracktype==0)
-	{
-		switch(va)
-		{	// we are in version 2!
-			case TRACK_SAMPLE:
-			{
-				compatible= new BMessage();
-				char ptr[rt+1];
-				file->Read(ptr,rt);
-				ptr[rt]='\0';
-				compatible->AddString("sample_name",BString(ptr));
-			}
-			break;
-			case TRACK_REVERSED:
-				if(!compatible) compatible=new BMessage();
-				compatible->AddBool("reverse",(bool)rt);
-			break;
-			case TRACK_RESAMPLE_EN:
-				compatible->AddBool("resample_enable",(bool)rt);
-				break;
-			case TRACK_RESAMPLE:
-				compatible->AddInt16("resample",(int16)rt);
-				break; 	
-			case TRACK_AMPBOOST:
-				compatible->AddInt16("ampboost",(int16)rt);
-				if(rt>1)
-				compatible->AddBool("boost_enable",true);
-				// this is the last sample1.2 message:
-				tm->LoadTrackSettings(tr,compatible);
-				AnalizeError(compatible);
-				delete compatible;
-				compatible=NULL;
-				break;
-			default:break;
-				
-		}
-	} else
-	if(tracktype==1) //Tn303 version 1.2
-	{
-		switch(va){
-		
-			case TRACK_SPECIFIC_DATA_START:
-			{
-				BMessage msg;
-				msg.Unflatten(file);
-				tm->LoadTrackSettings(tr,&msg);
-				AnalizeError(&msg);
-			}
-			break;
-		}
-	} else
-	if(tracktype==10) //VIW version 1.2
-	{
-		switch(va){
-		
-			case TRACK_SPECIFIC_DATA_START:
-			{
-				//debugger("vst! settings??! GetConfig!");
-				BMessage msg;
-				msg.Unflatten(file);
-				msg.PrintToStream();
-				
-				BMessage d_msg;
-				d_msg.AddString("plugin_name",BString("mdaJX10"));
-				d_msg.AddMessage("window_settings",&msg);
-				d_msg.AddMessage("instrument_preset_old",&msg);
-				tm->LoadTrackSettings(tr,&d_msg);
-				AnalizeError(&msg);
-			}
-			break;
-		}
-	}
+{
 }
 
 //
@@ -1378,26 +732,21 @@ JFileManager::SaveFile(entry_ref rif,Song* song, bool zip)
 	//TODO MOVE TO THE SONG CLASS??!?
 	BMessage songInfo;
 	songInfo.AddInt64  ( "Version" 		, FILE_VERSION_INT);
-    songInfo.AddString ( "Title"   		, "");
 	songInfo.AddString ( "Description"	, song->getDescription());
 	songInfo.AddBool   ( "DescPopUp"    , song->popupdesc);
 	songInfo.AddInt64  ( "BeatPerMinute", song->getTempo());
 	songInfo.AddBool   ( "PlayAll"      , song->getSequence()->all);
  	songInfo.AddInt64  ( "NumNotes"		, song->getNumberNotes());
+ 	// Playlist: 
+	BMessage playlist;
+	song->getSequence()->SaveSettings(playlist);
+    songInfo.AddMessage("Playlist", &playlist);
+
+ 	
 
 	//saving Mixer information.
 	BMessage mixer;
-	for (uint8 i=0; i<PMixer::Get()->CountBusses(); i++) {
-		BMessage mixerLine;
-		PBus* bus = PMixer::Get()->BusAt(i);
-		mixerLine.AddFloat("Gain", bus->Gain());
-		mixerLine.AddFloat("Pan",  bus->Pan());
-		BMessage fxs;
-		bus->Effector()->SaveSettings(&fxs);
-		mixerLine.AddMessage("Effects", &fxs);
-
-		mixer.AddMessage("Line", &mixerLine);
-	}
+	PMixer::Get()->SaveSettings(mixer);
 	songInfo.AddMessage("Mixer", &mixer);
 
 
@@ -1405,108 +754,27 @@ JFileManager::SaveFile(entry_ref rif,Song* song, bool zip)
 	TrackManager*	trackManager = TrackManager::Get();
 	
 	BMessage	boostsSettings;
-	for(int16 i=0;i<MAX_PLUG;i++)
-	{
-		if(trackManager->isBoosterValid(i))
-		{
-			BMessage boost;
-			boost.AddInt16("id", i);
-			
-			trackManager->SaveBoosterSettings(i, &boost);
-			boostsSettings.AddMessage("BoostSettings", &boost);		
-		}
-	}
-
+	trackManager->SaveBoosterSettings(boostsSettings);
 	songInfo.AddMessage("Boosts", &boostsSettings);
+	
+
     
 	BMessage tracksSettings;
 	for(int j=0;j<song->getNumberTrack();j++)
 	{
-	
 		// Track Saving
 		BMessage track;
-
-		Track* cur = song->getTrackAt(j);
-		
-		track.AddInt16("Type", cur->getModel());				
-		track.AddFloat("Gain", cur->Gain());
-		track.AddFloat("Pan",  cur->Pan());					
-		
-		if(cur->isNameLocked()) 
-		{
-			track.AddString("Name",		  cur->getName());		
-			track.AddBool  ("NameLocked", true);
-		}
-		
-		track.AddBool ("Mute", 		!cur->isOn());
-		track.AddInt16("OutputLine", cur->getRouteLine());
-		track.AddInt16("MidiIn", 	 cur->GetMidiInCh());
-		track.AddInt16("MidiEnale",  cur->IsMidiInEnable());
-
-		BMessage settings;
-		trackManager->SaveTrackSettings(cur, &settings);
-		track.AddMessage("settings", &settings);
-		
-		BMessage patterns;
-		for(int i=0; i<song->getNumberMeasure(); i++)
-		{
-			BMessage pattern;
-		
-			Pattern* pat = cur->getPatternAt(i); 
-		
-			for(int k=0;k<pat->getNumberNotes();k++)
-			{
-				BMessage note;
-				note.AddBool( "Value", pat->getNoteAt(k)->getValue());
-				note.AddFloat("Gain",  pat->getNoteAt(k)->Gain());
-				note.AddFloat("Pan",   pat->getNoteAt(k)->Pan());
-				note.AddInt16("Note",  pat->getNoteAt(k)->getNote());
-
-				pattern.AddMessage("Note", &note);
-			}		
-		
-			patterns.AddMessage("Pattern", &pattern);
-		}
-		
-		track.AddMessage("Patterns",&patterns);
-
+		song->getTrackAt(j)->SaveSettings(track);
 		tracksSettings.AddMessage("TrackSettings", &track);
 	}
 
-	songInfo.AddMessage("TracksSettings", &tracksSettings);
+	songInfo.AddMessage("TracksSettings", &tracksSettings);    
     
-    
-    // Playlist: 
-	BMessage playlist;
 
-	//TODO: move into Sequence class!!
-
-	playlist.AddBool("Enable", song->getSequence()->loop_enable);
-	playlist.AddInt16("Point", song->getSequence()->loop_points[0]);
-	playlist.AddInt16("Point", song->getSequence()->loop_points[1]);
-    	
-	for(int p=0;p<song->getSequence()->getMaxSeq()+1;p++)
-	{
-		BMessage sequence;
-		/*Inserire altro ciclo loop*/
-		for(int16 jx=0;jx<song->getSequence()->getMaxPat();jx++)
-		{
-			int y = song->getSequence()->ItemAt(p,jx);
-			if ( y >= 0 )
-				sequence.AddInt16("Pattern", jx);
-		}
-		playlist.AddMessage("Sequence", &sequence);
-	}
-    	
-    songInfo.AddMessage("Playlist", &playlist);
-	songInfo.Flatten(file);	
-
-    AddMime(file);
-    	
-//    file->Close();
+  	
+	songInfo.Flatten(file);
+    AddMime(file);    	
     delete file;
-	
-	LogInfo("File Saved!\n");
-
+	LogInfo("\nFile Saved!\n");
 	return B_OK;	
 }

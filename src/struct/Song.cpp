@@ -17,25 +17,23 @@
 #include <stdio.h>
 #include <math.h>
 
-int tracknote_division;	//dirty hack;
-int notes_per_measaure;	//dirty hack;
+int tracknote_division = 4 ;	//dirty hack;
+int notes_per_measaure = 16;	//dirty hack;
 
 Song::Song()
 {
 	tempo_bpm=120;
 	setTempo(tempo_bpm);
 	file_entry=NULL;
-	
-	mixer_settings=new BMessage();
-	
+		
 	popupdesc=true;
 	
 	sequence=new Sequence();
 	sequence->Reset();
 	
-	num_notes=NUM_NOTES;
-	tracknote_division=4;
-	notes_per_measaure=16;
+	num_notes = NUM_NOTES;
+	tracknote_division = 4;
+	notes_per_measaure = 16;
 	AddMeasure();		// a song MUST have at least one Measure!
 }
 
@@ -60,9 +58,8 @@ Song::AddMeasure()
 	{
 		getTrackAt(h)->AddMeasure(1,getNumberNotes());
 	}
-	//getSequence()->setMaxPat(getSequence()->getMaxPat()+1);	
+
 	getSequence()->AddMeasure(T_GEN_MEASURE);
-	//printf("Current Song num_mea %d\n",getSequence()->getMaxPat());
 }
 int
 Song::getIndexOfTrack(Track* tx)
@@ -99,21 +96,15 @@ Song::AddTrack(Track* j)
 void
 Song::RemoveTrack(Track* t)
 {
-	//Track* t;
-	//t= (Track*)trk.ItemAt(p);
-	int p=trk.IndexOf((void*)t);
-	//printf("Song:: rmove track id %d\n",p);
-	trk.RemoveItem(p);
+	trk.RemoveItem(trk.IndexOf((void*)t));
 	delete t;
-	
 }
 
 int
 Song::MeltTrack(Track* j )
 {
 	 trk.AddItem((void*)j);
-	 return trk.IndexOf((void*)j);
-	
+	 return trk.IndexOf((void*)j);	
 }
 
 int
@@ -128,14 +119,12 @@ Song::~Song()
 {
 	for(int h=0;h<getNumberTrack();h++)
 		delete 	getTrackAt(h);
-		
 }
 
 Track*
 Song::getTrackAt(int val)
 {
 	return (Track*)trk.ItemAt(val);
-	
 }
 int
 Song::getCurrentMeasure()
@@ -147,41 +136,26 @@ int
 Song::getNumberMeasure()
 {
 	return getSequence()->getMaxPat();
-	//return measure=getSequence()->getMaxPat()+1;
 }
 
 void
 Song::setNumberMeasure(int val)
 {
 	getSequence()->setMaxPat(val);
-	//measure=val;
 }
 void
 Song::Init()
-{
+{	
+	fullFile.MakeEmpty();
+	for(int h=0;h<getNumberTrack();h++)
+	{
+	   getTrackAt(h)->moveToPattern(0);
+	}		
+}
 
-	
-	for(int h=0;h<getNumberTrack();h++)
-		{
-	             getTrackAt(h)->moveToPattern(0);
-		}
-			
-}
-/*
-void
-Song::ResetSamples()
-{
-	for(int h=0;h<getNumberTrack();h++)
-		{
-			
-			//getTrackAt(h)->setType(UNSET_TYPE);			
-	            }
-}
-*/
 void
 Song::setTempo(int bpm)
 {
-	//bpm=message->FindInt32("be:value");
 	tempo_bpm=bpm;
 	note_size=(size_t)2646000/bpm;
 	while(note_size % 4 !=0) note_size++;	
@@ -196,6 +170,7 @@ Song::getNoteSize()
 {
 	return note_size;
 }
+
 BEntry*
 Song::getEntry()
 {
@@ -204,6 +179,6 @@ Song::getEntry()
 void
 Song::setEntry(BEntry* s)
 {
-	file_entry=s;
+	file_entry = s;
 }
 

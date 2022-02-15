@@ -75,7 +75,7 @@ JMDrumPanel::JMDrumPanel():PlugPanel(){
 		 msg=new BMessage(TWEAK);
 		 msg->AddInt16("id",i);
 		 
-		 box->AddChild(sl[i]=new BSlider(r,"ciao",info->Parameters[i]->Name,NULL,info->Parameters[i]->MinValue,info->Parameters[i]->MaxValue));
+		 box->AddChild(sl[i]=new BSlider(r,"slider",info->Parameters[i]->Name,NULL,info->Parameters[i]->MinValue,info->Parameters[i]->MaxValue));
 		 sl[i]->SetModificationMessage(msg);
 		 sl[i]->SetValue(info->Parameters[i]->DefValue);
 		 sl[i]->SetFontSize(10);
@@ -111,7 +111,7 @@ JMDrumPanel::JMDrumPanel():PlugPanel(){
 }
 
 void
-JMDrumPanel::Reset(Track* tr){
+JMDrumPanel::ResetToTrack(Track* tr){
 	if(tr){
 	
 		SetTitle(tr->getName());
@@ -135,7 +135,7 @@ JMDrumPanel::Reset(Track* tr){
 	}
 	else
 		myTrack=NULL;
-	PlugPanel::Reset(tr);
+	PlugPanel::ResetToTrack(tr);
 	
 	
 };
@@ -216,7 +216,7 @@ JMDrumPanel::MessageReceived(BMessage* msg)
 			if(XUtils::LoadPreset(PRESET_DIRECTORY,item->Label(),&set)){
 				if(set.FindInt16("revision")==PRESET_REVISION){
 					jm_booster->LoadTrackSettings((Track*)myTrack,&set);
-					Reset((Track*)myTrack);
+					ResetToTrack((Track*)myTrack);
 				}
 			}	
 		}

@@ -55,7 +55,7 @@ VIWPanel::VIWPanel(const BList* vst):PlugPanel(){
 }
 
 void
-VIWPanel::Reset(Track* tr){
+VIWPanel::ResetToTrack(Track* tr){
 	if(tr){
 	
 		SetTitle(tr->getName());
@@ -74,7 +74,7 @@ VIWPanel::Reset(Track* tr){
 	}
 	else	myTrack=NULL;
 	
-	PlugPanel::Reset(tr);
+	PlugPanel::ResetToTrack(tr);
 	
 	
 };

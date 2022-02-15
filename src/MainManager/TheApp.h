@@ -61,10 +61,8 @@ private:
 		void					ClearPattern(Pattern*);
 		
 		/* questi lavorano su DefaultSong : */
-		status_t				LoadRequest(entry_ref);
-		void					EmptySong();
-		void					DefaultSong(bool close);
-		void					CloseSong(Song*);
+		Song*					LoadRequest(entry_ref);
+		void					EmptySong(bool close);
 		void					LoadSong(entry_ref ref);
 			
 		

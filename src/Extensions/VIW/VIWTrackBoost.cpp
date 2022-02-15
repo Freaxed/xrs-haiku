@@ -48,8 +48,7 @@ VIWTrackBoost::VIWTrackBoost():TrackBoost()
 Track*
 VIWTrackBoost::getTrack()
 {
-	VIWTrack *trk=new VIWTrack();
-	return (Track*)(trk);
+	return (Track*)(new VIWTrack(this));
 }
 
 PlugPanel*
@@ -59,89 +58,13 @@ VIWTrackBoost::getPanel()
 }
 
 
-void
-VIWTrackBoost::LoadTrackSettings(Track* trk, BMessage* data){
-/*		
-		VIWTrack*	st=(VIWTrack*)trk;
-		BMessage*		mes=new BMessage();
-		
-		BString name;
-		status_t stat=data->FindString("plugin_name",&name);
-				
-		if(stat==B_OK){
-		
-		
-		
-		int pos=FindVSTi(name.String());
-		
-		if(pos<0) {
-		
-		BString error_s;
-		error_s.SetTo(T_VIW_CANT_FIND);
-		error_s << name.String() <<" \n";
-		data->AddString("error",error_s.String());
-		//printf("%s",error_s.String());
-		return; // VSTi NOT FOUND!
-		}
-		PlugInEntry*	stru=(PlugInEntry*)list->ItemAt(pos);
-		
-		st->LoadVSTi(stru->ref.name);
-		
-		
-		if(data->FindMessage("instrument_preset",mes)==B_OK)
-		{
-			if(st->getViw()) st->getViw()->LoadPreset(mes);
-		}
-		else
-		if(data->FindMessage("instrument_preset_old",mes)==B_OK)
-		{
-			if(st->getViw()) st->getViw()->LoadPresetOLD(mes);
-		}
-		
-		mes->MakeEmpty();
-		data->FindMessage("window_settings",mes);
-		
-		if(st->getWin()) st->getWin()->LoadPref(mes);
-		}
-*/
-}
-void			
-VIWTrackBoost::SaveTrackSettings(Track* trk,BMessage* data)
-{/*
-		VIWTrack*	st=(VIWTrack*)trk;
-		BMessage*		mes;
-		
-		if(st->getViw()!=NULL){
-			mes=new BMessage();
-			entry_ref ref;
-			get_ref_for_path(st->getViw()->filename_path.String(),&ref);
-			data->AddString("plugin_name",ref.name);
-						
-			st->getViw()->SavePreset(mes);
-			data->AddMessage("instrument_preset",mes);
-			
-			//mes->PrintToStream();
-			
-			mes->MakeEmpty();
-			
-			st->getWin()->SavePref(mes);
-			data->AddMessage("window_settings",mes);	
-			
-		}
-	*/
-}
 
-int
-VIWTrackBoost::FindVSTi(const char* name)
-{/*
-	BPath path;
-	for(int i=0;i<list->CountItems();i++){
-			PlugInEntry*	stru=(PlugInEntry*)list->ItemAt(i);
-			path.SetTo(stru->ref.name);
-			path.InitCheck();
-			//printf("ref.name %s\n",path.Leaf());
-			if(strcmp(name,path.Leaf())==0) return i;
+VSTPlugin*
+VIWTrackBoost::FindVSTi(const char* EffectName)
+{
+	for(int i=0; i<list->CountItems(); i++){
+		VSTPlugin	*stru = (VSTPlugin*)list->ItemAt(i);
+		if(strcmp(stru->EffectName(), EffectName) == 0) return stru;
 	}
-*/
-	return -1;
+	return NULL;
 }

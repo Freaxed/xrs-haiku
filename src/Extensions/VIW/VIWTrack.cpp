@@ -13,26 +13,20 @@
 #include "PlugWindow.h"
 #include "XHost.h"
 #include "viw_locale.h"
+#include "VIWTrackBoost.h"
 #include <AppKit.h>
 #include <StorageKit.h>
 
 #define	 FRAMES_NUM	1024
 
 
-VIWTrack::VIWTrack():Track()
+VIWTrack::VIWTrack(VIWTrackBoost* boost):Track(), mBoost(boost)
 {
-	stream_l=new float[ FRAMES_NUM];
-	stream_r=new float[ FRAMES_NUM];
-	stream_s[0]=stream_l;
-	stream_s[1]=stream_r;
-
-	
-
+	stream_s[0] = new float[ FRAMES_NUM ];
+	stream_s[1] = new float[ FRAMES_NUM ];
 	curNote=new Note();
 	viw=NULL;
 	win=NULL;
-	
-	
 	ResetName();
 }	
 
@@ -103,8 +97,8 @@ VIWTrack::Reset(){
 
 VIWTrack::~VIWTrack(){
 
-	delete stream_l;
-	delete stream_r;
+	delete[] stream_s[0];
+	delete[] stream_s[1];
 	LoadVSTi(NULL);
 }
 
@@ -186,4 +180,51 @@ VIWTrack::goOff()
 	stopVoice();
 	//FIX viw->SetStatus(false); 
 }
-						  
+
+					
+void
+VIWTrack::SaveCustomSettings(BMessage& msg)
+{
+	if(getViw() != NULL){
+
+		msg.AddString("EffectName", getViw()->EffectName());
+		msg.AddString("Path", getViw()->Path());
+		msg.AddString("Type", "VST");
+		BMessage effectData;
+		getViw()->SavePreset(&effectData);
+		msg.AddMessage("Settings", &effectData);			
+		
+		BMessage windowSettings;
+		getWin()->SaveSettings(windowSettings);
+		msg.AddMessage("WindowSettings", &windowSettings);		
+	}
+}
+
+void
+VIWTrack::LoadCustomSettings(BMessage& msg)
+{
+	BString name;
+			
+	if ( msg.FindString("EffectName", &name) == B_OK)
+	{
+		VSTPlugin* plugin = mBoost->FindVSTi(name.String());
+
+		if (plugin)
+		{
+			LoadVSTi(plugin);
+			BMessage effectData;
+			if (getViw() && msg.FindMessage("Settings", &effectData) == B_OK) 
+				getViw()->LoadPreset(&effectData);
+			
+			BMessage windowSettings;
+			if (getWin() && msg.FindMessage("WindowSettings", &windowSettings) == B_OK)
+				getWin()->LoadSettings(windowSettings);
+		}
+		else
+		{
+			LogError("Can't find the VST Instrument plugin: %s", name.String());
+			//FIXME report the error!
+		}
+	}
+}
+					  

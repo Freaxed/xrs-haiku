@@ -27,6 +27,13 @@ class ValuableManager : public BLooper {
 		
 		template<class TYPE>
 		void	UpdateValue(ValuableID vID, TYPE fValue1, TYPE fValue2);
+
+		// don't use this function unless you know what are you doing..
+		// if an component needs to get data, just use RegisterValue
+		bool	GetInternalLastMessage(ValuableID vID, BMessage& fValue);
+
+		// don't use this function unless you know what are you doing..
+		void	UpdateValue(BMessage& fValue);
 		
 		bool	RegisterValuableReceiver(ValuableID vID, BHandler* receiver, bool doUpdate = true);
 		
@@ -140,7 +147,6 @@ ValuableManager::UpdateValue(ValuableID vID, TYPE fValue1, TYPE fValue2) {
 	Valuable<TYPE> bMessage(vID, fValue1, fValue2);
 	PostMessage(&bMessage);
 }
-
 
 
 

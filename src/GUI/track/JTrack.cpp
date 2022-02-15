@@ -202,7 +202,7 @@ JTrack::Init(BMessage *m)
 }
 
 void
-JTrack::Reset(Pattern* p ,Track* tr)
+JTrack::ResetToTrack(Pattern* p ,Track* tr)
 {
 	
 	myTrack=tr;

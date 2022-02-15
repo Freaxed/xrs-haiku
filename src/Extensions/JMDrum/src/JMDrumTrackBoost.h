@@ -6,13 +6,11 @@
 class JMDrumTrackBoost : public TrackBoost
 {
 	public:
-			JMDrumTrackBoost();
-			virtual		~JMDrumTrackBoost(){}
-	virtual 	Track*		getTrack();
-	virtual 	PlugPanel*	getPanel();
-	
-	virtual	void			SaveTrackSettings(Track*,BMessage*);
-	virtual	void			LoadTrackSettings(Track* trk,BMessage* data);
+				  			 JMDrumTrackBoost();
+							~JMDrumTrackBoost(){}
+							
+			 	Track*		getTrack();
+			 	PlugPanel*	getPanel();
 
 };
 #endif

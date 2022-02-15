@@ -12,9 +12,9 @@ class MidiPanel: public PlugPanel
 {
 	public:
 				MidiPanel();
-	virtual void 	Reset(Track* tr);
-	virtual void	AttachedToWindow();
-	virtual void	MessageReceived(BMessage *msg);
+	 void 	ResetToTrack(Track* tr);
+	 void	AttachedToWindow();
+	 void	MessageReceived(BMessage *msg);
 	
 	private:
 		typedef struct controller{

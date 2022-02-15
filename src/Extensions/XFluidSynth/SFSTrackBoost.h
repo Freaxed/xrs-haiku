@@ -16,16 +16,13 @@ class SFSTrackBoost : public TrackBoost
 	public:
 			SFSTrackBoost();
 			virtual		~SFSTrackBoost();
-	virtual 	Track*		getTrack();
-	virtual 	PlugPanel*	getPanel();
+	 	Track*		getTrack();
+	 	PlugPanel*	getPanel();
 	
-	virtual	bool			Load(Track* cur,int t,BFile* file,int32 va,int32 rt) { return false;};
-	virtual	void			SaveTrackSettings(Track* trk,BMessage* data);
-	virtual	void			SaveBoosterSettings(BMessage* data);
-	virtual	void			LoadBoosterSettings(BMessage* data);
-	virtual	void			LoadTrackSettings(Track* trk,BMessage* data);
-	virtual	void			Reset();				//each time a new song is ready
-	virtual	void			Restart();				//EACH TIME A song is going to be close.
+		bool			Load(Track* cur,int t,BFile* file,int32 va,int32 rt) { return false;};
+		void			SaveBoosterSettings(BMessage* data);
+		void			LoadBoosterSettings(BMessage* data);
+		void			ResetToSong();				//each time a new song is ready
 	
 	BMenu*	getBankMenu(){ return menu;};
 	
@@ -33,6 +30,7 @@ class SFSTrackBoost : public TrackBoost
 	status_t			LoadSF(const char* filename);
 	void				RemoveMe(Track*);
 	
+
 	
 	private:
 		

@@ -29,16 +29,17 @@ class SamplerTrackBoost : public TrackBoost
 						~SamplerTrackBoost();
 	 	Track*			getTrack();
 		PlugPanel*		getPanel(){return (PlugPanel*)panel;}
-		void			SaveTrackSettings(Track* trk,BMessage* data);
+		
 		void			SaveBoosterSettings(BMessage* data);
 		void			LoadBoosterSettings(BMessage* data);
-		void			LoadTrackSettings(Track* trk,BMessage* data);
+		
 	
 		status_t	RefReceived(entry_ref,Track*,BMessage *m=NULL);
 	
 
-		void			Reset();	//on a new song!
+		void			ResetToSong();	//on a new song!
 		void			Restart();
+		
 		void			RemoveAll();
 			
 		void			ConsiderToRemove(SamplerTrack* t);
@@ -55,13 +56,18 @@ class SamplerTrackBoost : public TrackBoost
 	void				RefreshSelected();
 	void				RemoveMe(SamplerTrack*);
 	
+
+	protected:
+	friend SamplerTrack;
+
+	void	_secureSetSample(SamplerTrack* tr,Sample*);
 	
 	private:
 			
 			BList			tracks;
 			
 			status_t		_checkPath(const char *p);
-			status_t		_loadSampler(const char*,int type,int32 offset=0);
+			status_t		_loadSampler(const char*);
 			
 			BMenu*		menu;
 			ExternalManager*	extm;
@@ -73,8 +79,7 @@ class SamplerTrackBoost : public TrackBoost
 
 			SamplerPanel	*panel;
 			
-			void	_secureSetSample(SamplerTrack* tr,Sample*);
-			void	_addMD5(const char*,BMessage *data);
+			
 			
 };
 #endif

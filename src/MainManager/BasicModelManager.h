@@ -12,6 +12,8 @@ class BasicModelManager {
 	public:
 		BasicModelManager();
 		~BasicModelManager();
+		
+		void	ResetValues();
 };
 
 

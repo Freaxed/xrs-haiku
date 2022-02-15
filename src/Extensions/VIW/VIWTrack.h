@@ -16,16 +16,18 @@
 class		VSTInstrumentPlugin;
 class		PlugWindow;
 class 		VSTPlugin;
+class		VIWTrackBoost;
 
 
 class VIWTrack: public Track
 {
 	public:
 	
-						VIWTrack();
+						VIWTrack(VIWTrackBoost* );
 						~VIWTrack();
 	void			Reset();
 	void			Process(float**,int32,int,float factor=1.0);
+	TRACK_GEN_TYPE	getProcessorType() { return TT_FULL_PROCESS; }
 	
 	int				getModel();
 	void			goOn();
@@ -35,12 +37,17 @@ class VIWTrack: public Track
 	void			stopVoice(int note=-1);
 	
 	
-	VSTInstrumentPlugin*	getViw(){return viw;};
-	PlugWindow*			getWin(){return win;};
+	VSTInstrumentPlugin*		getViw(){return viw;};
+	PlugWindow*					getWin(){return win;};
 	void						setWin(PlugWindow* w){win=w;};
 	void						LoadVSTi(VSTPlugin* plugin);
 
  rgb_color	GetPreferredPadColor(){ rgb_color a={255,152,49,255}; return a;}
+	
+	
+						
+	void				SaveCustomSettings(BMessage& msg);
+	void				LoadCustomSettings(BMessage& msg);
 	
 protected:
 			const char*	getPreferredName();	
@@ -48,11 +55,10 @@ private:
 		
 		
 		float 		*stream_s[2];
-		float 		*stream_l;
-		float 		*stream_r;
 		
 		VSTInstrumentPlugin*	viw;
-		PlugWindow*			win;
+		PlugWindow*				win;
+		VIWTrackBoost*			mBoost;
 };
 
 #endif

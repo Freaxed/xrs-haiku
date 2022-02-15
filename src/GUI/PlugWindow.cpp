@@ -204,31 +204,22 @@ PlugWindow::MessageReceived(BMessage* msg)
 	
 }
 void
-PlugWindow::SavePref(BMessage* m)
+PlugWindow::SaveSettings(BMessage& m)
 {
-	m->AddFloat("Xpos",Frame().left);
-	m->AddFloat("Ypos",Frame().top);
-	m->AddFloat("Ysize",nameMenu->Frame().Width());
-	m->AddBool("big",GetState());
-}
+	m.AddFloat("Xpos",Frame().left);
+	m.AddFloat("Ypos",Frame().top);}
 
 
 void
-PlugWindow::LoadPref(BMessage* msg)
+PlugWindow::LoadSettings(BMessage& msg)
 {
-		float x;
-		bool b;
-		if(msg->FindFloat("Xpos",&x)==B_OK)
+		float x,y;
+		if(msg.FindFloat("Xpos", &x) == B_OK &&  msg.FindFloat("Ypos", &y) == B_OK)
 		{
 			if(Lock()){
-			MoveTo(x,msg->FindFloat("Ypos"));
-			msg->FindFloat("Ysize",&smallW);
-			
-			if(msg->FindBool("big",&b)==B_OK)
-				SetState(b,smallW);
-				
-			config->ResetUIFromPlugin();
-			Unlock();
+				MoveTo(x, y);
+				config->ResetUIFromPlugin();
+				Unlock();
 			}
 		}
 }

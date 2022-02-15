@@ -20,9 +20,9 @@ BzWindow::RedirectMessages(RedirectFunc m_f,void* ck){
 void 
 BzWindow::MessageReceived(BMessage *msg){
 
-	bool b;
-	if(m_func!=NULL)
-		b=m_func(msg,cookies);
+	bool b = false;
+	if(m_func != NULL)
+		b = m_func(msg,cookies);
 		
 	if(b) BWindow::MessageReceived(msg);
 }

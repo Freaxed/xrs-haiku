@@ -26,7 +26,7 @@ class JTrack : public TrackBlock
 		virtual void	AttachedToWindow();
 			  	void	Init(BMessage *m);
 			  	void	RControl();
-			  	void	Reset(Pattern*,Track*);
+			  	void	ResetToTrack(Pattern*, Track*);
 			  	void	Refresh(Pattern*);
 			    void	Select();
 			  	void	Deselect();

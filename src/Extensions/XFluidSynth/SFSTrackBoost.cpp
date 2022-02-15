@@ -43,7 +43,7 @@ SFSTrackBoost::SFSTrackBoost():TrackBoost()
 	XHost::Get()->SendMessage(X_Switch,(void*)sfwin);
 }
 void		
-SFSTrackBoost::Reset()
+SFSTrackBoost::ResetToSong()
 {
 	fluid_booster = this;
 		
@@ -60,12 +60,7 @@ SFSTrackBoost::Reset()
 
 }
 
-void		
-SFSTrackBoost::Restart() {
-	
-	fluid_booster=NULL;
-	LoadSF(NULL);
-}
+
 
 SFSTrackBoost::~SFSTrackBoost()
 {
@@ -116,37 +111,12 @@ SFSTrackBoost::RemoveMe(Track* tr)
 PlugPanel*
 SFSTrackBoost::getPanel(){return p;}
 
-void
-SFSTrackBoost::SaveTrackSettings(Track* trk,BMessage* data)
-{
-	
-	
-	SFSTrack *myTrack=(SFSTrack*)trk;
-	data->AddInt16("channel",myTrack->GetChannel());
-	
-	theSynth.SaveChannelSettings(data,myTrack->GetChannel());
-	
-	data->AddInt16("reverb_send",myTrack->GetReverbSend());
-	data->AddInt16("chorus_send",myTrack->GetChorusSend());
-			
-}
 
-
-void			
-SFSTrackBoost::LoadTrackSettings(Track* trk,BMessage* data)
-{
-	SFSTrack *myTrack=(SFSTrack*)trk;
-		
-	myTrack->SetChannel(data->FindInt16("channel"));
-	
-	theSynth.LoadChannelSettings(data,myTrack->GetChannel());
-	
-	myTrack->SetReverbSend(data->FindInt16("reverb_send"));
-	myTrack->SetChorusSend(data->FindInt16("chorus_send"));
-}
 void
 SFSTrackBoost::LoadBoosterSettings(BMessage* data)
 {
+	fluid_booster=NULL;
+	LoadSF(NULL);
 	BString name;
 	if(data->FindString("bank_name",&name)==B_OK)
 	{
@@ -164,7 +134,7 @@ SFSTrackBoost::LoadBoosterSettings(BMessage* data)
 		
 
 	BMessage	extra;	
-	if(data->FindMessage("extra",&extra)==B_OK);
+	if(data->FindMessage("extra",&extra)==B_OK)
 		sfwin->LoadExtra(&extra);
 }
 
@@ -182,8 +152,6 @@ SFSTrackBoost::SaveBoosterSettings(BMessage* data)
 void
 SFSTrackBoost::_emptyMenu()
 {
-	int32 tot;
-	tot = menu->CountItems();
 	
 	BMenu *sub;
 	while(menu->CountItems()){
@@ -265,3 +233,4 @@ SFSTrackBoost::SetLine(int line,Track* trk)
 	}
 	
 }
+

@@ -30,14 +30,14 @@ class XHost{
 		static	XHost*	Get();
 		
 		void*		SendMessage(int msg, void* param, void* extra=NULL);
-		void		AllowLock(bool b){ lock=b; }
+//		void		AllowLock(bool b){ lock=b; }
 		
-		void		LockEngine();
-		void		UnlockEngine();
+		void		LockEngine  (const char* who = "XHost");
+		void		UnlockEngine(const char* who = "XHost");
 		
 	private:
 				XHost();
-		bool	lock;		 	
+//		bool	lock;		 	
 };
 
 //extern	XHost*				xhost;

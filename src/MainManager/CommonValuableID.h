@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Your Name <your@email.address>
+ * Copyright 2006-2022, Andrea Anzani.
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef CommonValuableID_H

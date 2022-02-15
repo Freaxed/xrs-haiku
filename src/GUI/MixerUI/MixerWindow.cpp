@@ -31,7 +31,9 @@ MixerWindow::MixerWindow(void)
 	
 	for (uint8 i=0; i<PMixer::Get()->CountBusses(); i++) {
 		PBus* bus = PMixer::Get()->BusAt(i);
-		group->AddView(new MixerLine(bus, VID_MIXER_LIN_VOL(i), VID_MIXER_LIN_PAN(i), VID_MIXER_LIN_MET(i)));
+		MixerLine* line = new MixerLine(bus, VID_MIXER_LIN_VOL(i), VID_MIXER_LIN_PAN(i), VID_MIXER_LIN_MET(i));
+		mMixerLines.AddItem(line);
+		group->AddView(line);
 	}
 	BSize size(group->BasePreferredSize());
 	ResizeTo(size.Width(), size.Height());
@@ -50,3 +52,13 @@ MixerWindow::QuitRequested()
 	WindowManager::Get()->Switch(this);
 	return false;
 }
+
+void
+MixerWindow::ResetUI()
+{
+	for(int i=0;i<mMixerLines.CountItems();i++) {
+		MixerLine*	line = (MixerLine*)mMixerLines.ItemAt(i);
+		line->ResetUI();
+	}
+}
+

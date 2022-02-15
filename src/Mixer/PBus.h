@@ -39,6 +39,7 @@ class PBus: public PMixable  {
 					
 					void	    SetName(const char* name) { fName = name; }
 					const char*	Name() { return fName.String(); }
+				
 	private:
 			
 			PEffector 			fEffector;

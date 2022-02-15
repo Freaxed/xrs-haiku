@@ -56,13 +56,14 @@ TheApp::TheApp(const char * signature) :
 	dinamic_clip=new BList(1);
 	PrepareToRun();
 }
+
 TheApp::~TheApp()
 {
-	//if(msucco->Lock()){
-	if(msucco->Acquire("~TheApp") == B_OK){
-		msucco->Stop();
+	msucco->Stop();
+	if(msucco->LockEngine("~TheApp")){
+
 		msucco->ReallyStop();	//stop the engine	
-		xhost->AllowLock(false);
+//		xhost->AllowLock(false);
 		 
 		//fVManager->Dump();
 		 
@@ -80,7 +81,7 @@ TheApp::~TheApp()
 		
 		 track_manager->Close();
 			 		
-		 jfm->CloseSong(currentSong);		
+		 delete (currentSong);
 		 
 			 
 		 if(mixerWin->Lock())
@@ -111,8 +112,7 @@ TheApp::~TheApp()
 		XrsMidiIn::Get()->Release();
 		XrsMidiOut::Get()->Release();
 		
-		if(msucco->Lock())			
-			msucco->Quit();
+		msucco->Quit();
 	
 	}
 	
@@ -132,36 +132,31 @@ TheApp::~TheApp()
 void
 TheApp::PrepareToRun()
 {
-
-
-		
-	AboutBox *ab=new AboutBox(false);
-	bigtime_t start=system_time();
+	AboutBox *ab = new AboutBox(false);
+	bigtime_t start = system_time();
 	ab->Show();
-	
-	
-	
+
 	Configurator::Get()->cf_Init("XRSConfig");	
 	
 	ab->setText("loading..vst");
-	vst_manager=VstManager::Get();
+	vst_manager = VstManager::Get();
 	
 	ab->setText("loading..Extensions");
 	
-	win_manager=WindowManager::Get();
+	win_manager = WindowManager::Get();
 	AddCommonFilter(win_manager);
 	
 	fVManager = ValuableManager::Get();
 	
 	fModel = new BasicModelManager();
 	
-	mea_manager= MeasureManager::Get();
+	mea_manager = MeasureManager::Get();
 	AddCommonFilter(mea_manager);
 	
-	trackinfo= TrackInfoWindow::Get();
+	trackinfo = TrackInfoWindow::Get();
 
 	
-	track_manager= TrackManager::Get();
+	track_manager = TrackManager::Get();
 	track_manager->Init();
 	 	
 	jfm= JFileManager::Get();
@@ -221,35 +216,28 @@ TheApp::PrepareToRun()
 		fValuableMonitor->Show();
 		fVManager->AttachMonitorValuableManager(fValuableMonitor);
 	}
-	
 
-	
-	DefaultSong(false);
-	
-	if(currentSong){
-		delete currentSong->getEntry();
-		currentSong->setEntry(NULL);
-	}
+	EmptySong(false);
 }
 	
 
 
 void 
-TheApp::LoadSong(entry_ref ref){
+TheApp::LoadSong(entry_ref ref)
+{
+	msucco->Stop();			  // no more sound processing?
 
-	if(msucco->Acquire("LoadSong") == B_OK)
+	//if(msucco->LockEngine("LoadSong"))
 	{
+		fModel->ResetValues();	 // default valuables (mixer & tempo!)
 		
-		msucco->Stop();			  //no more sound processing
-		xhost->AllowLock(false);  // nobody can lock/unlock juice
-		 
-		LoadRequest(ref);
+		Song* oldSong = LoadRequest(ref); 		 // triggers the new valuables! (mixer, NOT TEMPO!?!?!)
 			
 		mea_manager->Reset(currentSong->getSequence());
 			
 		if (main_window->Lock())
 		{
-			main_window->Reset(currentSong);
+			main_window->ResetToSong(currentSong);	//Update UI according to struct(song);
 			main_window->Unlock();
 		}
 	
@@ -258,18 +246,20 @@ TheApp::LoadSong(entry_ref ref){
 			mw->Reset(currentSong->getSequence());	
 			mw->Unlock();
 		}
-	
-		//fix me
-//		mixerWin->LoadSettings(currentSong->mixer_settings);
-			
-		jfm->AnalizeError(currentSong->mixer_settings);
-			
-		XrsMidiIn::Get()->Reset(currentSong);
 		
+		if (MixerWindow::Get()->Lock())
+		{
+			MixerWindow::Get()->ResetUI();
+			MixerWindow::Get()->Unlock();
+		}			
+		
+		XrsMidiIn::Get()->Reset(currentSong);		
+		
+		msucco->LockEngine("ResetSong");
 		msucco->ResetSong(currentSong);
-			
-		xhost->AllowLock(true);
-		msucco->Release("LoadSong");
+		msucco->UnlockEngine("ResetSong");
+
+		delete oldSong;
 		
 		Panels::showErrors(jfm->ErrorsLog());
 	}
@@ -282,220 +272,180 @@ TheApp::LoadSong(entry_ref ref){
 	
 }
 void
-TheApp::EmptySong()
+TheApp::EmptySong(bool close = true)
 {
-	status_t	ask;
-	ask=jfm->AskForClose(currentSong);
-		
-	if(ask==B_OK)
+	status_t	ask = B_OK;
+	if(close)
+		ask = jfm->AskForClose(currentSong);
+
+	if(ask == B_OK)
 	{
 		entry_ref ref;
 		LoadSong(ref);
 	}
 }
-void
-TheApp::DefaultSong(bool close=true)
-{
-	entry_ref ref;
-	status_t	ask=B_ERROR;
-	
-	if(close) ask=jfm->AskForClose(currentSong);
-	
-		
-	if(!close || ask==B_OK){
-			
-		entry_ref ref;
-		XUtils::GetDefaultSongRef(&ref);
-		LoadSong(ref);
-	
-	}
-}
+
 void
 TheApp::MessageReceived(BMessage* message)
 {
-	entry_ref ref;
-	
-	status_t	ask;
-	//int id;
-	//int32 old;
-	
+	entry_ref   ref;
+
 	switch(message->what)
 	{
-	
-	case MENU_NEW_EMPTY:
-	
-		EmptySong();
-	
-	break;
-		
-	case MENU_NEW_DEFAULT:
-	
-		DefaultSong();
-		
+		case MENU_NEW_EMPTY:	
+			EmptySong();	
 		break;
-		
-	case MENU_SAVE:
-		
-		
-		jfm->Save(currentSong,false);
-	
+			
+		case MENU_NEW_DEFAULT:
+			EmptySong(true);
 		break;
-	case MENU_SAVEAS:
-		
-		
-		jfm->Save(currentSong,true);
-	
+			
+		case MENU_SAVE:		
+			jfm->Save(currentSong,false);
 		break;
-	case	X_REFS_RECEIVED:
-		OpenRefs(message);
+		case MENU_SAVEAS:
+			jfm->Save(currentSong,true);
+		break;
+		case X_REFS_RECEIVED:
+			OpenRefs(message);
 		break;	
-	case MENU_OPEN:
-		ask=jfm->AskForClose(currentSong);
-		if(ask==B_OK) jfm->Load();
+		case MENU_OPEN:
+			if(jfm->AskForClose(currentSong) == B_OK) 
+				jfm->Load();
 		break;
-	case MENU_EXPORT:
-		main_window->PostMessage(message);
-	break;
-	
-		
-	case B_SAVE_REQUESTED:
-		if(message->FindRef("directory",&ref)==B_OK)
-		{
-			jfm->SaveReq(ref,message->FindString("name"),currentSong);
-			main_window->Saved();
-		}
-	break;
-	case	'expt':	// EXPORT AS WAVE
-
+		case MENU_EXPORT:
+			main_window->PostMessage(message);
+		break;		
+		case B_SAVE_REQUESTED:
+			if(message->FindRef("directory",&ref)==B_OK)
+			{
+				jfm->SaveReq(ref,message->FindString("name"),currentSong);
+				main_window->Saved();
+			}
+		break;
+		case 'expt':	// EXPORT AS WAVE
 			jfm->RenderAsWave(message);
-
-	break;
-	
-	case MENU_COPY:
-		if(main_window->Lock())
-		{	
+		break;
 		
-			clipboard->setNumberNotes(currentSong->getNumberNotes());
-			CopyPattern((track_manager->getCurrentTrack())->getPatternAt(mea_manager->GetCurrentPattern()),clipboard);
-			main_window->Unlock();
-		}
-		main_window->PostMessage(message);
-	break;
-	case MENU_CUT:
-		
-		if(main_window->Lock())
-		{
-			clipboard->setNumberNotes(currentSong->getNumberNotes());
-			CopyPattern((track_manager->getCurrentTrack())->getPatternAt(mea_manager->GetCurrentPattern()),clipboard);
-			ClearPattern((track_manager->getCurrentTrack())->getPatternAt(mea_manager->GetCurrentPattern()));
-			main_window->Unlock();
-		}
-		main_window->PostMessage(message);
-	break;
-	case MENU_PASTE:
-		
-		if(main_window->Lock())
-		{
-			clipboard->setNumberNotes(currentSong->getNumberNotes());
-			CopyPattern(clipboard,(track_manager->getCurrentTrack())->getPatternAt(mea_manager->GetCurrentPattern()));
-			main_window->Unlock();
-		}
-		main_window->PostMessage(message);
-	break;
-	case MENU_MEA_COPY:
-		
-		if(main_window->Lock())
-		{
-			for(int i=0;i<dinamic_clip->CountItems();i++)
-			{
-				delete (Pattern*)dinamic_clip->ItemAt(i);	
-			}
-			
-			dinamic_clip->MakeEmpty();
-						
-			for(int i=0;i<currentSong->getNumberTrack();i++)
-			{
-				Pattern *r=new Pattern(currentSong->getNumberNotes());
-				r->setNumberNotes(currentSong->getNumberNotes());
-				dinamic_clip->AddItem(r);
-				CopyPattern(currentSong->getTrackAt(i)->getPatternAt(mea_manager->GetCurrentPattern()),r);
-											
-			}
-						
-			main_window->Unlock();
-		}
-		main_window->PostMessage(message);
-	break;
-	case MENU_MEA_CUT:
-		
-		if(main_window->Lock())
-		{
-			for(int i=0;i<dinamic_clip->CountItems();i++)
-			{
-				delete (Pattern*)dinamic_clip->ItemAt(i);	
-			}
-			
-			dinamic_clip->MakeEmpty();
-						
-			for(int i=0;i<currentSong->getNumberTrack();i++)
-			{
-				Pattern *r=new Pattern(currentSong->getNumberNotes());
-				r->setNumberNotes(currentSong->getNumberNotes());
-				dinamic_clip->AddItem(r);
-				CopyPattern(currentSong->getTrackAt(i)->getPatternAt(mea_manager->GetCurrentPattern()),r);
-											
-			}
-			for(int i=0;i<currentSong->getNumberTrack();i++)
-			{
-				ClearPattern(currentSong->getTrackAt(i)->getPatternAt(mea_manager->GetCurrentPattern()));
-			}
-			main_window->Unlock();
-			
-		}
-		main_window->PostMessage(message);
-	break;
-	case MENU_MEA_PASTE:
-		
-		if(dinamic_clip->CountItems() > 0) 
-		{
-			 if(main_window->Lock())
-	 		{
-	 			
-				for(int i=0;i<dinamic_clip->CountItems();i++)
-				{
-					if(i<currentSong->getNumberTrack())
-					{
-						Pattern *r=(Pattern*)dinamic_clip->ItemAt(i);
-						r->setNumberNotes(currentSong->getNumberNotes());
-						CopyPattern(r,currentSong->getTrackAt(i)->getPatternAt(mea_manager->GetCurrentPattern()));
-					}
-				}
+		case MENU_COPY:
+			if(main_window->Lock()) {
+				clipboard->setNumberNotes(currentSong->getNumberNotes());
+				CopyPattern((track_manager->getCurrentTrack())->getPatternAt(mea_manager->GetCurrentPattern()),clipboard);
 				main_window->Unlock();
 			}
 			main_window->PostMessage(message);
-		}
-	break;
-	case SONG_RESET:
-		if(main_window->Lock()){
-		main_window->Reset(currentSong,false);
-		main_window->Unlock();
-		}
-		if(mw->Lock()){
-		mw->Reset(currentSong->getSequence());
-		mw->Unlock();
-		}
-	break;
-	case MENU_RENAME:
-		main_window->PostMessage(message);
-	break;
-	case ADD_TN306:
-	case ADD_TRACK:
-	case REMOVE_TRACK:
-		main_window->PostMessage(message);
-	break;
-	default:
-	 BApplication::MessageReceived(message);
-	break;
+		break;
+		case MENU_CUT:
+			if(main_window->Lock()) {
+				clipboard->setNumberNotes(currentSong->getNumberNotes());
+				CopyPattern((track_manager->getCurrentTrack())->getPatternAt(mea_manager->GetCurrentPattern()),clipboard);
+				ClearPattern((track_manager->getCurrentTrack())->getPatternAt(mea_manager->GetCurrentPattern()));
+				main_window->Unlock();
+			}
+			main_window->PostMessage(message);
+		break;
+		case MENU_PASTE:		
+			if(main_window->Lock()) {
+				clipboard->setNumberNotes(currentSong->getNumberNotes());
+				CopyPattern(clipboard,(track_manager->getCurrentTrack())->getPatternAt(mea_manager->GetCurrentPattern()));
+				main_window->Unlock();
+			}
+			main_window->PostMessage(message);
+		break;
+		case MENU_MEA_COPY:
+			
+			if(main_window->Lock())
+			{
+				for(int i=0;i<dinamic_clip->CountItems();i++)
+				{
+					delete (Pattern*)dinamic_clip->ItemAt(i);	
+				}
+				
+				dinamic_clip->MakeEmpty();
+							
+				for(int i=0;i<currentSong->getNumberTrack();i++)
+				{
+					Pattern *r=new Pattern(currentSong->getNumberNotes());
+					r->setNumberNotes(currentSong->getNumberNotes());
+					dinamic_clip->AddItem(r);
+					CopyPattern(currentSong->getTrackAt(i)->getPatternAt(mea_manager->GetCurrentPattern()),r);
+												
+				}
+							
+				main_window->Unlock();
+			}
+			main_window->PostMessage(message);
+		break;
+		case MENU_MEA_CUT:
+			
+			if(main_window->Lock())
+			{
+				for(int i=0;i<dinamic_clip->CountItems();i++)
+				{
+					delete (Pattern*)dinamic_clip->ItemAt(i);	
+				}
+				
+				dinamic_clip->MakeEmpty();
+							
+				for(int i=0;i<currentSong->getNumberTrack();i++)
+				{
+					Pattern *r=new Pattern(currentSong->getNumberNotes());
+					r->setNumberNotes(currentSong->getNumberNotes());
+					dinamic_clip->AddItem(r);
+					CopyPattern(currentSong->getTrackAt(i)->getPatternAt(mea_manager->GetCurrentPattern()),r);
+												
+				}
+				for(int i=0;i<currentSong->getNumberTrack();i++)
+				{
+					ClearPattern(currentSong->getTrackAt(i)->getPatternAt(mea_manager->GetCurrentPattern()));
+				}
+				main_window->Unlock();			
+			}
+			main_window->PostMessage(message);
+		break;
+		case MENU_MEA_PASTE:
+			
+			if(dinamic_clip->CountItems() > 0) 
+			{
+				if(main_window->Lock())
+				{
+					
+					for(int i=0;i<dinamic_clip->CountItems();i++)
+					{
+						if(i<currentSong->getNumberTrack())
+						{
+							Pattern *r=(Pattern*)dinamic_clip->ItemAt(i);
+							r->setNumberNotes(currentSong->getNumberNotes());
+							CopyPattern(r,currentSong->getTrackAt(i)->getPatternAt(mea_manager->GetCurrentPattern()));
+						}
+					}
+					main_window->Unlock();
+				}
+				main_window->PostMessage(message);
+			}
+		break;
+		case SONG_RESET: //used by Panels.cpp.. (to be removed!)
+			if(main_window->Lock())
+			{
+				main_window->ResetToSong(currentSong);
+				main_window->Unlock();
+			}
+			if(mw->Lock()){
+				mw->Reset(currentSong->getSequence());
+				mw->Unlock();
+			}
+		break;
+		case MENU_RENAME:
+			main_window->PostMessage(message);
+		break;
+		case ADD_TN306:
+		case ADD_TRACK:
+		case REMOVE_TRACK:
+			main_window->PostMessage(message);
+		break;
+		default:
+		BApplication::MessageReceived(message);
+		break;
 	}
 }	
 void
@@ -528,9 +478,7 @@ TheApp::QuitRequested()
 	if (ask == B_OK) {
 		fVManager->Dump();
 	}	
-	return (ask==B_OK);
-	
-	
+	return (ask==B_OK);	
 }
 void
 TheApp::RefsReceived(BMessage *message)
@@ -542,45 +490,37 @@ TheApp::RefsReceived(BMessage *message)
 		status_t ask=jfm->AskForClose(currentSong);
 		if(ask!=B_OK) return;	
 	}
+
 	if(message->FindRef("refs",&ref)==B_OK)
-		{			
-			LoadSong(ref);
-			
-			
-			
-		}
-	
+	{			
+		LoadSong(ref);
+	}
 }
 void
 TheApp::OpenRefs(BMessage *message)
 {
 	entry_ref ref;
 				
-	if(message->FindRef("refs",&ref)==B_OK)
+	if(message->FindRef("refs", &ref) == B_OK)
 			LoadSong(ref);
 	
 }
 
-status_t
+Song*
 TheApp::LoadRequest(entry_ref ref)
 {
-	Song* new_song;
-	new_song=jfm->EmptySong();
+	Song* new_song = jfm->EmptySong();
 	
+	//even if it does not exist it's OK. We will apply and empty song!
+	jfm->LoadFile(ref, new_song);
+
+	Song* oldSong = currentSong;	
+	currentSong = new_song;
 	
-	CloseSong(currentSong);
-	jfm->LoadFile(ref,new_song);
-	
-	currentSong=new_song;
-	return B_OK;
+	return oldSong;
 }
-void
-TheApp::CloseSong(Song *s)
-{
-	/* Clearing Mixer & Other stuff ?*/
-	jfm->CloseSong(s);
-	track_manager->Restart();
-}
+
+
 void
 TheApp::AboutRequested()
 {

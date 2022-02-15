@@ -114,11 +114,11 @@ TracksPanel::getCurrentTrack()
 void
 TracksPanel::RemoveTrack(int h)
 {
-	
-	JTrack *t=xnv[h];
+	JTrack *t = xnv[h];
 	
 	if(Window()->Lock()){	
 		xnv.Erase(h);
+		LogTrace("Removing Track %d", h);
 		TrackList::RemoveTrack((TrackBlock*)t);
 		delete t;
 		Window()->Unlock();
@@ -130,8 +130,8 @@ TracksPanel::AddTrack(int h)
 {
 	ScrollBar(B_HORIZONTAL)->SetValue(0);
 	
-	if(Window()->Lock()){
-	
+	if(Window()->Lock())
+	{	
 		JTrack* t = tm->MakeJTrack(curSong->getTrackAt(h), 
 		                         BRect(BUTTONS_X_START,
 		                               BUTTONS_Y_START+(float)h*30.0f-40.0f,
@@ -146,31 +146,31 @@ TracksPanel::AddTrack(int h)
 		msg->AddInt16("id", (int16) h);
 		t->Init(msg);
 		int selPattern=MeasureManager::Get()->GetCurrentPattern();
-		t->Reset(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
-		
+		t->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
 		Window()->Unlock();
 	}
-	
+
 	
 	SelectTrack(h);
 	FixScrollBar();
+	LogTrace("JTrack %d added!", h);
 }
 void
-TracksPanel::Reset(Song* s)
+TracksPanel::ResetToSong(Song* s)
 {
-	curSong=s;
-	
-	tm->Reset(s);
-	
 	BView::ScrollTo(0,0);
+
+	curSong = s;
 	
+	tm->ResetToSong(s);
+	
+
 	int max;
 	
-	//Remove
+	//reverse remove
 	max=xnv.Count();
 	for(int h=max-1;h>=0;h--)
 	{
-		printf("removing.. %d\n",h);
 		RemoveTrack(h);
 	}
 	
@@ -178,6 +178,7 @@ TracksPanel::Reset(Song* s)
 	max=curSong->getNumberTrack();
 	for(int h=0;h<max;h++)
 	{
+		LogTrace("TracksPanel::Adding new JTrack %d..", h);
 		AddTrack(h);		
 	}
 	
@@ -185,7 +186,7 @@ TracksPanel::Reset(Song* s)
 	int selPattern=MeasureManager::Get()->GetCurrentPattern();
 	for(int h=0;h<xnv.Count();h++)
 	{
-		xnv[h]->Reset(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
+		xnv[h]->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
 	}
 	
 	if(curSong->getNumberTrack()>0) SelectTrack(0);
@@ -290,12 +291,12 @@ TracksPanel::RemoveTrackAt(int id)
 {
 	JTrack*	tr;
 	
-	printf("Rermoving the track.. %d\n",id);
+	LogTrace("Rermoving the track.. %d\n",id);
 	
 
 	if(id < 0) return;
 	
-	SelectTrack(-1);		
+	SelectTrack(-1);
 	
 	RemoveTrack(id);
 	
@@ -309,7 +310,7 @@ TracksPanel::RemoveTrackAt(int id)
 		BMessage *msg=new BMessage(TRACK_SET);
 		msg->AddInt16("id", (int16) h);
 		tr->Init(msg);
-		tr->Reset(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
+		tr->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
 			
 		}
 	Window()->Unlock();
@@ -332,7 +333,7 @@ void
 TracksPanel::RefreshGraphics()
 {
 	if(Window()->Lock()){
-	Reset(curSong);
+//	Reset(curSong);
 	Window()->Unlock();
 	}
 }	
@@ -342,7 +343,7 @@ TracksPanel::RefreshSelected()
 	int selPattern=MeasureManager::Get()->GetCurrentPattern();
 	if(Window()->Lock()){
 	if(tm->getCurrentJTrack())
-	tm->getCurrentJTrack()->Reset(tm->getCurrentJTrack()->getTrack()->getPatternAt(selPattern),tm->getCurrentJTrack()->getTrack());
+	tm->getCurrentJTrack()->ResetToTrack(tm->getCurrentJTrack()->getTrack()->getPatternAt(selPattern),tm->getCurrentJTrack()->getTrack());
 	Window()->Unlock();
 	}
 }	
@@ -352,7 +353,7 @@ TracksPanel::Refresh(JTrack* t)
 	int selPattern=MeasureManager::Get()->GetCurrentPattern();
 	if(t==NULL) return;
 	if(Window()->Lock()){
-	t->Reset(t->getTrack()->getPatternAt(selPattern),t->getTrack());
+	t->ResetToTrack(t->getTrack()->getPatternAt(selPattern),t->getTrack());
 	Window()->Unlock();
 	}
 }	

@@ -22,9 +22,8 @@ class TNTrackBoost : public TrackBoost
 	PlugPanel* 	getPanel(){ return panel;}
 	Track*		getTrack();
 	
+	//????
 	bool		Load(Track* cur,int t,BFile* file,int32 va,int32 rt) ;
-	void		SaveTrackSettings(Track*,BMessage*);
-	void		LoadTrackSettings(Track* trk,BMessage* data);
 	
 	private:
 		TNPanel	*panel;

@@ -26,7 +26,7 @@ PositionView::PositionView(BRect frame,int d): BView(frame,"PositionView",B_FOLL
 			
 	pos[0]=pos[1]=pos[2]=-1;
 	pat[0]=pat[1]=pat[2]=-1;
-	beat[0]=beat[1]=beat[2]=-1;	
+	beat[0]=beat[1]=-1;	
 	
 	digit=XUtils::GetBitmap(23); //FIX
 

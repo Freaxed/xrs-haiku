@@ -33,7 +33,7 @@ for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(XRS_TOP)  $(sourceDir) ] ;
 }
 
-
+#<pe-src>
 Application XRS :
 	
 	#src/media
@@ -198,7 +198,7 @@ Application XRS :
 	VSTHost.cpp
 	VSTList.cpp
 	
-		
+#	</pe-src>
 	#: be translation game media midi midi2 tracker fluidsynth stdc++
 	: be localestub translation game media midi midi2 tracker stdc++ fluidlite sndfile samplerate
 	: resources/XRS.rsrc resources/skin.rsrc  

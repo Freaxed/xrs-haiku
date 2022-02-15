@@ -24,7 +24,7 @@ class TNPanel : public PlugPanel
 							TNPanel(TNTrackBoost* booster);
 			 		void	AttachedToWindow();
 					void	MessageReceived(BMessage* msg);
-					void	Reset(Track *track);
+					void	ResetToTrack(Track *track);
 		
 	private:
 

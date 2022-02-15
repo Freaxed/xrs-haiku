@@ -37,6 +37,9 @@ class Sequence
 		int		loop_points[2];
 		bool	loop_enable;
 		bool 	all;
+
+		void LoadSettings(BMessage& msg);
+		void SaveSettings(BMessage& msg);
 		
 	private:
 

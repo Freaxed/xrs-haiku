@@ -33,20 +33,15 @@ class ExternalManager
 
 			int32		CountItems();
 			status_t	InitCheck();
-			void		Empty();
-			status_t	AddSample(entry_ref ref, int *foundPos = NULL);
-			status_t	AddBankSample(BMessage*);
+			void		MakeEmpty();
+			status_t	AddSample(entry_ref ref, int *foundPos);
 			
-			entry_ref	the_ref; //ugly, fix!
 			
-			status_t	ExtractSample(entry_ref,int32);
 	private:
-	
 		//locked functions
 		status_t		LoadFile(entry_ref*, Sample* sample);
 
-		status_t		_extractSample(entry_ref,int32);
-		
+	
 		SampleList		samples_list;
 		status_t		lastStatus;
 };

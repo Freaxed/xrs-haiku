@@ -38,7 +38,11 @@ class TNTrack : public Track
 	void 			Tune(int halfsteps) { tuneoffset=halfsteps; }
 	int 			getTune() { return tuneoffset;}
 	
-	TRACK_GEN_TYPE	getProcessorType() { return TT_VOICE_PROCESS; }
+					
+	void				SaveCustomSettings(BMessage& msg);
+	void				LoadCustomSettings(BMessage& msg);
+	
+	TRACK_GEN_TYPE	getProcessorType() { return TT_FULL_PROCESS; }
 
 	VCO303		vco;
 	VCF303 		vcf;

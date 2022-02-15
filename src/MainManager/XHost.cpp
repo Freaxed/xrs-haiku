@@ -14,6 +14,7 @@
 #include  "JuiceEngine.h"
 #include  "WindowManager.h"
 #include  "MainWindow.h"
+#include "Log.h"
 
 XHost*	
 XHost::Get()
@@ -26,26 +27,28 @@ XHost::Get()
 
 XHost::XHost()
 {
-	lock = true;
+//	lock = true;
 }
 
 void		
-XHost::LockEngine() 
+XHost::LockEngine(const char* who) 
 {
-	JuiceEngine::Get()->Lock();
+//	if(!lock) 
+//		return; //fixme!
+	JuiceEngine::Get()->LockEngine(who);
 }
 
 void		
-XHost::UnlockEngine()
+XHost::UnlockEngine(const char* who)
 {
-	JuiceEngine::Get()->Unlock();
+//	if(!lock) 
+//		return; //fixme!
+	JuiceEngine::Get()->UnlockEngine(who);
 }
 		
 void*
 XHost::SendMessage(int msg,void* param, void* extra)
 {
-	status_t err;
-		
 	switch(msg){
 	
 	case X_MidiProducer:
@@ -66,13 +69,10 @@ XHost::SendMessage(int msg,void* param, void* extra)
 		WindowManager::Get()->Switch((BWindow*)param);	
 		break;
 	case X_LockSem:
-		if(!lock) return NULL;
-		err = JuiceEngine::Get()->Acquire("XHost");	
-		if(err!=B_NO_ERROR) printf("Error locking!\n");
+		LockEngine();
 		break;
 	case X_UnLockSem:
-		if(!lock) return NULL;
-		JuiceEngine::Get()->Release("XHost");	
+		UnlockEngine();
 		break;			
 	case X_BPM:
 		{
