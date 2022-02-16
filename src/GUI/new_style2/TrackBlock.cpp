@@ -14,11 +14,11 @@
 
 #include <Window.h>
 
-TrackBlock::TrackBlock(BRect r, char* name):BView(r,name,  B_FOLLOW_NONE,B_WILL_DRAW) 
+TrackBlock::TrackBlock(BRect r, const char* name) : BView(r, name, B_FOLLOW_NONE,B_WILL_DRAW) 
 {
 	SetViewColor(214,219,239);
-	expanded=false;
-	selected=false;
+	expanded = false;
+	selected = false;
 }
 
 void

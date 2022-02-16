@@ -217,8 +217,8 @@ VolView::_drawNote(int h)
 			if(mode_view==SUSTAIN_VIEW)
 			{
 			 bool slide=curPattern->getNoteAt(h)->getOct()&8;
-			 //SetHighColor(140,84,213);
-			 SetHighColor(255,255,255);
+			 SetHighColor(0, 0, 255);
+			 //SetHighColor(255,255,255);
 			 if(slide) 
 			 	rect.Set(NOTESTART+(BUTTON_LX+BUTTON_X_SPACE)*h+1,(BUTTON_LY/4),NOTESTART+(BUTTON_LX+BUTTON_X_SPACE)*(h+1)-BUTTON_X_SPACE-1,BUTTON_LY-(BUTTON_LY/4));
 			 else

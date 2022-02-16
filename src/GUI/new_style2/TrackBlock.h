@@ -20,7 +20,7 @@ class TrackEnd;
 class TrackBlock : public BView
 {
 	public:
-			     		 	TrackBlock(BRect r,char* name);
+			     		 	TrackBlock(BRect r,const char* name);
 	 		virtual void    MessageReceived(BMessage*);
 	 		virtual void	Draw(BRect r);
 	 		bool			IsExpanded(){ return expanded;}
