@@ -25,22 +25,6 @@ JMDrumTrack::JMDrumTrack():Track()
 		for(int i=0;i<16;i++) Vals[i]=0;
 		memset(&values,0,sizeof(struct DP));
 			
-		/*	printf(" ** Psycle Machine Information **\n");
-			
-			if(info->Flags & GENERATOR)
-			 printf("** GENERATOR:\n");
-				else
-			 printf("** EFFECT:\n");
-				
-			printf(" Version: %d\n",info->Version);
-			printf(" numParameters %d\n",info->numParameters);
-			printf(" Name: %s\n",info->Name);
-			printf(" ShortName: %s\n",info->ShortName);
-			printf(" Author: %s\n",info->Author);
-			printf(" Command: %s\n",info->Command);
-			memset(&values,0,sizeof(values));
-		*/	
-		
 		for (int i = 0; i<info->numParameters; i++) {
 			ParameterTweak(i, info->Parameters[i]->DefValue,Vals,&values);
 		}

@@ -37,14 +37,14 @@ ADigit::ADigit(BRect frame, BMessage *message,
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	
-	digit = XUtils::GetBitmap(14); //fix
+	digit = XUtils::GetBitmap(14);
 	
 	if(digit == NULL) 
-		printf("ADigit: no bitmap!\n");
+		LogError("ADigit: no bitmap found!\n");
 	
 	SetValueNoUpdate(m_fMinValue);
 	
-	sens=5;
+	fSentitivity = 5;
 }
 
 void
@@ -77,14 +77,11 @@ ADigit::UpdateValue(int32 n, bool invoke)
 void
 ADigit::Draw(BRect box)
 {
-	
-
 	DrawBitmapAsync(XUtils::GetBitmap(13));
 	
-	for(int i=0;i<3;i++)
-	
+	for(int i=0; i<3; i++) {
 		DrawBitmapAsync(digit,BRect(dig[i]*DIGITSIZE,0,dig[i]*DIGITSIZE+DIGITSIZE-1,HEIGHT-1),BRect(XPOS+i*DIGITSIZE,YPOS,XPOS-1+i*DIGITSIZE+DIGITSIZE,YPOS+HEIGHT-1));
-	//Synch();	
+	}
 }
 void
 ADigit::MouseDown(BPoint p)
@@ -188,13 +185,13 @@ ADigit::MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg)
 		return;
 	}
 	
-	if(where.y < m_ptPrev.y-sens && Value()+1 <= m_fMaxValue) 
+	if(where.y < m_ptPrev.y - fSentitivity && Value()+1 <= m_fMaxValue) 
 	{
 		 UpdateValue(Value()+1, true);
 	     set_mouse(mouse_start);	
 	}
 	else
-	if(where.y > m_ptPrev.y+sens && Value()-1 >= m_fMinValue) 
+	if(where.y > m_ptPrev.y + fSentitivity && Value()-1 >= m_fMinValue) 
 	{
 	     UpdateValue(Value()-1, true);
 		 set_mouse(mouse_start);	
