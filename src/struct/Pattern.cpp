@@ -15,8 +15,6 @@ Pattern::Pattern (int n)
 {
 	for(int h=0 ;  h<n ; h++)   
 		noteList.Add(new Note());
-		
-	lastVoice=NULL;
 }
 
 Note*
@@ -48,8 +46,7 @@ Pattern::setNumberNotes(int n)
 	{
 		for(int h=getNumberNotes();h<n;h++)
 			noteList.Add(new Note());
-	}
-	
+	}	
 }
 
 void
@@ -63,10 +60,7 @@ Pattern::LoadSettings(BMessage& pattern)
 	BMessage note;
 	while(pattern.FindMessage("Note", i, &note) == B_OK) {
 		if (i < getNumberNotes()) {
-			getNoteAt(i)->setValue(note.GetBool("Value", false));
-			getNoteAt(i)->SetGain(note.GetFloat("Gain",   0.8f));
-			getNoteAt(i)->SetPan(note.GetFloat("Pan", 0.0f));
-			getNoteAt(i)->setNote(note.GetInt16("Note", 60));
+			getNoteAt(i)->LoadSettings(note);
 		}
 		i++;
 	}
@@ -78,11 +72,7 @@ Pattern::SaveSettings(BMessage& pattern)
 	for(int k=0;k< getNumberNotes();k++)
 	{
 		BMessage note;
-		note.AddBool ("Value", getNoteAt(k)->getValue());
-		note.AddFloat("Gain",  getNoteAt(k)->Gain());
-		note.AddFloat("Pan",   getNoteAt(k)->Pan());
-		note.AddInt16("Note",  getNoteAt(k)->getNote());
-
+		getNoteAt(k)->SaveSettings(note);
 		pattern.AddMessage("Note", &note);
 	}
 }

@@ -25,6 +25,10 @@ class Note: public StereoVolumes
 		int		getOct();
 		long	getNote(){return note;};
 		void	setNote(long v){note=v;};
+
+		void 	LoadSettings(BMessage& msg);
+		void 	SaveSettings(BMessage& msg);
+
 	private:
 
 		bool	value;

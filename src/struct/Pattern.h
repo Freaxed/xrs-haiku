@@ -20,7 +20,6 @@ class Note;
 class Pattern
 {
 	public:
-	
 				Pattern(int);
 		
 		Note*	getNoteAt(int);
@@ -28,15 +27,12 @@ class Pattern
 		int 	getNumberNotes();
 		void 	setNumberNotes(int);
 		
-		XRSVoice	lastVoice;	
-		
-		void LoadSettings(BMessage& msg);
-		void SaveSettings(BMessage& msg);
+		void 	LoadSettings(BMessage& msg);
+		void 	SaveSettings(BMessage& msg);
 	
 	private:
 		
 		Vector<Note*> noteList;
-		
 };
 
 #endif 
