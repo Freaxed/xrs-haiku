@@ -29,18 +29,15 @@ class JFileManager
 {
 	public:
 		
-		~JFileManager();
-		
-	static JFileManager*	Get();
+			~JFileManager();		
+	static   JFileManager*		Get();
 	
-	status_t	SaveFile(entry_ref,Song*,bool zip=false); 	//The name	??
-	status_t	LoadFile(entry_ref,Song*);	//The name    ??
+	status_t	SaveFile(entry_ref, Song* );
+	status_t	LoadFile(entry_ref, Song* );
 	
 	Song*			EmptySong();
-//	void			CloseSong(Song*);	
 	
-	void			Init();
-	
+	void			Init();	
 	status_t		Load();
 	void			Save(Song*,bool);
 	void			SaveReq(entry_ref,const char*,Song*);
@@ -68,8 +65,7 @@ class JFileManager
 		int64		ReadFixed(int64*);
 		int64		ReadVar(void*);
 		
-		void		Comatible12(Track*,int32 va,int32 rt);
-		
+	
 		BFile*			file;
 		char*			x;
 		

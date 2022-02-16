@@ -225,46 +225,46 @@ TheApp::PrepareToRun()
 void 
 TheApp::LoadSong(entry_ref ref)
 {
+	BAlert* idle = XUtils::ShowIdleAlert("Loading song..");
+	
 	msucco->Stop();			  // no more sound processing?
 
-	//if(msucco->LockEngine("LoadSong"))
-	{
-		fModel->ResetValues();	 // default valuables (mixer & tempo!)
-		
-		Song* oldSong = LoadRequest(ref); 		 // triggers the new valuables! (mixer, NOT TEMPO!?!?!)
-			
-		mea_manager->Reset(currentSong->getSequence());
-			
-		if (main_window->Lock())
-		{
-			main_window->ResetToSong(currentSong);	//Update UI according to struct(song);
-			main_window->Unlock();
-		}
+	fModel->ResetValues();	 // default valuables (mixer & tempo!)
 	
-		if (mw->Lock())
-		{
-			mw->Reset(currentSong->getSequence());	
-			mw->Unlock();
-		}
+	Song* oldSong = LoadRequest(ref); 		 // triggers the new valuables! (mixer, NOT TEMPO!?!?!)
 		
-		if (MixerWindow::Get()->Lock())
-		{
-			MixerWindow::Get()->ResetUI();
-			MixerWindow::Get()->Unlock();
-		}			
+	mea_manager->Reset(currentSong->getSequence());
 		
-		XrsMidiIn::Get()->Reset(currentSong);		
-		
-		msucco->LockEngine("ResetSong");
-		msucco->ResetSong(currentSong);
-		msucco->UnlockEngine("ResetSong");
+	if (main_window->Lock())
+	{
+		main_window->ResetToSong(currentSong);	//Update UI according to struct(song);
+		main_window->Unlock();
+	}
 
-		delete oldSong;
-		
-		Panels::showErrors(jfm->ErrorsLog());
+	if (mw->Lock())
+	{
+		mw->Reset(currentSong->getSequence());	
+		mw->Unlock();
 	}
 	
-	// Show errors!;
+	if (MixerWindow::Get()->Lock())
+	{
+		MixerWindow::Get()->ResetUI();
+		MixerWindow::Get()->Unlock();
+	}			
+	
+	XrsMidiIn::Get()->Reset(currentSong);		
+	
+	msucco->LockEngine("ResetSong");
+	msucco->ResetSong(currentSong);
+	msucco->UnlockEngine("ResetSong");
+
+	delete oldSong;
+	
+	Panels::showErrors(jfm->ErrorsLog());
+
+	XUtils::HideIdleAlert(idle);
+	
 	
 	if(currentSong && currentSong->getSizeDescription()>0 && currentSong->popupdesc==true)
 			(new BAlert("XRS ",currentSong->getDescription(), "Ok",NULL,NULL,B_WIDTH_AS_USUAL,B_EMPTY_ALERT))->Go(NULL);

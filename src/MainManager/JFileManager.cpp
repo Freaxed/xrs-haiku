@@ -136,8 +136,11 @@ JFileManager::SaveReq(entry_ref ref, const char* file_name, Song* s)
 	p.Append(file_name);
 	
 	status_t er = get_ref_for_path(p.Path(), &rif);
-			
+	
+	BAlert* idle = XUtils::ShowIdleAlert("Saving...");
 	SaveFile(rif, s);
+	XUtils::HideIdleAlert(idle);
+	
 	if(s->getEntry() == NULL)
 	{
 		s->setEntry(new BEntry(&rif));
@@ -199,7 +202,7 @@ JFileManager::LoadFile(entry_ref rif, Song* song)
 				}
 				if (songInfo.GetInt64("Version", -1) != FILE_VERSION_INT) {
 					errors.AddString("error", "Invalid file version!");
-					LogError("Invalid file version!", rif.name);
+					LogError("Invalid file version! [%s]", rif.name);
 					delete file;
 					return B_ERROR;
 				}
@@ -286,7 +289,10 @@ JFileManager::Save(Song* s, bool saveas)
 	else
 	{
 		s->getEntry()->GetRef(&ref);
-		SaveFile(ref,s);
+		
+		BAlert* idle = XUtils::ShowIdleAlert("Saving...");
+		SaveFile(ref, s);
+		XUtils::HideIdleAlert(idle);
 	}
 	
 }
@@ -705,16 +711,12 @@ JFileManager::AnalizeError(BMessage* msg)
 }
 
 
-void
-JFileManager::Comatible12(Track* tr,int32 va,int32 rt)
-{
-}
 
 //
 // NEW VERSION All BMessage Based!
 #include "PMixer.h"
 status_t
-JFileManager::SaveFile(entry_ref rif,Song* song, bool zip)
+JFileManager::SaveFile(entry_ref rif, Song* song)
 {
 	status_t error;
 		

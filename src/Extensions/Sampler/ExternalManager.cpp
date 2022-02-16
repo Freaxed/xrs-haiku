@@ -20,6 +20,7 @@
 #include <Entry.h>
 #include <Path.h>
 #include <Alert.h>
+#include "Xed_Utils.h"
 
 
 ExternalManager::ExternalManager() 
@@ -66,7 +67,13 @@ ExternalManager::AddSample(entry_ref ref, int *pos)
 	}
 
 	Sample* sample = new Sample();
+
+	BAlert*	waitAlert = XUtils::ShowIdleAlert("Loading sample..");
+	
 	lastStatus  = LoadFile(&ref, sample);
+	
+	XUtils::HideIdleAlert(waitAlert);
+	
 	if (lastStatus != B_OK) {
 		LogError("Can't open sample file [%s]", ref.name);
 		delete sample;
