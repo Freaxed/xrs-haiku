@@ -211,6 +211,7 @@ JFileManager::LoadFile(entry_ref rif, Song* song)
 	    	delete file;
 			return error;
 		}
+		song->setEntry(new BEntry(&rif));
 		delete file;
 	}
 
@@ -259,7 +260,7 @@ JFileManager::LoadFile(entry_ref rif, Song* song)
 		i++;
 	}
 	
-	song->setEntry(new BEntry(&rif));
+
 	LogInfo("\nSong loaded.\n");	
   
 	//XUtils::HideIdleAlert(wait);
