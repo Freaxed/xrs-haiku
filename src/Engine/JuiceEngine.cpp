@@ -114,16 +114,17 @@ JuiceEngine::ResetSong(Song* song)
 	CHECK_LOCK
 	
 	fCurrentSong = song;
-	SendTrackMessage(SystemReset,0);
-	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, song->getTempo()); //huge bug: it's not syncronous!
-	LogInfo("*** FIX HERE BPM ****");
-
+	SendTrackMessage(SystemReset, 0);
+	SetBPM(GetBPM());
+	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, GetBPM()); // it's not syncronous (but we set it before this call)
 }
 
 void	
 JuiceEngine::SetBPM(int bpm)
 {
-	//if (fCurrentSong) fCurrentSong->setTempo(bpm);
+	if (fCurrentSong) 
+		fCurrentSong->setTempo(bpm);
+
 	int32 note_size=(size_t)2646000/bpm;
 	while(note_size % 4 !=0) note_size++;
 	fSamplesPerBeat = note_size; //fCurrentSong->getNoteSize();
@@ -132,13 +133,9 @@ JuiceEngine::SetBPM(int bpm)
 	SendTrackMessage(TempoChange,(float)fSamplesPerBeat);	
 }
 
-int		
+int
 JuiceEngine::GetBPM() {
-
-	if(fCurrentSong)
-		return fCurrentSong->getTempo();
-	else
-		return 0;	
+	return fCurrentSong ? fCurrentSong->getTempo() : 0;
 }
 const char*	SynthMessageStr[8] = {
 	"TempoChange",	 // samples per sixteenth note
