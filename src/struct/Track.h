@@ -34,7 +34,7 @@ class Track: public StereoVolumes
 {
 	public:
 	
-				   Track();
+				 Track();
 		virtual	~Track();
 		
 	
@@ -64,43 +64,41 @@ class Track: public StereoVolumes
 		virtual	void			Process(float**,int32,int,float factor=1.0);		
 		virtual	bool			HasData(){ return true;}; //may I ask 'process' ?
 		
-		//New in XRS 1.4
 
-		
-		virtual	void		RouteLineChanged(int line){};
+		virtual	void			RouteLineChanged(int line){};
 		
 		//tmp
-		virtual	bool		SupportPanNote(){ return false; };
-		virtual	bool		SupportSustainNote(){ return false;};
+		virtual	bool			SupportPanNote(){ return false; };
+		virtual	bool			SupportSustainNote(){ return false;};
 
 
-		void				SaveSettings(BMessage& msg);
-		void				LoadSettings(BMessage& msg);
+		void					SaveSettings(BMessage& msg);
+		void					LoadSettings(BMessage& msg);
 		
-		virtual	void		SaveCustomSettings(BMessage& msg) = 0;
-		virtual	void		LoadCustomSettings(BMessage& msg) = 0;
+		virtual	void			SaveCustomSettings(BMessage& msg) = 0;
+		virtual	void			LoadCustomSettings(BMessage& msg) = 0;
 		
 		//Measures
 
-		Pattern*			getPatternAt(int);
-		void				moveToPattern(int);
+		Pattern*				getPatternAt(int);
+		void					moveToPattern(int);
 		
-		bool				isOn();
-		void				setOn(bool);
-		int					getRouteLine(){ return route_line; };
-		void				setRouteLine(int r){ route_line=r;};
+		bool					isOn();
+		void					setOn(bool);
+		int						getRouteLine(){ return route_line; };
+		void					setRouteLine(int r){ route_line=r;};
 		
-		void				AddMeasure(int val,int);
-		void				RemoveMeasure(int num);
-		void				setName(const char*);
-		void				LockName(bool b);
-		const char*			getName();
-		void				ResetName();
-		bool				isNameLocked();
-		void				setNumberNotes(int);
+		void					AddMeasure(int val,int);
+		void					RemoveMeasure(int num);
+		void					setName(const char*);
+		void					LockName(bool b);
+		const char*				getName();
+		void					ResetName();
+		bool					isNameLocked();
+		void					setNumberNotes(int);
 		
-		BList				voice_list;	//Playing note list 
-		bool				cit; 		//Cut_It_Self		
+		BList					voice_list;	//Playing note list 
+		bool					cit; 		//Cut_It_Self		
 		
 				
 		

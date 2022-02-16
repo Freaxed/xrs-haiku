@@ -22,7 +22,7 @@ int notes_per_measaure = 16;	//dirty hack;
 
 Song::Song()
 {
-	tempo_bpm=120;
+	tempo_bpm = 120;
 	setTempo(tempo_bpm);
 	file_entry=NULL;
 		

@@ -339,11 +339,11 @@ XMPoz::MarkerPosition(int i)
 void	
 XMPoz::MoveMarker(int num,int ax,bool set)
 {
-	if(sequence && set)
-	if(sequence->loop_points[num]==ax) return;
-	else
-		sequence->loop_points[num]=ax;
-		
+	if(sequence && set) {
+		if(sequence->loop_points[num]==ax) return;
+		else
+			sequence->loop_points[num]=ax;
+	}
 	//printf("Marker %d %d\n",num,ax);
 	
 	ax *=GRID_SIZE;

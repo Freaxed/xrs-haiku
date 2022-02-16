@@ -3,15 +3,19 @@
 #include "Pattern.h"
 #include "Note.h"
 
-extern XHost*	xhost;
-   
+#define DEFAULT_GAIN 0.8f
+#define DEFAULT_PAN	 0.0f
+
 Track::Track ()
 {
+	SetGain(DEFAULT_GAIN);
+	SetPan (DEFAULT_PAN);
+
 	on=true;
 	route_line=0;
 	curNote=NULL;
 	name_set=false;
-	cit=true;		
+	cit=true;
 	midiin_channel=0;
 	midiin_enable=false;
 	ResetName();
@@ -53,8 +57,8 @@ Track::SaveSettings(BMessage& track)
 void
 Track::LoadSettings(BMessage& track)
 {
-	SetGain(track.GetFloat("Gain", 0.8f));
-	SetPan(track.GetFloat("Pan", 0.0f));
+	SetGain(track.GetFloat("Gain", DEFAULT_GAIN));
+	SetPan(track.GetFloat ("Pan",   DEFAULT_PAN));
 	LockName(track.GetBool("NameLocked", false));
 	if (isNameLocked()) 
 		setName(track.GetString("Name", "no-name"));
@@ -127,38 +131,27 @@ Track::isNameLocked()
 {
 	return name_set;
 }
-/*void 
-Track::Message(SynthMessage msg, float data)
-{
-	switch(msg) {
-		
-		case SystemReset:
-			Reset();
-			return;
-		break;
-		default: break; // gcc is dumn
-	}
-}*/
+
 
 void
 Track::AddMeasure(int val, int note)
 {
-	for(int h=0 ;  h<val; h++)  
-	
+	for(int h=0 ;  h<val; h++) {
 		 patternList.AddItem(new Pattern(note));
-		 
-	currentPattern=(Pattern*)patternList.ItemAt(0);	 
+	}
+
+	currentPattern = (Pattern*)patternList.ItemAt(0);	 
 }
 void
 Track::RemoveMeasure(int num)
 {
-	 patternList.RemoveItem(num);
-		 
-	currentPattern=(Pattern*)patternList.ItemAt(0);	 
+	patternList.RemoveItem(num);
+	currentPattern = (Pattern*)patternList.ItemAt(0);	 
 }
 
 Track::~Track(){}
 int	Track::getModel(){	return 0; }
+
 bool 
 Track::isOn()
 {
@@ -196,4 +189,4 @@ Track::Reset()
 	
 }
 void 	Track::Message(SynthMessage msg, float data){};
-void Track::Process(float ** buffer ,int32 sample_num,int spiaz,float factor){}
+void 	Track::Process(float ** buffer ,int32 sample_num,int spiaz,float factor){}

@@ -39,9 +39,12 @@ class Song
 		void		setNumberNotes(int);
 		
 		size_t		getNoteSize(); //in frame	
-					
+		
+		//////////////////////////////////////////////////////////////////
+		/// Tempo should be managed ONLY by JuiceEngine to avoid chaos!
 		void		setTempo(int32 bpm); //in bpm 
 		int32		getTempo();
+		//////////////////////////////////////////////////////////////////
 						
 		BEntry*		getEntry();
 		void		setEntry(BEntry*);
