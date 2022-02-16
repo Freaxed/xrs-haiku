@@ -213,10 +213,10 @@ MainWindow::ResetTitle()
 	
 	if(curSong && curSong->getEntry() != NULL)
 	{
-			entry_ref t;
-			curSong->getEntry()->GetRef(&t);
-			title += " - ";
-			title += t.name;
+		entry_ref t;
+		curSong->getEntry()->GetRef(&t);
+		title += " - ";
+		title += t.name;
 	} 
 	
 	SetTitle(title.String());
@@ -229,9 +229,10 @@ MainWindow::ResetToSong(Song* s)
 	LogTrace("Resetting MainWindow to new Song...");
 	curSong = s;
 
-	fPanel->ResetToSong(curSong, fTracksPanel);
+	//fPanel->ResetToSong(curSong, fTracksPanel);
 	fTracksPanel->ResetToSong(curSong);
-
+	fPanel->ResetToSong(curSong, fTracksPanel);
+	
 	ResetTitle();	
 	
 	ticks->SetNumberNotes(curSong->getNumberNotes());		

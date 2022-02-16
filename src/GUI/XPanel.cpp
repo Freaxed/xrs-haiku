@@ -29,7 +29,8 @@
 #include <InterfaceKit.h>
 #include <stdio.h>
 
-BMenuItem* new_bpm_menu(const char* label, int32 bpm_value) {
+BMenuItem* new_bpm_menu(const char* label, int32 bpm_value) 
+{
 	BMessage *msg = ValuableTools::CreateMessageForBController(VID_TEMPO_BPM);
 	msg->AddInt32("be:value", bpm_value);
 	BMenuItem* item =new BMenuItem(label, msg);
@@ -40,7 +41,7 @@ BMenuItem* new_bpm_menu(const char* label, int32 bpm_value) {
 
 
 XPanel::XPanel(BRect rect): BView(rect, "XPanel", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_NAVIGABLE)
-{	
+{
 	bpm_menu = new BPopUpMenu("popup",false);
 	bpm_menu->AddItem(new_bpm_menu(" 60 bpm",  60));
 	bpm_menu->AddItem(new_bpm_menu(" 80 bpm",  80));
@@ -69,6 +70,7 @@ XPanel::isAllPat(){
 
 void
 XPanel::ResetMeasureCount(){
+	LogTrace("XPanel::ResetMeasureCount");
 	curpat->SetMax(curSong->getNumberMeasure());
 }
 
@@ -76,11 +78,8 @@ void
 XPanel::ResetToSong(Song* s, TracksPanel* f)
 {
 	curSong = s;
-	tp = f;
-	
-	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, curSong->getTempo()); //To be removed!
-	LogTrace("******* TO BE REMOVED *************");
-	
+	tp = f;	
+
 	curpat->UpdateValue(1, true);
 	all_bt->SetValue(MeasureManager::Get()->GetPatternMode());
 	ResetMeasureCount();
@@ -149,10 +148,6 @@ XPanel::MessageReceived(BMessage* message)
 void
 XPanel::AttachedToWindow()
 {
-	//new stile
-	//BBitmap	*tile=XUtils::GetBitmap(6);
-	//if(tile!=NULL)  SetViewBitmap(tile);
-	
 	SetViewColor(panelColor);
 	BRect r(0,0,24,22);
 	
@@ -222,7 +217,7 @@ XPanel::AttachedToWindow()
 	
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	curpat=new XDigit(r,"curpat", "current_pattern", new BMessage(CURPAT_MSG),1,1);
+	curpat = new ADigit(r, new BMessage(CURPAT_MSG), 1, 1);
 	AddChild(curpat);
 	curpat->SetTarget(this);
 	

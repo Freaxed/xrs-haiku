@@ -21,7 +21,7 @@ class BankManager;
 class XDigit;
 class Pattern;
 class TracksPanel;
-class XDigit;
+class ADigit;
 class XPot;
 class BPictureButton;
 class PeakView;
@@ -46,7 +46,7 @@ class XPanel : public BView
 		void	SelectTrack(int);
 		PeakView* Two;
 	
-		XDigit				*curpat;
+		ADigit				*curpat;
 	
 		BPictureButton 		*play_bt;
 		BPictureButton 		*all_bt;
@@ -54,8 +54,7 @@ class XPanel : public BView
 		BPictureButton		*vst;
 		
 		
-		//XDigit			*bpm;
-		Song			*curSong;
+		Song*			curSong;
 		XPot*		 	master;
 		char			ttext[4];
 		bool 			key_rel;
