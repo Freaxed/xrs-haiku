@@ -33,27 +33,24 @@ class PBox : public BBox {
 
 	public:
 		
-								PBox(BRect rect,BMessage fTemplate, BMessage fData,const char* settings_name);
+								PBox(BRect rect,BMessage& fTemplate, BMessage& fData,const char* settings_name);
 
 				 void			AttachedToWindow();
 		virtual void			MessageReceived(BMessage *msg);
 
 				void			GetData(BMessage* data);
 				
-				const char*	GetSettingsName(){ return fSName.String();}
+				const char*		GetSettingsName(){ return fSName.String();}
 	private:
 		
-		float						BuildGUI(BMessage viewTemplate, BMessage settings,BView *view);
+		float						BuildGUI(BMessage& viewTemplate, BMessage& settings, BView *view);
 	
-		BView					*fView;
-
+		BView*					fView;
 		BView*					fPrefView;		
-
 		BMessage				fTemplate;
 		BMessage				fData;
-		float						fFontHeight;
-		BString					fSName;
-		
+		float					fFontHeight;
+		BString					fSName;		
 };
 
 #endif

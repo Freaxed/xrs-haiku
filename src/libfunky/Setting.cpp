@@ -41,9 +41,8 @@ Setting::Store(){
 }
 
 void
-Setting::Retrive(){
-
-	
+Setting::Retrive()
+{
 	status_t	err;
 		
 	BFile	file;

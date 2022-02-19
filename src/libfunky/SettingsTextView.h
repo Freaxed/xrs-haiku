@@ -9,7 +9,7 @@
 class SettingsTextView : public BView 
 {
 		public:
-						SettingsTextView(BRect frame, char *name, BString testo);
+						SettingsTextView(BRect frame, const char *name, BString testo);
 			 void AttachedToWindow();
 			 void Draw(BRect updateRect);
 			 void	SetText(const char*text){fText.SetTo(text);};

@@ -6,10 +6,10 @@
 #include <ScrollView.h>
 #include <Application.h>
 #include <Alert.h>
-//#include <Separator.h>
+#include <stdio.h>
 
 #include "SettingsTextView.h"
-
+#include <SupportDefs.h>
 
 #define _T(A) A
 
@@ -21,7 +21,7 @@ const float kDividerWidth = 100;
 
 #define SCROLLBAR 0	
 
-PBox::PBox(BRect rect, BMessage fT, BMessage fD,const char* settings_name)
+PBox::PBox(BRect rect, BMessage& fT, BMessage& fD, const char* settings_name)
 	: BBox(rect, "Property", B_FOLLOW_ALL,B_WILL_DRAW) 
 {
 
@@ -29,21 +29,15 @@ PBox::PBox(BRect rect, BMessage fT, BMessage fD,const char* settings_name)
 	fTemplate = fT;
 	fData = fD;
 
-#if B_BEOS_VERSION > B_BEOS_VERSION_5
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-#else
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetHighColor(0, 0, 0, 0);
-#endif
 
 };
 
 void
-PBox::AttachedToWindow(){
-	
+PBox::AttachedToWindow()
+{
 	//calc font height (for nice control size)	
 	font_height fontHeight;
 	be_bold_font->GetHeight(&fontHeight);
@@ -72,16 +66,9 @@ PBox::AttachedToWindow(){
 	
 			BView *view = new BView(frame, "", B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
 						
-#if B_BEOS_VERSION > B_BEOS_VERSION_5
 			view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			view->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			view->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-#else
-			view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-			view->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-			view->SetHighColor(0, 0, 0, 0);
-#endif
-
 	
 			float settings_height = BuildGUI(fTemplate, fData, view);
 					
@@ -110,78 +97,73 @@ PBox::AttachedToWindow(){
 }
 
 void
-PBox::GetData(BMessage* data){
-			
-			
-			
-			BView * panel = fPrefView;
-			BMessage cur;
-			
-			for (int i = 0; fTemplate.FindMessage("setting", i, &cur) == B_OK; i++) {
-				const char *name = cur.FindString("name");
-				int32 type = -1;
-				
-				cur.FindInt32("type", &type);
-				
-				if ( dynamic_cast<BTextControl*>(panel->FindView(name))) { 
-//					Free text
-					BTextControl * ctrl = (BTextControl*)panel->FindView(name);
-				
-					switch (type) {
-						case B_STRING_TYPE: {
-							data->AddString(name, ctrl->Text() );
-						} break;
-						case B_INT32_TYPE: {
-							data->AddInt32(name, atoi(ctrl->Text()) );
-						} break;
-						default: {
-							return;
-						};
-					};
-				} else if (dynamic_cast<BMenuField*>(panel->FindView(name))) {
-//					Provided option
-					BMenuField * ctrl = (BMenuField*)panel->FindView(name);
-					BMenuItem * item = ctrl->Menu()->FindMarked();
-					
-									
-					if (!item) return;
-					
-					switch (type) {
-						case B_STRING_TYPE: {
-							data->AddString(name, item->Label() );
-							BString index(name);
-							index << "_index";
-							data->AddInt32(index.String(), ctrl->Menu()->IndexOf(item)); //index 
-						} break;
-						case  B_INT32_TYPE: {
-							data->AddInt32(name, atoi(item->Label()) );
-							BString index(name);
-							index << "_index";
-							data->AddInt32(index.String(), ctrl->Menu()->IndexOf(item)); //index
-						} break;
-						default: {
-							return;
-						};
-					}
-				} else
-				if (dynamic_cast<BCheckBox*>(panel->FindView(name))) {
-// 					Boolean setting
-					BCheckBox * box = (BCheckBox*)panel->FindView(name);
-					
-					if ( box->Value() == B_CONTROL_ON ) {
-						data->AddBool(name,true);
-					} else {
-						data->AddBool(name,false);
-					}
-				} else if (dynamic_cast<BTextView *>(panel->FindView(name))) {
-					BTextView *view = (BTextView *)panel->FindView(name);
-					data->AddString(name, view->Text());
-				};
-				
-				
-			};
-
+PBox::GetData(BMessage* data)
+{
+	BView * panel = fPrefView;
+	BMessage cur;
+	
+	for (int i = 0; fTemplate.FindMessage("setting", i, &cur) == B_OK; i++) 
+	{
+		const char *name = cur.FindString("name");
+		int32 type = cur.GetInt32("type", -1);
 		
+		if ( dynamic_cast<BTextControl*>(panel->FindView(name))) { 
+//					Free text
+			BTextControl * ctrl = (BTextControl*)panel->FindView(name);
+		
+			switch (type) {
+				case B_STRING_TYPE: {
+					data->AddString(name, ctrl->Text() );
+				} break;
+				case B_INT32_TYPE: {
+					data->AddInt32(name, atoi(ctrl->Text()) );
+				} break;
+				default: {
+					return;
+				};
+			};
+		} else if (dynamic_cast<BMenuField*>(panel->FindView(name))) {
+//					Provided option
+			BMenuField * ctrl = (BMenuField*)panel->FindView(name);
+			BMenuItem * item = ctrl->Menu()->FindMarked();
+			
+							
+			if (!item) return;
+			
+			switch (type) {
+				case B_STRING_TYPE: {
+					data->AddString(name, item->Label() );
+					BString index(name);
+					index << "_index";
+					data->AddInt32(index.String(), ctrl->Menu()->IndexOf(item)); //index 
+				} break;
+				case  B_INT32_TYPE: {
+					data->AddInt32(name, atoi(item->Label()) );
+					BString index(name);
+					index << "_index";
+					data->AddInt32(index.String(), ctrl->Menu()->IndexOf(item)); //index
+				} break;
+				default: {
+					return;
+				};
+			}
+		} else
+		if (dynamic_cast<BCheckBox*>(panel->FindView(name))) {
+// 					Boolean setting
+			BCheckBox * box = (BCheckBox*)panel->FindView(name);
+			
+			if ( box->Value() == B_CONTROL_ON ) {
+				data->AddBool(name,true);
+			} else {
+				data->AddBool(name,false);
+			}
+		} else if (dynamic_cast<BTextView *>(panel->FindView(name))) {
+			BTextView *view = (BTextView *)panel->FindView(name);
+			data->AddString(name, view->Text());
+		};
+		
+		
+	};
 }
 				
 void 
@@ -205,7 +187,7 @@ PBox::MessageReceived(BMessage *msg) {
 	};
 };
 
-float PBox::BuildGUI(BMessage viewTemplate, BMessage settings, BView *view) {
+float PBox::BuildGUI(BMessage& viewTemplate, BMessage& settings, BView *view) {
 	
 	BMessage curr;
 	float yOffset = kEdgeOffset + kControlOffset;
@@ -215,7 +197,8 @@ float PBox::BuildGUI(BMessage viewTemplate, BMessage settings, BView *view) {
 	
 	BMessage postAdded;
 	
-	for (int i=0; viewTemplate.FindMessage("setting",i,&curr) == B_OK; i++ ) {
+	for (int i=0; viewTemplate.FindMessage("setting",i,&curr) == B_OK; i++ ) 
+	{
 		char temp[512];
 		
 		// get text etc from template
