@@ -74,6 +74,8 @@ class Engine: public BLooper {
 		virtual	void	Stopping(){};
 		
 		BSoundPlayer*			player;
+		
+		size_t			GetPreferredBufferSize() { return FRAMES_NUM*FRAMESIZE;}
 	
 	private:
 

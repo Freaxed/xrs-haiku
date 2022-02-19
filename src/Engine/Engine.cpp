@@ -36,7 +36,7 @@ Engine::Init() {
 	fmt.channel_count = 2;
 	fmt.frame_rate = 44100;
 	fmt.byte_order = B_MEDIA_LITTLE_ENDIAN;
-	fmt.buffer_size = FRAMES_NUM*FRAMESIZE;
+	fmt.buffer_size = GetPreferredBufferSize();
 	
 	
 	player = new BSoundPlayer(&fmt,fName.String(),FillBuffer,NULL,this);
@@ -66,7 +66,9 @@ Engine::ReallyStop() {
 	
 	IF_LOCK
 	
+	player->SetHasData(false);
 	player->Stop();
+	
 	_clearBuffers();
 	
 	UNLOCK
@@ -77,6 +79,7 @@ Engine::ReallyStart(){
 	
 	IF_LOCK
 	
+	player->SetHasData(true);
 	player->Start();
 	
 	UNLOCK
@@ -210,7 +213,7 @@ Engine::MessageReceived(BMessage* message)
 	
 		case MESSAGE_NEWBUF:
 			_changeBuffer();		
-			SecureProcessBuffer(_getBuffer(), FRAMES_NUM*FRAMESIZE);
+			SecureProcessBuffer(_getBuffer(), GetPreferredBufferSize());
 			break;
 		case MESSAGE_START:
 			DoStart();
@@ -244,8 +247,8 @@ Engine::_clearBuffers(){
 
 	for(int i=0;i<PREBUFFER_SIZE;i++){
 
-		buffers[i]=malloc(FRAMES_NUM*FRAMESIZE);
-		memset(buffers[i],0,FRAMES_NUM*FRAMESIZE);
+		buffers[i]=malloc(GetPreferredBufferSize());
+		memset(buffers[i],0,GetPreferredBufferSize());
 	}
 }
 

@@ -40,8 +40,13 @@ class JuiceEngine : public Engine, public Tickable {
 				
 				
 				void	MessageReceived(BMessage* msg);
+				
+				//number of fullframes a single beat is composed of.
+				size_t	GetSamplesPerBeat() { return fSamplesPerBeat; }
 		
 	protected:
+	friend class JFileManager;
+	
 					JuiceEngine(const char* name);
 			void	Starting();
 			void	Stopping();
@@ -62,12 +67,12 @@ class JuiceEngine : public Engine, public Tickable {
 			
 			Song*	fCurrentSong;
 
-			int32	fSamplesPerBeat;
-			int32	fSamplesPerTick;			
+			size_t	fSamplesPerBeat;
+			size_t	fSamplesPerTick;			
 			
 			void	process_row(int32 row);
 			
-			int	BufferPosition;
+			size_t	BufferPosition;
 			
 			//Events
 			void			AddVoice(Track*,XRSVoice);

@@ -29,7 +29,7 @@ static NotifierLoopClock	the_clock; //put as singleton! (why? can't be a private
 
 
 
-int min(int a, int b) { return a<b ? a:b; }
+//int min(int a, int b) { return a<b ? a:b; }
 
 JuiceEngine*
 JuiceEngine::Get()
@@ -125,10 +125,15 @@ JuiceEngine::SetBPM(int bpm)
 	if (fCurrentSong) 
 		fCurrentSong->setTempo(bpm);
 
-	int32 note_size=(size_t)2646000/bpm;
+	// 2646000 = 44100 * 60 (number of samples per minutes)
+	// 
+	size_t note_size=(size_t)2646000/bpm;
 	while(note_size % 4 !=0) note_size++;
+	
 	fSamplesPerBeat = note_size; //fCurrentSong->getNoteSize();
 	fSamplesPerTick = fSamplesPerBeat/(fDefaultResolution*4);
+
+	LogTrace("JuiceEngine::SetBPM(%d) - SamplesPerBeat: %ld", bpm, fSamplesPerBeat);
 
 	SendTrackMessage(TempoChange,(float)fSamplesPerBeat);	
 }
@@ -213,17 +218,17 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 		return;
 	}
 			
-	const int32 num_track = fCurrentSong->getNumberTrack();
-	const int 	frames = size/FRAMESIZE;
+	const uint32 	num_track = fCurrentSong->getNumberTrack();
+	const size_t	frames = size/FRAMESIZE;
 	
-	int 		len=frames;
+	size_t 			len	=	frames;
 	
 	
 	/* Punto 1 : Divisione in sotto bufferini */
 		
 	while(len) {
 	
-		int buflen=min(len, (int)ceil(fSamplesPerTick-BufferPosition));
+		size_t buflen = std::min(len, (fSamplesPerTick-BufferPosition));
 		
 		BufferPosition	+=	buflen; 
 		
@@ -231,12 +236,12 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 		
 		if(buflen>0 && buflen<=frames) 
 			
-			for(int x=0;x<num_track;x++) 
+			for(uint32 x=0;x<num_track;x++) 
 			{ 
 				Track*	track=(Track*)fCurrentSong->getTrackAt(x);
 				
 				//Scelta del canale di output (PBus):				
-				uint8   line = track->getRouteLine();
+				uint8   line = (uint8)track->getRouteLine();
 				PBus* a_bus = PMixer::Get()->BusAt(line);
 				
 					
@@ -254,10 +259,10 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 						a_bus->SetUsed(true);
 						
 						XRSVoice v = (XRSVoice)track->voice_list.ItemAt(i);
-						uint32 ret=track->ProcessVoice(v,stream_note, buflen); 
+						size_t ret = track->ProcessVoice(v, stream_note, buflen); 
 	
 						if (ret>0)
-							a_bus->MixBuffer(stream_note,ret,frames-len);
+							a_bus->MixBuffer(stream_note, ret, frames-len);
 						else	
 							rem_list.AddItem((void*)v); //voice is dead.								
 					}
@@ -299,7 +304,7 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 	UpdateMeters();
 	
 	float **mixed = PMixer::Get()->GetMain()->Buffer();
-	for(int i=0 ;i<frames; i++){
+	for(size_t i=0 ;i<frames; i++){
 		fbuffer[(0 + i) * 2    ]	= mixed[0][i];
 		fbuffer[(0 + i) * 2 + 1] 	= mixed[1][i];
 	}
