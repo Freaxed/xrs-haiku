@@ -159,7 +159,7 @@ TheApp::PrepareToRun()
 	track_manager = TrackManager::Get();
 	track_manager->Init();
 	 	
-	jfm= JFileManager::Get();
+	jfm = JFileManager::Get();
 	jfm->Init();
 	
 		
@@ -324,7 +324,7 @@ TheApp::MessageReceived(BMessage* message)
 			}
 		break;
 		case 'expt':	// EXPORT AS WAVE
-			jfm->RenderAsWave(message);
+			JFileManager::Get()->RenderAsWave(message, currentSong);
 		break;
 		
 		case MENU_COPY:

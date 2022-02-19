@@ -43,10 +43,10 @@ class JFileManager
 	void			SaveReq(entry_ref,const char*,Song*);
 
 	
-	status_t	RenderAsWave(BMessage *setting);
+	status_t		RenderAsWave(BMessage *setting, Song* song);
 	void			ExportWave(BMessage *info);
 	
-	void		AddMime(BFile*);
+	void			AddMime(BNode*, const char* mime = "audio/XRS-File");
 	
 	
 	int		open_type;

@@ -44,6 +44,7 @@
 #include 	"Sequence.h"
 #include	"MixerWindow.h"
 #include 	"TrackManager.h"
+#include	"JuiceEngine.h"
 
 #include	"version.h"
 
@@ -352,19 +353,18 @@ close_export_line(media_file *dest)
 	 dest->file->ReleaseTrack(dest->track);
 	 dest->file->CloseFile();
 }
+#include "MediaFileSaver.h"
 
 status_t
-JFileManager::RenderAsWave(BMessage *message)
+JFileManager::RenderAsWave(BMessage *message, Song* song)
 {
-	return B_ERROR;
-	/*
+
 	 // decoding BMessage
 	 entry_ref ref;
 	 entry_ref rif;
 	 int form;
 	 bool all;
 	 int pattern;
-	 int32	lines;
 	 
 	 if(message->FindRef("directory",&rif)!=B_OK) return B_ERROR;
 	 
@@ -374,300 +374,83 @@ JFileManager::RenderAsWave(BMessage *message)
 
 	p.Append(message->FindString("name"));
 	get_ref_for_path(p.Path(),&ref);
-	printf("works %s\n",p.Path());
+	LogTrace("Exporting to %s\n",p.Path());
+	message->PrintToStream();
 				
-	form=message->FindInt16("format");
-	all=message->FindBool("playmode");
-	pattern=message->FindInt16("position");
-	
-	lines=message->FindInt16("lines");
-	
-	if(lines==1) lines=my_mixer->CountLines();
-	else lines++;
-	//
+	form    = message->FindInt16("format");
+	all     = message->GetBool ("playmode", false);
+	pattern = message->GetInt16("position", 1);
+
     if(filepanel!=NULL) 
 	{
 		delete filepanel;
 		filepanel=NULL;
 	}
-     printf("render : %d %d %d\n",form,all,pattern);
-     
-     status_t err;
-     entry_ref refrec;  
-     media_file_format mfi;
-     media_format mf,outfm;
-     int32 cookie=0;
-     
-     char *filetype;
-     void *buffer;
- 	 void *newbuffer;
- 	 int32	buffer_size;
- 	 
- 	 // all track
- 	
- 	 
- 	 int numTrack;
- 	 numTrack=lines;
- //	 int allTrack;
-// 	 allTrack=true;
- 	 media_file*	inuse;
- 	 inuse=new media_file[lines];
- 	 
- 	 for(int i=0;i<lines;i++) inuse[i].file=NULL;
- 	 
- 	  	 
-	 BAlert * al;
-	 BButton *theb;
-	 al=new BAlert("XRS",T_DIALOG_EXPORT_AS_WAVE,T_GEN_DONE);
-	 
-	 XUtils::SetIdleAlert(al);
-	 	 
-	 theb=(al->ButtonAt(0));
-	 theb->Hide();
-	 al->Go(NULL);
 	
-     //BMediaFile *dest;
-     //BMediaTrack	*rectrack;
-
-	 media_raw_audio_format *fmt;
-	 fmt=&mf.u.raw_audio;
-	 mf.type=B_MEDIA_RAW_AUDIO;
-	 
-
-	 switch(form){
+	MediaFileSaver fileSaver;
 	
-		case 0: //SHORT 	
-	 	
-	 		filetype="wav";
-	 		fmt->format=media_raw_audio_format::B_AUDIO_SHORT;
-			fmt->channel_count=2;
-			fmt->frame_rate=44100;
-			fmt->byte_order=B_MEDIA_LITTLE_ENDIAN;
-			fmt->buffer_size=FRAMES_NUM*4;
-			
-			newbuffer=malloc(FRAMES_NUM*4);
+	fileSaver.Open(p.Path());
 	
-	  	break;
-	  	
-	 	case 1:
-	 		filetype="AIFF";
-	 		fmt->format=media_raw_audio_format::B_AUDIO_FLOAT;
-			fmt->channel_count=2;
-			fmt->frame_rate=44100;
-			fmt->byte_order=B_MEDIA_LITTLE_ENDIAN;
-			fmt->buffer_size=FRAMES_NUM*8;
-			
-			newbuffer=NULL;
-			
-	 	default:
-	 		//goto cocco;
-	 	break;
-	}
 	
-	buffer_size=fmt->buffer_size;
 	
-	buffer=malloc(FRAMES_NUM*8); // il buffer da passare a ProcessBuff.. SEMPRE da 8 byte..
+	// Let's really stop the engine.
 	
-	   while((err=get_next_file_format(&cookie,&mfi))==B_OK){
-		
-		printf("format %s\n",mfi.short_name);
-	 	if(strcmp(mfi.short_name,filetype)==0)
-	 	break;
-	 	
-	  }
+	JuiceEngine::Get()->Stop();
+	JuiceEngine::Get()->ReallyStop();
 	
-	succo->BeginExport();	
+	//Do stuff
 	
-	//if(err!=B_OK) goto cocco;
-
+	//create buffer
+	void*	buffer = malloc(JuiceEngine::Get()->GetPreferredBufferSize());
 	
-	//BString newname;
-	//char* oldname;
-	//oldname=new char[strlen(ref.name)];
-	//strncpy(oldname,ref.name,strlen(ref.name));
-	BString basename;
-	basename.SetTo(ref.name);
-	BString	newname(basename);
-	//if(err!=B_OK) goto cocco;
-			
-	// version 1.4;
+	memset(buffer, 0, JuiceEngine::Get()->GetPreferredBufferSize());
 	
-	while(!succo->turn){
-		
-		
-		succo->ProcessBuffer((void *)succo,buffer,FRAMES_NUM*8);
-		
-		for(int i=0;i<numTrack;i++)
-		{
-		
-		 if( my_mixer->IsEnableLine(i)) 
-		 {		
-		 	if(inuse[i].file==NULL){	
-		 		
-		 		newname.SetTo(basename);
-		 		if(i!=0) {
-		 				newname.Append(" (");
-		 				newname.Append(my_mixer->getLineName(i));
-		 				newname.Append(")");
-		 		}
-		 		ref.set_name(newname.String());	
-		 		open_export_line(&inuse[i],ref,&mfi,&mf);
-		 }
-		 
-		 if(form==0) //SHORT 
-			 {
-			 	melt_to_wav(my_mixer->getBufferLine(i),newbuffer,FRAMES_NUM);
-			   //	transform_to_wav(buffer,newbuffer,FRAMES_NUM);
-				inuse[i].track->WriteChunk((char*)newbuffer,FRAMES_NUM*4);
-			 }
-	  	 else
-	  	
-	 	 if(form==1){
-	 	 		melt_to_aiff(my_mixer->getBufferLine(i),buffer,FRAMES_NUM);	
-				inuse[i].track->WriteChunk((char*)buffer,FRAMES_NUM*8);	
-		
-		}
-		} 		
-		}	
-	 	
- }
- 
- // qui manca ancora una nota da renderizzare
- //succo->last_buf_good
- size_t left;
- size_t chuck;
- 
- left=succo->note_size/4-(FRAMES_NUM-succo->last_buf_good);
- 
- while(left)
- {
- 	if(left>=FRAMES_NUM) chuck=FRAMES_NUM;
- 	else chuck=left;
- 	
- 		
- 		succo->ProcessBuffer((void *)succo,buffer,chuck*8);
- 		for(int i=0;i<numTrack;i++)
-		{
-		 if(inuse[i].file!=NULL)
-		 {	
-			if(form==0) //SHORT 
-			{
-			    melt_to_wav(my_mixer->getBufferLine(i),newbuffer,chuck);
-			   	//transform_to_wav(buffer,newbuffer,chuck);
-				inuse[i].track->WriteChunk((char*)newbuffer,chuck*4);
-			}
-	  		else
-	  	
-	 		if(form==1){
-	 	 		melt_to_aiff(my_mixer->getBufferLine(i),buffer,chuck);	
-				inuse[i].track->WriteChunk((char*)buffer,chuck*8);	
-		 	}
-		 }
-		}
-		left -=chuck;
- 	
-  	} 
-		
-		
-
-		// close files:
-		for(int i=0;i<numTrack;i++)
-		{
-		
-		 if(inuse[i].file!=NULL)			
-		 		close_export_line(&inuse[i]);
-			
-		}
-		//close_export_line(&inuse[0]);
-	    
-	    free(buffer);
-	    free(newbuffer);
-	    
-	    printf("Render finished!\n");
-	  	
-	  	//identify
-	  	BMimeType result;
-		BMimeType::GuessMimeType(&ref,&result);
-		BFile newFile(&ref,B_READ_WRITE);
-		BNodeInfo ninfo(&newFile); 
-		ninfo.SetType(result.Type());
-	    
-	   if(al->Lock())
-	   {
-	   	theb->Show();	 
-	  	XUtils::StopIdleAlert(al);
-	  	al->Unlock();
-	   }
+	JuiceEngine::Get()->LockEngine   ("RenderAsWave");
+	JuiceEngine::Get()->Start(); // Reset signal like when starting..
+	JuiceEngine::Get()->UnlockEngine ("RenderAsWave");	
 	
-	  succo->EndExport();
-		
-	  return B_OK;
-	  
-
-cocco:
+	//FIXME:
+		//-> rendering a different patter?
+		//-> rendering full song?
 	
-	ErrorMsg("An error occorred while exporting! :",strerror(err));
-	if(al->Lock()) al->Quit();
-	succo->EndExport();
-	return err;
-	*/
-}
-
-void
-melt_to_wav(float** from,void* to,size_t frames)
-{
-	int	r;
-	for(size_t i=0;i<frames;i++)
+	//let's calculate how many samples we need to write to the file..
+	
+	int64 totalSamples = JuiceEngine::Get()->GetSamplesPerBeat() * song->getNumberNotes() / 4; //FIXME GetSamplesPerBeat???
+	
+	while(totalSamples > 0)	// detect the end! 
 	{
-		
-		r=(int)(from[0][i]*32766);
-		memcpy((char*)to+i*4,(void*)&r,2);
-		//rights
-		r=(int)(from[1][i]*32766);
-		memcpy((char*)to+i*4+2,(void*)&r,2);
-	}
-}
-
-void
-melt_to_aiff(float** from,void* to,size_t frames)
-{
-	float r;
-	for(size_t i=0;i<frames;i++)
-	{
-		
-		r=from[0][i];
-		memcpy((char*)to+i*8,(void*)&r,4);
-		//rights
-		r=from[1][i];
-		memcpy((char*)to+i*8+4,(void*)&r,4);
-	}
-}
-
-void
-transform_to_wav(void* from,void* to,size_t frames)
-{
-	float f;
-	int	r;
-	for(size_t i=0;i<frames;i++)
-	{
-		// left
-		memcpy((void*)&f,(char*)from+i*8,4);
-		r=(int)(f*32766);
-		memcpy((char*)to+i*4,(void*)&r,2);
-		//rights
-		memcpy((void*)&f,(char*)from+i*8+4,4);
-		r=(int)(f*32766);
-		memcpy((char*)to+i*4+2,(void*)&r,2);
+		JuiceEngine::Get()->SecureProcessBuffer(buffer, JuiceEngine::Get()->GetPreferredBufferSize()); // loop in calling SecureProcessBuffer
+		if (totalSamples >= 1024)
+			fileSaver.WriteBlock((float*)buffer, 1024);
+		else
+			fileSaver.WriteBlock((float*)buffer, totalSamples);
+			
+		totalSamples -= 1024;
+		//printf("totalSamples %ld\n", totalSamples);
 	}
 	
+	fileSaver.Close();
+
+	BNode node(p.Path());
+	AddMime(&node, "audio/x-wave");
+
+
+	JuiceEngine::Get()->LockEngine   ("RenderAsWave");
+	JuiceEngine::Get()->Stop(); // Reset signal like when stopping..
+	JuiceEngine::Get()->UnlockEngine ("RenderAsWave");	
+	
+	JuiceEngine::Get()->ReallyStart();
+
+	free(buffer);
+	return B_OK;
 }
 
 void
-JFileManager::AddMime(BFile*	 file)
+JFileManager::AddMime(BNode* file, const char* mime)
 {
 	BNodeInfo	info;
 	info.SetTo(file);
-	info.SetType("audio/XRS-File");
+	info.SetType(mime);
 }
 status_t
 JFileManager::AskForClose(Song* s)
