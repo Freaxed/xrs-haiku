@@ -74,7 +74,7 @@ TB303Knobs::~TB303Knobs()
 {
 }
 
-void TB303Knobs::do_tune(float t)      {  if (fTrack) fTrack->Tune((int)(t*24.0f - 12.0f)); }
+void TB303Knobs::do_tune(float t)      {  if (fTrack) fTrack->Tune((int16)(t*24.0f - 12.0f)); }
 void TB303Knobs::do_cutoff(float c)    {  if (fTrack) fTrack->vcf.Cutoff(c); }
 void TB303Knobs::do_reso(float r)      {  if (fTrack) fTrack->vcf.Resonance(r); }
 void TB303Knobs::do_envmod(float e)    {  if (fTrack) fTrack->vcf.Envmod(e); }

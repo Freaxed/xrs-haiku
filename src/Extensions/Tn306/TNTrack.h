@@ -35,12 +35,11 @@ class TNTrack : public Track
 	bool			SupportPanNote(){ return true; };
 	bool			SupportSustainNote(){ return true;};
 	
-	void 			Tune(int halfsteps) { tuneoffset=halfsteps; }
-	int 			getTune() { return tuneoffset;}
-	
+	void 			Tune(int16 halfsteps) { tuneoffset=halfsteps; }
+	int16 			getTune() { return tuneoffset;}	
 					
-	void				SaveCustomSettings(BMessage& msg);
-	void				LoadCustomSettings(BMessage& msg);
+	void			SaveCustomSettings(BMessage& msg);
+	void			LoadCustomSettings(BMessage& msg);
 	
 	TRACK_GEN_TYPE	getProcessorType() { return TT_FULL_PROCESS; }
 
@@ -49,19 +48,16 @@ class TNTrack : public Track
 	VCA303 		vca;
 	Deverb 		dly;
 		
-	float		winx,winy,Ysize;
-	bool 		big,hidden;
-		
 	protected:
 	
 		virtual 	const char*	getPreferredName(){ return "Tn306";}
 	
 	private:
 			
-			int 				tuneoffset;
-			Element*			output;
-			int32				note_length;
-			int32				current_note_length;
+		int16 			tuneoffset;
+		Element*		output;
+		int32			note_length;
+		int32			current_note_length;
 };
 
 #endif

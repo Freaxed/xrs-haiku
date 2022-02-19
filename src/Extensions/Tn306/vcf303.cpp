@@ -1,5 +1,6 @@
 #include <math.h>
 #include "vcf303.h"
+#include "defaults.h"
 
 #define ENVINC 64
 #define ENVBITS 6
@@ -7,11 +8,12 @@
 
 VCF303::VCF303()
 {
-	envmod=0; cutoff=0;
-	Cutoff(0);
-	Resonance(0);
-	Envmod(0);
-	Decay(0);
+	envmod = DEF_VCF_ENVMOD; 
+	cutoff = DEF_VCF_CUTOFF;
+	Cutoff(cutoff);
+	Resonance(DEF_VCF_RESO);
+	Envmod(envmod);
+	Decay(DEF_VCF_DECAY);
 
 	envpos=0;
 	need_recalc=1;

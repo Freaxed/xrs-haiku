@@ -9,32 +9,25 @@
 
 #include "TNTrack.h"
 #include "Note.h"
-
 #include <math.h>
 #include <stdio.h>
+#include "defaults.h"
 
-#define PUMP_UP_FACTOR 3.0f
 
-TNTrack::TNTrack():Track()
+TNTrack::TNTrack():Track() , output(&vco) 
 {
 	vco.SetOutput(&vcf);
 	vcf.SetOutput(&vca);
 	vca.SetOutput(&dly);
 
-	output = &vco;
-	
-	winx=100;
-	winy=200;
-	
-	hidden = false;
-	big = true;
+//	output = &vco;
 
-	tuneoffset=0;
-	
+	tuneoffset = 0;
+
 	// Tempo changes:
-	note_length=0;
-	current_note_length=0;
-	
+	note_length 		= 0;
+	current_note_length = 0;
+
 	ResetName();
 }
 
@@ -94,9 +87,9 @@ TNTrack::Message(SynthMessage msg, float data)
 
 // convert halftone number into frequency.  halftone 93 is concert A (440Hz).
 
-static float notefreq(int halftone)
+static float notefreq(int16 halftone)
 {
-	return 55.0*pow(2, (float)(halftone-57)/12.0);
+	return 55.0f * powf(2, (float)(halftone-57)/12.0f);
 }
 
 
@@ -105,7 +98,7 @@ TNTrack::newVoice(Note* n,int VoiceTag)
 { 
 	curNote = n;
 	current_note_length=note_length/8;
-	output->Message(NoteChange, notefreq(tuneoffset+curNote->getNote()));
+	output->Message(NoteChange, notefreq(tuneoffset + (int16)curNote->getNote()));
 	output->Message(NoteOn, 10); // accent or whatever
 	return NULL;
 }
@@ -146,16 +139,16 @@ TNTrack::SaveCustomSettings(BMessage& msg)
 	msg.AddInt16("TNTune",		 getTune());
 }
 
+
 void
 TNTrack::LoadCustomSettings(BMessage& msg)
 {
-	vcf.Cutoff(msg.GetFloat("TNCutoff", 0.0f));
-	vcf.Resonance(msg.FindFloat("TNResonance", 0.0f));
-	vcf.Envmod(msg.FindFloat("TNEnvMod", 0.0f));
-	vcf.Decay(msg.FindFloat("TNDecay", 0.0f));
-	dly.Vol(msg.FindFloat("TNDelay", 0.0f));
-	dly.Distort(msg.FindFloat("TNDistortion", 0.0f));
-	dly.Feedback(msg.FindFloat("TNFeedback", 0.0f));
-
-	Tune(msg.GetInt16("TNTune", 0));	
+	vcf.Cutoff	 ( msg.GetFloat("TNCutoff",		DEF_VCF_CUTOFF ));
+	vcf.Resonance( msg.GetFloat("TNResonance",  DEF_VCF_RESO   ));
+	vcf.Envmod	 ( msg.GetFloat("TNEnvMod",		DEF_VCF_ENVMOD ));
+	vcf.Decay	 ( msg.GetFloat("TNDecay", 		DEF_VCF_DECAY  ));
+	dly.Vol		 ( msg.GetFloat("TNDelay",		DEF_DLY_VOL    ));
+	dly.Distort	 ( msg.GetFloat("TNDistortion", DEF_DLY_DIST   ));
+	dly.Feedback ( msg.GetFloat("TNFeedback", 	DEF_DLY_FBK    ));
+		Tune	 ( msg.GetInt16("TNTune", 		DEF_TUNE       ));
 }

@@ -3,17 +3,18 @@
 #include <math.h>
 #include <malloc.h>
 #include <memory.h>
+#include "defaults.h"
 
 Deverb::Deverb()
 {
-	Vol(0);
-	Feedback(0);
-	Distort(0.5);
+	Vol(DEF_DLY_VOL);
+	Feedback(DEF_DLY_FBK);
+	Distort(DEF_DLY_DIST);
 	
 	dlen=4096; 
 	dpos=0;
 	wavemag=0;
-	time_factor=0.25;
+	time_factor=DEF_DLY_TIME;
 	tempo=0;
 		
 	float *b = delaybuf.GetBuf(dlen);
