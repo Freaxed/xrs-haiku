@@ -6,7 +6,7 @@
 
 
 MainWindow::MainWindow(void)
-	:	BWindow(BRect(100,100,500,400),"Main Window",B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	:	BWindow(BRect(100,100,500,800),"Main Window",B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	BMessage templ;
 	BMessage values;
@@ -35,14 +35,23 @@ MainWindow::MainWindow(void)
 	s4.AddString("description", "Put your long description here");
 	s4.AddInt32("type", B_STRING_TYPE);
 	s4.AddBool("multi_line", true);
+	
+	BMessage s5;
+	s5.AddString("name", "EnableMe");
+	s5.AddString("description", "Abilitazione");
+	s5.AddInt32("type", B_BOOL_TYPE);
+	
 
 
 	templ.AddMessage("setting", &s1);
-	templ.AddMessage("setting", &s2);
-	templ.AddMessage("setting", &s3);
-	templ.AddMessage("setting", &s4);
+//	templ.AddMessage("setting", &s2);
+//	templ.AddMessage("setting", &s3);
+//	templ.AddMessage("setting", &s4);
+	templ.AddMessage("setting", &s5);
+	
+	templ.AddString("name", "Export Settings");
 
-	AddChild(new PBox(BRect(0,0, 400,300), templ, values, "Test"));
+	AddChild(new PBox(BRect(0,0, 400,700), templ, values, "Test"));
 }
 
 
