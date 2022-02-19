@@ -40,8 +40,8 @@ extern int 	tracknote_division;
 static		entry_ref rif;
 static		BTextControl	*txt;
 
-#define BOXSPACE	10.0
-#define OFFSET		5.0
+#define BOXSPACE	10.0f
+#define OFFSET		5.0f
 
 void
 Panels::showPrefsPanel()
@@ -74,10 +74,10 @@ Panels::showPrefsPanel()
 	box2->AddChild( txt=new BTextControl(r,"vstfolder",NULL,T_PREFS_NOT_SET,B_FOLLOW_NONE,B_WILL_DRAW) );
 	
 
-	r.top -= OFFSET;
+	r.top 	 -= OFFSET;
 	r.bottom -= OFFSET;
-	r.left=r.right+OFFSET;
-	r.right=r.right+=80;
+	r.left 	  = r.right + OFFSET;
+	r.right   = r.right + 80.0f;
 	
 	box2->AddChild(new BButton(r,"",T_GEN_SET,new BMessage('Set'),B_FOLLOW_NONE,B_WILL_DRAW));
 	
@@ -193,7 +193,7 @@ Panels::showSettings(Song* curSong)
 	box2->SetLabel(T_SETTINGS_TITLE);
 	
 	r=box2->Bounds();
-	r.right =r.Width()/2.;
+	r.right =r.Width()/2.0f;
 	r.left +=20;
 	
 	r.top=r.top+20;
@@ -218,7 +218,7 @@ Panels::showSettings(Song* curSong)
 	box2->AddChild(tw=new BTextView(r,"",x,B_FOLLOW_NONE,B_WILL_DRAW));
 	
 	r=box2->Bounds();
-	r.right =(r.Width())/2.;
+	r.right =(r.Width())/2.0f;
 	r.left +=20;
 	r.top = r.bottom-39;
 	r.bottom=r.top+32;
@@ -333,8 +333,8 @@ Panels::msgSettings(BMessage* message,void* cookies)
 }
 
 void
-Panels::showExport(int k,int m,JFileManager* jfm)
-{/*
+Panels::showExport(int k,int m)
+{
 	BBox *box,*box2,*box3;
 	BTabView	*tabview;
 	BTab		*tab;
@@ -355,24 +355,15 @@ Panels::showExport(int k,int m,JFileManager* jfm)
 	
 	r=box2->Bounds();
 	r.InsetBy(10,20);
-	//r.right=r.left+100;
-	//'r.bottom=r.top+100;
+
 	box2->AddChild(tabview=new BTabView(r, "tab_view"));
-	//box2->AddChild(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_FANCY_BORDER));
-	//box3->SetLabel("Section");
+
 	r=tabview->Bounds();
 	r.bottom -=tabview->TabHeight();
 	
-	//#ifdef ZETAr
-//		box3=new BBox(r,T_EXP_TITLE,B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER);
-//		tab=new BStringTab(BString(T_EXP_SECTION),box3);
-//		tabview->AddTab(tab);
-//	#else
-		tab=new BTab();
-		tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
-		tab->SetLabel(T_EXP_SECTION);
-	//#endif
-	
+	tab=new BTab();
+	tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
+	tab->SetLabel(T_EXP_SECTION);	
 	
 	
 	r=box3->Bounds();
@@ -383,7 +374,7 @@ Panels::showExport(int k,int m,JFileManager* jfm)
 	r.left=r.right+5;
 	r.right=r.left+36;
 	r.bottom=r.top+22;
-	box3->AddChild(a=new XDigit(r,NULL,NULL,1,m));
+	box3->AddChild( a = new XDigit(r, NULL, 1, m));
 	r=box3->Bounds();
 	r.InsetBy(20,20);
 	//r.right =+ 180;
@@ -396,25 +387,19 @@ Panels::showExport(int k,int m,JFileManager* jfm)
 	r=tabview->Bounds();
 	r.bottom -=tabview->TabHeight();
 	
-	//#ifdef ZETAr
-//		box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER);
-//		tab=new BStringTab(BString(T_EXP_FORMAT),box3);
-//		tabview->AddTab(tab);
-//	#else
-		tab=new BTab();
-		tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
-		tab->SetLabel(T_EXP_FORMAT);
-	//#endif
+	tab=new BTab();
+	tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
+	tab->SetLabel(T_EXP_FORMAT);
 	
 
 	r=box3->Bounds();
 	r.InsetBy(20,20);
-	//r.right += 160;
+
 	r.bottom=r.top+32;
 	box3->AddChild(radio=new BRadioButton(r,"radio3","Wave File (16bit stereo)",NULL));
 	r=box3->Bounds();
 	r.InsetBy(20,20);
-	//r.right =+ 180;
+
 	r.top+=32;
 	r.bottom=r.top+32;
 	box3->AddChild(radio4=new BRadioButton(r,"radio4","Aiff File (32bit stereo)",NULL));
@@ -423,25 +408,19 @@ Panels::showExport(int k,int m,JFileManager* jfm)
 	r=tabview->Bounds();
 	r.bottom -=tabview->TabHeight();
 	
-	//#ifdef ZETAr
-//		box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER);
-//		tab=new BStringTab(BString(T_EXP_MIXER),box3);
-//		tabview->AddTab(tab);
-//	#else
-		tab=new BTab();
-		tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
-		tab->SetLabel(T_EXP_MIXER);
-	//#endif
+	tab=new BTab();
+	tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
+	tab->SetLabel(T_EXP_MIXER);
 	
 		
 	r=box3->Bounds();
 	r.InsetBy(20,20);
-	//r.right =+ 160;
+
 	r.bottom=r.top+32;
 	box3->AddChild(radio=new BRadioButton(r,"radio5",T_EXP_MASTER_LINE,NULL));
 	r=box3->Bounds();
 	r.InsetBy(20,20);
-	//r.right =+ 180;
+
 	r.top+=32;
 	r.bottom=r.top+32;
 	box3->AddChild(radio6=new BRadioButton(r,"radio6",T_EXP_FX_LINES,NULL));
@@ -460,16 +439,11 @@ Panels::showExport(int k,int m,JFileManager* jfm)
 
 	box->AddChild(new BButton(r,"set",T_GEN_EXPORT,new BMessage('Expt'),B_FOLLOW_NONE,B_WILL_DRAW));
 	
-	a->SetValue(k);
-	
-	
-	//tabview->Select(0);
-
+	a->UpdateValue(k, true);
 	
 	BMessage *out=new BMessage();
 	out->AddPointer("win",(void*)win);
 	out->AddPointer("a",(void*)a);
-	out->AddPointer("jfm",(void*)jfm);
 	out->AddPointer("radio2",(void*)radio2);
 	out->AddPointer("radio4",(void*)radio4);
 	out->AddPointer("radio6",(void*)radio6);
@@ -477,7 +451,7 @@ Panels::showExport(int k,int m,JFileManager* jfm)
 	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
 	win->Show();
 	win->RedirectMessages(Panels::msgExport,(void*)out);
-	*/
+	
 }
 bool
 Panels::msgExport(BMessage* message,void* cookies)
@@ -500,8 +474,6 @@ Panels::msgExport(BMessage* message,void* cookies)
 
 				XDigit *a;
 				x->FindPointer("a",(void**)&a);
-				JFileManager	*jfm;
-				x->FindPointer("jfm",(void**)&jfm);
 				
 				BMessage *info=new BMessage('expt');
 				
@@ -518,9 +490,9 @@ Panels::msgExport(BMessage* message,void* cookies)
 				
 				
 				info->AddInt16("lines",(int16)rb->Value());
-				info->AddInt16("position",a->GetValue()-1);
+				info->AddInt16("position", (int16)(a->GetValue()-1) );
 				
-				jfm->ExportWave(info);
+				JFileManager::Get()->ExportWave(info);
 			}
 		break;
 		

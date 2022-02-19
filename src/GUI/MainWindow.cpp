@@ -291,7 +291,7 @@ MainWindow::MessageReceived(BMessage* message)
 			Panels::showPrefsPanel();
 			break;
 		case MENU_EXPORT:
-			Panels::showExport(MeasureManager::Get()->GetCurrentPattern()+1,curSong->getNumberMeasure(), NULL);
+			Panels::showExport(MeasureManager::Get()->GetCurrentPattern()+1,curSong->getNumberMeasure());
 			break;
 		
 		case PLAY_START:

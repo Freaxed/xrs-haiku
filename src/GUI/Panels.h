@@ -18,12 +18,11 @@ class Panels
 		static	void	showPrefsPanel();
 		static	bool	msgPrefs(BMessage* msg,void* cookies);
 		
-		static	void showSettings(Song*);
+		static	void 	showSettings(Song*);
 		static	bool	msgSettings(BMessage* msg,void* cookies);
 		
-		static	void	showExport(int k,int m,JFileManager*);
+		static	void	showExport(int k,int m);
 		static	bool	msgExport(BMessage* msg,void* cookies);
 		
-		static	void	showErrors(BMessage* msg);
-		//static	bool	msgErrors(BMessage* msg,void* cookies);		 	
+		static	void	showErrors(BMessage* msg); 	
 };
