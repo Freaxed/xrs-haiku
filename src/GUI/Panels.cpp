@@ -331,102 +331,60 @@ Panels::msgSettings(BMessage* message,void* cookies)
 	return true;
 	
 }
-
+#include "PBox.h"
 void
 Panels::showExport(int k,int m)
 {
-	BBox *box,*box2,*box3;
-	BTabView	*tabview;
-	BTab		*tab;
-	XDigit		*a;
-	BRadioButton	*radio,*radio2,*radio4,*radio6;
-	
 	BzWindow *win=new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_FLOATING_WINDOW,0);
 	win->SetLook(B_MODAL_WINDOW_LOOK);
 	win->SetFeel(B_MODAL_APP_WINDOW_FEEL);
 	win->SetFlags(B_ASYNCHRONOUS_CONTROLS|B_NOT_RESIZABLE);
 	
+	BBox *box;
 	win->AddChild(box=new BBox(win->Bounds(),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_PLAIN_BORDER));
 	BRect r(box->Bounds());
 	r.InsetBy(20,20);
 	r.bottom -=30;
-	box->AddChild(box2=new BBox(r,T_EXP_TITLE,B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_FANCY_BORDER));
-	box2->SetLabel(T_EXP_TITLE);
 	
-	r=box2->Bounds();
-	r.InsetBy(10,20);
+	BMessage fTemplate;
+	BMessage fData;
+	
+	fTemplate.AddString("name", "Export Settings");
+	
+	BMessage s1;
+	s1.AddString("name", "pattern");
+	s1.AddString("description", "Section to export");
+	s1.AddInt32("type", B_STRING_TYPE);
+	s1.AddString("valid_value", "Current Pattern");
+	s1.AddString("valid_value", "Entire Song");
+	s1.AddString("default", 	"Current Pattern");
+	
+	BMessage s2;
+	s2.AddString("name", "format");
+	s2.AddString("description", "Format");
+	s2.AddInt32("type", B_STRING_TYPE);
+	s2.AddString("valid_value", "AIFF WAVE (32bit float)");
+	s2.AddString("default", 	"AIFF WAVE (32bit float)");
+	
+	BMessage s3;
+	s3.AddString("name", "empty_space");
+	s3.AddString("description", "Time at the end");
+	s3.AddInt32("type", B_STRING_TYPE);
+	s3.AddString("valid_value", "None");
+	s3.AddString("valid_value", "1 	second");
+	s3.AddString("valid_value", "10 seconds");
+	s3.AddString("valid_value", "30 seconds");
+	s3.AddString("default", 	"None");
+	
+	
+	fTemplate.AddMessage("setting", &s1);
+	fTemplate.AddMessage("setting", &s2);
+	fTemplate.AddMessage("setting", &s3);
+			
+	PBox* pbox = new PBox(r, fTemplate, fData, "Export Settings");
+	box->AddChild(pbox);
 
-	box2->AddChild(tabview=new BTabView(r, "tab_view"));
-
-	r=tabview->Bounds();
-	r.bottom -=tabview->TabHeight();
-	
-	tab=new BTab();
-	tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
-	tab->SetLabel(T_EXP_SECTION);	
-	
-	
-	r=box3->Bounds();
-	r.InsetBy(20,20);
-	r.right =+ 160;
-	r.bottom=r.top+32;
-	box3->AddChild(radio=new BRadioButton(r,"radio1",T_EXP_SINGLE_MEASURE,NULL));
-	r.left=r.right+5;
-	r.right=r.left+36;
-	r.bottom=r.top+22;
-	box3->AddChild( a = new XDigit(r, NULL, 1, m));
-	r=box3->Bounds();
-	r.InsetBy(20,20);
-	//r.right =+ 180;
-	r.top+=32;
-	r.bottom=r.top+32;
-	box3->AddChild(radio2=new BRadioButton(r,"radio2",T_EXP_ALL_SONG,NULL));
-	
-	radio->SetValue(1);
-	
-	r=tabview->Bounds();
-	r.bottom -=tabview->TabHeight();
-	
-	tab=new BTab();
-	tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
-	tab->SetLabel(T_EXP_FORMAT);
-	
-
-	r=box3->Bounds();
-	r.InsetBy(20,20);
-
-	r.bottom=r.top+32;
-	box3->AddChild(radio=new BRadioButton(r,"radio3","Wave File (16bit stereo)",NULL));
-	r=box3->Bounds();
-	r.InsetBy(20,20);
-
-	r.top+=32;
-	r.bottom=r.top+32;
-	box3->AddChild(radio4=new BRadioButton(r,"radio4","Aiff File (32bit stereo)",NULL));
-	radio->SetValue(1);
-	
-	r=tabview->Bounds();
-	r.bottom -=tabview->TabHeight();
-	
-	tab=new BTab();
-	tabview->AddTab(box3=new BBox(r,"Export Song",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_NO_BORDER),tab);
-	tab->SetLabel(T_EXP_MIXER);
-	
-		
-	r=box3->Bounds();
-	r.InsetBy(20,20);
-
-	r.bottom=r.top+32;
-	box3->AddChild(radio=new BRadioButton(r,"radio5",T_EXP_MASTER_LINE,NULL));
-	r=box3->Bounds();
-	r.InsetBy(20,20);
-
-	r.top+=32;
-	r.bottom=r.top+32;
-	box3->AddChild(radio6=new BRadioButton(r,"radio6",T_EXP_FX_LINES,NULL));
-	radio->SetValue(1);
-
-	r=box2->Frame();
+	r=pbox->Frame();
 	r.top=r.bottom+5;
 	r.bottom =r.top+20;
 	r.left= r.right - (be_plain_font->StringWidth(T_GEN_CANCEL) + 	(OFFSET * 2));
@@ -439,68 +397,33 @@ Panels::showExport(int k,int m)
 
 	box->AddChild(new BButton(r,"set",T_GEN_EXPORT,new BMessage('Expt'),B_FOLLOW_NONE,B_WILL_DRAW));
 	
-	a->UpdateValue(k, true);
-	
-	BMessage *out=new BMessage();
-	out->AddPointer("win",(void*)win);
-	out->AddPointer("a",(void*)a);
-	out->AddPointer("radio2",(void*)radio2);
-	out->AddPointer("radio4",(void*)radio4);
-	out->AddPointer("radio6",(void*)radio6);
-	
 	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
 	win->Show();
-	win->RedirectMessages(Panels::msgExport,(void*)out);
+	win->RedirectMessages(Panels::msgExport,(void*)pbox);
+	
 	
 }
+
 bool
 Panels::msgExport(BMessage* message,void* cookies)
 {
-	BzWindow *win;
-	BMessage *x=((BMessage*)cookies);
-	x->FindPointer("win",(void**)&win);
-
-	
+	PBox *x=((PBox*)cookies);
 	switch(message->what)
-	{
-		
+	{		
 		case 'Canc':
-		
-			win->PostMessage(B_QUIT_REQUESTED);
-				
+			x->Window()->PostMessage(B_QUIT_REQUESTED);
 		break;
 		case 'Expt':
-			{
-
-				XDigit *a;
-				x->FindPointer("a",(void**)&a);
-				
-				BMessage *info=new BMessage('expt');
-				
-				BRadioButton *rb;
-				x->FindPointer("radio2",(void**)&rb);
-				info->AddBool("playmode",(bool)rb->Value());
-				
-				x->FindPointer("radio4",(void**)&rb);
-				
-				info->AddInt16("format",(int16)rb->Value());
-				
-				
-				x->FindPointer("radio6",(void**)&rb);
-				
-				
-				info->AddInt16("lines",(int16)rb->Value());
-				info->AddInt16("position", (int16)(a->GetValue()-1) );
-				
-				JFileManager::Get()->ExportWave(info);
-			}
-		break;
-		
+		{			
+			BMessage *info=new BMessage('expt');
+			x->GetData(info);
+			JFileManager::Get()->ExportWave(info);
+		}
+		break;	
 		default:
 			return true;
 		break;
 	}
-	
 	return true;
 }
 void

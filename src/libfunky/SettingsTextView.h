@@ -10,10 +10,10 @@ class SettingsTextView : public BView
 {
 		public:
 						SettingsTextView(BRect frame, const char *name, BString testo);
-			 void AttachedToWindow();
-			 void Draw(BRect updateRect);
-			 void	SetText(const char*text){fText.SetTo(text);};
-			 BString		Text(){ return fText; }
+			 void 		AttachedToWindow();
+			 void 		Draw(BRect updateRect);
+			 void		SetText(const char*text){fText.SetTo(text);};
+			 BString	Text(){ return fText; }
 		private:
 				BString fText;
 		
