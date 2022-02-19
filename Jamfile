@@ -198,6 +198,10 @@ Application XRS :
 	VSTHost.cpp
 	VSTList.cpp
 	
+	#
+	PBox.cpp
+	SettingsTextView.cpp
+	
 #	</pe-src>
 	#: be translation game media midi midi2 tracker fluidsynth stdc++
 	: be localestub translation game media midi midi2 tracker stdc++ fluidlite sndfile samplerate
