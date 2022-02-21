@@ -156,15 +156,21 @@ Song::Init()
 void
 Song::setTempo(int bpm)
 {
-	tempo_bpm=bpm;
-	note_size=(size_t)2646000/bpm;
-	while(note_size % 4 !=0) note_size++;	
+	tempo_bpm = bpm;
 }
 int
 Song::getTempo()
 {
 	return tempo_bpm;
 }
+
+
+void		
+Song::setNoteSize(size_t siz)
+{
+	note_size = siz;
+}
+
 size_t
 Song::getNoteSize()
 {

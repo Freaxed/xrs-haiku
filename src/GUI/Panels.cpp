@@ -355,8 +355,8 @@ Panels::showExport(int k,int m)
 	s1.AddString("name", "pattern");
 	s1.AddString("description", "Section to export");
 	s1.AddInt32("type", B_STRING_TYPE);
-	s1.AddString("valid_value", "Current Pattern");
-	s1.AddString("valid_value", "Entire Song");
+	s1.AddString("valid_value", "Current Pattern"); //0
+	s1.AddString("valid_value", "Entire Song");     //1
 	s1.AddString("default", 	"Current Pattern");
 	
 	BMessage s2;
@@ -368,13 +368,13 @@ Panels::showExport(int k,int m)
 	
 	BMessage s3;
 	s3.AddString("name", "empty_space");
-	s3.AddString("description", "Time at the end");
-	s3.AddInt32("type", B_STRING_TYPE);
-	s3.AddString("valid_value", "None");
-	s3.AddString("valid_value", "1 	second");
-	s3.AddString("valid_value", "10 seconds");
-	s3.AddString("valid_value", "30 seconds");
-	s3.AddString("default", 	"None");
+	s3.AddString("description", "Time at the end (seconds)");
+	s3.AddInt32("type", B_INT32_TYPE);
+	s3.AddInt32("valid_value", 0);
+	s3.AddInt32("valid_value", 1);
+	s3.AddInt32("valid_value", 10);
+	s3.AddInt32("valid_value", 30);
+	s3.AddInt32("default", 	0);
 	
 	
 	fTemplate.AddMessage("setting", &s1);

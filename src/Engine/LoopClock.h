@@ -14,23 +14,44 @@
 
 class LoopClock : public Clock {
 
+				// Fix the names: a beat is not a 'note'
+				// the default song as 4 beats each divided in 4 (4 notes)
+				// total of 16 notes...
+				// maybe we should use: beat as the beat and tick as the current misused beat..
+
 	public:
-				LoopClock(){ maxbeat = 15; }
+				LoopClock():fLoopEnable(true)
+				{
+					fMaxBeat = 15; //FIXME
+				}
 		
 		 void	Tick()
-		 		{ 
-		 						 				
-		 				uint64	time=Time();
-						NotifyTickedHigh(time);
-												
-						tick++;
-						if(tick == fDefaultResolution) { beat++; tick = 0; }
-						if(beat == maxbeat + 1 ) beat = 0;
+		 		{
+					if(beat == fMaxBeat + 1)
+					{
+						if (fLoopEnable)
+							beat = 0;		 		
+						else
+							return;			 
+					}
+
+					uint64	time = Time();
+					NotifyTickedHigh(time);
+
+					tick++;
+					if(tick == fDefaultResolution) { beat++; tick = 0; }					
 				}
-					
+
+		void	SetLoopEnable(bool enable) 
+				{
+					 beat = 0;
+					 fLoopEnable = enable;
+				}
+
 	private:
 		
-		long	maxbeat;
+				uint32	fMaxBeat;	// how many beats on the song ? (WRONG! see above)
+				bool	fLoopEnable;
 		
 
 };

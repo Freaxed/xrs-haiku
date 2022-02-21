@@ -187,7 +187,7 @@ Sequence::SaveSettings(BMessage& playlist)
 		assert(name);
 		measure.AddString("Name", name->String());
 		
-		for(int p=0; p < getMaxSeq() + 1; p++) //WHY +1??
+		for(int p=0; p < getMaxSeq() + 1; p++) //WHY +1?? (last + 1 = count)
 		{
 			if ( ItemAt(p, i) >= 0 )
 				measure.AddInt16("Pattern", p);

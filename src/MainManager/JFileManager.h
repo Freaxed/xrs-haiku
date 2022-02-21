@@ -61,9 +61,6 @@ class JFileManager
 					JFileManager();
 	
 		void		ErrorMsg(const char *msg,const char *txt);
-
-		int64		ReadFixed(int64*);
-		int64		ReadVar(void*);
 		
 	
 		BFile*			file;

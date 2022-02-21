@@ -324,7 +324,11 @@ TheApp::MessageReceived(BMessage* message)
 			}
 		break;
 		case 'expt':	// EXPORT AS WAVE
+		{
+			BAlert* idle = XUtils::ShowIdleAlert("Exporting..");
 			JFileManager::Get()->RenderAsWave(message, currentSong);
+			XUtils::HideIdleAlert(idle);
+		}
 		break;
 		
 		case MENU_COPY:

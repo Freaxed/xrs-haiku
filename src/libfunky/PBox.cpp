@@ -255,7 +255,7 @@ float PBox::BuildGUI(BMessage& viewTemplate, BMessage& settings, BView *view) {
 				}
 			} break;
 			case B_INT32_TYPE: {
-				if (curr.FindInt32("valid_value")) {
+				if (curr.FindInt32("valid_value") == B_OK) {
 					// It's a "select one of these" setting
 					
 					freeText = false;
@@ -264,18 +264,18 @@ float PBox::BuildGUI(BMessage& viewTemplate, BMessage& settings, BView *view) {
 					
 					int32 v = 0;
 					for ( int j = 0; curr.FindInt32("valid_value",j,&v) == B_OK; j++ ) {
-						sprintf(temp,"%ld", v);
+						sprintf(temp,"%d", v);
 						menu->AddItem(new BMenuItem(temp, NULL));
 					};
 					
 					if ( curr.FindInt32("default",&v) == B_OK ) {
-						sprintf(temp,"%ld",v);
+						sprintf(temp,"%d",v);
 						value = temp;
 						menu->FindItem(value)->SetMarked(true);
 					}
 					
 					if ( settings.FindInt32(name,&v) == B_OK ) {
-						sprintf(temp,"%ld",v);
+						sprintf(temp,"%d",v);
 						value = temp;
 						menu->FindItem(value)->SetMarked(true);
 					}
@@ -285,10 +285,10 @@ float PBox::BuildGUI(BMessage& viewTemplate, BMessage& settings, BView *view) {
 					// It's a free-text (but number) setting
 					int32 v = 0;
 					if (settings.FindInt32(name,&v) == B_OK) {
-						sprintf(temp,"%ld",v);
+						sprintf(temp,"%d",v);
 						value = temp;
 					} else if ( curr.FindInt32("default",&v) == B_OK ) {
-						sprintf(temp,"%ld",v);
+						sprintf(temp,"%d",v);
 						value = temp;
 					}
 					if (curr.FindBool("is_secret",&secret) != B_OK) secret = false;

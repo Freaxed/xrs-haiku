@@ -22,7 +22,7 @@ class Clock {
 		
 		virtual			~Clock(){};
 		
-		virtual void	Tick(){}
+		virtual	void	Tick() = 0;
 		
 		void	AddTickable(Tickable* t){ fLTick.Add(t); }
 	
@@ -32,15 +32,16 @@ class Clock {
 		
 		long	Resolution(){ return fDefaultResolution; }
 		
-		void	NotifyTickedLow(uint64	time,int16 beat,int16 tick){
-			for(int i=0;i<fLTick.Count();i++)
-				fLTick[i]->TickedLow(time,beat,tick);
+		//deprecated?
+		// void	NotifyTickedLow(uint64	time,int16 beat,int16 tick){
+		// 	for(int i=0;i<fLTick.Count();i++)
+		// 		fLTick[i]->TickedLow(time,beat,tick);
 							
-		}
+		// }
 		
 		void	NotifyTickedHigh(uint64	time){
 			for(int i=0;i<fLTick.Count();i++)
-				fLTick[i]->TickedHigh(time,beat,tick);
+				fLTick[i]->TickedHigh(time, beat, tick);
 		}
 				
 	protected:

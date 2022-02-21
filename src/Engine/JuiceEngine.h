@@ -36,8 +36,9 @@ class JuiceEngine : public Engine, public Tickable {
 				void	TickedHigh(uint64 time,int16 beat,int16 tick);
 			
 				//stopping events..
-				void	TickedLow(uint64 time,int16 beat,int16 tick);
+				//void	TickedLow(uint64 time,int16 beat,int16 tick);
 				
+				void	SetLoopEnable(bool enable);
 				
 				void	MessageReceived(BMessage* msg);
 				

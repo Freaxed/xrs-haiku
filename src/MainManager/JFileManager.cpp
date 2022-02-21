@@ -53,30 +53,6 @@
 #define 	DEL_TRACK 	'delt'
 
 
-//extern Mixer*			my_mixer;
-
-
-typedef struct _x {
-
-		BMediaFile* file;
-		BMediaTrack* track;
-}	media_file; 
-
-
-void
-transform_to_wav(void* from,void* to,size_t len);
-
-void
-melt_to_wav(float** from,void* to,size_t len);
-
-void
-melt_to_aiff(float** from,void* to,size_t len);
-
-void
-open_export_line(media_file*,entry_ref ref,media_file_format mfi,media_format* mf);
-
-void
-close_export_line(media_file*);
 
 JFileManager*
 JFileManager::Get()
@@ -299,27 +275,6 @@ JFileManager::Save(Song* s, bool saveas)
 }
 
 	
-
-int64
-JFileManager::ReadFixed(int64 *data)
-{
-	int64 code;
-	if(file->Read(&code,sizeof(int64))==0)
-		return SONG_STOP;
-	file->Read(data,sizeof(int64));
-	return code;	
-}
-int64
-JFileManager::ReadVar(void *data)
-{
-	int64 code;
-	int64 size;
-	code=ReadFixed(&size);
-	
-	file->Read(data,size);
-	
-	return code;	
-}
 void JFileManager::ExportWave(BMessage *info)
 {
 	if(!filepanel)
@@ -328,58 +283,29 @@ void JFileManager::ExportWave(BMessage *info)
 	filepanel->SetMessage(info);
 }
 
-status_t
-open_export_line(media_file *dest,entry_ref ref,media_file_format* mfi, media_format* mf)
-{
-	status_t err;
-	
-	dest->file=new BMediaFile(&ref,mfi);
-	err=dest->file->InitCheck();
-	
-	if(err!=B_OK) return err;
-			
-	dest->track=dest->file->CreateTrack(mf);
-	BString copy;
-	copy << "Created with" << VERSION_NUMBER << "by Anzani Andrea";
-	dest->file->AddCopyright(copy.String());
-	dest->file->CommitHeader();
-	
-	return B_OK;
-}
-void
-close_export_line(media_file *dest)
-{
-	 dest->track->Flush();
-	 dest->file->ReleaseTrack(dest->track);
-	 dest->file->CloseFile();
-}
+
 #include "MediaFileSaver.h"
+#include "MeasureManager.h"
+#include <algorithm>
 
 status_t
 JFileManager::RenderAsWave(BMessage *message, Song* song)
 {
 
-	 // decoding BMessage
-	 entry_ref ref;
-	 entry_ref rif;
-	 int form;
-	 bool all;
-	 int pattern;
-	 
-	 if(message->FindRef("directory",&rif)!=B_OK) return B_ERROR;
-	 
-	 
+	// decoding BMessage
+	entry_ref rif;	 
+	if ( message->FindRef("directory", &rif) != B_OK ) 
+	 	return B_ERROR;
+	
 	BEntry e(&rif);
-	BPath p(&e);
+	BPath  p(&e);
 
 	p.Append(message->FindString("name"));
-	get_ref_for_path(p.Path(),&ref);
+
 	LogTrace("Exporting to %s\n",p.Path());
 	message->PrintToStream();
-				
-	form    = message->FindInt16("format");
-	all     = message->GetBool ("playmode", false);
-	pattern = message->GetInt16("position", 1);
+
+	size_t empty_space =  message->GetInt32("empty_space", 0) * 44100; //in frames
 
     if(filepanel!=NULL) 
 	{
@@ -390,13 +316,20 @@ JFileManager::RenderAsWave(BMessage *message, Song* song)
 	MediaFileSaver fileSaver;
 	
 	fileSaver.Open(p.Path());
-	
+
+	// 0 -> currentPattern
+	// 1 -> allPatterns
+	// see Panels::showExport
+
+	bool playAllPatterns 	 = (message->GetInt32("pattern_index", 0) == 1);
+	bool previousPatternMode = MeasureManager::Get()->GetPatternMode();
 	
 	
 	// Let's really stop the engine.
 	
 	JuiceEngine::Get()->Stop();
 	JuiceEngine::Get()->ReallyStop();
+	MeasureManager::Get()->SetPatternMode(playAllPatterns);
 	
 	//Do stuff
 	
@@ -406,28 +339,39 @@ JFileManager::RenderAsWave(BMessage *message, Song* song)
 	memset(buffer, 0, JuiceEngine::Get()->GetPreferredBufferSize());
 	
 	JuiceEngine::Get()->LockEngine   ("RenderAsWave");
+	if (!playAllPatterns)
+		JuiceEngine::Get()->SetLoopEnable(false);
 	JuiceEngine::Get()->Start(); // Reset signal like when starting..
 	JuiceEngine::Get()->UnlockEngine ("RenderAsWave");	
 	
 	//FIXME:
-		//-> rendering a different patter?
-		//-> rendering full song?
+		//-> rendering full song? MeasureManager::Get()->SetPatternMode(fPanel->isAllPat());
 	
 	//let's calculate how many samples we need to write to the file..
+
 	
-	int64 totalSamples = JuiceEngine::Get()->GetSamplesPerBeat() * song->getNumberNotes() / 4; //FIXME GetSamplesPerBeat???
+
+	int64 seqCount = playAllPatterns ? (song->getSequence()->getMaxSeq() + 1) : 1;
+
+	LogTrace("Exporting %ld samples per beat", JuiceEngine::Get()->GetSamplesPerBeat());
 	
+	int64 totalSamples = (JuiceEngine::Get()->GetSamplesPerBeat() * song->getNumberNotes() / 4) * seqCount;
+	
+	LogTrace("Exporting %ld patterns; %g seconds ; %g space", seqCount, totalSamples/44100.0f, empty_space/44100.0f);
+
+	totalSamples += empty_space;
+
 	while(totalSamples > 0)	// detect the end! 
 	{
 		JuiceEngine::Get()->SecureProcessBuffer(buffer, JuiceEngine::Get()->GetPreferredBufferSize()); // loop in calling SecureProcessBuffer
-		if (totalSamples >= 1024)
-			fileSaver.WriteBlock((float*)buffer, 1024);
-		else
-			fileSaver.WriteBlock((float*)buffer, totalSamples);
+		//if (totalSamples >= 1024)
+			fileSaver.WriteBlock((float*)buffer, std::min<int64>((int64)1024, totalSamples));
+		//else
+		//	fileSaver.WriteBlock((float*)buffer, totalSamples);
 			
 		totalSamples -= 1024;
-		//printf("totalSamples %ld\n", totalSamples);
 	}
+
 	
 	fileSaver.Close();
 
@@ -437,7 +381,11 @@ JFileManager::RenderAsWave(BMessage *message, Song* song)
 
 	JuiceEngine::Get()->LockEngine   ("RenderAsWave");
 	JuiceEngine::Get()->Stop(); // Reset signal like when stopping..
-	JuiceEngine::Get()->UnlockEngine ("RenderAsWave");	
+	if (!playAllPatterns)
+		JuiceEngine::Get()->SetLoopEnable(true);
+	JuiceEngine::Get()->UnlockEngine ("RenderAsWave");
+
+	MeasureManager::Get()->SetPatternMode(previousPatternMode);
 	
 	JuiceEngine::Get()->ReallyStart();
 

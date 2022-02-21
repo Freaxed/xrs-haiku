@@ -99,10 +99,17 @@ JuiceEngine::TickedHigh(uint64 time,int16 beat,int16 tick)
 	if ( tick == 0 )
 		process_row(beat);
 }
+
+void	
+JuiceEngine::SetLoopEnable(bool enable)
+{
+	CHECK_LOCK
+	the_clock.SetLoopEnable(enable);
+}
 			
 
 // -**** NOT USED ******- //
-void JuiceEngine::TickedLow(uint64 time,int16 beat,int16 tick){}
+//void JuiceEngine::TickedLow(uint64 time,int16 beat,int16 tick){}
 				
 
 
@@ -122,17 +129,24 @@ JuiceEngine::ResetSong(Song* song)
 void	
 JuiceEngine::SetBPM(int bpm)
 {
-	if (fCurrentSong) 
-		fCurrentSong->setTempo(bpm);
+
 
 	// 2646000 = 44100 * 60 (number of samples per minutes)
-	// 
-	size_t note_size=(size_t)2646000/bpm;
-	while(note_size % 4 !=0) note_size++;
-	
-	fSamplesPerBeat = note_size; //fCurrentSong->getNoteSize();
-	fSamplesPerTick = fSamplesPerBeat/(fDefaultResolution*4);
 
+	//size_t note_size = (size_t) ceilf(2646000.0f / (float)bpm);
+	
+//	fSamplesPerBeat = note_size; //fCurrentSong->getNoteSize();
+//	fSamplesPerTick = fSamplesPerBeat/(fDefaultResolution*4); //FIXME: restart from 2646000 to avoid losing resolution!
+//	// FIXME FIXME FIXME
+	
+	fSamplesPerTick = (size_t) ceilf(2646000.0f / (float)(bpm * fDefaultResolution * 4));
+	fSamplesPerBeat = fSamplesPerTick * fDefaultResolution* 4;
+	
+	if (fCurrentSong) {
+		fCurrentSong->setTempo(bpm);
+		fCurrentSong->setNoteSize(fSamplesPerBeat);
+	}
+	
 	LogTrace("JuiceEngine::SetBPM(%d) - SamplesPerBeat: %ld", bpm, fSamplesPerBeat);
 
 	SendTrackMessage(TempoChange,(float)fSamplesPerBeat);	

@@ -25,6 +25,8 @@ VSTList::VSTList()
 
 	for (int32 i = 0; i < folders.CountStrings(); i++)
 		ScanPluginsFolder(folders.StringAt(i).String());
+		
+	ScanPluginsFolder("/boot/data/haikuports/media-plugins/open303/Out");
 }
 
 VSTList::~VSTList()
