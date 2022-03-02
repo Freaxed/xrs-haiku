@@ -42,6 +42,8 @@ class MainWindow : public XrsWindow
 				
 				void		SetWheelTarget(BHandler*);
 				
+
+				
 	protected:
 	
 	friend class TracksPanel;
@@ -49,6 +51,8 @@ class MainWindow : public XrsWindow
 	
 	
 	private:
+					void		OnPlay(bool doPlay);
+					
 								MainWindow();
 			status_t			AskRemove(const char*);
 			void				CreateMenu();
@@ -64,6 +68,10 @@ class MainWindow : public XrsWindow
 			/*Up Menu */
 			BMenuItem	*saveas_item;
 			BMenuItem	*save_item;	
+			BMenuItem	*new_item;
+			BMenuItem	*open_item;	
+			BMenuItem	*export_item;
+			BMenuItem	*settings_item;
 			BMenuBar	*menuBar;
 			BMenu		*menuFile;
 			BMenu		*openRecent;

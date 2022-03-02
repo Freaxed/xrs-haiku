@@ -59,8 +59,10 @@ XPanel::XPanel(BRect rect): BView(rect, "XPanel", B_FOLLOW_ALL_SIDES, B_WILL_DRA
 }
 
 void
-XPanel::PlayButtonOn(bool state){
-	play_bt->SetValue(state);
+XPanel::OnPlay(bool isPlaying){
+	play_bt->SetValue(isPlaying);
+	for (int i=0;i<5;i++)
+		tool[i]->SetEnabled(!isPlaying);
 }
 
 bool
@@ -89,15 +91,6 @@ XPanel::ResetToSong(Song* s, TracksPanel* f)
 void
 XPanel::MessageReceived(BMessage* message)
 {
-	
-	if(message->what>1000 && message->what<2000) //?
-	{
-		
-		if(message->what>1900) Window()->PostMessage(message);
-		else Window()->PostMessage(new BMessage(GENERIC));
-		
-	}
-		
 	switch(message->what)
 	{
 	
@@ -111,15 +104,6 @@ XPanel::MessageReceived(BMessage* message)
 		curpat->UpdateValue(MeasureManager::Get()->GetCurrentPattern()+1, false); 
 	break;
 	
-	case PLAY_START:
-		play_bt->SetValue(!play_bt->Value());
-	break;
-	
-	/*case TEMPO_FINE:
-		info = new BMessage(TEMPO_MOV);
-		info->AddInt32("be:value",bpm->GetValue());
-		Window()->PostMessage(info);
-	break;*/
 	case 'bpmp': //show the BPM menu
 		{
 			BPoint point;
@@ -254,11 +238,9 @@ XPanel::KeyDown(const char *key,int32 z)
 		Window()->Activate(true);
 		break;
 		case B_SPACE:
-			
-			Window()->PostMessage(new BMessage(PLAY_START));
-			play_bt->SetValue(!play_bt->Value());
-		
-			break;	
+			play_bt->SetValue(!play_bt->Value()); //does this invokes?
+			play_bt->Invoke();
+		break;	
 		
 		case B_FUNCTION_KEY:
 		

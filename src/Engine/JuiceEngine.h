@@ -18,6 +18,7 @@
 
 class Song;
 class XHost;
+class Track;
 
 class JuiceEngine : public Engine, public Tickable {
 
@@ -28,8 +29,6 @@ class JuiceEngine : public Engine, public Tickable {
 				 
 						~JuiceEngine();
 		
-				int		GetBPM();
-				void	SetBPM(int bpm);
 				void	ResetSong(Song* song);
 				
 				//starting events..
@@ -44,6 +43,8 @@ class JuiceEngine : public Engine, public Tickable {
 				
 				//number of fullframes a single beat is composed of.
 				size_t	GetSamplesPerBeat() { return fSamplesPerBeat; }
+
+				void	OnNewTrack(Track* trk); //prepare a newly created track (reset+settempo)
 		
 	protected:
 	friend class JFileManager;
@@ -60,7 +61,8 @@ class JuiceEngine : public Engine, public Tickable {
 				BList 	rem_list;
 					
 	private:
-			
+
+			void	SetBPM(int bpm);
 			void	UpdateMeters();
 						
 			float *stream_note[2];

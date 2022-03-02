@@ -107,14 +107,14 @@ MainWindow::CreateMenu(){
 	
 	menuBar = new BMenuBar(BRect(0,0,0,0), "Full Menu Bar");
 
-	menuBar->AddItem(menuFile=new BMenu(T_MENU_FILE));
-	menuBar->AddItem(menuEdit=new BMenu(T_MENU_EDIT));
-	menuFile->AddItem(new BMenuItem(T_MENU_EMPTY,new BMessage(MENU_NEW_EMPTY),'N'));
-	menuFile->AddItem(new BMenuItem(T_MENU_OPEN, new BMessage(MENU_OPEN),     'O'));
+	menuBar->AddItem(menuFile  = new BMenu(T_MENU_FILE));
+	menuBar->AddItem(menuEdit  = new BMenu(T_MENU_EDIT));
+	menuFile->AddItem(new_item = new BMenuItem("New",new BMessage(MENU_NEW_EMPTY),'N'));
+	menuFile->AddItem(open_item = new BMenuItem(T_MENU_OPEN, new BMessage(MENU_OPEN),     'O'));
 	menuFile->AddSeparatorItem();
-	menuFile->AddItem(save_item=new BMenuItem(T_MENU_SAVE,new BMessage(MENU_SAVE),'S'));
-	menuFile->AddItem(saveas_item=new BMenuItem(T_MENU_SAVE_AS,new BMessage(MENU_SAVEAS)));
-	menuFile->AddItem(new BMenuItem(T_MENU_EXPORT_AS_WAVE,new BMessage(MENU_EXPORT)));
+	menuFile->AddItem(save_item   = new BMenuItem(T_MENU_SAVE,new BMessage(MENU_SAVE),'S'));
+	menuFile->AddItem(saveas_item = new BMenuItem(T_MENU_SAVE_AS,new BMessage(MENU_SAVEAS)));
+	menuFile->AddItem(export_item = new BMenuItem(T_MENU_EXPORT_AS_WAVE,new BMessage(MENU_EXPORT)));
 	menuFile->AddSeparatorItem();
 	menuFile->AddItem(new BMenuItem(T_MENU_ABOUT,new BMessage(B_ABOUT_REQUESTED)));
 	menuFile->AddSeparatorItem();
@@ -128,7 +128,7 @@ MainWindow::CreateMenu(){
 	menuEdit->AddItem(edit_mea=new BMenu(T_MENU_MEASURE));
 	menuEdit->AddItem(new BMenuItem(T_MENU_PLAYLIST,new BMessage(EDIT_MSG)));
 	menuEdit->AddSeparatorItem();
-	menuEdit->AddItem(new BMenuItem(T_MENU_SONG_SETTINGS,new BMessage(MENU_SETTINGS)));
+	menuEdit->AddItem(settings_item = new BMenuItem(T_MENU_SONG_SETTINGS,new BMessage(MENU_SETTINGS)));
 	menuEdit->AddSeparatorItem();
 	menuEdit->AddItem(edit_prefs=new BMenuItem(T_MENU_GENERAL_PREFS,new BMessage(MENU_PREFS)));
 	edit_track->AddItem(new BMenuItem(T_MENU_REMOVE,new BMessage(REMOVE_TRACK),'R'));	
@@ -160,7 +160,7 @@ MainWindow::UpdateRecents(){
 void		
 MainWindow::PlayButtonOn(bool state){
 	if(Lock()){
-	 fPanel->PlayButtonOn(state);
+	 fPanel->OnPlay(state);
 	 Unlock();
 	}
 }
@@ -261,6 +261,33 @@ MainWindow::SetWheelTarget(BHandler *h)
 		wheel_target=NULL; //tp;
 }
 
+void		
+MainWindow::OnPlay(bool doPlay) 
+{	
+	if (Lock()) {
+		
+		doPlay ? JuiceEngine::Get()->Start() : JuiceEngine::Get()->Stop();
+		
+		doPlay = JuiceEngine::Get()->IsPlaying(); //could change (in case you play an already playing engine, it will stop..)
+		
+	      saveas_item->SetEnabled(!doPlay);
+		    save_item->SetEnabled(!doPlay);
+		     new_item->SetEnabled(!doPlay);
+	        open_item->SetEnabled(!doPlay);	
+		  export_item->SetEnabled(!doPlay);	
+		settings_item->SetEnabled(!doPlay);	
+		
+		PlayButtonOn(doPlay);
+	
+	Unlock();
+	}		
+	
+	
+	
+}
+
+
+
 void
 MainWindow::MessageReceived(BMessage* message)
 {
@@ -295,14 +322,13 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		
 		case PLAY_START:
-			JuiceEngine::Get()->Start();
-			break;
+		{
+			OnPlay (message->GetInt32("be:value", 1) == 1);
+		}
+		break;
 		case PLAY_ALL_SET:
 			MeasureManager::Get()->SetPatternMode(fPanel->isAllPat());
 			break;
-		/*case TEMPO_MOV:
-			JuiceEngine::Get()->PostMessage(message);
-			break;*/
 		case TRACK_SET:
 			PostMessage(message, fTracksPanel);
 			break;
@@ -358,7 +384,7 @@ MainWindow::MessageReceived(BMessage* message)
 				curSong->AddMeasure();
 			XHost::Get()->SendMessage(X_UnLockSem,0);
 			fPanel->ResetMeasureCount();
-			MatrixWindow::Get()->Reset(curSong->getSequence());
+			MatrixWindow::Get()->Reset(curSong->getSequence(), curSong->getNumberNotes());
 			MeasureManager::Get()->SetCurrentPattern(z);
 			}
 			break;
@@ -375,7 +401,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if(err==B_OK){
 			
 				fPanel->ResetMeasureCount();
-				MatrixWindow::Get()->Reset(curSong->getSequence());
+				MatrixWindow::Get()->Reset(curSong->getSequence(), curSong->getNumberNotes());
 			
 			if( f >= curSong->getNumberMeasure() ) 
 				
@@ -413,13 +439,14 @@ MainWindow::AskRemove(const char *txt)
 void
 MainWindow::AddTrack(Track* trk)
 {
-	if (trk==NULL) return;
+	if (!trk) 
+		return;
 	
-	trk->Message(SystemReset,0);
-	trk->Message(TempoChange,(float)curSong->getNoteSize());
-		XHost::Get()->SendMessage(X_LockSem,0);
-			curSong->AddTrack(trk);
-		XHost::Get()->SendMessage(X_UnLockSem,0);
-	fTracksPanel->AddTrack(curSong->getNumberTrack()-1);
+	JuiceEngine::Get()->LockEngine("AddTrack");
+	JuiceEngine::Get()->OnNewTrack(trk);
+	curSong->AddTrack(trk);
+	JuiceEngine::Get()->UnlockEngine("AddTrack");
+	
+	fTracksPanel->AddTrack(curSong->getNumberTrack() - 1);
 }
 

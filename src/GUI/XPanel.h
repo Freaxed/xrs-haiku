@@ -38,7 +38,7 @@ class XPanel : public BView
 		void		KeyUp(const char *bytes,int32);
 		bool		isAllPat();
 			
-		void		PlayButtonOn(bool);
+		void		OnPlay(bool isPlaying);
 		void		ResetMeasureCount();
 
 	private:
@@ -51,7 +51,6 @@ class XPanel : public BView
 		BPictureButton 		*play_bt;
 		BPictureButton 		*all_bt;
 		BPictureButton		*edit;
-		BPictureButton		*vst;
 		
 		
 		Song*			curSong;

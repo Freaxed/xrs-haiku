@@ -20,10 +20,7 @@ class LoopClock : public Clock {
 				// maybe we should use: beat as the beat and tick as the current misused beat..
 
 	public:
-				LoopClock():fLoopEnable(true)
-				{
-					fMaxBeat = 15; //FIXME
-				}
+				LoopClock():fLoopEnable(true),fMaxBeat (0) { }
 		
 		 void	Tick()
 		 		{
@@ -48,6 +45,7 @@ class LoopClock : public Clock {
 					 fLoopEnable = enable;
 				}
 
+		void	SetMaxBeat(uint32 maxBeat) { fMaxBeat = maxBeat; } //still WRONG but needs a complete refactor.
 	private:
 		
 				uint32	fMaxBeat;	// how many beats on the song ? (WRONG! see above)

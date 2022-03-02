@@ -1,2 +1,7 @@
-- Inserire una BScrollView per le traccie.
-- Cambio del BPM non funziona.
+- WAVE Export (da finire)
+- Error in loading (panel)
+- ReadMe per github
+- version git su about.
+- draw knob di default
+
+

@@ -11,7 +11,7 @@
 //#define	TEMPO_MOV		5006 
 #define	MENU_BANK		5007 
 #define	NONE_BANK		5008
-#define	GENERIC			5010 
+
 #define	TEMPO_FINE		5011
 #define	TOTPAT_MSG		5013
 #define	TRACK_SAMP_EXT	5014

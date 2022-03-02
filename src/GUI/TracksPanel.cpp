@@ -25,6 +25,7 @@
 #include <Entry.h>
 #include <TranslationUtils.h>
 #include <InterfaceKit.h>
+#include "Song.h"
 
 
 TracksPanel::TracksPanel(BRect rect): TrackList(rect),ticks(NULL)
@@ -146,7 +147,7 @@ TracksPanel::AddTrack(int h)
 		msg->AddInt16("id", (int16) h);
 		t->Init(msg);
 		int selPattern=MeasureManager::Get()->GetCurrentPattern();
-		t->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
+		t->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h),curSong->GetBeatDivision());
 		Window()->Unlock();
 	}
 
@@ -186,7 +187,7 @@ TracksPanel::ResetToSong(Song* s)
 	int selPattern=MeasureManager::Get()->GetCurrentPattern();
 	for(int h=0;h<xnv.Count();h++)
 	{
-		xnv[h]->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
+		xnv[h]->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h), curSong->GetBeatDivision());
 	}
 	
 	if(curSong->getNumberTrack()>0) SelectTrack(0);
@@ -200,12 +201,7 @@ TracksPanel::MessageReceived(BMessage* message)
 	int id;
 	entry_ref ref;
 	
-	if(message->what>1000 && message->what<2000)
-	{
-		//curSong->setModified(true);
-		Window()->PostMessage(new BMessage(GENERIC));
-	}
-		
+
 	switch(message->what)
 	{
 	
@@ -277,7 +273,7 @@ TracksPanel::resetPattern()
 	int selPattern=MeasureManager::Get()->GetCurrentPattern();
 	
 	for(int h=0;h<curSong->getNumberTrack();h++)		
-		getJTrackAt(h)->Refresh(curSong->getTrackAt(h)->getPatternAt(selPattern));
+		getJTrackAt(h)->Refresh(curSong->getTrackAt(h)->getPatternAt(selPattern), curSong->GetBeatDivision());
 }
 
 void
@@ -310,7 +306,7 @@ TracksPanel::RemoveTrackAt(int id)
 		BMessage *msg=new BMessage(TRACK_SET);
 		msg->AddInt16("id", (int16) h);
 		tr->Init(msg);
-		tr->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h));
+		tr->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h), curSong->GetBeatDivision());
 			
 		}
 	Window()->Unlock();
@@ -343,17 +339,20 @@ TracksPanel::RefreshSelected()
 	int selPattern=MeasureManager::Get()->GetCurrentPattern();
 	if(Window()->Lock()){
 	if(tm->getCurrentJTrack())
-	tm->getCurrentJTrack()->ResetToTrack(tm->getCurrentJTrack()->getTrack()->getPatternAt(selPattern),tm->getCurrentJTrack()->getTrack());
+	tm->getCurrentJTrack()->ResetToTrack(tm->getCurrentJTrack()->getTrack()->getPatternAt(selPattern),tm->getCurrentJTrack()->getTrack(), curSong->GetBeatDivision());
 	Window()->Unlock();
 	}
 }	
 void
 TracksPanel::Refresh(JTrack* t)
 {
-	int selPattern=MeasureManager::Get()->GetCurrentPattern();
-	if(t==NULL) return;
+	int selPattern = MeasureManager::Get()->GetCurrentPattern();
+	
+	if( t == NULL) 
+		return;
+	
 	if(Window()->Lock()){
-	t->ResetToTrack(t->getTrack()->getPatternAt(selPattern),t->getTrack());
-	Window()->Unlock();
+		t->ResetToTrack(t->getTrack()->getPatternAt(selPattern),t->getTrack(), curSong->GetBeatDivision());
+		Window()->Unlock();
 	}
 }	

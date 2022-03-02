@@ -31,7 +31,7 @@ class MatrixWindow:public XrsWindow
 			 void FrameResized(float,float);
 				
 			
-				void	Reset(Sequence*);
+				void	Reset(Sequence*, int16 notesPerMeasaure);
 				//void	setPosition(int);
 	
 	private:

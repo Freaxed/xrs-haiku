@@ -36,7 +36,6 @@
 #include "locale.h"
 
 
-extern int 	tracknote_division;
 static		entry_ref rif;
 static		BTextControl	*txt;
 
@@ -229,7 +228,7 @@ Panels::showSettings(Song* curSong)
 	x.right=x.left+36;
 	x.top=5;
 	x.bottom=x.top+22;
-	sampler->AddChild(a=new XDigit(x, VID_EMPTY, "sampler?", NULL, 4,32));
+	sampler->AddChild(a=new XDigit(x, VID_EMPTY, "sampler?", NULL, 2, 8));
 	box2->AddChild(sampler);
 	x=sampler->Bounds();
 	x.InsetBy(4,4);
@@ -267,8 +266,8 @@ Panels::showSettings(Song* curSong)
 	tw->SetText(curSong->getDescription());
 	cb->SetValue(curSong->popupdesc);
 	
-	a->UpdateValue((int32)curSong->getNumberNotes(), true);
-	b->UpdateValue((int32)tracknote_division, true);
+	a->UpdateValue((int32)curSong->GetBeats(),  true);
+	b->UpdateValue((int32)curSong->GetBeatDivision(), true);
 	
 	BMessage *out=new BMessage();
 	out->AddPointer("win",(void*)win);
@@ -315,9 +314,8 @@ Panels::msgSettings(BMessage* message,void* cookies)
 				x->FindPointer("cb",(void**)&cb);
 					
 				curSong->setDescription(tw->Text());
-				curSong->setNumberNotes(a->GetValue());
 				curSong->popupdesc=(bool)cb->Value();
-				tracknote_division=(int)b->GetValue();
+				curSong->setBeatInfo((int16)a->GetValue(), (int16)b->GetValue());
 				be_app->PostMessage(new BMessage(SONG_RESET));
 				win->PostMessage(B_QUIT_REQUESTED);
 			}

@@ -17,13 +17,13 @@
 #include <stdio.h>
 #include <math.h>
 
-int tracknote_division = 4 ;	//dirty hack;
-int notes_per_measaure = 16;	//dirty hack;
 
 Song::Song()
 {
-	tempo_bpm = 120;
-	setTempo(tempo_bpm);
+	fBeats 			   = 4; //MOVE TO DEFAULTS (ENGINE? CLOCK?)
+	fBeatDivision	   = 4; //MOVE TO DEFAULTS (ENGINE? CLOCK?)
+	setTempo(120);
+
 	file_entry=NULL;
 		
 	popupdesc=true;
@@ -31,25 +31,40 @@ Song::Song()
 	sequence=new Sequence();
 	sequence->Reset();
 	
-	num_notes = NUM_NOTES;
-	tracknote_division = 4;
-	notes_per_measaure = 16;
+
+
 	AddMeasure();		// a song MUST have at least one Measure!
 }
 
+Song::~Song()
+{
+	for(int h=0;h<getNumberTrack();h++)
+		delete 	getTrackAt(h);
+	
+	if (sequence)
+		delete sequence;
+}
+
+
+int16 Song::GetBeatDivision() {	return fBeatDivision; }
+int16 Song::GetBeats()		  {	return fBeats;		  }
+
+// size_t Song::GetSamplesPerTick() { return fSamplesPerTick; }
+// size_t Song::GetSamplesPerBeat() { return fSamplesPerBeat; }
+
 
 void
-Song::setNumberNotes(int n)
+Song::setBeatInfo(int16 beats, int16 divison)
 {
-	notes_per_measaure=n;
-	num_notes=n;
-	
-	for(int h=0;h<getNumberTrack();h++)
+	fBeatDivision = divison;
+	fBeats 		  = beats;
+
+	for(int h=0; h<getNumberTrack(); h++)
 	{
-		getTrackAt(h)->setNumberNotes(n);
+		getTrackAt(h)->setNumberNotes(fBeats * fBeatDivision);
 	}
-	//do all!
 }
+
 void
 Song::AddMeasure()
 {
@@ -115,11 +130,7 @@ Song::getNumberTrack()
 
 
 
-Song::~Song()
-{
-	for(int h=0;h<getNumberTrack();h++)
-		delete 	getTrackAt(h);
-}
+
 
 Track*
 Song::getTrackAt(int val)
@@ -146,7 +157,6 @@ Song::setNumberMeasure(int val)
 void
 Song::Init()
 {	
-	fullFile.MakeEmpty();
 	for(int h=0;h<getNumberTrack();h++)
 	{
 	   getTrackAt(h)->moveToPattern(0);
@@ -154,27 +164,15 @@ Song::Init()
 }
 
 void
-Song::setTempo(int bpm)
+Song::setTempo(int32 bpm)
 {
-	tempo_bpm = bpm;
+	fBeatsPerMinutes = bpm;
 }
-int
+
+int32
 Song::getTempo()
 {
-	return tempo_bpm;
-}
-
-
-void		
-Song::setNoteSize(size_t siz)
-{
-	note_size = siz;
-}
-
-size_t
-Song::getNoteSize()
-{
-	return note_size;
+	return fBeatsPerMinutes;
 }
 
 BEntry*

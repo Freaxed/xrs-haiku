@@ -26,8 +26,8 @@ class JTrack : public TrackBlock
 		virtual void	AttachedToWindow();
 			  	void	Init(BMessage *m);
 			  	void	RControl();
-			  	void	ResetToTrack(Pattern*, Track*);
-			  	void	Refresh(Pattern*);
+			  	void	ResetToTrack(Pattern*, Track*, int16 beatDivisio);
+			  	void	Refresh(Pattern*, int16 beatDivision);
 			    void	Select();
 			  	void	Deselect();
 			  	int		getModel();

@@ -19,7 +19,6 @@
 #include <InterfaceKit.h>
 
 
-extern int tracknote_division; //uglyyyyy
 	
 
 XNotesView::XNotesView(BRect rect,int16 t): BControl(rect,"_xnotesview","",NULL,B_FOLLOW_LEFT,B_WILL_DRAW)
@@ -37,7 +36,8 @@ XNotesView::XNotesView(BRect rect,int16 t): BControl(rect,"_xnotesview","",NULL,
 	
 	notify=new BMessage(NOTIFY_NOTE);
 	notify->AddInt16("note",0);
-	
+
+	fBeatDivision	= 4; //FIXME, where is the default settings?
 }
 
 XNotesView::~XNotesView(){}
@@ -59,28 +59,23 @@ XNotesView::Draw(BRect r)
 	
 	
 	for(int h=ax1;h<ax2;h++)
-	{
-	
-	  
+	{	  
 		rect.Set((BUTTON_LX+BUTTON_X_SPACE)*h,0,(BUTTON_LX+BUTTON_X_SPACE)*(h+1)-BUTTON_X_SPACE,BUTTON_LY);
-		
-		
-						
-		if(h%tracknote_division==0) 			
+	
+		if( h % fBeatDivision == 0 )
+		{ 			
 			if(curPattern->getNoteAt(h)->getValue()) 
 					DrawBitmapAsync(picOn,rect); 
 				else
 					DrawBitmapAsync(picOff,rect);
+		}
 		else
-			
+		{			
 			if(curPattern->getNoteAt(h)->getValue()) 
 					DrawBitmapAsync(picOnB,rect); 
 				else
 					DrawBitmapAsync(picOffB,rect); 
-		
-		
-	
-	
+		}
 	}
 }
 void
@@ -144,8 +139,9 @@ XNotesView::MouseDown(BPoint p)
 }
 
 void
-XNotesView::Reset(Pattern* trk)
+XNotesView::Reset(Pattern* trk, int16 beatDivision)
 {
-	curPattern=trk;
+	curPattern 		= trk;
+	fBeatDivision	= beatDivision;
 	Invalidate();			
 }

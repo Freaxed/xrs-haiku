@@ -28,12 +28,7 @@ class XNotesView : public BControl
 		void		MouseDown(BPoint);
 		void		MouseUp(BPoint);
 	 	void 		MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg);
-		void		Reset(Pattern*);
-
-		//void		Reset(Pattern*,bool);
-		//status_t	Init();
-					
-
+		void		Reset(Pattern*, int16 beatDivision);
 			
 	private:
 
@@ -46,6 +41,7 @@ class XNotesView : public BControl
 		bool		set_state;
 		int			selected;
 		BMessage	*notify;
+		int16		fBeatDivision;
 };
 #endif
 

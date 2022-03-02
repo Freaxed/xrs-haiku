@@ -1,0 +1,14 @@
+
+list of 'setting' bmessages
+each with:
+    name = name of the setting (this is more an ID)
+        (if the name is 'app_sig' it's a special setting)
+    description = desc of the setting (this is more a label)
+    type:
+        B_STRING_TYPE
+            Selector of possible values:
+                add a set of "valid_value" keys and a "default" to set the default value
+            Free text:
+                add 'multi_line' (bool) if multiline
+                add 'is_secret' (bool) for password (?)
+        B_INT32_TYPE

@@ -243,7 +243,7 @@ TheApp::LoadSong(entry_ref ref)
 
 	if (mw->Lock())
 	{
-		mw->Reset(currentSong->getSequence());	
+		mw->Reset(currentSong->getSequence(), currentSong->getNumberNotes());	
 		mw->Unlock();
 	}
 	
@@ -428,16 +428,20 @@ TheApp::MessageReceived(BMessage* message)
 				main_window->PostMessage(message);
 			}
 		break;
-		case SONG_RESET: //used by Panels.cpp.. (to be removed!)
+		case SONG_RESET: //used by Panels.cpp after changing Beats and BeatDivision value..
+						 // Is there a better alternative?
 			if(main_window->Lock())
 			{
 				main_window->ResetToSong(currentSong);
 				main_window->Unlock();
 			}
 			if(mw->Lock()){
-				mw->Reset(currentSong->getSequence());
+				mw->Reset(currentSong->getSequence(), currentSong->getNumberNotes());
 				mw->Unlock();
 			}
+			JuiceEngine::Get()->LockEngine("SongReset");
+			JuiceEngine::Get()->ResetSong(currentSong);
+			JuiceEngine::Get()->UnlockEngine("SongReset");
 		break;
 		case MENU_RENAME:
 			main_window->PostMessage(message);
@@ -448,7 +452,7 @@ TheApp::MessageReceived(BMessage* message)
 			main_window->PostMessage(message);
 		break;
 		default:
-		BApplication::MessageReceived(message);
+			BApplication::MessageReceived(message);
 		break;
 	}
 }	

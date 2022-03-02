@@ -198,11 +198,13 @@ JFileManager::LoadFile(entry_ref rif, Song* song)
 	LogTrace("LoadFile: applying global song info..");
 	song->setDescription(songInfo.GetString( "Description", ""));
 	song->popupdesc = songInfo.GetBool("DescPopUp", false);
-	song->setTempo(songInfo.GetInt64("BeatPerMinute", 120));
 	song->getSequence()->all = songInfo.GetBool("PlayAll", false);
-	song->setNumberNotes(songInfo.GetInt64("NumNotes", 16));
 	
-		// Il giro deve essere: dalla song devo salvare il numero di "Measure" e il nome.
+	song->setTempo	 (songInfo.GetInt32("BeatsPerMinute", 120));
+	song->setBeatInfo(songInfo.GetInt16("NumBeats", 		4), 
+	                  songInfo.GetInt16("BeatDivision", 	4));
+	
+	// Il giro deve essere: dalla song devo salvare il numero di "Measure" e il nome.
 	// poi aggiungendo le traccie si dovrebbe creare tutto automaticamente..
 
 	    // Playlist: 
@@ -345,30 +347,26 @@ JFileManager::RenderAsWave(BMessage *message, Song* song)
 	JuiceEngine::Get()->UnlockEngine ("RenderAsWave");	
 	
 	//FIXME:
-		//-> rendering full song? MeasureManager::Get()->SetPatternMode(fPanel->isAllPat());
+		//-> rendering full song is working but
+		// not working: rendering full song + extra space at the end.
+	
+	
 	
 	//let's calculate how many samples we need to write to the file..
-
-	
-
 	int64 seqCount = playAllPatterns ? (song->getSequence()->getMaxSeq() + 1) : 1;
 
-	LogTrace("Exporting %ld samples per beat", JuiceEngine::Get()->GetSamplesPerBeat());
+	LogTrace("Exporting %ld samples per beat , Number of beats: %d", JuiceEngine::Get()->GetSamplesPerBeat(), song->GetBeats());
 	
-	int64 totalSamples = (JuiceEngine::Get()->GetSamplesPerBeat() * song->getNumberNotes() / 4) * seqCount;
+	int64 totalSamples = (JuiceEngine::Get()->GetSamplesPerBeat() * song->GetBeats()) * seqCount;
 	
-	LogTrace("Exporting %ld patterns; %g seconds ; %g space", seqCount, totalSamples/44100.0f, empty_space/44100.0f);
+	LogTrace("Exporting %ld patterns; %f seconds ; %f space", seqCount, (float)((float)totalSamples/44100.0f), (float)((float)empty_space/44100.0f));
 
 	totalSamples += empty_space;
 
 	while(totalSamples > 0)	// detect the end! 
 	{
 		JuiceEngine::Get()->SecureProcessBuffer(buffer, JuiceEngine::Get()->GetPreferredBufferSize()); // loop in calling SecureProcessBuffer
-		//if (totalSamples >= 1024)
-			fileSaver.WriteBlock((float*)buffer, std::min<int64>((int64)1024, totalSamples));
-		//else
-		//	fileSaver.WriteBlock((float*)buffer, totalSamples);
-			
+		fileSaver.WriteBlock((float*)buffer, std::min<int64>((int64)1024, totalSamples));
 		totalSamples -= 1024;
 	}
 
@@ -467,10 +465,13 @@ JFileManager::SaveFile(entry_ref rif, Song* song)
 	BMessage songInfo;
 	songInfo.AddInt64  ( "Version" 		, FILE_VERSION_INT);
 	songInfo.AddString ( "Description"	, song->getDescription());
-	songInfo.AddBool   ( "DescPopUp"    , song->popupdesc);
-	songInfo.AddInt64  ( "BeatPerMinute", song->getTempo());
+	songInfo.AddBool   ( "DescPopUp"    , song->popupdesc);	
 	songInfo.AddBool   ( "PlayAll"      , song->getSequence()->all);
- 	songInfo.AddInt64  ( "NumNotes"		, song->getNumberNotes());
+
+	songInfo.AddInt32  ( "BeatsPerMinute", song->getTempo());
+ 	songInfo.AddInt16  ( "NumBeats"		 , song->GetBeats());
+	songInfo.AddInt16  ( "BeatDivision"	 , song->GetBeatDivision());
+
  	// Playlist: 
 	BMessage playlist;
 	song->getSequence()->SaveSettings(playlist);

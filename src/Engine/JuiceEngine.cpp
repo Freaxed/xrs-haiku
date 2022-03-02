@@ -94,7 +94,7 @@ JuiceEngine::ValuableChanged(BMessage* msg) {
 
 //tick!
 void	
-JuiceEngine::TickedHigh(uint64 time,int16 beat,int16 tick) 
+JuiceEngine::TickedHigh(uint64 time, int16 beat, int16 tick) 
 {
 	if ( tick == 0 )
 		process_row(beat);
@@ -110,10 +110,6 @@ JuiceEngine::SetLoopEnable(bool enable)
 
 // -**** NOT USED ******- //
 //void JuiceEngine::TickedLow(uint64 time,int16 beat,int16 tick){}
-				
-
-
-
 
 void
 JuiceEngine::ResetSong(Song* song)
@@ -122,49 +118,44 @@ JuiceEngine::ResetSong(Song* song)
 	
 	fCurrentSong = song;
 	SendTrackMessage(SystemReset, 0);
-	SetBPM(GetBPM());
-	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, GetBPM()); // it's not syncronous (but we set it before this call)
+	SetBPM(fCurrentSong->getTempo());
+	ValuableManager::Get()->UpdateValue(VID_TEMPO_BPM, fCurrentSong->getTempo()); // it's not syncronous (but we set it before this call)
 }
 
 void	
 JuiceEngine::SetBPM(int bpm)
 {
-
-
-	// 2646000 = 44100 * 60 (number of samples per minutes)
-
-	//size_t note_size = (size_t) ceilf(2646000.0f / (float)bpm);
-	
-//	fSamplesPerBeat = note_size; //fCurrentSong->getNoteSize();
-//	fSamplesPerTick = fSamplesPerBeat/(fDefaultResolution*4); //FIXME: restart from 2646000 to avoid losing resolution!
-//	// FIXME FIXME FIXME
-	
-	fSamplesPerTick = (size_t) ceilf(2646000.0f / (float)(bpm * fDefaultResolution * 4));
-	fSamplesPerBeat = fSamplesPerTick * fDefaultResolution* 4;
-	
 	if (fCurrentSong) {
-		fCurrentSong->setTempo(bpm);
-		fCurrentSong->setNoteSize(fSamplesPerBeat);
+		fCurrentSong->setTempo(bpm); //this updates the following information:
+		int resolutionPerBeat = fDefaultResolution * fCurrentSong->GetBeatDivision();
+		fSamplesPerTick = (size_t) ceilf(2646000.0f / (float)(bpm * resolutionPerBeat));	
+		fSamplesPerBeat = fSamplesPerTick * resolutionPerBeat;
+		//update the clock!
+		the_clock.SetMaxBeat(fCurrentSong->getNumberNotes() - 1);
 	}
 	
-	LogTrace("JuiceEngine::SetBPM(%d) - SamplesPerBeat: %ld", bpm, fSamplesPerBeat);
+	LogTrace("JuiceEngine::SetBPM(%d) - fSamplesPerTick: %ld - SamplesPerBeat: %ld", bpm, fSamplesPerTick, fSamplesPerBeat);
 
-	SendTrackMessage(TempoChange,(float)fSamplesPerBeat);	
+	SendTrackMessage(TempoChange, (float)fSamplesPerBeat);	
 }
 
-int
-JuiceEngine::GetBPM() {
-	return fCurrentSong ? fCurrentSong->getTempo() : 0;
+void	
+JuiceEngine::OnNewTrack(Track* trk) //prepare a newly created track (reset+settempo)
+{
+	CHECK_LOCK
+	trk->Message(SystemReset,0);
+	trk->Message(TempoChange,(float)fSamplesPerBeat);
 }
+
 const char*	SynthMessageStr[8] = {
 	"TempoChange",	 // samples per sixteenth note
 	"NoteChange",  	 // change pitch of next note (float freq)
-	"NoteOn",		 	 // trigger note (float velocity)
+	"NoteOn",		 // trigger note (float velocity)
 	"NoteOff",	 	 // release note (float aftertouch?)
-	"NoteSlide",	 	 // slide to next note (none)
+	"NoteSlide",	 // slide to next note (none)
 	"SystemReset",	 // Make a Reset!
-	"SystemStop",		 // Stop song
-	"SystemStart"		 // Start song
+	"SystemStop",	 // Stop song
+	"SystemStart"	 // Start song
 	
 };
 void		
@@ -172,7 +163,8 @@ JuiceEngine::SendTrackMessage(SynthMessage msg, float data){
 	
 	CHECK_LOCK;
 	
-	LogTrace("SendTrackMessage: SynthMessage[%s][%d] - data[%f]", SynthMessageStr[msg], msg, data);
+	if (msg < 8) //to avoid crash if SynthMessageStr is outofsync with SynthMessage
+		LogTrace("SendTrackMessage: SynthMessage[%s][%d] - data[%f]", SynthMessageStr[msg], msg, data);
 	
 	if(fCurrentSong)
 	for(int y=0;y<fCurrentSong->getNumberTrack();y++) {
@@ -183,9 +175,9 @@ JuiceEngine::SendTrackMessage(SynthMessage msg, float data){
 
 
 void	
-JuiceEngine::Starting(){
-
-	BufferPosition=0;
+JuiceEngine::Starting()
+{
+	BufferPosition = 0;
 
 	the_clock.Reset();
 	the_clock.SendValue(P0, -1);
@@ -199,14 +191,12 @@ JuiceEngine::Starting(){
     UnlockEngine("JuiceEngine::Startig");
 		
 	SendTrackMessage(SystemStart,0);
-
 }
 
 void	
-JuiceEngine::Stopping(){
-
-	BufferPosition=0;
-	
+JuiceEngine::Stopping()
+{
+	BufferPosition = 0;	
 	SendTrackMessage(SystemStop,0);
 	if (fCurrentSong) {
 		int32 	numtracks = fCurrentSong->getNumberTrack();
@@ -215,7 +205,6 @@ JuiceEngine::Stopping(){
 			DeleteVoices((Track*)fCurrentSong->getTrackAt(numtracks));	
 		}
 	}
-
 	the_clock.ResetAndNotify(player->Latency());
 }
 
@@ -223,7 +212,6 @@ JuiceEngine::Stopping(){
 void	
 JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 {
-
 	PMixer::Get()->ResetBuffers();
 	
 	if(!IsPlaying() || !fCurrentSong)
@@ -233,9 +221,8 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 	}
 			
 	const uint32 	num_track = fCurrentSong->getNumberTrack();
-	const size_t	frames = size/FRAMESIZE;
-	
-	size_t 			len	=	frames;
+	const size_t	frames 	  = size / FRAMESIZE;	
+		  size_t	len		  =	frames;
 	
 	
 	/* Punto 1 : Divisione in sotto bufferini */
@@ -249,9 +236,9 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 		/* Punto 2 : Processiamo il bufferino di ogni traccia.. */
 		
 		if(buflen>0 && buflen<=frames) 
-			
+		{	
 			for(uint32 x=0;x<num_track;x++) 
-			{ 
+			{
 				Track*	track=(Track*)fCurrentSong->getTrackAt(x);
 				
 				//Scelta del canale di output (PBus):				
@@ -295,18 +282,16 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 						track->Process(stream_stream, buflen, 0);
 						a_bus->MixBuffer(stream_stream,buflen,frames-len);
 					}																				
-				}
-						
+				}						
 			}
+		}		
 		
-		
-		
-		if(BufferPosition>=fSamplesPerTick) 
-		{			
-			BufferPosition-=fSamplesPerTick;
+		if(BufferPosition >= fSamplesPerTick) 
+		{	
+			BufferPosition -= fSamplesPerTick;
 			the_clock.Tick();
 		}
-		len -= buflen;		
+		len -= buflen;
 	}
 		
 	// Mixer Processing (questa parte tutta nel mixer con un bel Melt..)
@@ -319,8 +304,8 @@ JuiceEngine::SecureProcessBuffer(void * buffer, size_t size)
 	
 	float **mixed = PMixer::Get()->GetMain()->Buffer();
 	for(size_t i=0 ;i<frames; i++){
-		fbuffer[(0 + i) * 2    ]	= mixed[0][i];
-		fbuffer[(0 + i) * 2 + 1] 	= mixed[1][i];
+		fbuffer[ (i * 2) + 0]	= mixed[0][i];
+		fbuffer[ (i * 2) + 1] 	= mixed[1][i];
 	}
 	
 }

@@ -202,13 +202,13 @@ MatrixWindow::MessageReceived(BMessage *m)
 
 
 void
-MatrixWindow::Reset(Sequence* s)
+MatrixWindow::Reset(Sequence* s, int16 notesPerMeasaure)
 {
 	if(Lock())
 	{
 		seq=s;	
 		en->SetValue(s->loop_enable);
-		tt->Reset(s);
+		tt->Reset(s, notesPerMeasaure);
 		the_n->Reset(s);
 		the_m->Reset(s);
 		Unlock();

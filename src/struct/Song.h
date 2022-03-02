@@ -14,6 +14,7 @@
 
 #include <SupportKit.h>
 #include <List.h>
+#include "Resolution.h"
 
 class Track;
 class BEntry;
@@ -35,15 +36,14 @@ class Song
 		int			getNumberTrack();
 		int			getIndexOfTrack(Track* tx);
 		
-		int			getNumberNotes(){return num_notes;};
-		void		setNumberNotes(int);
-		
-		size_t		getNoteSize(); //in frame	
-		void		setNoteSize(size_t siz);
+		int16		getNumberNotes(){return fBeats * fBeatDivision;};
+
+		void		setBeatInfo(int16 beats, int16 divison);
+
 		
 		//////////////////////////////////////////////////////////////////
-		/// Tempo should be managed ONLY by JuiceEngine to avoid chaos!
-		void		setTempo(int32 bpm); //in bpm 
+		// tempo must be an int32 (it's also a Valuable)
+		void		setTempo(int32 bpm);
 		int32		getTempo();
 		//////////////////////////////////////////////////////////////////
 						
@@ -69,21 +69,23 @@ class Song
 		const char*		getDescription() 			 { return description.String(); };
 		void			setDescription(const char*d ){ description.SetTo(d);        };
 		size_t			getSizeDescription()         { return description.Length(); };
-			
-//TEMP: this is where we save the full information of a file:
-
-		BMessage		fullFile;
-
+		
+		int16			GetBeatDivision();
+		int16			GetBeats();
+	
 	private:
+
 
 			BList			trk;
 			BString			description;
 			Sequence*		sequence;
-			size_t			note_size;
-			int32			tempo_bpm;
+
 			BEntry*			file_entry;	
 			bool			modified;
-			int				num_notes;
+
+			int16			fBeats;				// by default 4 Beats
+			int16			fBeatDivision;  	// by default a beat is divided in 4
+			int32			fBeatsPerMinutes;	// BPM / Tempo
 };
 
 #endif

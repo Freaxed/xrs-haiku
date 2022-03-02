@@ -64,7 +64,7 @@
 #define T_SETTINGS_TITLE				_T("Song Settings")
 #define T_SETTINGS_SONG_DESCRIPTION		_T("Song Description")
 #define	T_SETTINGS_POPUP_ONLOAD			_T("PopUp on load")
-#define T_SETTINGS_NOTES_PER_MEASURE 	_T("Notes per Measure")
+#define T_SETTINGS_NOTES_PER_MEASURE 	_T("Beats per Measure")
 #define T_SETTINGS_BEAT_DIVISION		_T("Beat division")
 // prefs
 #define T_PREFS_TITLE					_T("General Prefs")

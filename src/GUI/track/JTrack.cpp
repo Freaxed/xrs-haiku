@@ -73,15 +73,6 @@ JTrack::InvokeRename()
 void
 JTrack::MessageReceived(BMessage* message)
 {
-
-		
-	/*if(message->what>1000 && message->what<2000)
-	{
-		if(message->what>1900) Window()->PostMessage(message);
-		else Window()->PostMessage(new BMessage(GENERIC));
-	}*/
-	
-			
 	switch(message->what)
 	{
 
@@ -202,14 +193,14 @@ JTrack::Init(BMessage *m)
 }
 
 void
-JTrack::ResetToTrack(Pattern* p ,Track* tr)
+JTrack::ResetToTrack(Pattern* p , Track* tr, int16 beatDivision)
 {
 	
 	myTrack=tr;
 	model=tr->getModel();
 	int poz;
 	
-	Refresh(p);
+	Refresh(p, beatDivision);
 	
 	xtr->SetPadColor(tr->GetPreferredPadColor());
 	
@@ -269,10 +260,10 @@ JTrack::SetName(const char* t)
 }
 
 void
-JTrack::Refresh(Pattern* p )
+JTrack::Refresh(Pattern* p, int16 beatDivision)
 {
 	myPat=p; 
-	vnc->Reset(p);
+	vnc->Reset(p, beatDivision);
 	
 	TrackEnd* a = trackend_list[0];
 	TrackEnd* b = trackend_list[1];

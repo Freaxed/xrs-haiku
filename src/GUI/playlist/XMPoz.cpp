@@ -62,7 +62,7 @@ XMPoz::MessageReceived(BMessage* msg)
 }
 
 void
-XMPoz::Reset(Sequence* s)
+XMPoz::Reset(Sequence* s, int16 notesPerMeasaure)
 {
 	sequence=s;
 	curPat=-1;
@@ -72,7 +72,7 @@ XMPoz::Reset(Sequence* s)
 
 	Invalidate();
 	
-	factor=16.0/notes_per_measaure;
+	factor = 16.0 / notesPerMeasaure;
 
 }
 void
