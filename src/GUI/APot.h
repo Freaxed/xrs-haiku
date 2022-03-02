@@ -109,7 +109,7 @@ public:
 	//draws
 	
 	
-	void DrawKnob(BRect updateRect);
+	void DrawKnob(BRect updateRect, const rgb_color& color);
 
 	float CalcAngleIncr(BPoint prev, BPoint cur);
 	float GetDragAngle(BPoint prev, BPoint cur);

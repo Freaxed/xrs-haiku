@@ -23,10 +23,6 @@
 
 static float rads(float degrees);
 
-#define MSG 'sett'
-
-#define LZ	10
-
 class PotViewerDisplayValue : public DisplayValue {
 	public:
 		void	Show(BView* view, float position) { PotViewer::Get()->InitShow(view, position); }
@@ -95,8 +91,8 @@ APot::FrameResized(float newWidth, float newHeight)
 void	
 APot::GetPreferredSize(float* _width, float* _height) 
 {
-			if (_width) *_width   = m_Size;
-			if (_height) *_height = m_Size;
+	if (_width) *_width   = m_Size;
+	if (_height) *_height = m_Size;
 }
 			
 
@@ -180,7 +176,10 @@ APot::AttachedToWindow(){
 	BControl::AttachedToWindow();
 }
 
+#include "Colors.h"
+
 void APot::Draw(BRect updateRect){
+	
 	SetDrawingMode(B_OP_ALPHA);
 	SetPenSize(m_PenSize);
 	
@@ -194,32 +193,20 @@ void APot::Draw(BRect updateRect){
 		SetHighColor(ViewColor());
 		FillRect(updateRect);
 		if (IsTracking())
-			SetHighColor(255,0,0);
+			SetHighColor(Red);
 		else
-			SetHighColor(0,0,0);
+			SetHighColor(Black);
 		
 		StrokeArc(Bounds().InsetByCopy(m_PenSize / 2.0f, m_PenSize / 2.0f ), -65, 305);
 	}		
-	
-	if(IsTracking()){
-		rgb_color yellow = {255,255,55};
-		BRect b(Bounds());
-		BeginLineArray(1);
-		
-		AddLine(BPoint(0,0),BPoint(LZ,0),yellow);
-		AddLine(BPoint(b.right,b.bottom),BPoint(b.right,b.bottom-LZ),yellow);
-		
-		EndLineArray();
-	
-	}
-	
-	DrawKnob(updateRect);
+
+	DrawKnob(updateRect, Yellow);
 }
 
 
 
 
-void APot::DrawKnob(BRect updateRect)
+void APot::DrawKnob(BRect updateRect,  const rgb_color& color = Yellow)
 {
 	BRect calc = KnobRect();
 	
@@ -238,7 +225,7 @@ void APot::DrawKnob(BRect updateRect)
 		p.x = o.x + r*sin(rads(Angle()));
 		p.y = o.y - r*cos(rads(Angle()));
 		
-		SetHighColor(255,255,55);
+		SetHighColor(color);
 		SetLineMode(B_ROUND_CAP,B_ROUND_JOIN);
 		StrokeLine(o, p);
 		

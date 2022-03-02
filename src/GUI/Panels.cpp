@@ -70,7 +70,7 @@ Panels::showPrefsPanel()
 	r.top = r.bottom + 10;
 	r.bottom +=20;
 	
-	box2->AddChild( txt=new BTextControl(r,"vstfolder",NULL,T_PREFS_NOT_SET,B_FOLLOW_NONE,B_WILL_DRAW) );
+	box2->AddChild( txt=new BTextControl(r,"vstfolder",NULL,T_PREFS_NOT_SET, NULL, B_FOLLOW_NONE,B_WILL_DRAW) );
 	
 
 	r.top 	 -= OFFSET;
