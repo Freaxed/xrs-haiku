@@ -36,6 +36,8 @@ for sourceDir in $(sourceDirs) {
 #<pe-src>
 Application XRS :
 	
+	LoadingError.cpp
+	
 	#src/media
 	VSTItem.cpp
 	VSTParamsView.cpp

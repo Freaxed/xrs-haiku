@@ -13,16 +13,15 @@
 #include  <File.h>
 #include <NodeInfo.h>
 
-
 class Song;
 class SJFilter; 
-class TrackManager;
-class BCheckBox;
 class BFilePanel;
 
 #define	X_REFS_RECEIVED	'xrec'
 
 class Track;
+
+
 
 
 class JFileManager
@@ -46,40 +45,18 @@ class JFileManager
 	status_t		RenderAsWave(BMessage *setting, Song* song);
 	void			ExportWave(BMessage *info);
 	
-	void			AddMime(BNode*, const char* mime = "audio/XRS-File");
+	void			AddMime(BNode*, const char* mime = "audio/XRS-File");	
 	
+	status_t		AskForClose(Song*);
 	
-	int		open_type;
-		
-	status_t	AskForClose(Song*);
-	
-	void		AnalizeError(BMessage*);
-	BMessage*	ErrorsLog(){ return errors_log;}
 	
 	
 	private:
 					JFileManager();
-	
-		void		ErrorMsg(const char *msg,const char *txt);
-		
-	
-		BFile*			file;
-		char*			x;
-		
 		
 		BFilePanel*	filepanel;
 		BFilePanel*	openpanel;
-
-
-		SJFilter 	*filtro;
-		TrackManager*	tm;
-		BDirectory 	*dir;
-
-		BCheckBox	*chek;
-
-		BMessage*		errors_log;
-		BMessage*		compatible; //for loading 1.2 files..
-		entry_ref sl;
+		SJFilter*		filtro;
 };
 
 

@@ -3,5 +3,5 @@
 - ReadMe per github
 - version git su about.
 - draw knob di default
-
+- disabilitare il check dei buffer (define? title?)
 

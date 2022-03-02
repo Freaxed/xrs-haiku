@@ -261,7 +261,7 @@ TheApp::LoadSong(entry_ref ref)
 
 	delete oldSong;
 	
-	Panels::showErrors(jfm->ErrorsLog());
+	debugger("ShowErrors"); //Panels::showErrors(jfm->ErrorsLog());
 
 	XUtils::HideIdleAlert(idle);
 	

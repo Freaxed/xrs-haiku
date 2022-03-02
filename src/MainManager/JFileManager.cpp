@@ -48,11 +48,7 @@
 
 #include	"version.h"
 
-#define 	CLEAR_TRS	'cls'
-#define		DEL_TRS		'del'
-#define 	DEL_TRACK 	'delt'
-
-
+#include "LoadingError.h"
 
 JFileManager*
 JFileManager::Get()
@@ -65,18 +61,14 @@ JFileManager::Get()
 
 JFileManager::JFileManager()
 {
-	openpanel=NULL;	
-	filepanel=NULL;
-	open_type=0;
-	filtro=new SJFilter();
-	errors_log=new BMessage('errs');
-	XUtils::GetXRSDirectoryEntry(&sl,"Samples");
-	compatible=NULL;
+	openpanel = NULL;	
+	filepanel = NULL;
+	filtro = new SJFilter();
 }
 
 void
 JFileManager::Init(){
-	tm = TrackManager::Get(); //should be removed.
+	
 }
 
 Song*
@@ -112,7 +104,7 @@ JFileManager::SaveReq(entry_ref ref, const char* file_name, Song* s)
 	
 	p.Append(file_name);
 	
-	status_t er = get_ref_for_path(p.Path(), &rif);
+	get_ref_for_path(p.Path(), &rif);
 	
 	BAlert* idle = XUtils::ShowIdleAlert("Saving...");
 	SaveFile(rif, s);
@@ -140,7 +132,6 @@ JFileManager::SaveReq(entry_ref ref, const char* file_name, Song* s)
 status_t
 JFileManager::Load()
 {
-	open_type=0;
 	entry_ref sl;
 	XUtils::GetXRSDirectoryEntry(&sl,"Songs");
 	
@@ -157,42 +148,39 @@ JFileManager::Load()
 status_t
 JFileManager::LoadFile(entry_ref rif, Song* song)
 {
-	errors_log->MakeEmpty(); //?
-	BMessage errors;
+	LoadingError::Reset();
 	
-	status_t error;
+	status_t error = B_OK;
 	
 	BMessage songInfo;
 	
 	if (BEntry(&rif).Exists())
 	{
-		BFile* file = new BFile();   	
-	    if ((error = file->SetTo(&rif, B_READ_ONLY) == B_OK) && 
-	        (error = file->InitCheck() == B_OK)) 
+		BFile file;
+	    if ((error = file.SetTo(&rif, B_READ_ONLY) == B_OK) && 
+	        (error = file.InitCheck() == B_OK)) 
 	    {
-				file->Seek(0, SEEK_SET);			
-				if ((error = songInfo.Unflatten(file)) != B_OK)
+				file.Seek(0, SEEK_SET);			
+				if ((error = songInfo.Unflatten(&file)) != B_OK)
 				{
+					LoadingError::Add("XRS", "Can't decode the file!", "Is it an XRS file?");
 					LogError("Can't decode the file! [%s]", rif.name);
-					delete file;
 					return error;
 				}
 				if (songInfo.GetInt64("Version", -1) != FILE_VERSION_INT) {
-					errors.AddString("error", "Invalid file version!");
+					LoadingError::Add("XRS", "Invalid file version!", "old file version? try to contact the app developer!");
 					LogError("Invalid file version! [%s]", rif.name);
-					delete file;
 					return B_ERROR;
 				}
 				
 		} 
 		else  
 		{
+			LoadingError::Add("XRS", "Can't read the file", "Is it an XRS file?");
 	    	LogError("Can't read file! [%s]", rif.name);
-	    	delete file;
 			return error;
 		}
 		song->setEntry(new BEntry(&rif));
-		delete file;
 	}
 
 	LogTrace("LoadFile: applying global song info..");
@@ -232,7 +220,7 @@ JFileManager::LoadFile(entry_ref rif, Song* song)
 	int i=0;
 	BMessage track;
 	while(tracksSettings.FindMessage("TrackSettings", i, &track) == B_OK) {
-		int type = track.GetInt16("Type", -1);
+		int16 type = track.GetInt16("Type", -1);
 		if (type >= 0) {
 			Track* cur = trackManager->getTrack(type); //create a track
 			song->AddTrack(cur); //create track & sequence linked to measures
@@ -366,7 +354,7 @@ JFileManager::RenderAsWave(BMessage *message, Song* song)
 	while(totalSamples > 0)	// detect the end! 
 	{
 		JuiceEngine::Get()->SecureProcessBuffer(buffer, JuiceEngine::Get()->GetPreferredBufferSize()); // loop in calling SecureProcessBuffer
-		fileSaver.WriteBlock((float*)buffer, std::min<int64>((int64)1024, totalSamples));
+		fileSaver.WriteBlock((float*)buffer, std::min<int64>(1024L, totalSamples));
 		totalSamples -= 1024;
 	}
 
@@ -415,30 +403,6 @@ JFileManager::AskForClose(Song* s)
 	else return B_ERROR;
 		
 }
-void
-JFileManager::ErrorMsg(const char *msg,const char *txt)
-{
-	char pippo[strlen(msg)+strlen(txt)+2];
-	
-	strcpy(pippo,msg);
-	strcat(pippo,"\n");
-	strcat(pippo,txt); 
-	(new BAlert("XRS", pippo, T_GEN_OK,NULL,NULL,B_WIDTH_AS_USUAL,B_WARNING_ALERT))->Go();	
-}
-void
-JFileManager::AnalizeError(BMessage* msg)
-{
-	if(errors_log==NULL) return;
-	BString error_str;
-	int i=0;
-	while(msg->FindString("error",i,&error_str)==B_OK)
-	{
-		//printf("ERROR: %s",error_str.String());
-		errors_log->AddString("error",error_str);
-		i++;
-	}
-}
-
 
 
 //
