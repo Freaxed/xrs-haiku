@@ -79,8 +79,8 @@ XUtils::ResetList(BView* view)
 	b_list->AddItem((void*)MakeBitmapSkin("volpad"));			//0
 	b_list->AddItem((void*)MakeBitmapSkin("volpadoff"));			//1
 	b_list->AddItem((void*)MakeBitmapSkin("panpad"));			//2
-	b_list->AddItem((void*)MakeBitmapSkin("text.png"));//3
-	b_list->AddItem((void*)MakeBitmapSkin("Slider.png"));//4
+	b_list->AddItem((void*)nil);//3
+	b_list->AddItem((void*)nil);//4
 	b_list->AddItem((void*)MakeBitmapSkin("Line"));			//5
 	b_list->AddItem((void*)nil);//6
 	b_list->AddItem((void*)MakeBitmapSkin("Morbido"));			//7
@@ -394,7 +394,7 @@ XUtils::MakePictureSkin(const char *name,BView *w)
 	const BBitmap* bitmap = LoadIcon(name);
 	
 	if (!bitmap) 
-		printf("Can't load skin element : %s\n",name);
+		LogError("Can't load skin element : %s",name);
 	
 	return MakePicture((BBitmap*)bitmap,w);
 }
@@ -405,7 +405,7 @@ XUtils::MakeBitmapSkin(const char *name)
 	const BBitmap* bitmap = LoadIcon(name);
 	
 	if(!bitmap) 
-		printf("Can't load skin element : %s\n",name);
+		LogError("Can't load skin element : %s",name);
 	
 	return (BBitmap*)bitmap;
 }
@@ -464,7 +464,7 @@ XUtils::CheckMimeType(BApplication *app)
 		{
 			m.SetPreferredApp("application/x-vnd.xeD.XRS");
 			m.Install();
-			printf("MimeType installed!\n");
+			LogInfo("MimeType installed!");
 		}
 
 }
@@ -493,7 +493,7 @@ XUtils::HideIdleAlert(BAlert *al)
 }
 
 void
-XUtils::FillPresetsMenu(const char* name, BMenu* men, unsigned long msg){
+XUtils::FillPresetsMenu(const char* name, BMenu* men, uint32 msg){
 
 	BDirectory	xdir;
 	BPath		xpath;
@@ -593,7 +593,7 @@ XUtils::LoadPreset(const char* plugname,const char* presname,BMessage* msg, cons
 	
 	BFile	*file=new BFile();
 	xpath.Append(presname);
-	printf("LOAD full filename %s\n",xpath.Path());
+	LogTrace("LOAD full filename %s",xpath.Path());
 	err=file->SetTo(xpath.Path(),B_READ_ONLY);
 	
 	if(err!=B_OK) {
@@ -602,7 +602,7 @@ XUtils::LoadPreset(const char* plugname,const char* presname,BMessage* msg, cons
 	}
 	
 	if(mime && !CheckMimeType(file, mime)) {
-		printf ("wrong file type %d\n",err);
+		LogError ("Wrong file type %d",err);
 		delete file;
 		return false;
 	}
@@ -625,10 +625,9 @@ bool
 XUtils::CheckMimeType(BFile* file, const char* MimeString)
 {
 	BNodeInfo	info;
-	status_t 	err;
-	err=info.SetTo(file);
+	info.SetTo(file);
 	char mime[B_MIME_TYPE_LENGTH];
-	err=info.GetType(mime);
+	info.GetType(mime);
 
 	return (strcmp(mime,MimeString) == 0);
 }

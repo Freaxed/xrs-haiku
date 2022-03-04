@@ -35,7 +35,7 @@ class XUtils
 		static void				CreateBootBitmap(BRect* z,BBitmap** bitmap,bool mode);
 
 
-		static	void			FillPresetsMenu(const char* plugname,BMenu* men,unsigned long);
+		static	void			FillPresetsMenu(const char* plugname,BMenu* men, uint32);
 		static	bool			SavePreset(const char* plugname,const char* presname,BMessage* msg, const char* mime = NULL);
 		static	bool			LoadPreset(const char* plugname,const char* presname,BMessage* msg, const char* mime = NULL);
 		

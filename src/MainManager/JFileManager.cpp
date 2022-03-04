@@ -231,9 +231,7 @@ JFileManager::LoadFile(entry_ref rif, Song* song)
 	}
 	
 
-	LogInfo("\nSong loaded.\n");	
-  
-	//XUtils::HideIdleAlert(wait);
+	LogInfo("Song loaded (%s).", rif.name == NULL ? "<empty>" : rif.name);	
 	
 	return B_OK;
 	
