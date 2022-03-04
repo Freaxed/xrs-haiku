@@ -23,7 +23,9 @@
 #include	"MeasureManager.h"
 #include	"locale.h"
 #include 	"PositionView.h"
-#include 	"XrsMidiIn.h"
+#ifdef XRS_MIDI
+	#include 	"XrsMidiIn.h"
+#endif
 #include 	"version.h"
 #include	"Song.h"
 #include	"WindowManager.h"
@@ -359,11 +361,11 @@ MainWindow::MessageReceived(BMessage* message)
 			
 				Track* trk=fTracksPanel->getCurrentTrack();
 				int pos=curSong->getIndexOfTrack(trk);
-				XrsMidiIn::Get()->UnregisterCh(trk,trk->GetMidiInCh());
+				#ifdef XRS_MIDI
+					XrsMidiIn::Get()->UnregisterCh(trk,trk->GetMidiInCh());
+				#endif
 				XHost::Get()->SendMessage(X_LockSem,0);
-//				XHost::Get()->AllowLock(false);
 					curSong->RemoveTrack(trk);
-//				XHost::Get()->AllowLock(true);
 				XHost::Get()->SendMessage(X_UnLockSem,0);
 				fTracksPanel->RemoveTrackAt(pos);
 				fTracksPanel->resetPattern(); //UI Refresh!

@@ -144,9 +144,9 @@ Application XRS :
 	Song.cpp
 	
 	#src/MainManager
-	MidiTools.cpp
-	XrsMidiOut.cpp
-	XrsMidiIn.cpp
+	#MidiTools.cpp
+	#XrsMidiOut.cpp
+	#XrsMidiIn.cpp
 	TrackManager.cpp
 	JFileManager.cpp
 	VstManager.cpp
@@ -205,7 +205,7 @@ Application XRS :
 	SettingsTextView.cpp
 	
 #	</pe-src>
-	#: be translation game media midi midi2 tracker fluidsynth stdc++
-	: be localestub translation game media midi midi2 tracker stdc++ fluidlite sndfile samplerate
+	: be localestub translation game media tracker stdc++ fluidlite sndfile samplerate
+	#midi midi2
 	: resources/XRS.rsrc resources/skin.rsrc  
 ;

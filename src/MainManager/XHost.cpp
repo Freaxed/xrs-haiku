@@ -6,17 +6,17 @@
  * Authors:
  *		Andrea Anzani <andrea.anzani@gmail.com>
  */
-
-
 #include  "XHost.h"
-#include  "XrsMidiOut.h"
+#ifdef XRS_MIDI
+	#include  "XrsMidiOut.h"
+#endif
 #include  "Track.h"
 #include  "JuiceEngine.h"
 #include  "WindowManager.h"
 #include  "MainWindow.h"
-#include "Log.h"
+#include  "Log.h"
 
-XHost*	
+XHost*
 XHost::Get()
 {
 	static	XHost*	instance = NULL;
@@ -27,22 +27,18 @@ XHost::Get()
 
 XHost::XHost()
 {
-//	lock = true;
+
 }
 
 void		
 XHost::LockEngine(const char* who) 
 {
-//	if(!lock) 
-//		return; //fixme!
 	JuiceEngine::Get()->LockEngine(who);
 }
 
 void		
 XHost::UnlockEngine(const char* who)
 {
-//	if(!lock) 
-//		return; //fixme!
 	JuiceEngine::Get()->UnlockEngine(who);
 }
 		
@@ -50,15 +46,11 @@ void*
 XHost::SendMessage(int msg,void* param, void* extra)
 {
 	switch(msg){
-	
+#ifdef XRS_MIDI
 	case X_MidiProducer:
 		return	(BMidiLocalProducer*)XrsMidiOut::Get();
 		break;
-	
-	case X_KillVoice:
-		((Track*)extra)->killVoice(param);
-		JuiceEngine::Get()->rem_list.AddItem(param);	
-		break;
+#endif
 	case X_RegWindow:
 		WindowManager::Get()->RegisterMe((BWindow*)param,(const char*)extra);	
 		break;
@@ -74,12 +66,6 @@ XHost::SendMessage(int msg,void* param, void* extra)
 	case X_UnLockSem:
 		UnlockEngine();
 		break;			
-	case X_BPM:
-		{
-		 //int tempo=JuiceEngine::Get()->GetBPM();
-		 //memcpy(param,(void*)&tempo,sizeof(int));
-		}
-		break;		
 	case X_MainWindowDeactivate:
 		if(MainWindow::Get()->Lock())
 		{

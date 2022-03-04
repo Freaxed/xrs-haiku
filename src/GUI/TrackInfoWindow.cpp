@@ -10,7 +10,9 @@
 #include 	"TrackInfoWindow.h"
 #include	"Track.h"
 #include	"XDigit.h"
-#include	"XrsMidiIn.h"
+#ifdef XRS_MIDI
+	#include	"XrsMidiIn.h"
+#endif
 #include	"locale.h"
 #include	"MainWindow.h"
 #include	"WindowManager.h"
@@ -45,9 +47,13 @@ TrackInfoWindow::TrackInfoWindow():XrsWindow(BRect(640+0,230+0,640+179,230+280),
 	r.InsetBy(4,4);
 	r.right-=50;
 	r.top+=2;
-	sampler->AddChild(en=new BCheckBox(r,"",T_TRACKINFO_MIDIN,new BMessage(ENABLE_MIDI_IN)));
-	sampler->AddChild(ch=new XDigit(BRect(120,5,120+36,5+22), VID_EMPTY ,"sampler_midi_in", new BMessage(SET_MIDI_IN), 1,16));
+	sampler->AddChild(en = new BCheckBox(r,"",T_TRACKINFO_MIDIN,new BMessage(ENABLE_MIDI_IN)));
+	sampler->AddChild(ch = new XDigit(BRect(120,5,120+36,5+22), VID_EMPTY ,"sampler_midi_in", new BMessage(SET_MIDI_IN), 1,16));
 	ch->SetTarget(this);
+#ifndef XRS_MIDI
+	en->SetEnabled(false);
+	ch->SetEnabled(false);
+#endif
 	bot->AddChild(sampler);
 	AddChild(bot);
 	myTrack=NULL;
@@ -66,13 +72,14 @@ void
 TrackInfoWindow::SetTrack(Track* tr){ 
 	
 	myTrack=tr;
-	
+#ifdef XRS_MIDI
 	if (Lock())
 	{
 		ch->UpdateValue(tr->GetMidiInCh()+1, true);
 		en->SetValue(tr->IsMidiInEnable());
 		Unlock();
 	}
+#endif
 }
 
 bool
@@ -84,7 +91,7 @@ TrackInfoWindow::QuitRequested()
 
 void
 TrackInfoWindow::MessageReceived(BMessage* msg){
-	
+#ifdef XRS_MIDI	
 	if(msg->what==SET_MIDI_IN){
 	
 		
@@ -106,5 +113,6 @@ TrackInfoWindow::MessageReceived(BMessage* msg){
 		}
 	}
 	else
+#endif
 	BWindow::MessageReceived(msg);
 }
