@@ -5,7 +5,7 @@
 #ifndef FloatBuffer_H_
 #define FloatBuffer_H_
 
-#define BOUND_CHECK 1
+#include "version.h"
 
 
 
