@@ -50,18 +50,17 @@ Sequence::SetMeasureName(const char* s,int pos)
 int
 Sequence::Reset()
 {
-	
-		if(matrix2!=NULL) delete matrix2;
-		matrix2=new BTimedEventQueue();
-	
-		for(int i=0;i<names.CountItems();i++)
-		{
-			BString* s=(BString*)names.ItemAt(i);
-			if(s!=NULL) delete s;
-			names.RemoveItem(i);
-		}
-		MaxSeq=0;
-		return 0;
+	if(matrix2!=NULL) delete matrix2;
+	matrix2=new BTimedEventQueue();
+
+	for(int i=0;i<names.CountItems();i++)
+	{
+		BString* s=(BString*)names.ItemAt(i);
+		if(s!=NULL) delete s;
+		names.RemoveItem(i);
+	}
+	MaxSeq=0;
+	return 0;
 					
 }
 
@@ -80,15 +79,12 @@ Sequence::RemoveMeasure(int pos)
 		/* qua devono scalare tutti :( */
 		
 		for(int j=pos+1;j<getMaxPat();j++){
-		
-		find=matrix2->FindFirstMatch(x*10000+j,BTimedEventQueue::B_AT_TIME,true);
-		if(find){
-				matrix2->RemoveEvent(find);
-				media_timed_event nmev(x*10000+j-1,BTimedEventQueue::B_USER_EVENT);
-				matrix2->AddEvent(nmev);
-				
-		}		
-		
+			find = matrix2->FindFirstMatch(x*10000+j,BTimedEventQueue::B_AT_TIME,true);
+			if(find){
+					matrix2->RemoveEvent(find);
+					media_timed_event nmev(x*10000+j-1,BTimedEventQueue::B_USER_EVENT);
+					matrix2->AddEvent(nmev);					
+			}		
 		}		
 	}
 
