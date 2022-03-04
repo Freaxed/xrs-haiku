@@ -424,16 +424,22 @@ Panels::msgExport(BMessage* message,void* cookies)
 	}
 	return true;
 }
+
+#include "LoadingError.h"
+#include "Colors.h"
 void
-Panels::showErrors(BMessage* list)
+Panels::showLoadingError()
 {
-	if(list==NULL || list->IsEmpty()) return;
-	 
+	const ErrorList& list = LoadingError::GetErrorList();
+
+	if (list.CountItems() == 0)
+		return;
+
 	BBox 			*box;
 	BTextView		*tw;
 
 	
-	BzWindow *win=new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_FLOATING_WINDOW,0);
+	BzWindow* win = new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_FLOATING_WINDOW,0);
 	win->SetLook(B_MODAL_WINDOW_LOOK);
 	win->SetFeel(B_MODAL_APP_WINDOW_FEEL);
 	win->SetFlags(B_ASYNCHRONOUS_CONTROLS|B_NOT_RESIZABLE);
@@ -442,57 +448,43 @@ Panels::showErrors(BMessage* list)
 	
 	BRect r(box->Bounds());
 	r.InsetBy(20,20);
-	r.bottom -=30;
-	
+	r.right  -= B_V_SCROLL_BAR_WIDTH;
+	r.bottom -= (30 + B_H_SCROLL_BAR_HEIGHT);
+
 	BRect x;
-	x.top=0;
-	x.left=0;
-	x.right=r.Width();
-	x.bottom=r.Height();
-	box->AddChild(tw=new BTextView(r,"set",x,B_FOLLOW_NONE,B_WILL_DRAW));
+	x.top    = 0;
+	x.left   = 0;
+	x.right  = r.Width();
+	x.bottom = r.Height();
+
+	tw = new BTextView(r, "set", x, B_FOLLOW_NONE, B_WILL_DRAW);
+	box->AddChild(new BScrollView("textview_scroll", tw, B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, true, true,B_FANCY_BORDER));
 	
-	
-	
-	r.top=r.bottom+10;
-	r.bottom =r.top+20;
-	r.left= r.right-60;
+	r.top    = r.bottom + 10 + B_H_SCROLL_BAR_HEIGHT;
+	r.bottom = r.top    + 20;
+	r.left   = r.right  - 60 + B_V_SCROLL_BAR_WIDTH;
 	
 	box->AddChild(new BButton(r,"set","Oh!",new BMessage(B_QUIT_REQUESTED),B_FOLLOW_NONE,B_WILL_DRAW));
-	
-	
+
 	tw->SetStylable(true);
+	tw->SetFontAndColor(be_bold_font, B_FONT_ALL, &Red);
+	tw->Insert("ERROR IN LOADING FILE!");
+	tw->SetFontAndColor(be_plain_font, B_FONT_ALL, &Black);
+	tw->Insert("\n\n");
 	
-	BString error_str;
-	int i=0;
-	while(list->FindString("error",i,&error_str)==B_OK)
+	for (int i=0; i<list.CountItems();i++)
 	{
-		
-		tw->Insert(error_str.String());
-		i++;
+		ErrorItem* element = list.ItemAt(i);
+		tw->Insert(element->who.String());
+		tw->Insert(": ");
+		tw->Insert(element->what.String());
+		tw->Insert("\n");
+		tw->SetFontAndColor(be_plain_font, B_FONT_ALL, &Blue);
+		tw->Insert(element->solution.String());
+		tw->SetFontAndColor(be_plain_font, B_FONT_ALL, &Black);
+		tw->Insert("\n\n");
 	}
 
 	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
 	win->Show();
-	//win->RedirectMessages(Panels::msgErrors,(void*)NULL);
-
-	
 }
-/*
-bool
-Panels::msgErrors(BMessage* message,void* cookies)
-{
-	BzWindow *win;
-	//BMessage *x=((BMessage*)cookies);
-	//x->FindPointer("win",(void**)&win);
-
-	
-	switch(message->what)
-	{
-				
-		default:
-			return true;
-		break;
-	}
-	
-	return true;
-}*/

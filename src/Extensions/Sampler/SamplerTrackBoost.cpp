@@ -32,6 +32,7 @@
 
 #include "sampler_locale.h"
 #include "locale.h"
+#include "LoadingError.h"
 
 // DINAMIC CAST!!!!!!!! //
 
@@ -168,9 +169,18 @@ SamplerTrackBoost::LoadBoosterSettings(BMessage* data)
 	{
 		BEntry entry;
 		entry.SetTo(path.String());
-							
-		if ( _checkPath(path.String()) == B_OK )
-			_loadSampler(path.String());
+
+		status_t loadSample = _checkPath(path.String());
+		if ( loadSample == B_OK )
+			loadSample = _loadSampler(path.String());
+		
+		if (loadSample != B_OK)
+		{
+			BString what("Can't load the sample [");
+			what << path.String() << "]!";
+			LoadingError::Add("Sampler", what.String(), "Find the missing sample and assign to the right track!");
+		}
+		
 	}
 	MakeMenu();
 	LogTrace("LoadBoosterSettings, loaded %d samples", i-1);

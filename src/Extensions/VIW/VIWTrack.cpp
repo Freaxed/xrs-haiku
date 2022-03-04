@@ -16,6 +16,7 @@
 #include "VIWTrackBoost.h"
 #include <AppKit.h>
 #include <StorageKit.h>
+#include "LoadingError.h"
 
 #define	 FRAMES_NUM	1024
 
@@ -222,8 +223,9 @@ VIWTrack::LoadCustomSettings(BMessage& msg)
 		}
 		else
 		{
-			LogError("Can't find the VST Instrument plugin: %s", name.String());
-			//FIXME report the error!
+			BString what("Can't find the VST instrument [");
+			what << name.String() << "] Track [" << getName() << "]!";
+			LoadingError::Add("VIWTrack", what.String(), "Install the missing VST instrument!");
 		}
 	}
 }

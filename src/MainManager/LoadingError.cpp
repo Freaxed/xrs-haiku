@@ -19,5 +19,10 @@ LoadingError::Add(const char* who, const char* what, const char* solution)
 void
 LoadingError::Reset()
 {
-	
+	while(mErrors.CountItems())
+	{
+		ErrorItem* item = mErrors.ItemAt(0);
+		mErrors.RemoveItem(item);
+		delete item;
+	}
 }
