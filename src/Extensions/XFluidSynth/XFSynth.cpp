@@ -75,7 +75,8 @@ XFSynth::SaveGlobalSettings(BMessage* data){
 }
 
 void
-XFSynth::LoadGloablSettings(BMessage* data){
+XFSynth::LoadGloablSettings(BMessage* data)
+{
 
 }
 			
@@ -129,22 +130,22 @@ XFSynth::LoadFile(const char* filename)
 {
 	fsynth	newsynth;
 	
-	newsynth.synth=NULL;
-	newsynth.sfont=NULL;
-	newsynth.sfont_id=-1;
+	newsynth.synth    = NULL;
+	newsynth.sfont    = NULL;
+	newsynth.sfont_id = -1;
 	
 	if(!filename || !settings) return newsynth;
 	
 	
 	newsynth.synth 		= new_fluid_synth(settings);
-	newsynth.sfont_id	= fluid_synth_sfload(newsynth.synth,filename,1);
+	newsynth.sfont_id	= fluid_synth_sfload(newsynth.synth, filename, 1);
 	
-	if(newsynth.sfont_id < 0) {
+	if(newsynth.sfont_id == -1) {
 		
 		delete_fluid_synth(newsynth.synth);
-		newsynth.synth=NULL;
-		newsynth.sfont=NULL;
-		newsynth.sfont_id=-1;
+		newsynth.synth    = NULL;
+		newsynth.sfont    = NULL;
+		newsynth.sfont_id = -1;
 		return newsynth;
 	}
 	

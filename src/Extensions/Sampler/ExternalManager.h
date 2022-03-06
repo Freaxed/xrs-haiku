@@ -11,14 +11,14 @@
 #include <MediaTrack.h>
 #include <Entry.h>
 
-#include "Vector.h"
+#include "VectorNew.h"
 #include "GlobalDef.h"
 
 class Sample;
 class BFile;
 
-typedef Vector<Sample*>	SampleList;
-typedef Vector<Sample*>::Iterator	SampleListIterator;	
+typedef VectorNew<Sample*>	SampleList;
+
 
 class ExternalManager 
 {
@@ -27,9 +27,10 @@ class ExternalManager
 					~ExternalManager();
 			
 			Sample*			getSampleAt(int);	
-			SampleList*		getSampleList();
 			
-			status_t		AddSampleList(BList*);
+			void		DeleteSampleAt(int);
+			void		DeleteSample(Sample*);
+
 
 			int32		CountItems();
 			status_t	InitCheck();
@@ -40,7 +41,6 @@ class ExternalManager
 	private:
 		//locked functions
 		status_t		LoadFile(entry_ref*, Sample* sample);
-
 	
 		SampleList		samples_list;
 		status_t		lastStatus;

@@ -12,32 +12,29 @@
 
 enum 
 {
-		X_MidiProducer,
-		X_BPM,
-		X_KillVoice,
-		X_LockSem,
-		X_UnLockSem,
-		X_RegWindow,
-		X_UnregWindow,
-		X_Switch,
-		X_MainWindowDeactivate,
-		X_MainWindowActivate
+#ifdef XRS_MIDI
+	X_MidiProducer,
+#endif
+	X_LockSem,
+	X_UnLockSem,
+	X_RegWindow,
+	X_UnregWindow,
+	X_Switch,
+	X_MainWindowDeactivate,
+	X_MainWindowActivate
 };
 
 class XHost{
 
 	public:
+
 		static	XHost*	Get();
 		
 		void*		SendMessage(int msg, void* param, void* extra=NULL);
-//		void		AllowLock(bool b){ lock=b; }
-		
 		void		LockEngine  (const char* who = "XHost");
 		void		UnlockEngine(const char* who = "XHost");
 		
 	private:
 				XHost();
-//		bool	lock;		 	
 };
 
-//extern	XHost*				xhost;

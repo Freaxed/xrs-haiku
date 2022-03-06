@@ -32,6 +32,7 @@
 
 #include "sampler_locale.h"
 #include "locale.h"
+#include "LoadingError.h"
 
 // DINAMIC CAST!!!!!!!! //
 
@@ -168,9 +169,18 @@ SamplerTrackBoost::LoadBoosterSettings(BMessage* data)
 	{
 		BEntry entry;
 		entry.SetTo(path.String());
-							
-		if ( _checkPath(path.String()) == B_OK )
-			_loadSampler(path.String());
+
+		status_t loadSample = _checkPath(path.String());
+		if ( loadSample == B_OK )
+			loadSample = _loadSampler(path.String());
+		
+		if (loadSample != B_OK)
+		{
+			BString what("Can't load the sample [");
+			what << path.String() << "]!";
+			LoadingError::Add("Sampler", what.String(), "Find the missing sample and assign to the right track!");
+		}
+		
 	}
 	MakeMenu();
 	LogTrace("LoadBoosterSettings, loaded %d samples", i-1);
@@ -249,33 +259,19 @@ SamplerTrackBoost::RemoveSample(Sample* s)
 	BList list;
 	
 	TrackManager::Get()->getAllMyTrack(&list,0);
-	
-	SampleList *sl=extm->getSampleList();
-	
-	if(sl==NULL) 
-		return;
 			
 	for(int i=0;i<list.CountItems();i++)
 	{
 		SamplerTrack* tr=(SamplerTrack*)list.ItemAt(i);
-		Sample* ss=tr->getSample();
-		if(ss == s)
+		if(tr->getSample() == s)
 		{
 			_secureSetSample(tr,NULL);
 			if(tr->isNameLocked()==false) tr->ResetName();
 		}
 	}
-		
-	for(int i=0;i<sl->Count();i++) 
-	{
-		Sample* fs = (*sl)[i];
-		if(fs == s)
-		{
-			sl->Erase(i);
-			delete fs;
-			break;
-		}
-	}
+	
+	extm->DeleteSample(s);
+	
 	MakeMenu();
 	TrackManager::Get()->refreshAllMyTrack(0);
 }
@@ -316,12 +312,11 @@ SamplerTrackBoost::ConsiderToRemove(SamplerTrack* t)
 	
 	
 	/* Removing..*/
-	Sample 		*rem=t->getSample();
-	SampleList  *sl=extm->getSampleList();
-	sl->Remove(rem);
-	
+	Sample* toBeRemoved = t->getSample();
+		
 	_secureSetSample(t,NULL);
-	delete rem;
+	
+	extm->DeleteSample(toBeRemoved);
 
 	MakeMenu();
 }

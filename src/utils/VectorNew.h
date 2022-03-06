@@ -22,9 +22,18 @@ public:
 	void Erase(int position){
 			this->erase(std::next(this->begin(), position));
 		 }
+	void	MakeEmpty() { this->clear(); }
 	
-private:
-		std::vector<Value>	_vector;
+	int 	IndexOf(Value v) 
+	{
+		for(int j=0;j<Count();j++)
+		{
+			if (v == (*this)[j])
+				return j;
+		} 
+		return -1;
+	}
+
 };
 
 #endif	// _VECTOR_NEW_H

@@ -1,7 +1,7 @@
 - WAVE Export (da finire)
-- Error in loading (panel)
 - ReadMe per github
 - version git su about.
-- draw knob di default
-
+- copyrights su about box
+- disabilitare il check dei buffer (define? title?)
+- dipendenze nel receipe?
 

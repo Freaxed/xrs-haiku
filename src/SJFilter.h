@@ -13,10 +13,8 @@
 class SJFilter : public BRefFilter
 {
 public:
-		SJFilter();
+		SJFilter(){};
 		
 		bool Filter(const entry_ref* ref, BNode* node,
 						struct stat_beos* stat, const char* mimeType);
-
-//	virtual bool Filter(const entry_ref *erf,BNode *node,struct stat_beos *st,const char *filetype);
 };

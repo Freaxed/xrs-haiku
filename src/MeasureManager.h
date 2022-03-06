@@ -33,7 +33,7 @@
 #include <Application.h>
 
 
-#include "Vector.h"
+#include "VectorNew.h"
 
 #define	SETPAT	'setp'
 
@@ -82,7 +82,7 @@ class MeasureManager: public BMessageFilter
 		Sequence*	sequence;
 		bool		all_patterns;
 		
-		Vector<BHandler*> hands;
+		VectorNew<BHandler*> hands;
 		
 };
 

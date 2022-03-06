@@ -10,8 +10,8 @@ class BBitmap;
 
 #include <SupportDefs.h>
 #include <String.h>
-//#include "KeyMap.h"
-#include "VectorMap.h"
+#include "KeyMap.h"
+//#include "VectorMap.h"
 
 class ImageCache
 {
@@ -28,7 +28,7 @@ public:							// Operations
 	static  const BBitmap *		GetImage( BString which ,BString name);
 
 
-	static	 void AddImage(BString name,BBitmap* which);
+	static	 void AddImage(BString name, const BBitmap* which);
 	static	 void DeleteImage(BString name);
 
 	/** Frees the singleton instance of the cache;
@@ -46,9 +46,8 @@ private:
 private:						// Instance Data
 
 
-//	KeyMap<BString,BBitmap*>	m_bitmaps;
-	VectorMap<BString, const BBitmap*> m_bitmaps;
-	typedef VectorMap<BString, const BBitmap*>::Iterator iterator;
+	KeyMap<BString, const BBitmap*>	m_bitmaps;
+	typedef KeyMap<BString, const BBitmap*>::iterator	iterator;
 
 };
 

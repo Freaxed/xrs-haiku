@@ -16,6 +16,7 @@
 
 #include "Xed_Utils.h"
 #include "sfs_locale.h"
+#include "LoadingError.h"
 
 #define	MY_ID	7
 #define	MAXCHANNEL	16
@@ -115,23 +116,23 @@ SFSTrackBoost::getPanel(){return p;}
 void
 SFSTrackBoost::LoadBoosterSettings(BMessage* data)
 {
-	fluid_booster=NULL;
-	LoadSF(NULL);
+	fluid_booster = NULL;
+	
+	status_t err = B_OK;
 	BString name;
-	if(data->FindString("bank_name",&name)==B_OK)
+
+	LoadSF(NULL);
+	if(data->FindString("bank_name", &name) == B_OK)
 	{
-		status_t err=LoadSF(name.String());
-		if(err!=B_OK){
-		
-			BString err;
-			err << T_SFS_ERROR_LOADING << " " << name.String() ;
-			data->AddString("error",err);
-		
-		}
+		err = LoadSF(name.String());
 	}
-	else
-		LoadSF(NULL);
-		
+	
+	if (err != B_OK)
+	{
+		BString what("Can't find the SoundFont file [");
+		what << name.String() << "]!";
+		LoadingError::Add("fluidlite", what.String(), "Get the missing SoundFont file!");		
+	}
 
 	BMessage	extra;	
 	if(data->FindMessage("extra",&extra)==B_OK)
@@ -142,8 +143,6 @@ void
 SFSTrackBoost::SaveBoosterSettings(BMessage* data)
 {
 	theSynth.SaveGlobalSettings(data);
-	data->AddString("version","0.1"); // ??
-	
 	
 	BMessage	extra;	
 	sfwin->SaveExtra(&extra);
@@ -187,6 +186,14 @@ SFSTrackBoost::LoadSF(const char* filename)
 		theSynth.ApplySynth(newsynth);
 		
 		XHost::Get()->SendMessage(X_UnLockSem,0);
+
+		if (newsynth.sfont_id == -1)
+		{
+			BString what("Can't load the SoundFont file [");
+			what << filename << "]!";
+			LoadingError::Add("XFluidSynth", what.String(), "Find the missing SoundFont and assign to the right tracks!");
+		}
+
 		
 		XUtils::HideIdleAlert(al);
 	}

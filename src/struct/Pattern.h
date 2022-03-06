@@ -12,7 +12,7 @@
 
 #include "GlobalDef.h"
 #include "XRSVoice.h"
-#include "Vector.h"
+#include "VectorNew.h"
 #include <Message.h>
 
 class Note;
@@ -32,7 +32,7 @@ class Pattern
 	
 	private:
 		
-		Vector<Note*> noteList;
+		VectorNew<Note*> noteList;
 };
 
 #endif 

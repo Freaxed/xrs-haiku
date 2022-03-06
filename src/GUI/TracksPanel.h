@@ -17,7 +17,6 @@
 #include "TrackList.h"
 #include "ColorsDef.h"
 #include "TrackManager.h"
-//#include "Vector.h"
 #include "VectorNew.h"
 
 class Song;

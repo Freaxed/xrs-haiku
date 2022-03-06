@@ -35,8 +35,10 @@
 
 #include	"WindowManager.h"
 #include	"MatrixWindow.h"
-#include	"XrsMidiIn.h"
-#include	 "XrsMidiOut.h"
+#ifdef XRS_MIDI
+	#include	"XrsMidiIn.h"
+	#include	"XrsMidiOut.h"
+#endif
 #include    "MBWindow.h"
 #include	"TrackInfoWindow.h"
 #include 	"PotViewer.h"
@@ -108,10 +110,10 @@ TheApp::~TheApp()
 		 	mw->Quit();
 		 	
 
-			
+#ifdef XRS_MIDI
 		XrsMidiIn::Get()->Release();
 		XrsMidiOut::Get()->Release();
-		
+#endif		
 		msucco->Quit();
 	
 	}
@@ -252,24 +254,23 @@ TheApp::LoadSong(entry_ref ref)
 		MixerWindow::Get()->ResetUI();
 		MixerWindow::Get()->Unlock();
 	}			
-	
+
+#ifdef XRS_MIDI	
 	XrsMidiIn::Get()->Reset(currentSong);		
-	
+#endif
+
 	msucco->LockEngine("ResetSong");
 	msucco->ResetSong(currentSong);
 	msucco->UnlockEngine("ResetSong");
 
 	delete oldSong;
 	
-	Panels::showErrors(jfm->ErrorsLog());
+	XUtils::HideIdleAlert(idle);	
+	
+	Panels::showLoadingError();
 
-	XUtils::HideIdleAlert(idle);
-	
-	
 	if(currentSong && currentSong->getSizeDescription()>0 && currentSong->popupdesc==true)
 			(new BAlert("XRS ",currentSong->getDescription(), "Ok",NULL,NULL,B_WIDTH_AS_USUAL,B_EMPTY_ALERT))->Go(NULL);
-	
-	
 }
 void
 TheApp::EmptySong(bool close = true)
@@ -292,14 +293,10 @@ TheApp::MessageReceived(BMessage* message)
 
 	switch(message->what)
 	{
-		case MENU_NEW_EMPTY:	
-			EmptySong();	
-		break;
-			
 		case MENU_NEW_DEFAULT:
-			EmptySong(true);
-		break;
-			
+		case MENU_NEW_EMPTY:
+			EmptySong();
+		break;			
 		case MENU_SAVE:		
 			jfm->Save(currentSong,false);
 		break;

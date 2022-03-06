@@ -13,7 +13,7 @@
 #include "VstManager.h"
 #include "XHost.h"
 #include "Log.h"
-
+#include "LoadingError.h"
 
 PEffector::PEffector():PNode(){
 	next = NULL; 
@@ -54,8 +54,15 @@ PEffector::LoadSettings(BMessage& msg)
 		VSTPlugin* plugin = NULL;
 		BString effectName;
 		
-		if (effect.FindString("EffectName", &effectName) == B_OK)
-			plugin = FindVST(effectName.String());		
+		if (effect.FindString("EffectName", &effectName) == B_OK) {
+			plugin = FindVST(effectName.String());
+			if (!plugin)
+			{
+				BString what("Can't find the VST plugin [");
+				what << effectName.String() << "]!";
+				LoadingError::Add("VST Loader", what.String(), "Install the missing VST plugin!");
+			}
+		}
 
 		VSTItem* newItem = CreateVstAtPosition(plugin, position);
 		if (newItem) {
