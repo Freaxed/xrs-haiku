@@ -13,7 +13,7 @@
 #include <View.h>
 
 #include "TrackEnd.h"
-#include "Vector.h"
+#include "VectorNew.h"
 
 class TrackBlock;
 
@@ -21,14 +21,16 @@ class TrackList : public BView
 {
 	public:
 			     	 TrackList(BRect r);
-			     	 
-	virtual void 	 MessageReceived(BMessage*);
+
 	        void	 AddTrack(TrackBlock*);
 			void	 RemoveTrack(TrackBlock*);
 			void	 Expanded(TrackBlock*,float );
 			void	 UnExpanded(TrackBlock*,float);
 	private:
-		 Vector<TrackBlock*>	list;
+		
+		 	VectorNew<TrackBlock*>	list;
+		 	
+		 	int		_moveAfter(TrackBlock*,float);
 				
 };
 #endif

@@ -14,7 +14,7 @@
 #include <Window.h>
 #include <stdio.h>
 
-#define SPACE	10.
+#define SPACE	10.0f
 
 TrackList::TrackList(BRect r):BView(r,"s2", B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS)
 {}
@@ -22,69 +22,51 @@ TrackList::TrackList(BRect r):BView(r,"s2", B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRA
 void
 TrackList::AddTrack(TrackBlock *tb)
 {
-	float y=SPACE;
+	float y = SPACE;
 	
-	if(list.Count()!=0)
-	
-		y=list[list.Count()-1]->Frame().bottom+SPACE;
+	if(list.Count() > 0)	
+		y += list.Last()->Frame().bottom;
 	
 	
 	AddChild((BView*)tb);
 	
-	tb->MoveTo(0,y);
+	tb->MoveTo(0, y);
 	list.Add(tb);
 }
 void
 TrackList::RemoveTrack(TrackBlock* t)
 {
-	int32 pos=list.IndexOf(t);
 	RemoveChild(t);
-	for(int i=pos+1;i<list.Count();i++)
-	{
-		list[i]->MoveBy(0,-1*t->Bounds().Height()-10);	
-	}
-	list.Erase(pos);
+	int pos = _moveAfter(t, -1*t->Bounds().Height()-10);
+
+	if (pos > -1)
+		list.Erase(pos);
 	
 }
-void 
-TrackList::MessageReceived(BMessage* msg)
-{
-	switch(msg->what)
-	{
-		
-	default:
-		BView::MessageReceived(msg);
-	break;
-	
-	}	
-}
+
 void
-TrackList::Expanded(TrackBlock* b,float delta)
+TrackList::Expanded(TrackBlock* t, float delta)
 {
-	int32 position = list.IndexOf(b);
-	
-	if(position<0) 
-		return;
-		
-	for(int32 i=position+1;i<list.Count();i++)
-	{
-		list[i]->MoveBy(0,delta);
-	}	
-	
+	_moveAfter(t, delta);
 	FrameResized(0,0); //fast and fourious
 }
 void
 TrackList::UnExpanded(TrackBlock* b,float delta)
 {
-	int32 position = list.IndexOf(b);
-	if(position<0) 
-		return;
-	
-	for(int32 i=position+1;i<list.Count();i++)
+	Expanded(b, -1*delta);
+}
+
+int
+TrackList::_moveAfter(TrackBlock* t, float delta)
+{
+	int pos = list.IndexOf(t);
+		
+	for(int i = pos + 1 ; i < list.Count(); i++)
 	{
-		list[i]->MoveBy(0,-1*delta);
+		list[i]->MoveBy(0, delta);
 	}	
 	
-	FrameResized(0,0); //fast and fourious
-
+	return pos;
 }
+
+

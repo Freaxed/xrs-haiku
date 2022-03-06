@@ -10,7 +10,7 @@
 #ifndef Clock_H_
 #define Clock_H_
 
-#include "Vector.h"
+#include "VectorNew.h"
 #include "Tickable.h"
 
 #include "Resolution.h"
@@ -49,7 +49,7 @@ class Clock {
 		int16	tick;
 	
 	private:	
-		Vector<Tickable*>	fLTick;		
+		VectorNew<Tickable*>	fLTick;		
 
 };
 #endif

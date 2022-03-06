@@ -88,38 +88,31 @@ TrackBlock::UnExpand(float delta)
 void
 TrackBlock::Expanded(TrackEnd* te,float delta)
 {
-	if(!te) return;
-	float c=te->getExpansionSize();
-	
-	
-	((TrackList*)Parent())->Expanded(this,c);
-	Expand(c);	
-	
-	int i=trackend_list.IndexOf(te);
-		
-	for(int j=i+1;j<trackend_list.Count();j++)
-	{
-		trackend_list[j]->MoveBy(0,te->getExpansionSize());			
-	}
-	
-
+	_expanded(te, delta, 1);
 }
 void
 TrackBlock::UnExpanded(TrackEnd* te,float delta)
 {
+	_expanded(te, delta, -1);
+}
+
+void
+TrackBlock::_expanded(TrackEnd* te, float delta, int direction)
+{
 	if(!te) return;
 	float c=te->getExpansionSize();
 		
-	((TrackList*)Parent())->Expanded(this,-1*c);
-	Expand(-1*c);		
+	((TrackList*)Parent())->Expanded(this, direction * c);
+	Expand(direction * c);		
 	
 	
-	int i=trackend_list.IndexOf(te);
+	int i = trackend_list.IndexOf(te);
 		
 	for(int j=i+1;j<trackend_list.Count();j++)
 	{
-		trackend_list[j]->MoveBy(0,-1*te->getExpansionSize());			
+		trackend_list[j]->MoveBy(0, direction * te->getExpansionSize());			
 	}
 	
 }
+
 //.

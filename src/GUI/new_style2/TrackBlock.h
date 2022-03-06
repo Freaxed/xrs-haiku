@@ -13,7 +13,7 @@
 #include <View.h>
 #include <Button.h>
 
-#include "Vector.h"
+#include "VectorNew.h"
 
 class TrackEnd;
 
@@ -40,9 +40,12 @@ class TrackBlock : public BView
 	private:
 			bool expanded;
 			bool selected;
+			
+			void				_expanded(TrackEnd*, float, int);
+			
 	protected:
 
-			Vector<TrackEnd*>	 trackend_list;
+			VectorNew<TrackEnd*>	 trackend_list;
 			
 };
 #endif

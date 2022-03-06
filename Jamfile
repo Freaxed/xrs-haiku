@@ -12,7 +12,6 @@ local sourceDirs =
 	src/GUI/track
 	src/GUI/MixerUI/
 	src/GUI/playlist
-	src/libfunky
 	src/Valuable
 	src/Engine
 	src/Mixer
@@ -205,7 +204,7 @@ Application XRS :
 	SettingsTextView.cpp
 	
 #	</pe-src>
-	: be localestub translation game media tracker stdc++ fluidlite sndfile samplerate
+	: be localestub translation game media tracker stdc++ fluidlite vorbisfile sndfile samplerate
 	#midi midi2
 	: resources/XRS.rsrc resources/skin.rsrc  
 ;

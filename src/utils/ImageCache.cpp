@@ -4,6 +4,9 @@
 #include <Bitmap.h>
 #include <Debug.h>
 #include <TranslationUtils.h>
+#include "Log.h"
+
+using namespace std;
 
 // ---------------------------------------------------------------------------
 // Class Data Initialization
@@ -20,10 +23,10 @@ ImageCache::ImageCache() {
 
 ImageCache::~ImageCache()
 {
-	iterator iter = m_bitmaps.Begin();
+	iterator iter = m_bitmaps.begin();
 	
-	while( iter != m_bitmaps.End() ) {
-		const BBitmap* bit =  iter->Value() ;
+	while( iter != m_bitmaps.end() ) {
+		const BBitmap* bit =  iter->second ;
 		delete bit;
 		iter++;
 	}
@@ -43,28 +46,27 @@ ImageCache::GetImage(
 
 	/* cerca.. se non c'e' lo carica altrimenti usa quello */
 
-	const BBitmap *bitmap = NULL;
-	iterator iter = m_instance->m_bitmaps.Find(name);
+	bool found = false;
+	const BBitmap *bitmap = m_instance->m_bitmaps.ValueFor(name, &found);
 	
 
-	if( iter == m_instance->m_bitmaps.End() ){
+	if( !found ){
 		bitmap = LoadImage(which.String(),name.String());
 		if(bitmap) 	
-			m_instance->m_bitmaps.Insert(name,bitmap);
-	} else
-		bitmap = iter->Value();
-
+			m_instance->m_bitmaps.AddItem(name, bitmap);
+	}
+	
 	return bitmap;
 }
 
 
 void
-ImageCache::AddImage(BString name,BBitmap* which){
+ImageCache::AddImage(BString name, const BBitmap* which){
 
 	if (m_instance == NULL)
 		m_instance = new ImageCache();
 		
-	m_instance->m_bitmaps.Insert(name, which);		
+	m_instance->m_bitmaps.AddItem(name, which);		
 }
 
 void
@@ -72,14 +74,14 @@ ImageCache::DeleteImage(BString name){
 
 	if (m_instance == NULL)
 		m_instance = new ImageCache();
-		
-	const BBitmap* bitmap = NULL;
-	iterator iter = m_instance->m_bitmaps.Find(name);	
 	
-	if(iter != m_instance->m_bitmaps.End()){
-		bitmap = iter->Value();
-		m_instance->m_bitmaps.Remove(name);
-		delete bitmap;	
+	bool found = false;
+	const BBitmap* bitmap = m_instance->m_bitmaps.ValueFor(name, &found);
+	
+	if(found){
+		m_instance->m_bitmaps.RemoveItemFor(name);
+		if (bitmap)
+			delete bitmap;	
 	}
 }
 
@@ -101,7 +103,7 @@ ImageCache::LoadImage(
 		bitmap = BTranslationUtils::GetBitmap('PNG ', shortName);
 	
 	if(!bitmap)
-		printf("ImageCache: Can't load bitmap! (nor [%s] nor [resources:PNG :%s]\n",fullName,shortName);
+		LogError("ImageCache: Can't load bitmap! (nor [%s] nor [resources:PNG :%s]",fullName,shortName);
 
 	return bitmap;
 }

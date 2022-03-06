@@ -38,9 +38,7 @@ ExternalManager::MakeEmpty()
 	LogDebug("ExternalManager::MakeEmpty()");
 	Sample	*sample;
 	while(CountItems()){
-		sample = getSampleAt(0);
-		samples_list.Erase(0);
-		delete sample;
+		DeleteSampleAt(0);
 	}
 
 	samples_list.MakeEmpty();
@@ -130,11 +128,23 @@ ExternalManager::getSampleAt(int val){
 	return samples_list[val];
 }
 
+void		
+ExternalManager::DeleteSampleAt(int pos) {
+	Sample* toBeRemoved = getSampleAt(pos);
+	samples_list.Erase(pos);
+	delete toBeRemoved;
+}
 
-
-SampleList*
-ExternalManager::getSampleList(){
-	return &samples_list;
+void		
+ExternalManager::DeleteSample(Sample* toBeRemoved) {
+	for(int i=0;i<samples_list.Count();i++)
+	{
+		if (samples_list[i] == toBeRemoved)
+		{
+			DeleteSampleAt(i);
+			break;
+		}
+	}
 }
 
 int32
