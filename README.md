@@ -1,19 +1,17 @@
 # XRS for Haiku OS
 XRS is a simple Rhythm Station. You can use it to create music compositions and loops of your preferred elettronic music genres.
 
-Current version main features:
 
-Based on version 1.8 for Zeta
+**Current version main features:**
 
-32bit 44100 engine
+ - Based on version 1.8 for Zeta
 
-VST2 plugin support (effects and virtual instruments)
+- 32bit 44100 engine
 
-SoundFont support (via fluidlite)
+- VST2 plugin support (effects and virtual instruments)
 
-5 mixer lines
+- SoundFont support (via fluidlite)
 
-Export as WAVE AIFF
+- 5 mixer lines
 
-
-
+- Export as WAVE AIFF
