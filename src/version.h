@@ -1,5 +1,5 @@
 //Current version info
-#define     BOUND_CHECK         1
+//#define     BOUND_CHECK         1
 #define 	VERSION_NUMBER 		"1.9"
 
 #ifdef BOUND_CHECK

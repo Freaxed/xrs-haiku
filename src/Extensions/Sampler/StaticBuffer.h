@@ -33,7 +33,11 @@ public:
 		if (!IS_VALID(buffer)) {
 			LogError ("MediaFileLoader - Error : Out of memory.") ;
 		}
-		LogTrace("StaticBuffer ready (%d floats) (bound_check %d)!", NbFrames, BOUND_CHECK);
+		#ifdef BOUND_CHECK
+			LogTrace("StaticBuffer ready (%d floats) (YES bound_check)!", NbFrames);
+		#else
+			LogTrace("StaticBuffer ready (%d floats) (NO bound_check)!", NbFrames);
+		#endif
 	}
 
 	~StaticBuffer() {
