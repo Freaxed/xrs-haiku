@@ -1,4 +1,3 @@
-- Fix PianoRoll
 - WAVE Export (da finire)
 - ReadMe per github
 - version git su about.
