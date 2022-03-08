@@ -25,37 +25,7 @@
 #include <InterfaceKit.h>
 #include <strings.h>
 #include "TranslationKit.h"
-// -------------------------------------------------------------------
-void
-BroadcastToClients(const char* mimeAppStr, BMessage* theMesg)
-{
-	// Make a signature string of prospective clients
-	// Get a list of all running applications
-	BList* appList = new BList();
-	be_roster->GetAppList(appList);
-	
-	// Look through list for matching signatures
-	app_info theInfo;
-	team_id theTeam;
-	int32 numApps = appList->CountItems();
-	while(numApps > 0) {
-		theTeam = (team_id)appList->ItemAt(numApps - 1);
-		status_t result = be_roster->GetRunningAppInfo(theTeam,&theInfo);
-		if(result == B_OK) {
-			// Compare signature and send message if match
-			if(::strstr(theInfo.signature,mimeAppStr) != NULL) {
-				BMessenger* theMessenger = new BMessenger(NULL,theTeam);
-				if(theMessenger->IsValid()) {
-					theMessenger->SendMessage(theMesg);
-				}
-				delete theMessenger;
-			}
-		}
-		numApps--;
-	}
-	delete appList;
-	delete theMesg;
-}
+
 // -------------------------------------------------------------------
 void
 GetAppDirectoryPath(BPath* thePath)

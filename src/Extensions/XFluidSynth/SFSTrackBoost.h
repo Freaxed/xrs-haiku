@@ -3,7 +3,7 @@
 
 #include	"TrackBoost.h"
 #include	"XFSynth.h"
-#include	"ObjectList.h"
+#include	<ObjectList.h>
 
 
 class SFWindow;	

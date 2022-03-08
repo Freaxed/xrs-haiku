@@ -16,7 +16,7 @@
 #include 	"PianoEdit.h"
 #include	"locale.h"
 
-PianoControl::PianoControl(BRect frame,	char*	name):TrackEnd(frame,  name) 
+PianoControl::PianoControl(BRect frame,	const char*	name):TrackEnd(frame,  name) 
 {
 	fCurrentPattern = NULL;
 		

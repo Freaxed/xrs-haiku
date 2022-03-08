@@ -9,7 +9,6 @@
 #include <Menu.h>
 #include <MenuItem.h>
 #include <MenuField.h>
-#include "ObjectList.h"
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>

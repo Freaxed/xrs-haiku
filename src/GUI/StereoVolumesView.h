@@ -8,7 +8,7 @@
 
 #include <SupportDefs.h>
 #include <View.h>
-#include <ValuableManager.h>
+#include "ValuableManager.h"
 
 class	XPot;
 

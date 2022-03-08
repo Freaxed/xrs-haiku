@@ -14,7 +14,7 @@
 #include <Window.h>
 
 
-TrackEnd::TrackEnd(BRect r,char* name):BView(r,name,B_FOLLOW_NONE,B_WILL_DRAW) 
+TrackEnd::TrackEnd(BRect r, const char* name):BView(r,name,B_FOLLOW_NONE,B_WILL_DRAW) 
 {
 	AddChild(brez= new BPictureButton(BRect(6,1,6+10,1+8),"_menu",XUtils::GetPicture(0),XUtils::GetPicture(1),new BMessage('rez'),B_TWO_STATE_BUTTON));
 	SetViewColor(214,219,239);

@@ -21,7 +21,7 @@ class PianoControl : public	TrackEnd {
 	
 public:
 	
-						PianoControl(BRect	frame, char*	 name);
+						PianoControl(BRect	frame, const char*	 name);
 		  	void		Reset(Pattern* p);
 		 	void 		Draw(BRect r);
  			void		Expand();

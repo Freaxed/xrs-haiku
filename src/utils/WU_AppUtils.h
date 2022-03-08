@@ -27,11 +27,6 @@
 #include <Picture.h>
 
 // -------------------------------------------------------------------
-void
-BroadcastToClients(const char* mimeAppStr, BMessage* theMesg);
-// Broadcasts 'theMesg' to all running apps which have 'mimeAppStr'
-// as A PART of their application's signature.
-// -------------------------------------------------------------------
 // Sets the path to the BApplication's directory. The results may be
 // tested by thePath->InitCheck().
 void

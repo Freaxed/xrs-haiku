@@ -18,7 +18,7 @@ class BPictureButton;
 class TrackEnd: public BView
 {
 	public:
-			     			TrackEnd(BRect r, char* name);
+			     			TrackEnd(BRect r, const char* name);
 	 		virtual 	void 		MessageReceived(BMessage*);
 	 		virtual 	void		Draw(BRect r);
 	 		virtual 	void 		AttachedToWindow();
