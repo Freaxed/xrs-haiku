@@ -322,7 +322,7 @@ VolView::_randPar()
 	
 	for(int i=0;i<curPattern->getNumberNotes();i++)
 	{
-		double r = ( (double)rand() / (double)(RAND_MAX+1) );
+		double r = ( (double)rand() / (double)(RAND_MAX) );
 		
 		if(mode_view==VELOCITY_VIEW)
 		curPattern->getNoteAt(i)->SetGain(-r);	
