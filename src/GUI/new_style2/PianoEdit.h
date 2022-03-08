@@ -16,6 +16,9 @@
 #define	MOVESCROLL	'mosc'
 #define	NOTE		'note'
 #define	SLIDE		'slid'
+#define	NOTESIZE	10.0f
+#define	TOTALSIZE	120.0f	// piano Height
+
 
 class PianoEdit : public BView
 {
@@ -28,11 +31,12 @@ class PianoEdit : public BView
 	 void	MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg);
 	 void	ScrollTo(BPoint);
 	 void	_drawNote(int i,int j);
+
+	 bool	IsSharp(int v);
 	 
 	private:
-				Pattern*		pat;
-				BBitmap*		piano;
-				BView*			focused;
+		Pattern*		fPattern;
+		BBitmap*		fPianoBitmap;
 };
 
 #endif

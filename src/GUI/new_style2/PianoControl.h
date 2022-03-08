@@ -19,8 +19,6 @@ class PianoEdit;
 
 class PianoControl : public	TrackEnd {
 	
-	typedef	TrackEnd  _inherited;
-
 public:
 	
 						PianoControl(BRect	frame, char*	 name);
@@ -33,14 +31,13 @@ public:
 			void		Refresh();
 private:
 
-		Pattern*				curPattern;		
-		BScrollView*			scroll_view;
-		PianoEdit*				pe;
-		BBitmap*				piano;
-		BScrollBar*				ve;
+		Pattern*				fCurrentPattern;		
+		BScrollView*			fScrollView;
+		PianoEdit*				fPianoView;
+		BScrollBar*				fVerticalScrollBar;
 		BStringView*			w_note;
 		void					setNote(int n);
-		char					infonote[5];
+		char					infonote[16];
 		
 };
 

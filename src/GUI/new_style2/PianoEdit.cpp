@@ -14,71 +14,84 @@
 
 #include	<stdio.h>
 
-#define	NOTESIZE	10.
-#define	TOTALSIZE	120.	// piano Height
-#define NOTESTART	50.
+#define NOTESTART	 50.0f
+#define NOTE_REVERSE 107
 
-
-PianoEdit::PianoEdit(BRect r): BView(r,"",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW),pat(NULL)
+PianoEdit::PianoEdit(BRect r): BView(r,"",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW),fPattern(NULL)
 {
-	piano = XUtils::GetBitmap(8); //FIX, remove.
+	fPianoBitmap = XUtils::GetBitmap(8); //FIX, remove.
 	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 void 
-PianoEdit::Draw(BRect r){
-
-			
-		/*	if(r.Intersects(BRect(0,0,NOTESTART,120)))	DrawBitmap(piano,BPoint(NOTESTART-24,0));*/
-			
-	int	pianotop=(int)floor(r.top/(float)TOTALSIZE);
-	int	pianobottom=(int)floor(r.bottom/(float)TOTALSIZE);
+PianoEdit::Draw(BRect r)
+{
+	
+	int	pianotop	=(int)floor(r.top    / TOTALSIZE);
+	int	pianobottom =(int)floor(r.bottom / TOTALSIZE);
 				
 	for(int j=pianotop;j<pianobottom+1;j++) 
-		DrawBitmapAsync(piano,BPoint(0,j*TOTALSIZE));
+		DrawBitmapAsync(fPianoBitmap, BPoint(0, j * TOTALSIZE));
 			
 	
 
-	if(pat==NULL) return;
+	if(fPattern == NULL) 
+		return;
 			
 			
-			if(r.right<NOTESTART) return;
-			if(r.left<NOTESTART) r.left=NOTESTART;
-			
-			int	left=(int)floor((r.left-NOTESTART)/(23));
-			int	right=(int)ceil((r.right-NOTESTART+1.)/(23));
-			int	top=(int)floor((r.top)/(float)NOTESIZE);
-			int	bottom=(int)ceil((r.bottom+1.)/(float)NOTESIZE);
-			
+	if(r.right < NOTESTART) 
+		return;
 	
-			
-			SetHighColor(160,160,160);
-			
-			if(right>pat->getNumberNotes()) right=pat->getNumberNotes();
-			
-			for(int j=top;j<bottom;j++)
-			
-			for(int i=left;i<right;i++){
-			
-			int n=(j)%12;
-			
-			if(n==1 || n==3 || n==5 || n==8 || n==10)
-			
+	if(r.left < NOTESTART) 
+		r.left=NOTESTART;
+	
+	int	left	= (int)floor((r.left-NOTESTART)/(23));
+	int	right	= (int)ceil((r.right-NOTESTART+1.)/(23));
+	int	top		= (int)floor((r.top)/(float)NOTESIZE);
+	int	bottom	= (int)ceil((r.bottom+1.)/(float)NOTESIZE);
+
+	SetHighColor(160,160,160);
+	
+	if(right>fPattern->getNumberNotes()) 
+		right = fPattern->getNumberNotes();
+	
+	for(int j=top;j<bottom;j++)
+	{
+		for(int i=left;i<right;i++)
+		{
+			int n = j % 12;
+
+			if (IsSharp(n))
+			{
 				SetHighColor(168,199,190);
-			else
-				SetHighColor(160,192,182);
-				
-				_drawNote(i,j);
-			
 			}
+			else
+			{
+				SetHighColor(160,192,182);
+			}
+				
+			_drawNote(i,j);
+		
+		}
+	}
+}
+
+bool
+PianoEdit::IsSharp(int n)
+{
+	return ( n == 1 || 
+			 n == 3 || 
+			 n == 5 || 
+			 n == 8 || 
+			 n == 10 );
 }
 void
 PianoEdit::_drawNote(int i,int j)
 {
-	if(107-pat->getNoteAt(i)->getNote()==j)
+	if(NOTE_REVERSE-fPattern->getNoteAt(i)->getNote()==j)
 	{
 		SetHighColor(239,179,0);
-		if(!pat->getNoteAt(i)->getValue())
+		if(!fPattern->getNoteAt(i)->getValue())
 			SetHighColor(130,130,130);
 	}		
 		
@@ -91,7 +104,7 @@ PianoEdit::_drawNote(int i,int j)
 }
 void PianoEdit::MouseDown(BPoint point) {
 		
-	if(!Bounds().Contains(point) || pat==NULL)	return;
+	if(!Bounds().Contains(point) || fPattern==NULL)	return;
 	if(point.x<NOTESTART) return;
 	
 	uint32 buttons;
@@ -99,28 +112,27 @@ void PianoEdit::MouseDown(BPoint point) {
 	
 	int	ax1=(int)floor((point.x-NOTESTART)/(23));
 	
-	if (buttons & B_PRIMARY_MOUSE_BUTTON) {
-		
-		
+	if (buttons & B_PRIMARY_MOUSE_BUTTON) 
+	{
 		int	ax2=(int)floor(point.y/NOTESIZE);
 	
-		if(ax1>= pat->getNumberNotes() ) ax1=pat->getNumberNotes()-1;
+		if(ax1>= fPattern->getNumberNotes() ) ax1=fPattern->getNumberNotes()-1;
 		if(ax1<0) ax1=0;
 	
-		int old=pat->getNoteAt(ax1)->getNote();
+		int old = NOTE_REVERSE - fPattern->getNoteAt(ax1)->getNote();
 		
 		
 	
-		Invalidate(BRect(ax1*23+NOTESTART,(107-old)*NOTESIZE,ax1*23+22+NOTESTART,(107-old)*NOTESIZE+NOTESIZE+1));
-		pat->getNoteAt(ax1)->setNote(107-ax2);
-		Invalidate(BRect(ax1*23+NOTESTART,(ax2)*NOTESIZE,ax1*23+22+NOTESTART,(ax2)*NOTESIZE+NOTESIZE+1));
+		Invalidate(BRect(ax1*23+NOTESTART, old*NOTESIZE, ax1*23+22+NOTESTART, old*NOTESIZE + NOTESIZE+1));
+		fPattern->getNoteAt(ax1)->setNote( NOTE_REVERSE - ax2);
+		Invalidate(BRect(ax1*23+NOTESTART,(ax2*NOTESIZE),ax1*23+22+NOTESTART,(ax2*NOTESIZE)+NOTESIZE+1));
 	}
-	 else
-		 	{
-		 		BMessage* m=new BMessage(MOVESCROLL);
-		 		m->AddInt16("goto",pat->getNoteAt(ax1)->getNote());
-		 		Window()->PostMessage(m,Parent());	
-		 	}
+	else
+	{
+		BMessage* m=new BMessage(MOVESCROLL);
+		m->AddInt16("goto", (NOTE_REVERSE - fPattern->getNoteAt(ax1)->getNote()) - 5);
+		Window()->PostMessage(m,Parent());	
+	}
 	
 	BView::MouseDown(point);
 }
@@ -132,7 +144,7 @@ PianoEdit::ScrollTo(BPoint point)
 		
 	//post
 	BMessage* m=new BMessage(NOTE);
-	m->AddInt16("note",107-ax2);
+	m->AddInt16("note",NOTE_REVERSE-ax2);
 	Window()->PostMessage(m,Parent());	
 	BView::ScrollTo(point);
 }
@@ -157,16 +169,14 @@ PianoEdit::MouseMoved(BPoint point, uint32 code,const BMessage *dragDropMsg)
 	
 	//post
 	BMessage* m=new BMessage(NOTE);
-	m->AddInt16("note",107-ax2);
+	m->AddInt16("note",NOTE_REVERSE-ax2);
 	Window()->PostMessage(m,Parent());	
 }
 
 void 
 PianoEdit::Reset(Pattern* p)
 {
-
-	 pat=p; 
-	 Invalidate();
-
+ fPattern=p; 
+ Invalidate();
 };
 
