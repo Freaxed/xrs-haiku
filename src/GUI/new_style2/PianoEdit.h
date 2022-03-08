@@ -37,6 +37,7 @@ class PianoEdit : public BView
 	private:
 		Pattern*		fPattern;
 		BBitmap*		fPianoBitmap;
+		int				fMouseOverNote;
 };
 
 #endif

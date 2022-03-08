@@ -21,6 +21,7 @@ PianoEdit::PianoEdit(BRect r): BView(r,"",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW),fPatt
 {
 	fPianoBitmap = XUtils::GetBitmap(8); //FIX, remove.
 	SetViewColor(B_TRANSPARENT_COLOR);
+	fMouseOverNote = 5;
 }
 
 void 
@@ -32,12 +33,21 @@ PianoEdit::Draw(BRect r)
 				
 	for(int j=pianotop;j<pianobottom+1;j++) 
 		DrawBitmapAsync(fPianoBitmap, BPoint(0, j * TOTALSIZE));
-			
 	
+	Sync();
 
 	if(fPattern == NULL) 
 		return;
-			
+	
+	int	top		= (int)floor((r.top)/(float)NOTESIZE);
+	int	bottom	= (int)ceil((r.bottom+1.)/(float)NOTESIZE);
+
+	if (fMouseOverNote >= top && fMouseOverNote <= bottom) //MouseOver draw
+	{
+		SetHighColor(255, 0 , 0, 100);
+		StrokeRect(BRect(0, fMouseOverNote*NOTESIZE, NOTESTART,  fMouseOverNote*NOTESIZE + NOTESIZE));
+	}
+
 			
 	if(r.right < NOTESTART) 
 		return;
@@ -47,10 +57,9 @@ PianoEdit::Draw(BRect r)
 	
 	int	left	= (int)floor((r.left-NOTESTART)/(23));
 	int	right	= (int)ceil((r.right-NOTESTART+1.)/(23));
-	int	top		= (int)floor((r.top)/(float)NOTESIZE);
-	int	bottom	= (int)ceil((r.bottom+1.)/(float)NOTESIZE);
 
-	SetHighColor(160,160,160);
+
+	//SetHighColor(160,160,160);
 	
 	if(right>fPattern->getNumberNotes()) 
 		right = fPattern->getNumberNotes();
@@ -69,10 +78,9 @@ PianoEdit::Draw(BRect r)
 			{
 				SetHighColor(160,192,182);
 			}
-				
 			_drawNote(i,j);
-		
 		}
+		
 	}
 }
 
@@ -151,16 +159,16 @@ PianoEdit::ScrollTo(BPoint point)
 void
 PianoEdit::MouseMoved(BPoint point, uint32 code,const BMessage *dragDropMsg)
 {
-	int	ax2=(int)floor(point.y/NOTESIZE);
+	int	ax2 = (int)floor(point.y/NOTESIZE);
 	
-	if(code==B_ENTERED_VIEW )
+	if(code == B_ENTERED_VIEW )
 	{
 		MainWindow::Get()->SetWheelTarget(this);
 	}
 	
 	else
 	
-	if(code==B_EXITED_VIEW )
+	if(code == B_EXITED_VIEW )
 	{
 		ax2=108;
 		MainWindow::Get()->SetWheelTarget(NULL);
@@ -169,8 +177,14 @@ PianoEdit::MouseMoved(BPoint point, uint32 code,const BMessage *dragDropMsg)
 	
 	//post
 	BMessage* m=new BMessage(NOTE);
-	m->AddInt16("note",NOTE_REVERSE-ax2);
+	m->AddInt16("note", NOTE_REVERSE - ax2);
 	Window()->PostMessage(m,Parent());	
+
+	if (ax2 != fMouseOverNote) 
+	{
+		fMouseOverNote = ax2;
+		Invalidate();
+	}
 }
 
 void 
