@@ -187,9 +187,7 @@ LIBPATHS =
 #	Additional paths to look for system headers. These use the form
 #	"#include <header>". Directories that contain the files in SRCS are
 #	NOT auto-included here.
-#SYSTEM_INCLUDE_PATHS =  /boot/system/develop/headers/be \
-# /boot/system/develop/headers/cpp \
-# /boot/system/develop/headers/posix
+SYSTEM_INCLUDE_PATHS =  
 
 #	Additional paths paths to look for local headers. These use the form
 #	#include "header". Directories that contain the files in SRCS are

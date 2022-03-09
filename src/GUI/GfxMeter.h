@@ -12,7 +12,6 @@
 #define _GfxMeter_h_
 
 #include <View.h>
-#include "async.h" //?
 #include "ValuableManager.h"
 
 class BBitmap;
