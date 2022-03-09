@@ -16,7 +16,7 @@ TARGET_DIR = .
 TYPE = APP
 
 # 	If you plan to use localization, specify the application's MIME signature.
-APP_MIME_SIG = 
+APP_MIME_SIG = application/x-vnd.xeD.XRS
 
 #	The following lines tell Pe and Eddie where the SRCS, RDEFS, and RSRCS are
 #	so that Pe and Eddie can fill them in for you.
@@ -153,7 +153,7 @@ SRCS =  ./src/Configurator.cpp \
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.
-RDEFS = 
+RDEFS = resources/XRS.rdef
 
 #	Specify the resource files to use. Full or relative paths can be used.
 #	Both RDEFS and RSRCS can be utilized in the same Makefile.
@@ -175,7 +175,7 @@ RSRCS =  resources/XRS.rsrc resources/skin.rsrc
 #	- 	if your library does not follow the standard library naming scheme,
 #		you need to specify the path to the library and it's name.
 #		(e.g. for mylib.a, specify "mylib.a" or "path/mylib.a")
-LIBS =  be localestub translation game media tracker stdc++ fluidlite vorbisfile sndfile samplerate
+LIBS =  be localestub translation game media tracker stdc++ /boot/system/lib/libfluidlite.so sndfile samplerate
 
 #	Specify additional paths to directories following the standard libXXX.so
 #	or libXXX.a naming scheme. You can specify full paths or paths relative
