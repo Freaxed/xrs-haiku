@@ -69,7 +69,7 @@ LoadIcon(const char* name){
 	BPath icon_path(GetAppRelativePath().String());
 	icon_path.Append("icons");
 	icon_path.Append(name);
-	return ImageCache::GetImage(icon_path.Path(),BString(name));	
+	return ImageCache::GetImage(icon_path.Path(), BString(name));	
 }
 
 void		

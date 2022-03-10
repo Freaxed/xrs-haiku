@@ -35,6 +35,7 @@
 #include <TypeConstants.h>
 #include <Screen.h>
 #include <GroupLayout.h>
+#include <IconUtils.h>
 #include "Log.h"
 
 //don't move.
@@ -69,8 +70,7 @@ XUtils::ResetList(BView* view)
 		p_list->AddItem((void*)MakePictureSkin("max_off",view));	//7
 		p_list->AddItem((void*)MakePictureSkin("par_tool_off",view));	//8				
 		p_list->AddItem((void*)MakePictureSkin("par_tool",view));	//9
-		p_list->AddItem((void*)MakePictureSkin("donate.gif",view));	//10
-	
+		p_list->AddItem((void*)NULL);	
 	}
 	
 	BBitmap *nil=NULL;
@@ -263,6 +263,21 @@ XUtils::EasyButton(BRect buttonsize, int32 index,BMessage *msg, BView *view)
 	return PBut;
 }
 
+
+BBitmap*
+XUtils::CreateBootBitmap(BRect r)
+{
+	BBitmap *image = new BBitmap(r, B_RGBA32);
+	BResources* resources = be_app->AppResources();
+	size_t size = 0;
+	const void* buffer = resources->LoadResource('VICN', "BEOS:ICON", &size);
+	
+	if (buffer != NULL)
+		BIconUtils::GetVectorIcon((uint8*)buffer, size, image);
+
+	return  image;
+}
+/*
 void
 XUtils::CreateBootBitmap(BRect* z, BBitmap** img, bool big)
 {
@@ -302,7 +317,7 @@ XUtils::CreateBootBitmap(BRect* z, BBitmap** img, bool big)
 	if(!big)
 		delete shot;
 	delete vista;
-}
+}*/
 
 BPicture*
 XUtils::MakePicture(BBitmap* bit ,BView* vie)

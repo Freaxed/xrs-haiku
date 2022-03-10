@@ -18,17 +18,10 @@ class AboutBox : public BWindow
 	 	   ~AboutBox();
 	 	
 	 	void 	setText(const char*);
-		void 	WindowActivated(bool);
-		void	MessageReceived(BMessage*);
 	 
 	private:
-	 		//TODO: fix these ugly names:
-	 		
-	 		BStringView *text;
-	 		BBitmap*	shot;
-			BView*		w;
-			BPoint 		centered_point;
-			bool		big_mode;
+	 		BStringView*	fStatusText;
+			BBitmap*		fAboutBitmap;
 		 	
 };
 //--

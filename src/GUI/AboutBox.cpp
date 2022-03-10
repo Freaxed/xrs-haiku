@@ -10,69 +10,28 @@
 #include "Xed_Utils.h"
 #include "version.h"
 #include "locale.h"
-#include "URLView.h"
-
-#include <malloc.h>
 #include <Alert.h>
 #include <Box.h>
-#include <Button.h>
 #include <Window.h>
-#include <String.h>
-#include <Roster.h>
+#include "Colors.h"
 
-#define PREFS_H 204
+#define PREFS_H 300
 #define PREFS_L 300
 
-#define CLOSE_NOW	'clos'
 
-AboutBox::~AboutBox(){
-	delete shot;
-}
-
-void
-AboutBox::WindowActivated(bool on)
+AboutBox::AboutBox(bool big_mode):BWindow( BRect( 0, 0, PREFS_L, PREFS_H), 
+                                           "About XRS", 
+										   B_TITLED_WINDOW_LOOK, 
+										   B_MODAL_APP_WINDOW_FEEL, 
+										   B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE)
 {
-	BWindow::WindowActivated(on);
-	if(!on) 
-		return;
-	
-	BRect r(Bounds());
-	r.OffsetBy(centered_point);
-	
-	XUtils::CreateBootBitmap(&r,&shot, true);
-	
-	w->SetViewBitmap(shot);
-	MoveTo(centered_point);
-
-	w->Invalidate();
-}
-
-void
-AboutBox::MessageReceived(BMessage* m)
-{
-	if(m->what == CLOSE_NOW)
-	{
-		 PostMessage(new BMessage(B_QUIT_REQUESTED));
-	}
-	else
-		BWindow::MessageReceived(m);
-	
-}
-AboutBox::AboutBox(bool mode):BWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS|B_NOT_RESIZABLE)
-{
+	fStatusText = NULL;
 	float larg = PREFS_L;
-	
-	if(mode) 
-	{
-		larg += 100;
-		ResizeBy(100,0);
-	}
-	
-	MoveTo(-2*larg,-2*PREFS_H);
-	big_mode=mode;
-	centered_point=BAlert::AlertPosition(larg,PREFS_H);
 
-	if(!mode) 
+	MoveTo(-2*larg,-2*PREFS_H);
+	BPoint centered_point = BAlert::AlertPosition(larg,PREFS_H);
+
+	if(!big_mode) 
 		SetLook(B_NO_BORDER_WINDOW_LOOK);
 	
 	BView *sporca=new BView(BRect(0,0,10,10),"",B_FOLLOW_NONE,B_WILL_DRAW);
@@ -80,77 +39,72 @@ AboutBox::AboutBox(bool mode):BWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_MODAL_WIN
 	
 	XUtils::ResetList(sporca);
 	RemoveChild(sporca);
-	
-	BRect r(Frame());
-	
-	w=new BView(Bounds(),"",B_FOLLOW_NONE,B_WILL_DRAW);
-	AddChild(w);
-	
-	r=Bounds();
-	
-	r.top=r.bottom+1;
-	
-	float k=0;
-	if(mode) 
-		k=150;
-		
-	r.bottom+=k;
-	ResizeBy(-1,k-1);
-	
-	BBox *but=new BBox(r,"",B_FOLLOW_ALL,B_WILL_DRAW);
-	
-		
-	if(mode){
-	
+
+
+	fAboutBitmap = XUtils::CreateBootBitmap(Bounds());
 
 	
-	BButton *ok=new BButton(BRect(300,100,300+61,100+30),"","..ok?",new BMessage(CLOSE_NOW));
-	ok->SetFontSize(12);
-	but->AddChild(ok);
-	text=NULL;
+	BRect r(Bounds());
+	BView* w;
+	AddChild(w = new BView(r, "LogoView", B_FOLLOW_NONE, B_WILL_DRAW));
 	
 	
 	
-	URLView *email = new URLView( BRect( 20, 35, 299, 50 ), "Author ", "Andrea Anzani", "" );
-	email->SetHoverEnabled( true );
-	email->AddAttribute( "META:name", "Andrea Anzani" );
-	email->AddAttribute( "META:nickname", "xeD" );
-	email->AddAttribute( "META:url", "https://github.com/Freaxed/xrs-haiku" );
-	email->AddAttribute( "META:country", "Italy" );
+	float k   = big_mode ? 150 : 20;
+	r.top 	  = r.bottom + 1;
+	r.bottom += k;
+
+	ResizeBy(0, k-1);
 	
+	BBox* but = new BBox(r, "UnderTheLogo", B_FOLLOW_ALL, B_WILL_DRAW);
 	
-	but->AddChild( new BStringView(BRect(10,10,200,35),"",T_DIALOG_WRITTEN_BY)); 
-	but->AddChild( email );
-	but->AddChild(new URLView(BRect( 20,50,200,65),"","GitHub Page","https://github.com/Freaxed/xrs-haiku"));
-	
-	BStringView *sv;
-	but->AddChild( sv = new BStringView(BRect(10,70,299,85),"","FluidLite library (LGPL) by www.iiwu.org")); 
-	sv->SetFontSize(10);
-	but->AddChild( sv = new BStringView(BRect(10,88,299,103),"","VST Plug-In Technology by Steinberg")); 
-	sv->SetFontSize(10);
-	
-	BString version;
-	version << "Version: " << VERSION_NUMBER << "    Build: " << __DATE__ << "   [" << CODENAME << "]" << "[Haiku version]";
-	
-	but->AddChild(sv =new BStringView(BRect(10,50+80,380,50+95),"",version.String()));
-	sv->SetFontSize(10);
-	
-	}
-	 else
+	if(big_mode)
 	{
-		but->AddChild( text=new BStringView(BRect(0,0,r.Width(),20),"",T_DIALOG_LOADING)); 
+		BRect x(0, 0, 299 - B_V_SCROLL_BAR_WIDTH , 149);
+		BRect y(0, 0, 299 - B_V_SCROLL_BAR_WIDTH , 149);
+
+		BTextView* textView = new BTextView(x, "about_text", y, B_FOLLOW_NONE);
+		BScrollView* scrollView = new BScrollView("scrollView", textView, B_FOLLOW_NONE, 0, false, true, B_FANCY_BORDER);
+		but->AddChild(scrollView);
+		textView->SetStylable (true);
+ 		textView->MakeEditable (false);
+		textView->SetFontAndColor(be_bold_font, B_FONT_ALL, &Blue);
+		textView->Insert("XRS version ");
+		textView->Insert(VERSION_NUMBER);
+		textView->Insert(" by Andrea Anzani\n");
+		textView->SetFontAndColor(be_plain_font, B_FONT_ALL, &Black);
+		textView->Insert("https://github.com/Freaxed/xrs-haiku\n\n");
+		textView->Insert("FluidLite by Robin Lobel (LGPL-2.1-or-later)\n\n");
+		textView->Insert("libsndfile library by Erik de Castro Lopo (LGPL-2.1-or-later)\n\n");
+		textView->Insert("libsamplerate library by Erik de Castro Lopo (BSD-2-Clause License)\n\n");
+		textView->Insert("VST Plug-In Technology by Steinberg\n\n");
+	}
+	else
+	{
+		but->AddChild( fStatusText = new BStringView(BRect(0, 0, r.Width(), 20),"", T_DIALOG_LOADING)); 
 	}
 
 	AddChild(but);
+	w->SetViewBitmap(fAboutBitmap);
+	MoveTo(centered_point);
 	
 }
+
+AboutBox::~AboutBox()
+{
+	if (fAboutBitmap)
+		delete fAboutBitmap;
+}
+
 void
 AboutBox::setText(const char*t)
 {
-//	if( text!=NULL )	
+	if (fStatusText == NULL)
+		return;
+
 	if(Lock())
 	{
-		text->SetText(t); 
+		fStatusText->SetText(t); 
 		Unlock();
  	}
 }

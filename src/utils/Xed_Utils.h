@@ -32,7 +32,7 @@ class XUtils
 		
 		static BAlert*			ShowIdleAlert(const char* multilineText);
 		static void				HideIdleAlert(BAlert*);
-		static void				CreateBootBitmap(BRect* z,BBitmap** bitmap,bool mode);
+		static BBitmap*			CreateBootBitmap(BRect size);
 
 
 		static	void			FillPresetsMenu(const char* plugname,BMenu* men, uint32);
