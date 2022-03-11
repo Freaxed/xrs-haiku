@@ -10,6 +10,7 @@
 #include "Xed_Utils.h"
 #include "version.h"
 #include "locale.h"
+#include "commit.h"
 #include <Alert.h>
 #include <Box.h>
 #include <Window.h>
