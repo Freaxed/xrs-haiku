@@ -14,6 +14,7 @@
 #include <Alert.h>
 #include <Box.h>
 #include <Window.h>
+#include <Font.h>
 #include "Colors.h"
 
 #define PREFS_H 300
@@ -69,10 +70,15 @@ AboutBox::AboutBox(bool big_mode):BWindow( BRect( 0, 0, PREFS_L, PREFS_H),
 		but->AddChild(scrollView);
 		textView->SetStylable (true);
  		textView->MakeEditable (false);
-		textView->SetFontAndColor(be_bold_font, B_FONT_ALL, &Blue);
+
+		BFont font(be_plain_font);
+		font.SetSize(14.0);
+		textView->SetFontAndColor(&font, B_FONT_ALL, &Blue);
 		textView->Insert("XRS version ");
 		textView->Insert(VERSION_NUMBER);
-		textView->Insert(" by Andrea Anzani\n");
+		textView->Insert(" (");
+		textView->Insert(GIT_COMMIT);
+		textView->Insert(")\nby Andrea Anzani\n");
 		textView->SetFontAndColor(be_plain_font, B_FONT_ALL, &Black);
 		textView->Insert("https://github.com/Freaxed/xrs-haiku\n\n");
 		textView->Insert("FluidLite by Robin Lobel (LGPL-2.1-or-later)\n\n");

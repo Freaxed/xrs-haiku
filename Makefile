@@ -1,6 +1,6 @@
 OLD_COMMIT := $(shell cat src/commit.h)
 COMMIT := $(shell git rev-parse --short HEAD)
-COMMIT_FILE := $(shell echo '\#define GIT_COMMIT  $(COMMIT)')
+COMMIT_FILE := $(shell echo '\#define GIT_COMMIT  "$(COMMIT)"')
 ##TEST := $(shell echo '$(COMMIT_FILE) | $(OLD_COMMIT)' > test.h)
 ifneq ($(COMMIT_FILE), $(OLD_COMMIT))
 	UPDATE_FILE := $(shell echo '$(COMMIT_FILE)' > src/commit.h)
