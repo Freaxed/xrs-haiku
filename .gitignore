@@ -9,3 +9,4 @@ objects.x86_64*
 
 src/tests/test-sampler/output.wav
 
+src/commit.h
