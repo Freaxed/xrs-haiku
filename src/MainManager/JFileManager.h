@@ -10,17 +10,27 @@
 #ifndef _JFILEMANAGER_H_
 #define _JFILEMANAGER_H_
 
-#include  <File.h>
+#include <File.h>
 #include <NodeInfo.h>
+#include <FilePanel.h>
 
 class Song;
-class SJFilter; 
 class BFilePanel;
 
 #define	X_REFS_RECEIVED	'xrec'
 
 class Track;
 
+class SJFilter : public BRefFilter
+{
+public:
+		SJFilter(){};
+		
+		bool Filter(const entry_ref*, BNode* node, struct stat_beos*, const char* mimeType)
+		{
+			return ( node->IsDirectory() || (strcmp(mimeType,"audio/XRS-File") == 0));
+		}
+};
 
 
 

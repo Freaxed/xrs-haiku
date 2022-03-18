@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <SymLink.h>
 #include <FindDirectory.h>
-#include <FilePanel.h>
 #include <Roster.h>
 #include <Application.h>
 #include <Path.h>
@@ -31,8 +30,6 @@
 #include <Button.h>
 #include <MediaTrack.h>
 #include <MediaFile.h>
-
-#include "SJFilter.h"
 
 #include  "Song.h"
 #include "Pattern.h"
