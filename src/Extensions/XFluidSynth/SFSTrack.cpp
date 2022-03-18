@@ -72,7 +72,7 @@ SFSTrack::getModel(){return 7;}
 
 const char*
 SFSTrack::getPreferredName() {
-	return "XFluidSynth";
+	return "SoundFont";
 } 
 
 void SFSTrack::Process(float** buffer,int32 samples_num,int spiaz,float factor)

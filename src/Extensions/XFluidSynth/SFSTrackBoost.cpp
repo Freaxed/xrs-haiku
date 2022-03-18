@@ -31,7 +31,7 @@ const XFSynth			*ptheSynth=&theSynth;
 SFSTrackBoost::SFSTrackBoost():TrackBoost()
 {
 	fluid_booster=this;
-	name <<"XFluidSynth";
+	name <<"SoundFont";
 	id=MY_ID;
 
 	theSynth.Init();
@@ -191,7 +191,7 @@ SFSTrackBoost::LoadSF(const char* filename)
 		{
 			BString what("Can't load the SoundFont file [");
 			what << filename << "]!";
-			LoadingError::Add("XFluidSynth", what.String(), "Find the missing SoundFont and assign to the right tracks!");
+			LoadingError::Add("SoundFont", what.String(), "Find the missing SoundFont and assign to the right tracks!");
 		}
 
 		
