@@ -11,3 +11,7 @@ resource app_version {
 	short_info	= "XRS",
 	long_info	= "XRS"
 };
+
+resource file_types message {
+	"types" = "audio/XRS-File"
+};
