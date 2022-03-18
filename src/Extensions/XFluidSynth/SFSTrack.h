@@ -21,25 +21,26 @@ class SFSTrack: public Track
 	virtual	int			getModel();
 	virtual	void			goOn();
 	virtual	void			goOff();
-	virtual 	void 			Message(SynthMessage msg, float data);
+	virtual 	void 		Message(SynthMessage msg, float data);
 
 	virtual	bool			HasData(){ return hasdata; }
 			void			SetHasData(bool b){ hasdata=b;}
 	
 	virtual	XRSVoice		newVoice(Note* n,int VoiceTag);
-	virtual	void				stopVoice(int note=-1);
-	virtual	void				RouteLineChanged(int line);
+	virtual	void			stopVoice(int note=-1);
+	virtual	void			RouteLineChanged(int line);
 		
 
-			void		SetChannel(int ch);
-			int		GetChannel(){ return channel;}
+	void		SetChannel(int ch);
+	int			GetChannel();
 			
-			void		SetReverbSend(int val){ reverb_send=val;};
-			int		GetReverbSend(){ return reverb_send;};
+	void		SetReverbSend(int val);
+	int			GetReverbSend();
 			
-			void		SetChorusSend(int val){ chorus_send=val;};
-			int		GetChorusSend(){ return chorus_send;};	
-			virtual rgb_color	GetPreferredPadColor(){ rgb_color a={174,155,87,255}; return a;}
+	void		SetChorusSend(int val);
+	int			GetChorusSend();
+
+	virtual rgb_color	GetPreferredPadColor(){ rgb_color a={174,155,87,255}; return a;}
 
 
 	void				SaveCustomSettings(BMessage& msg);

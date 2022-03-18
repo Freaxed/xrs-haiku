@@ -14,8 +14,7 @@
 #define	SET_CHORUS			'seth'
 
 
-#define	DEF_CONTROL_CHORUS	93
-#define	DEF_CONTROL_REVERB	91
+
 
 #define	SHOW_WINDOW	'sviw'
 
@@ -167,14 +166,12 @@ SFSPanel::MessageReceived(BMessage* msg)
 			menu->Superitem()->SetLabel(ptheSynth->GetChannelPresetName(myTrack->GetChannel()));
 		break;
 		case SET_REVERB:
-			if(myTrack==NULL || !ptheSynth->IsValid()) return;
-			ptheSynth->SendCC(myTrack->GetChannel(),DEF_CONTROL_REVERB,reverb->Value());
-			myTrack->SetReverbSend(reverb->Value());
+			if(myTrack)
+				myTrack->SetReverbSend(reverb->Value());
 		break;
 		case SET_CHORUS:
-			if(myTrack==NULL || !ptheSynth->IsValid()) return;
-			ptheSynth->SendCC(myTrack->GetChannel(),DEF_CONTROL_CHORUS,chorus->Value());
-			myTrack->SetChorusSend(chorus->Value());
+			if(myTrack)
+				myTrack->SetChorusSend(chorus->Value());
 		break;
 		default:
 			PlugPanel::MessageReceived(msg);

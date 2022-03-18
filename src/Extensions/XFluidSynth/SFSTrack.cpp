@@ -10,6 +10,9 @@
 
 #define	 FRAMES_NUM	1024
 
+#define	DEF_CONTROL_CHORUS	93
+#define	DEF_CONTROL_REVERB	91
+
 
 extern	fluid_settings_t* settings;
 extern 	SFSTrackBoost*	  fluid_booster;
@@ -153,3 +156,37 @@ SFSTrack::LoadCustomSettings(BMessage& msg)
 	SetReverbSend(msg.FindInt16("Reverb"));
 	SetChorusSend(msg.FindInt16("Chorus"));
 }
+
+int
+SFSTrack::GetChannel()
+{ 
+	return channel;
+}
+		
+void
+SFSTrack::SetReverbSend(int val)
+{ 
+	reverb_send = val;
+	if (ptheSynth)
+		ptheSynth->SendCC(GetChannel(), DEF_CONTROL_REVERB, reverb_send);
+}
+
+int			
+SFSTrack::GetReverbSend()
+{ 
+	return reverb_send;
+}
+			
+void
+SFSTrack::SetChorusSend(int val)
+{ 
+	chorus_send = val;
+	if (ptheSynth)
+		ptheSynth->SendCC(GetChannel(), DEF_CONTROL_CHORUS, chorus_send);
+}
+
+int
+SFSTrack::GetChorusSend()
+{ 
+	return chorus_send;
+};	
