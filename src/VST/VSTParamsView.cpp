@@ -4,8 +4,23 @@
 #include <GroupLayout.h>
 #include "VSTKnob.h"
 #include <StringView.h>
+#include "vestige.h"
 
 #define MAX_PER_ROW 10
+
+/*
+	fEffect->dispatcher (fEffect, effEditGetRect, 0, 0, &rect, 0);
+	if (rect)
+	{
+		nativeUI=true;
+		ResizeTo (float (rect[3] - 1), float (rect[2] - 1) );
+		BRect frame (Bounds ());
+		//frame.top += kConfigHeight;
+		BView * host = new BView (frame, 0, 0, 0);
+		AddChild (host);
+		fEffect->dispatcher (fEffect, effEditOpen, 0, 0, host, 0);
+	}
+*/
 
 VSTParamsView::VSTParamsView(VSTPlugin* plugin)
               : BView("VSTParamsView", B_WILL_DRAW|B_FRAME_EVENTS, NULL), fPlugin(plugin)
@@ -19,10 +34,22 @@ VSTParamsView::VSTParamsView(VSTPlugin* plugin)
 	group->AddItem(grid);
 	grid->SetSpacing(1, 1);
 	
+	//fEffect->dispatcher (fEffect, effOpen, 0, 0, 0, 0.);
+	short *rect = 0;
+	VSTEffect*	fEffect = fPlugin->Effect();
+	fEffect->dispatcher (fEffect, effEditGetRect, 0, 0, &rect, 0);
+	if (rect)
+	{
+		BView * host = new BView (BRect(0,0, 500, 500), "editor", 0, 0);
+		grid->AddView (host, 0, 0);
+		fEffect->dispatcher (fEffect, effEditOpen, 0, 0, host, 0);
+	} else
+	{
 	int count = plugin->ParametersCount();
 	for (int p = 0; p < count; p++) {
 		VSTKnob* knob = new VSTKnob(plugin->Parameter(p));
 		grid->AddView(knob, p % MAX_PER_ROW, p / MAX_PER_ROW);
+	}
 	}
 
 	ResizeTo(group->BasePreferredSize());

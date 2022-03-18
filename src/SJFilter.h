@@ -16,5 +16,8 @@ public:
 		SJFilter(){};
 		
 		bool Filter(const entry_ref* ref, BNode* node,
-						struct stat_beos* stat, const char* mimeType);
+						struct stat_beos* stat, const char* mimeType)
+		{
+			return ( node->IsDirectory() || (strcmp(mimeType,"audio/XRS-File") == 0));
+		}
 };

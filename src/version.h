@@ -3,9 +3,9 @@
 #define 	VERSION_NUMBER 		"1.9.0"
 
 #ifdef BOUND_CHECK
-    #define 	DEFAULT_TITLE  		"[BC] XRS"
+    #define 	DEFAULT_TITLE  	"[BC] XRS"
 #else
-    #define 	DEFAULT_TITLE  		"XRS"
+    #define 	DEFAULT_TITLE  	"XRS"
 #endif
 
 #define		FILE_VERSION_INT	5

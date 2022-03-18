@@ -1,4 +1,8 @@
 - WAVE Export (da finire)
 - ReadMe per github
-- version git su about.
+- togliere open3030
 - dipendenze nel receipe?
+- rename track
+    - VST Instrument
+    - SoundFont
+- Fix chorus / reverb / channel per le tracce di SoundFont

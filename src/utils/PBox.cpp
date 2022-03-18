@@ -368,7 +368,7 @@ float PBox::BuildGUI(BMessage& viewTemplate, BMessage& settings, BView *view) {
 		
 		
 		view->AddChild(control);
-		printf("added child %s %s\n",control->Name(),name);
+		//printf("added child %s %s\n",control->Name(),name);
 		
 		if(enabling)
 			 ((BCheckBox*)control)->SetTarget(this);

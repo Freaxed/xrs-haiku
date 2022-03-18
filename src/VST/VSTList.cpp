@@ -6,12 +6,13 @@
  */
 
 
+
 #include <Entry.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <PathFinder.h>
 #include <StringList.h>
-
+#include "Log.h"
 #include "VSTList.h"
 
 VSTList::VSTList()
@@ -26,7 +27,7 @@ VSTList::VSTList()
 	for (int32 i = 0; i < folders.CountStrings(); i++)
 		ScanPluginsFolder(folders.StringAt(i).String());
 		
-	ScanPluginsFolder("/boot/data/haikuports/media-plugins/open303/Out");
+	ScanPluginsFolder("/boot/data/oxefmsynth/out");
 }
 
 VSTList::~VSTList()
@@ -108,8 +109,10 @@ VSTList::ScanPluginsFolder(const char* path, bool make_dir)
 			if (ret == B_OK) {
 				plugin->UnLoadModule();
 				fPluginsList.AddItem(plugin);				
-			} else
+			} else {
+				LogError("Can't load plugin %s (%d)", p.Path(), ret);
 				delete plugin;
+			}
 		}
 	}
 	return 0;
