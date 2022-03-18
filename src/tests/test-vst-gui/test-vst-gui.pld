@@ -45,6 +45,7 @@ LOCALINCLUDE=/boot/data/xrs/code/xrs-haiku/src/vst_host
 LOCALINCLUDE=/boot/data/xrs/code/xrs-haiku/src/GUI
 LOCALINCLUDE=/boot/data/xrs/code/xrs-haiku/src/vst_host
 LOCALINCLUDE=/boot/data/xrs/code/xrs-haiku/src/GUI
+LOCALINCLUDE=boot/data/xrs/code/xrs-haiku/src/utils
 LOCALINCLUDE=.
 LOCALINCLUDE=../../vst_host
 LOCALINCLUDE=../../GUI
