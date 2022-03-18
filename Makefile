@@ -1,10 +1,3 @@
-OLD_COMMIT := $(shell cat src/commit.h)
-COMMIT := $(shell git rev-parse --short HEAD)
-COMMIT_FILE := $(shell echo '\#define GIT_COMMIT  "$(COMMIT)"')
-##TEST := $(shell echo '$(COMMIT_FILE) | $(OLD_COMMIT)' > test.h)
-ifneq ($(COMMIT_FILE), $(OLD_COMMIT))
-	UPDATE_FILE := $(shell echo '$(COMMIT_FILE)' > src/commit.h)
-endif
 ## Haiku Generic Makefile v2.6 ##
 
 ## Fill in this file to specify the project being created, and the referenced
@@ -36,8 +29,7 @@ APP_MIME_SIG = application/x-vnd.xeD.XRS
 #	means this Makefile will not work correctly if two source files with the
 #	same name (source.c or source.cpp) are included from different directories.
 #	Also note that spaces in folder names do not work well with this Makefile.
-SRCS =  ./src/Configurator.cpp \
-./src/DrawCentredText.cpp \
+SRCS =  \
 ./src/Engine/Engine.cpp \
 ./src/Engine/JuiceEngine.cpp \
 ./src/Extensions/JMDrum/src/Drum.cpp \
@@ -96,8 +88,6 @@ SRCS =  ./src/Configurator.cpp \
 ./src/GUI/TickView.cpp \
 ./src/GUI/TrackInfoWindow.cpp \
 ./src/GUI/TracksPanel.cpp \
-./src/GUI/VSTKnob.cpp \
-./src/GUI/VSTParamsView.cpp \
 ./src/GUI/ValuablePeakView.cpp \
 ./src/GUI/VertPeakView.cpp \
 ./src/GUI/XDigit.cpp \
@@ -127,17 +117,15 @@ SRCS =  ./src/Configurator.cpp \
 ./src/MainManager/TrackManager.cpp \
 ./src/MainManager/VstManager.cpp \
 ./src/MainManager/XHost.cpp \
-./src/MeasureManager.cpp \
+./src/MainManager/MeasureManager.cpp \
+./src/MainManager/WindowManager.cpp \
 ./src/Mixer/PBus.cpp \
 ./src/Mixer/PEffector.cpp \
 ./src/Mixer/PMixable.cpp \
 ./src/Mixer/PMixer.cpp \
-./src/SJFilter.cpp \
 ./src/Valuable/Valuable.cpp \
 ./src/Valuable/ValuableManager.cpp \
 ./src/Valuable/ValuableMonitorWindow.cpp \
-./src/WindowManager.cpp \
-./src/media/VSTItem.cpp \
 ./src/struct/Note.cpp \
 ./src/struct/Pattern.cpp \
 ./src/struct/Sequence.cpp \
@@ -152,10 +140,14 @@ SRCS =  ./src/Configurator.cpp \
 ./src/utils/Utils.cpp \
 ./src/utils/WU_AppUtils.cpp \
 ./src/utils/Xed_Utils.cpp \
-./src/vst_host/ParameterSlider.cpp \
-./src/vst_host/VSTConfigureView.cpp \
-./src/vst_host/VSTHost.cpp \
-./src/vst_host/VSTList.cpp
+./src/utils/Configurator.cpp \
+./src/utils/DrawCentredText.cpp \
+./src/VST/VSTKnob.cpp \
+./src/VST/VSTParamsView.cpp \
+./src/VST/ParameterSlider.cpp \
+./src/VST/VSTHost.cpp \
+./src/VST/VSTItem.cpp \
+./src/VST/VSTList.cpp
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.
@@ -219,7 +211,7 @@ LOCAL_INCLUDE_PATHS =  \
 ./src/media \
 ./src/struct \
 ./src/utils \
-./src/vst_host
+./src/VST
 
 #	Specify the level of optimization that you want. Specify either NONE (O0),
 #	SOME (O1), FULL (O2), or leave blank (for the default optimization level).
@@ -249,7 +241,7 @@ SYMBOLS :=
 
 #	Includes debug information, which allows the binary to be debugged easily.
 #	If set to "TRUE", debug info will be created.
-DEBUGGER := TRUE
+DEBUGGER := 
 
 #	Specify any additional compiler flags to be used.
 COMPILER_FLAGS = 

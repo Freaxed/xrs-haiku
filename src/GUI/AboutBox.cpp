@@ -10,7 +10,6 @@
 #include "Xed_Utils.h"
 #include "version.h"
 #include "locale.h"
-#include "commit.h"
 #include <Alert.h>
 #include <Box.h>
 #include <Window.h>
@@ -77,7 +76,7 @@ AboutBox::AboutBox(bool big_mode):BWindow( BRect( 0, 0, PREFS_L, PREFS_H),
 		textView->Insert("XRS version ");
 		textView->Insert(VERSION_NUMBER);
 		textView->Insert(" (");
-		textView->Insert(GIT_COMMIT);
+		textView->Insert(CODENAME);
 		textView->Insert(")\nby Andrea Anzani\n");
 		textView->SetFontAndColor(be_plain_font, B_FONT_ALL, &Black);
 		textView->Insert("https://github.com/Freaxed/xrs-haiku\n\n");
