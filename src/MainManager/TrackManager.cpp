@@ -289,15 +289,11 @@ TrackManager::SelectTrack(JTrack* x) {
 						current->Hide();
 					current=(BView*)v;
 					current->Show();
-					LogTrace("1Before Lock");
 					TrackInfoWindow::Get()->Unlock();
-					//TrackInfoWindow::Get()->UpdateIfNeeded();
-					//TrackInfoWindow::Get()->Activate();
-					LogTrace("2Before Lock");
 					v->ResetToTrack(x->getTrack());
 					TrackInfoWindow::Get()->SetTrack(x->getTrack());
-					//TrackInfoWindow::Get()->UpdateIfNeeded();
-					LogTrace("3Before Lock");
+
+
 				}
 				LogTrace("After Lock");
 				
