@@ -30,6 +30,8 @@ BMessenger* mess;
 
 extern	XFSynth			*ptheSynth;
 
+#define MULT 100
+
 			
 SFWindow::SFWindow() :
 	BWindow(BRect(450,30,450+WWIN,30+HWIN),"SoundFont", B_FLOATING_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_NOT_ZOOMABLE)
@@ -46,72 +48,35 @@ SFWindow::SFWindow() :
 }
 
 void
-//SFWindow::Reset(fluid_ptheSynth_t* s,const char *title=NULL)
-SFWindow::Reset(const char *title)
+SFWindow::Reset()
 {
-		
-	if(!ptheSynth->IsValid()) {
-	
-	
-		reverb_on=false;
-		chorus_on=false;
-	if(Lock())
-	{
-		pot_gain->SetValue(0);
-		ck_reverb->SetValue(0);
-		ck_chorus->SetValue(0);
-		
-		pot_reverb_roomsize->SetValue(0); 	
-		pot_reverb_damping->SetValue(0); 			
-		pot_reverb_width->SetValue(0);			
-		pot_reverb_level->SetValue(0); 		
-	
-		
-		chorus_type=0;
-		field_chorus_type->Menu()->ItemAt(chorus_type)->SetMarked(true);
-		pot_chorus_level->SetValue(0);
-		pot_chorus_depth->SetValue(0);
-		digit_chorus_n->UpdateValue(0, true);				
-		pot_chorus_speed->SetValue(0);
-		
-		str_name->SetText(T_SFS_NO_SF2);
-		Unlock();
-	}
-	return;
-	};
-	
-	reverb_on=false;
-	chorus_on=false;
-	
-	ptheSynth->SetReverbOn(false);
-	ptheSynth->SetChorusOn(false);
-	
-	
-
-	
 	if(Lock())
 	{	
-		ptheSynth->SetGain(0.8);
-		pot_gain->SetValue(80);
-		pot_reverb_roomsize->SetValue(ptheSynth->GetReverbRoomSize()*100.); 	
-		pot_reverb_damping->SetValue(ptheSynth->GetReverbDamp()*100.); 			
-		pot_reverb_width->SetValue(ptheSynth->GetReverbWidth()*100.);			
-		pot_reverb_level->SetValue(ptheSynth->GetReverbLevel()*100.); 		
+		pot_gain->SetValue(ptheSynth->GetGain() * MULT);
+		pot_reverb_roomsize->SetValue(ptheSynth->GetReverbRoomSize() * MULT); 	
+		pot_reverb_damping->SetValue(ptheSynth->GetReverbDamp() * MULT); 			
+		pot_reverb_width->SetValue(ptheSynth->GetReverbWidth()  * MULT);			
+		pot_reverb_level->SetValue(ptheSynth->GetReverbLevel()  * MULT); 		
 	
+		ck_reverb->SetValue(ptheSynth->IsReverbOn() ? 1 : 0);
 		
-		chorus_type=ptheSynth->GetChorusType();
-		if(chorus_type>1) chorus_type=1;
+		
+		int chorus_type = ptheSynth->GetChorusType();
+		if (chorus_type>1) 
+			chorus_type = 1;
+			
 		field_chorus_type->Menu()->ItemAt(chorus_type)->SetMarked(true);
 		pot_chorus_level->SetValue(ptheSynth->GetChorusLevel()*10);
 		pot_chorus_depth->SetValue(ptheSynth->GetChorusDepth()*10);
-		digit_chorus_n->UpdateValue(ptheSynth->GetChorusNr(), true);				
+		digit_chorus_n->UpdateValue(ptheSynth->GetChorusNr(), false);				
 		pot_chorus_speed->SetValue(ptheSynth->GetChorusSpeed()*100.);
+		
+		
+		ck_chorus->SetValue(ptheSynth->IsChorusOn() ? 1 : 0);
+		
+		
+		str_name->SetText(ptheSynth->GetSoundFontName()); //fixme use 'Leaf!'
 	
-		Unlock();
-	}
-	if(Lock() && title!=NULL)
-	{
-		str_name->SetText(title);	
 		Unlock();
 	}
 }
@@ -206,7 +171,7 @@ SFWindow::MessageReceived(BMessage* message)
 			{
 				BEntry r(&ref);
 				BPath p(&r);
-				fluid_booster->LoadSF(p.Path());
+				fluid_booster->LoadSoundFont(p.Path());
 			}
 			
 			//delete mess;				
@@ -219,58 +184,6 @@ SFWindow::MessageReceived(BMessage* message)
 	}	
 }
 
-
-void
-SFWindow::SaveExtra(BMessage *b)
-{
-	if(!ptheSynth->IsValid()) return;
-	b->AddFloat("gain",ptheSynth->GetGain());
-	b->AddBool("reverb_on",ck_reverb->Value());
-	b->AddFloat("reverb_roomsize",ptheSynth->GetReverbRoomSize());
-	b->AddFloat("reverb_damping",ptheSynth->GetReverbDamp());
-	b->AddFloat("reverb_width",ptheSynth->GetReverbWidth());
-	b->AddFloat("reverb_level",ptheSynth->GetReverbLevel());
-	b->AddBool("chorus_on",ck_chorus->Value());
-	b->AddFloat("chorus_n",ptheSynth->GetChorusNr());
-	b->AddFloat("chorus_level",ptheSynth->GetChorusLevel());
-	b->AddFloat("chorus_speed",ptheSynth->GetChorusSpeed());
-	b->AddFloat("chorus_depth",ptheSynth->GetChorusDepth());
-	b->AddFloat("chorus_type",chorus_type);	
-}
-
-void
-SFWindow::LoadExtra(BMessage *b){
-
-		
-	if(Lock()){
-	
-		float gain = b->FindFloat("gain");
-		ptheSynth->SetGain(gain);
-		pot_gain->SetValue(gain*100.0);
-		
-		//fluid_ptheSynth_set_reverb_on
-	
-			/*
-	
-		fluid_ptheSynth_set_reverb(ptheSynth,
-				(float)pot_reverb_roomsize->Value()/100.,
-				(float)pot_reverb_damping->Value()/100.,
-				(float)pot_reverb_width->Value()/100.,
-				(float)pot_reverb_level->Value()/100.);
-	*/
-	
-	/*
-	fluid_ptheSynth_set_chorus(ptheSynth,
-				digit_chorus_n->GetValue(),
-				(float)pot_chorus_level->Value()/10.,
-				(float)pot_chorus_speed->Value()/100.,
-				(float)pot_chorus_depth->Value()/10.,
-				chorus_type);
-	*/
-			
-	Unlock();
-	}	
-}
 void
 SFWindow::InitGUI()
 {
@@ -300,7 +213,7 @@ SFWindow::InitGUI()
 	r.bottom -=10;
 	r.right =r.left+180;
 	BBox *box=new BBox(r,"ciao");//,B_FOLLOW_NONE,0);
-	box->SetLabel(ck_reverb=new BCheckBox(BRect(0,0,0,0),T_SFS_REVERB,T_SFS_REVERB,new BMessage('revo')));
+	box->SetLabel(ck_reverb=new BCheckBox(ir,T_SFS_REVERB,T_SFS_REVERB,new BMessage('revo')));
 	box2->AddChild(box);
 	
 

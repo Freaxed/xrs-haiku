@@ -27,8 +27,10 @@ class SFSTrackBoost : public TrackBoost
 	BMenu*	getBankMenu(){ return menu;};
 	
 	void				SetLine(int line,Track*);
-	status_t			LoadSF(const char* filename);
+	status_t			UpdateMenu();
 	void				RemoveMe(Track*);
+	
+	void				LoadSoundFont(const char*);
 	
 
 	

@@ -25,11 +25,7 @@ class SFWindow:public BWindow
 
 		static  void	info(void* data, char* name, int option);
 		static  void	optioninfo(void* data, char* name, char* option);
-
-		//void		Reset(fluid_synth_t*,const char *s=NULL);
-		void		Reset(const char *s=NULL);
-		void		SaveExtra(BMessage*);
-		void		LoadExtra(BMessage*);
+		void			Reset();
 		
 private:
 		void	InitGUI();

@@ -35,18 +35,14 @@ class XFSynth {
 			void	Init();		//only once
 			void	Reset();	//clean up all
 			
-			void	SaveChannelSettings(BMessage*,int);
-			void	LoadChannelSettings(BMessage*,int);
-			
-			void	SaveGlobalSettings(BMessage*);
-			void	LoadGloablSettings(BMessage*);
+			void	SaveSettings(BMessage&);
+			void	LoadSettings(BMessage&);
 			
 			
-			fsynth	LoadFile(const char*);
-			void	ApplySynth(fsynth);
+
 			
 			
-			bool	IsValid(){ if(fSynth.synth) return true; else return false; } ;
+			bool	IsValid(){ return (fSynth.synth != NULL); } ;
 			
 			//dsp
 			void	NoteOff(int channel,int note);
@@ -63,7 +59,8 @@ class XFSynth {
 			
 			//reverb
 			void	SetReverbOn(bool rev);
-			//bool	IsReverbOn();
+			bool	IsReverbOn();
+			
 			float	GetReverbRoomSize();
 			float	GetReverbDamp();
 			float	GetReverbWidth();
@@ -73,7 +70,8 @@ class XFSynth {
 			
 			
 			void	SetChorusOn(bool ch);
-			//bool	IsChorusOn();
+			bool	IsChorusOn();
+			
 			int		GetChorusType();
 			float	GetChorusLevel();
 			float	GetChorusDepth();
@@ -92,8 +90,25 @@ class XFSynth {
 			
 			void	FillMenu(BMenu*);
 			
+			const char*	GetSoundFontName();
+					
+			bool	LoadSoundFont(const char* filename);
 			
 	private:		
+			void	DumpPreset();
+
+			fsynth	LoadFile(const char*);
+			void	ApplySynth(fsynth);
+		
+			void	SaveChannelSettings(BMessage&,int);
+			void	LoadChannelSettings(BMessage&,int);
+
+			void	SaveReverbSettings(BMessage&);
+			void	LoadReverbSettings(BMessage&);
+
+			void	SaveChorusSettings(BMessage&);
+			void	LoadChorusSettings(BMessage&);
+			
 			void	FreeSynth(fsynth&);
 						
 			fluid_settings_t* 	settings;
@@ -103,6 +118,9 @@ class XFSynth {
 	friend class SFSTrackBoost;
 	
 			fsynth				fSynth;
+			
+			bool				fReverbOn;
+			bool				fChorusOn;
 			
 };
 #endif

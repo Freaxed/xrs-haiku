@@ -137,9 +137,6 @@ void
 SFSTrack::SaveCustomSettings(BMessage& msg)
 {
 	msg.AddInt16("Channel",GetChannel());
-	
-	ptheSynth->SaveChannelSettings(&msg, GetChannel());
-	
 	msg.AddInt16("Reverb", GetReverbSend());
 	msg.AddInt16("Chorus", GetChorusSend());
 			
@@ -149,10 +146,7 @@ void
 SFSTrack::LoadCustomSettings(BMessage& msg)
 {
 
-	SetChannel(msg.FindInt16("channel"));
-	
-	ptheSynth->LoadChannelSettings(&msg, GetChannel());
-	
+	SetChannel(msg.FindInt16("Channel"));
 	SetReverbSend(msg.FindInt16("Reverb"));
 	SetChorusSend(msg.FindInt16("Chorus"));
 }

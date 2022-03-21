@@ -116,37 +116,15 @@ SFSTrackBoost::getPanel(){return p;}
 void
 SFSTrackBoost::LoadBoosterSettings(BMessage* data)
 {
-	fluid_booster = NULL;
-	
-	status_t err = B_OK;
-	BString name;
-
-	LoadSF(NULL);
-	if(data->FindString("bank_name", &name) == B_OK)
-	{
-		err = LoadSF(name.String());
-	}
-	
-	if (err != B_OK)
-	{
-		BString what("Can't find the SoundFont file [");
-		what << name.String() << "]!";
-		LoadingError::Add("fluidlite", what.String(), "Get the missing SoundFont file!");		
-	}
-
-	BMessage	extra;	
-	if(data->FindMessage("extra",&extra)==B_OK)
-		sfwin->LoadExtra(&extra);
+	fluid_booster = NULL; //?	
+	theSynth.LoadSettings(*data);
+	UpdateMenu();
 }
 
 void
 SFSTrackBoost::SaveBoosterSettings(BMessage* data)
 {
-	theSynth.SaveGlobalSettings(data);
-	
-	BMessage	extra;	
-	sfwin->SaveExtra(&extra);
-	data->AddMessage("extra",&extra);
+	theSynth.SaveSettings(*data);
 }
 void
 SFSTrackBoost::_emptyMenu()
@@ -159,58 +137,33 @@ SFSTrackBoost::_emptyMenu()
 		menu->RemoveItem(sub);
 		delete sub;
 	}
-	
-	
-	
+}
+
+void
+SFSTrackBoost::LoadSoundFont(const char* filename)
+{
+
+	theSynth.LoadSoundFont(filename);
+	UpdateMenu();
 }
 
 status_t
-SFSTrackBoost::LoadSF(const char* filename)
+SFSTrackBoost::UpdateMenu()
 {
-	fsynth newsynth;
-	newsynth.synth=NULL;
-	
-	if(!filename) {
-	
-		theSynth.Reset();
-	
-	}
-	else {
-	
-		BAlert * al = XUtils::ShowIdleAlert(T_SFS_LOADING);
-	 
-		newsynth = theSynth.LoadFile(filename);		
-		
-		XHost::Get()->SendMessage(X_LockSem,0);
-		
-		theSynth.ApplySynth(newsynth);
-		
-		XHost::Get()->SendMessage(X_UnLockSem,0);
 
-		if (newsynth.sfont_id == -1)
-		{
-			BString what("Can't load the SoundFont file [");
-			what << filename << "]!";
-			LoadingError::Add("SoundFont", what.String(), "Find the missing SoundFont and assign to the right tracks!");
-		}
-
-		
-		XUtils::HideIdleAlert(al);
-	}
-	
-	
 	_emptyMenu();	
-	
-	
 	theSynth.FillMenu(menu);
-	
+
+	LogTrace("SFSTrackBoost:menu:CountItems %d", menu->CountItems());
+
 	for(int i=0;i<menu->CountItems();i++)
+	{
 		menu->SubmenuAt(i)->SetTargetForItems(p);
-		
+	}	
 	
-	BPath pathname(filename);
+	BPath pathname(theSynth.GetSoundFontName());
 	
-	sfwin->Reset(pathname.Leaf());
+	sfwin->Reset();
 	
 	if(tracks.CountItems() > 0 ){
 		p->Refresh();
