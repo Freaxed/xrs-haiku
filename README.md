@@ -2,16 +2,20 @@
 XRS is a simple Rhythm Station. You can use it to create music compositions and loops of your preferred elettronic music genres.
 
 
-**Current version main features:**
+**Main features:**
 
- - Based on version 1.8 for Zeta
+- Based on version 1.8 for Zeta
 
-- 32bit 44100 engine
+- 32bit 44100 internal engine with 5 mixer lines
 
-- VST2 plugin support (effects and virtual instruments)
+- 5 VST2 Effects for each mixer lines
 
-- SoundFont support (via fluidlite)
+- Internal Samples
 
-- 5 mixer lines
+- VST2 Instruments supports
+
+- SoundFont Instruments support (via fluidlite)
+
+- Internal Roland TB-303 emulator (Tn306)
 
 - Export as WAVE AIFF
