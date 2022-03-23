@@ -138,7 +138,6 @@ SRCS =  \
 ./src/utils/Setting.cpp \
 ./src/utils/SettingsTextView.cpp \
 ./src/utils/Utils.cpp \
-./src/utils/WU_AppUtils.cpp \
 ./src/utils/Xed_Utils.cpp \
 ./src/utils/Configurator.cpp \
 ./src/utils/DrawCentredText.cpp \

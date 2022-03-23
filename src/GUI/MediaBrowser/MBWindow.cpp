@@ -9,7 +9,6 @@
 #include "MBWindow.h"
 #include "XListView.h"
 #include "XListItem.h"
-#include "WU_AppUtils.h"
 #include "Xed_Utils.h"
 #include "WindowManager.h"
 #include "locale.h"

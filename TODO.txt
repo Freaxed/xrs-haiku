@@ -1,4 +1,2 @@
 - WAVE Export (da finire)
-- ReadMe per github
-- togliere open3030 / oxe
 - dipendenze nel receipe?
