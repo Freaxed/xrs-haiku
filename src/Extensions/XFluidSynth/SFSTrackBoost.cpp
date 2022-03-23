@@ -154,8 +154,6 @@ SFSTrackBoost::UpdateMenu()
 	_emptyMenu();	
 	theSynth.FillMenu(menu);
 
-	LogTrace("SFSTrackBoost:menu:CountItems %d", menu->CountItems());
-
 	for(int i=0;i<menu->CountItems();i++)
 	{
 		menu->SubmenuAt(i)->SetTargetForItems(p);
@@ -165,7 +163,8 @@ SFSTrackBoost::UpdateMenu()
 	
 	sfwin->Reset();
 	
-	if(tracks.CountItems() > 0 ){
+	if(tracks.CountItems() > 0)
+	{
 		p->Refresh();
 	}
 	return B_OK;

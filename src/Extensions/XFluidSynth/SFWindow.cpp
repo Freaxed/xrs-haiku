@@ -30,7 +30,7 @@ BMessenger* mess;
 
 extern	XFSynth			*ptheSynth;
 
-#define MULT 100
+#define MULT 100.0f
 
 			
 SFWindow::SFWindow() :
@@ -66,33 +66,19 @@ SFWindow::Reset()
 			chorus_type = 1;
 			
 		field_chorus_type->Menu()->ItemAt(chorus_type)->SetMarked(true);
-		pot_chorus_level->SetValue(ptheSynth->GetChorusLevel()*10);
-		pot_chorus_depth->SetValue(ptheSynth->GetChorusDepth()*10);
+		pot_chorus_level->SetValue(ptheSynth->GetChorusLevel()* MULT);
+		pot_chorus_depth->SetValue(ptheSynth->GetChorusDepth()* MULT);
 		digit_chorus_n->UpdateValue(ptheSynth->GetChorusNr(), false);				
-		pot_chorus_speed->SetValue(ptheSynth->GetChorusSpeed()*100.);
+		pot_chorus_speed->SetValue(ptheSynth->GetChorusSpeed()* MULT);
 		
 		
 		ck_chorus->SetValue(ptheSynth->IsChorusOn() ? 1 : 0);
 		
-		
-		str_name->SetText(ptheSynth->GetSoundFontName()); //fixme use 'Leaf!'
+		BPath p(ptheSynth->GetSoundFontName());
+		str_name->SetText(p.Leaf());
 	
 		Unlock();
 	}
-}
-void
-SFWindow::info(void* data, char* name, int option)
-{
-//	printf("name %s \t\t option %d\n",name,option);
-//	fluid_settings_foreach_option((fluid_settings_t*)data,name,NULL,optioninfo);
-//	int ret=fluid_settings_is_realtime((fluid_settings_t*)data,name);
-//	printf("\t REALTIME %d\n",ret);
-		
-}
-void
-SFWindow::optioninfo(void* data, char* name, char* option)
-{
-	printf("\t\t\t name %s \t option %s\n",name,option);
 }
 
 bool
@@ -105,22 +91,27 @@ SFWindow::QuitRequested()
 void
 SFWindow::set_reverb()
 {
-	ptheSynth->SetReverb((float)pot_reverb_roomsize->Value()/100.,
-				(float)pot_reverb_damping->Value()/100.,
-				(float)pot_reverb_width->Value()/100.,
-				(float)pot_reverb_level->Value()/100.);
-			
+	ptheSynth->SetReverb((float)pot_reverb_roomsize->Value() / MULT,
+						 (float)pot_reverb_damping->Value()  / MULT,
+						 (float)pot_reverb_width->Value()    / MULT,
+						 (float)pot_reverb_level->Value()    / MULT);
 }
 
 void
 SFWindow::set_chorus()
 {
-	ptheSynth->SetChorus(
-				digit_chorus_n->GetValue(),
-				(float)pot_chorus_level->Value()/10.,
-				(float)pot_chorus_speed->Value()/100.,
-				(float)pot_chorus_depth->Value()/10.,
-				chorus_type);
+	/*
+		nr	Chorus voice count (0-99, CPU time consumption proportional to this value)
+	level	Chorus level (0.0-10.0)
+	speed	Chorus speed in Hz (0.1-5.0)
+	depth_ms	Chorus depth (max value depends on synth sample-rate, 0.0-21.0 is safe for sample-rate values up to 96KHz)
+	type	Chorus waveform type (fluid_chorus_mod)
+	*/
+	ptheSynth->SetChorus(digit_chorus_n->GetValue(),
+				        (float)pot_chorus_level->Value() / MULT,
+						(float)pot_chorus_speed->Value() / MULT,
+						(float)pot_chorus_depth->Value() / MULT,
+						chorus_type);
 			
 }
 void
@@ -130,13 +121,12 @@ SFWindow::MessageReceived(BMessage* message)
 	switch(message->what)
 	{
 		case 'gain':
-			val=message->FindInt32("be:value");
-			ptheSynth->SetGain((float)val/100.0);
+			val = message->FindInt32("be:value");
+			ptheSynth->SetGain((float) val / MULT);
 		break;
 		//reverb
 		case 'revo':
-			
-			val=message->FindInt32("be:value");
+			val = message->FindInt32("be:value");
 			ptheSynth->SetReverbOn((bool)val);
 		break;
 		case 'revX':
@@ -144,37 +134,28 @@ SFWindow::MessageReceived(BMessage* message)
 		break;
 		//chorus
 		case 'choo':
-			
-			val=message->FindInt32("be:value");
+			val = message->FindInt32("be:value");
 			ptheSynth->SetChorusOn((bool)val);
 		break;
-		case 'choX':
-		
+		case 'choX':		
 			set_chorus();
 		break;
-		case 'chot':
-			
-			chorus_type=(int)message->FindInt32("index");
+		case 'chot':			
+			chorus_type = (int)message->FindInt32("index");
 			set_chorus();
 		break;
-		case 'load':
-			
-			
+		case 'load':			
 			openpanel->Show();
 		break;
 		case 'loax':
-		{
-			
-			entry_ref ref;
-				
+		{		
+			entry_ref ref;				
 			if(message->FindRef("refs",&ref)==B_OK)
 			{
 				BEntry r(&ref);
 				BPath p(&r);
 				fluid_booster->LoadSoundFont(p.Path());
 			}
-			
-			//delete mess;				
 		}
 		break;
 		default:
@@ -218,22 +199,36 @@ SFWindow::InitGUI()
 	
 
 	r=BRect(8,0,172,50-18);
+
+	/*
+		roomsize	Reverb room size value (0.0-1.0)
+		damping	Reverb damping value (0.0-1.0)
+		width	Reverb width value (0.0-100.0)
+		level	Reverb level value (0.0-1.0)
+	*/
+
+	r.OffsetBy(0,41);
+	pot_reverb_level=createCanvas(r,T_SFS_LEVEL, 'revX', box, 0, 100);
 		
 	r.OffsetBy(0,41);
-	pot_reverb_level=createCanvas(r,T_SFS_LEVEL,'revX',box);
-		
-	r.OffsetBy(0,41);
-	pot_reverb_width=createCanvas(r,T_SFS_WIDTH,'revX',box);
+	pot_reverb_width=createCanvas(r,T_SFS_WIDTH, 'revX', box, 0, 100*100);
 	
 	r.OffsetBy(0,41);
-	pot_reverb_damping=createCanvas(r,T_SFS_DAMPING,'revX',box);
+	pot_reverb_damping=createCanvas(r,T_SFS_DAMPING, 'revX', box, 0, 100);
 		
 	r.OffsetBy(0,41);
-	pot_reverb_roomsize=createCanvas(r,T_SFS_ROOMSIZE,'revX',box);	
+	pot_reverb_roomsize=createCanvas(r,T_SFS_ROOMSIZE, 'revX', box, 0, 100);	
 	
 		
 	
 	//chorus
+/*
+	nr	Chorus voice count (0-99, CPU time consumption proportional to this value)
+	level	Chorus level (0.0-10.0)
+	speed	Chorus speed in Hz (0.1-5.0)
+	depth_ms	Chorus depth (max value depends on synth sample-rate, 0.0-21.0 is safe for sample-rate values up to 96KHz)
+	type	Chorus waveform type (fluid_chorus_mod)
+*/
 	r=box->Frame();
 	r.OffsetBy(r.right+1,0);
 	
@@ -252,7 +247,7 @@ SFWindow::InitGUI()
 	box->SetLabel(ck_chorus=new BCheckBox(ir,T_SFS_CHORUS,T_SFS_CHORUS,new BMessage('choo')));
 	
 	r.OffsetBy(0,41);
-	pot_chorus_level=createCanvas(r,T_SFS_LEVEL,'choX',box);
+	pot_chorus_level=createCanvas(r,T_SFS_LEVEL,'choX',box,0, 1000);
 	
 	
 	r.OffsetBy(0,41);
@@ -264,16 +259,16 @@ SFWindow::InitGUI()
 	ir.right-=50; 
 	ir.bottom-=6;
 	sampler->AddChild(new BStringView(ir,"",T_SFS_NR));
-	sampler->AddChild(digit_chorus_n=new ADigit(BRect(120,5,120+36,5+21), new BMessage('choX'),1,99));
+	sampler->AddChild(digit_chorus_n=new ADigit(BRect(120,5,120+36,5+21), new BMessage('choX'),0,99));
 	box->AddChild(sampler);
 	
 	
 	r.OffsetBy(0,41);
-	pot_chorus_depth=createCanvas(r,T_SFS_DEPTH,'choX',box);
+	pot_chorus_depth=createCanvas(r,T_SFS_DEPTH,'choX',box, 0, 2100);
 	
 	
 	r.OffsetBy(0,41);
-	pot_chorus_speed=createCanvas(r,T_SFS_SPEED,'choX',box,30,500);
+	pot_chorus_speed=createCanvas(r,T_SFS_SPEED,'choX',box,10,500);
 	
 	
 	r.OffsetBy(0,41);
