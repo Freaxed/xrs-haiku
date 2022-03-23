@@ -144,7 +144,6 @@ SRCS =  \
 ./src/utils/DrawCentredText.cpp \
 ./src/VST/VSTKnob.cpp \
 ./src/VST/VSTParamsView.cpp \
-./src/VST/ParameterSlider.cpp \
 ./src/VST/VSTHost.cpp \
 ./src/VST/VSTItem.cpp \
 ./src/VST/VSTList.cpp

@@ -31,7 +31,6 @@ APP_MIME_SIG =
 #	Also note that spaces in folder names do not work well with this Makefile.
 SRCS =  /boot/data/xrs/code/xrs-haiku/src/GUI/APot.cpp \
  App.cpp \
- /boot/data/xrs/code/xrs-haiku/src/vst_host/ParameterSlider.cpp \
  /boot/data/xrs/code/xrs-haiku/src/GUI/ParameterValueKnob.cpp \
  /boot/data/xrs/code/xrs-haiku/src/GUI/PotViewer.cpp \
  /boot/data/xrs/code/xrs-haiku/src/vst_host/VSTHost.cpp \
