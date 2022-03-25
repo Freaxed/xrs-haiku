@@ -235,7 +235,7 @@ float PBox::BuildGUI(BMessage& viewTemplate, BMessage& settings, BView *view) {
 //					menu->SetDivider(be_plain_font->StringWidth(name) + 10);
 					
 					for (int j = 0; curr.FindString("valid_value", j); j++) {
-						menu->AddItem(new BMenuItem(curr.FindString("valid_value", j),NULL));
+						menu->AddItem(new BMenuItem(curr.FindString("valid_value", j), new BMessage('MENU')));
 					};
 					
 					value = NULL;
@@ -355,8 +355,10 @@ float PBox::BuildGUI(BMessage& viewTemplate, BMessage& settings, BView *view) {
 					textView->SetText(_T(value));			
 				};
 			} else {
+				BString control_name(name);
+				control_name += "_control";
 				control = new BMenuField(BRect(0, 0, kControlWidth, fFontHeight),
-					name, _T(desc), menu);
+					control_name.String(), _T(desc), menu);
 				
 				float size=kDividerWidth;
 				if(control->StringWidth(_T(desc)) > kDividerWidth)

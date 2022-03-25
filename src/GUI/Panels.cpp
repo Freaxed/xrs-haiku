@@ -329,6 +329,7 @@ Panels::msgSettings(BMessage* message,void* cookies)
 	return true;
 	
 }
+
 #include "PBox.h"
 void
 Panels::showExport(int k,int m)
@@ -408,6 +409,23 @@ Panels::msgExport(BMessage* message,void* cookies)
 	PBox *x=((PBox*)cookies);
 	switch(message->what)
 	{		
+		case 'MENU':
+		{
+			BMenuItem* item;
+			if (message->FindPointer("source", (void**)&item) == B_OK)
+			{
+				if (BString(item->Menu()->Name()).Compare("pattern") == 0)
+				{
+					int32 index = 0;
+					if (message->FindInt32("index", &index) == B_OK)
+					{
+						BMenuField* empty_space = (BMenuField*)x->Window()->FindView("empty_space_control");
+						empty_space->SetEnabled((index == 0));
+					}
+				}
+			}
+		}
+		break;
 		case 'Canc':
 			x->Window()->PostMessage(B_QUIT_REQUESTED);
 		break;
