@@ -18,7 +18,7 @@ MeasureManager::MeasureManager()
 	:BMessageFilter(B_PROGRAMMED_DELIVERY,B_LOCAL_SOURCE,SETPAT),
 	curpat(0),sequence(NULL)
 {
-	ValuableManager::Get()->RegisterValuable("measure.allpatters", 0);
+	ValuableManager::Get()->RegisterValuable("measure.allpatters", (int32)0);
 	
 	curPos=0;
 }

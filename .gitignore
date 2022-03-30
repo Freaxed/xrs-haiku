@@ -4,7 +4,7 @@ generated/*
 *.bin
 compile_commands.json
 *.log
-objects.x86_64*
+objects.*
 (Objects*
 
 src/tests/test-sampler/output.wav
