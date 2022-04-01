@@ -41,7 +41,7 @@ static		BTextControl	*txt;
 
 #define BOXSPACE	10.0f
 #define OFFSET		5.0f
-
+/*
 void
 Panels::showPrefsPanel()
 {
@@ -117,15 +117,175 @@ Panels::showPrefsPanel()
 	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
 	win->Show();
 	win->RedirectMessages(Panels::msgPrefs,(void*)win);
+}*/
+
+
+
+#include <ControlLook.h>
+#include <FindDirectory.h>
+#include <GroupLayout.h>
+#include <Layout.h>
+#include <LayoutBuilder.h>
+
+#define kMsgAddFolder 		'addf'
+#define kMsgRemoveFolder 	'remf'
+#define kMsgCancel 			'canj'
+#define kMsgSave 			'resj'
+#define kMsgSelect			'self'
+
+//Setting
+/*
+void
+Panels::showPrefsPanel()
+{
+	BzWindow *win = new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_FLOATING_WINDOW,0);
+
+
+	BListView* fFoldersListView = new BListView(BRect(), "listFolders",B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL,
+                B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);//BRect(0,0, 10,10), "listFolders");
+	fFoldersListView->AddItem(new BStringItem("rif.name"));
+	BScrollView* foldersScrollView = new BScrollView("folderScroll", fFoldersListView, B_FOLLOW_ALL_SIDES,0,true,true);
+	//float padding = be_control_look->DefaultItemSpacing();
+
+
+	BLayoutBuilder::Group<>(win, B_VERTICAL, 0)
+			.SetInsets(B_USE_WINDOW_SPACING)
+			.Add(foldersScrollView);
+
+	//win->ResizeToPreferred();
+	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
+	win->Show();
+	win->RedirectMessages(Panels::msgPrefs, (void*)win);
+}*/
+
+void
+Panels::showPrefsPanel()
+{
+	BzWindow *win=new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_FLOATING_WINDOW,0);
+	win->SetLook(B_MODAL_WINDOW_LOOK);
+	win->SetFeel(B_MODAL_APP_WINDOW_FEEL);
+	win->SetFlags(B_ASYNCHRONOUS_CONTROLS|B_NOT_RESIZABLE);
+
+	BBox* foldersBox = new BBox("vstFolders");
+	foldersBox->SetFont(be_bold_font);
+	foldersBox->SetLabel("Additional VST folders");
+
+	BButton* addButton = new BButton("add", "Add", new BMessage(kMsgAddFolder));
+
+	BButton* fRemove = new BButton("remove", "Remove", new BMessage(kMsgRemoveFolder));
+
+	fRemove->SetEnabled(false);
+
+
+	BListView* fFoldersListView = new BListView(BRect(), "listFolders",B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL,
+                B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
+
+	fFoldersListView->SetSelectionMessage(new BMessage(kMsgSelect));
+	BScrollView* foldersScrollView = new BScrollView("folderScroll", fFoldersListView, B_FOLLOW_ALL_SIDES,0,true,true);
+	foldersScrollView->SetExplicitMinSize(BSize(be_plain_font->Size() * 30, 250));
+
+	float padding = be_control_look->DefaultItemSpacing();
+
+	BLayoutBuilder::Group<>(foldersBox, B_HORIZONTAL, padding)
+			.SetInsets(padding, padding * 2, padding, padding)
+			.Add(foldersScrollView)
+			.AddGroup(B_VERTICAL, padding / 2, 0.0f)
+					.SetInsets(0)
+					.Add(addButton)
+					.Add(fRemove)
+					.AddGlue();
+
+	BBox* fButtonsBox = new BBox("buttons");
+	fButtonsBox->SetBorder(B_NO_BORDER);
+
+
+	BButton* fCancel = new BButton("cancel",  "Cancel", new BMessage(kMsgCancel));
+	BButton* fSave = new BButton("save", "Save", new BMessage(kMsgSave));
+
+
+	fCancel->SetEnabled(true);
+	fSave->SetEnabled(true);
+
+
+	BLayoutBuilder::Group<>(fButtonsBox, B_HORIZONTAL, padding)
+			//.SetInsets(padding, padding * 2, padding, padding)
+			.SetInsets(0)
+			.AddGlue()
+			.AddGroup(B_HORIZONTAL, padding / 2, 0.0f)
+			//		.SetInsets(0)
+					.Add(fCancel)
+					.Add(fSave)
+					.AddGlue();
+
+	BLayoutBuilder::Group<>(win, B_VERTICAL, 0)
+			.SetInsets(B_USE_WINDOW_SPACING)
+			.Add(foldersBox)
+			.AddStrut(B_USE_DEFAULT_SPACING)
+			.Add(fButtonsBox);
+
+	//win->Layout(true);
+	if (fRemove->Bounds().Width() > fSave->Bounds().Width())
+			fSave->SetExplicitMinSize(BSize(fRemove->Bounds().Width(), B_SIZE_UNSET));
+	else
+			fRemove->SetExplicitMinSize(BSize(fSave->Bounds().Width(), B_SIZE_UNSET));
+
+	win->ResizeToPreferred();
+	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
+	win->Show();
+	win->RedirectMessages(Panels::msgPrefs, (void*)win);
 }
+
+
 bool
 Panels::msgPrefs(BMessage* message,void* cookies)
 {
 	BzWindow *win=(BzWindow*)cookies;
-	/*if(win->Lock()) win->Quit();
-	return true;*/
+	static  BMessenger messenger(NULL, win);
+	static  BFilePanel openpanel(B_OPEN_PANEL, &messenger, &rif,B_DIRECTORY_NODE,false,NULL,NULL,true,true);
+	switch(message->what)
+	{
+	  case kMsgSelect:
+		{
+			BListView *list = (BListView*)win->FindView("listFolders");
+			BListItem* fSelected = list->ItemAt( list->CurrentSelection());
+			BButton* button = (BButton*)win->FindView("remove");
+			button->SetEnabled(fSelected != NULL);
+        }
+		break;
+		case kMsgAddFolder:
+		{
+			openpanel.Show();
+		}
+		break;
+		case kMsgRemoveFolder:
+		break;
+		case kMsgCancel:
+			win->PostMessage(B_QUIT_REQUESTED);
+		break;
+		case kMsgSave:
+		break;
+		case B_REFS_RECEIVED:
+		{
+			entry_ref rif;
+			if(message->FindRef("refs", &rif) == B_OK)
+			{
+				BListView *list = (BListView*)win->FindView("listFolders");
+				list->AddItem(new BStringItem(BPath(&rif).Path()));
+			}
+		}
+		break;
+		default:
+			return true;
+		break;
+	}
 	
-	//BMessenger *m;
+	return true;
+}
+/*
+bool
+Panels::msgPrefs(BMessage* message,void* cookies)
+{
+	BzWindow *win=(BzWindow*)cookies;
 	BEntry e;
 	BPath p;
 	
@@ -167,10 +327,8 @@ Panels::msgPrefs(BMessage* message,void* cookies)
 	
 	return true;
 	
-}
+}*/
 
-
-//Setting
 void
 Panels::showSettings(Song* curSong)
 {

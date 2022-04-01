@@ -25,4 +25,5 @@ class Panels
 		static	bool	msgExport(BMessage* msg,void* cookies);
 		
 		static	void	showLoadingError(); 	
+
 };
