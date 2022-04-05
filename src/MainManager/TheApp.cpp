@@ -128,8 +128,8 @@ TheApp::~TheApp()
 	
 	
 	
-	Configurator::Get()->cf_Close(); //Configuration/Preferences		
-	printf("Quit\n");
+	Configurator::Get()->Close();
+	LogInfo("Goodbye XRS!");
 }
 void
 TheApp::PrepareToRun()
@@ -138,7 +138,7 @@ TheApp::PrepareToRun()
 	bigtime_t start = system_time();
 	ab->Show();
 
-	Configurator::Get()->cf_Init("XRSConfig");	
+	Configurator::Get()->Init("XRSConfig");	
 	
 	ab->setText("loading..vst");
 	vst_manager = VstManager::Get();
