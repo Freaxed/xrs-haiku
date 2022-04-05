@@ -41,84 +41,6 @@ static		BTextControl	*txt;
 
 #define BOXSPACE	10.0f
 #define OFFSET		5.0f
-/*
-void
-Panels::showPrefsPanel()
-{
-	BBox *box,*box2;
-	BzWindow *win=new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_FLOATING_WINDOW,0);
-	win->SetLook(B_MODAL_WINDOW_LOOK);
-	win->SetFeel(B_MODAL_APP_WINDOW_FEEL);
-	win->SetFlags(B_ASYNCHRONOUS_CONTROLS|B_NOT_RESIZABLE);
-	
-	win->AddChild(box=new BBox(win->Bounds(),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_PLAIN_BORDER));
-	BRect r(box->Bounds());
-	r.InsetBy(BOXSPACE,BOXSPACE);
-	r.bottom -= BOXSPACE+20;
-	box->AddChild(box2=new BBox(r,T_PREFS_TITLE,B_FOLLOW_ALL_SIDES,B_WILL_DRAW,B_FANCY_BORDER));
-	box2->SetLabel(T_PREFS_TITLE);
-	r=box2->Bounds();
-	
-	r.left += OFFSET;
-	r.right -= OFFSET;
-	r.top=50;
-	r.bottom =r.top+20;
-	box2->AddChild( 	new BStringView(r,"",T_PREFS_VST_FOLDER,B_FOLLOW_NONE,B_WILL_DRAW));
-	
-	r.left += OFFSET;
-	r.right -= 100;
-	r.top = r.bottom + 10;
-	r.bottom +=20;
-	
-	box2->AddChild( txt=new BTextControl(r,"vstfolder",NULL,T_PREFS_NOT_SET, NULL, B_FOLLOW_NONE,B_WILL_DRAW) );
-	
-
-	r.top 	 -= OFFSET;
-	r.bottom -= OFFSET;
-	r.left 	  = r.right + OFFSET;
-	r.right   = r.right + 80.0f;
-	
-	box2->AddChild(new BButton(r,"",T_GEN_SET,new BMessage('Set'),B_FOLLOW_NONE,B_WILL_DRAW));
-	
-	r=box2->Bounds();
-	
-	r.left += OFFSET;
-	r.right -= OFFSET;
-	r.top=150;
-	r.bottom =r.top+20;
-	
-	box2->AddChild(new BStringView(r,"",T_PREFS_RESTART,B_FOLLOW_NONE,B_WILL_DRAW));
-	
-	r=box2->Frame();
-	r.top=r.bottom+5;
-	r.bottom =r.top+20;
-	r.left= r.right - (be_plain_font->StringWidth(T_GEN_CANCEL) + 	(OFFSET * 2));
-		
-	box->AddChild(new BButton(r,"",T_GEN_CANCEL,new BMessage('Canc'),B_FOLLOW_NONE,B_WILL_DRAW));
-	
-	r.right = r.left - OFFSET;
-	r.left= r.right - (be_plain_font->StringWidth(T_GEN_CANCEL) + 	(OFFSET * 2));
-
-	box->AddChild(new BButton(r,"",T_GEN_SAVE,new BMessage('Save'),B_FOLLOW_NONE,B_WILL_DRAW));
-	
-	
-	BEntry e;
-	BPath p;
-	status_t err=Config()->Ref("vstfolder",&rif,"/boot/xeD/");
-	
-	if(err==B_OK){
-	e.SetTo(&rif);
-	e.GetPath(&p);
-	txt->SetText(p.Path());
-	}
-	
-		
-	
-	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
-	win->Show();
-	win->RedirectMessages(Panels::msgPrefs,(void*)win);
-}*/
-
 
 
 #include <ControlLook.h>
@@ -132,32 +54,9 @@ Panels::showPrefsPanel()
 #define kMsgCancel 			'canj'
 #define kMsgSave 			'resj'
 #define kMsgSelect			'self'
+#define kVstFolders 		"vstfolders"
 
-//Setting
-/*
-void
-Panels::showPrefsPanel()
-{
-	BzWindow *win = new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_FLOATING_WINDOW,0);
-
-
-	BListView* fFoldersListView = new BListView(BRect(), "listFolders",B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL,
-                B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);//BRect(0,0, 10,10), "listFolders");
-	fFoldersListView->AddItem(new BStringItem("rif.name"));
-	BScrollView* foldersScrollView = new BScrollView("folderScroll", fFoldersListView, B_FOLLOW_ALL_SIDES,0,true,true);
-	//float padding = be_control_look->DefaultItemSpacing();
-
-
-	BLayoutBuilder::Group<>(win, B_VERTICAL, 0)
-			.SetInsets(B_USE_WINDOW_SPACING)
-			.Add(foldersScrollView);
-
-	//win->ResizeToPreferred();
-	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
-	win->Show();
-	win->RedirectMessages(Panels::msgPrefs, (void*)win);
-}*/
-
+//Preferences
 void
 Panels::showPrefsPanel()
 {
@@ -231,8 +130,16 @@ Panels::showPrefsPanel()
 
 	win->ResizeToPreferred();
 	win->MoveTo(BAlert::AlertPosition(PREFS_L,PREFS_H));
+	
+	entry_ref rif;
+	for(int i=0; Config()->FindRef(kVstFolders, i, &rif) == B_OK; i++)
+	{
+		fFoldersListView->AddItem(new BStringItem(BPath(&rif).Path()));
+	}	
+	
 	win->Show();
 	win->RedirectMessages(Panels::msgPrefs, (void*)win);
+
 }
 
 
@@ -258,11 +165,32 @@ Panels::msgPrefs(BMessage* message,void* cookies)
 		}
 		break;
 		case kMsgRemoveFolder:
+		{
+			BListView *list = (BListView*)win->FindView("listFolders");
+			BListItem* fSelected = list->ItemAt( list->CurrentSelection());
+			list->RemoveItem(fSelected);
+			BButton* button = (BButton*)win->FindView("remove");
+			button->SetEnabled(false);			
+		}
 		break;
 		case kMsgCancel:
 			win->PostMessage(B_QUIT_REQUESTED);
 		break;
 		case kMsgSave:
+		{
+			BListView *list = (BListView*)win->FindView("listFolders");
+			Config()->RemoveName(kVstFolders);
+			for (int i=0;i<list->CountItems();i++)
+			{
+				entry_ref	rif;
+				BStringItem* fItem = (BStringItem*)list->ItemAt(i);
+				get_ref_for_path(fItem->Text(),&rif);
+				Config()->AddRef(kVstFolders, &rif);				
+			}
+			
+			win->PostMessage(B_QUIT_REQUESTED);	
+		}
+
 		break;
 		case B_REFS_RECEIVED:
 		{
@@ -281,53 +209,6 @@ Panels::msgPrefs(BMessage* message,void* cookies)
 	
 	return true;
 }
-/*
-bool
-Panels::msgPrefs(BMessage* message,void* cookies)
-{
-	BzWindow *win=(BzWindow*)cookies;
-	BEntry e;
-	BPath p;
-	
-	switch(message->what)
-	{
-		case 'Set':
-			{
-			BMessenger *m=new BMessenger(NULL,win);
-			BFilePanel *openpanel=new BFilePanel(B_OPEN_PANEL,m,&rif,B_DIRECTORY_NODE,false,NULL,NULL,true,true);
-			openpanel->Show();
-			}
-		break;
-		case 'Canc':
-		
-			win->PostMessage(B_QUIT_REQUESTED);
-				
-		break;
-		case 'Save':
-			
-			get_ref_for_path(txt->Text(),&rif);			
-			Config()->ReplaceRef("vstfolder",&rif);
-			win->PostMessage(B_QUIT_REQUESTED);
-			
-		break;
-		case B_REFS_RECEIVED:
-		
-			if(message->FindRef("refs",&rif)==B_OK)
-			{
-				e.SetTo(&rif);
-				e.GetPath(&p);
-				BTextControl *txt=(BTextControl*)win->FindView("vstfolder");
-				txt->SetText(p.Path());
-			}
-		break;
-		default:
-			return true;
-		break;
-	}
-	
-	return true;
-	
-}*/
 
 void
 Panels::showSettings(Song* curSong)
