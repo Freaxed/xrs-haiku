@@ -14,6 +14,7 @@
 #include <StringList.h>
 #include "Log.h"
 #include "VSTList.h"
+#include "Configurator.h"
 
 VSTList::VSTList()
 {
@@ -26,6 +27,14 @@ VSTList::VSTList()
 
 	for (int32 i = 0; i < folders.CountStrings(); i++)
 		ScanPluginsFolder(folders.StringAt(i).String());
+		
+	//Extra folders from configuration
+	
+	entry_ref rif;
+	for(int i=0; Config()->FindRef("vstfolders", i, &rif) == B_OK; i++)
+	{
+		ScanPluginsFolder(BPath(&rif).Path());
+	}	
 }
 
 VSTList::~VSTList()
