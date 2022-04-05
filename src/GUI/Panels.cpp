@@ -120,6 +120,7 @@ Panels::showPrefsPanel()
 			.SetInsets(B_USE_WINDOW_SPACING)
 			.Add(foldersBox)
 			.AddStrut(B_USE_DEFAULT_SPACING)
+			.Add(new BStringView("ciao","You need to restart XRS to apply these settings"))
 			.Add(fButtonsBox);
 
 	//win->Layout(true);

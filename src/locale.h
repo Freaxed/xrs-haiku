@@ -49,7 +49,7 @@
 #define T_MENU_MEASURE			T_GEN_MEASURE
 #define T_MENU_PLAYLIST			T_GEN_PLAYLIST
 #define T_MENU_SONG_SETTINGS	_T("Song Settings..")
-#define T_MENU_GENERAL_PREFS 	_T("General Prefs..")
+#define T_MENU_GENERAL_PREFS 	_T("Preferences...")
 #define T_MENU_HIDE_ALL			_T("Hide All")
 
 //dialog
@@ -66,11 +66,6 @@
 #define	T_SETTINGS_POPUP_ONLOAD			_T("PopUp on load")
 #define T_SETTINGS_NOTES_PER_MEASURE 	_T("Beats per Measure")
 #define T_SETTINGS_BEAT_DIVISION		_T("Beat division")
-// prefs
-#define T_PREFS_TITLE					_T("General Prefs")
-#define	T_PREFS_VST_FOLDER					_T("Extra VST Folder :")
-#define T_PREFS_NOT_SET						_T("< not set yet >")
-#define T_PREFS_RESTART						_T("Save and Restart XRS to apply these settings.")
 
 //export
 #define	T_EXP_TITLE				_T("Export Song")
