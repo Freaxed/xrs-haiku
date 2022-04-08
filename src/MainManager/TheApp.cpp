@@ -39,7 +39,9 @@
 	#include	"XrsMidiIn.h"
 	#include	"XrsMidiOut.h"
 #endif
-#include    "MBWindow.h"
+#ifdef MEDIA_BROWSER
+	#include    "MBWindow.h"
+#endif
 #include	"TrackInfoWindow.h"
 #include 	"PotViewer.h"
 #include 	"PMixer.h"
@@ -95,8 +97,12 @@ TheApp::~TheApp()
 		 		
 			mixerWin->Quit();
 		 }
+		 
 		 if(main_window->Lock()) 
 		 	main_window->Quit();
+
+#ifdef MEDIA_BROWSER		 	
+
 		 if(media_browser->Lock())
 		 {
 		 	if(media_browser->IsHidden())
@@ -106,6 +112,8 @@ TheApp::~TheApp()
 		 		
 		 	media_browser->Quit();
 		 }
+#endif 
+
 		 if(mw->Lock()) 
 		 	mw->Quit();
 		 	
@@ -195,13 +203,17 @@ TheApp::PrepareToRun()
 	if(ab->Lock()) ab->Quit();	
 	
 	float show;
-	media_browser=new MBWindow();
+	
+#ifdef MEDIA_BROWSER
+
+	media_browser = new MBWindow();
 	win_manager->Show(media_browser);
 	
 	show=Config()->FloatKey("media_browser_show",1);
 	
 	if(show<1)
 		win_manager->Hide(media_browser);
+#endif
 	//
 	show=Config()->FloatKey("mixer_window_show",0);
 	win_manager->Show(mixerWin);

@@ -19,7 +19,8 @@ class BOutlineListView;
 class MBWindow : public XrsWindow
 {
 
-public:
+private: //since 1.9.2 the MediaBrowser is gone (useless!?!?)
+
 					 MBWindow();
 					~MBWindow();
 			

@@ -87,7 +87,9 @@ private:
 		MixerWindow*		mixerWin;
 		MainWindow*			main_window;
 		MatrixWindow*		mw;
+#ifdef MEDIA_BROWSER
 		MBWindow*			media_browser;
+#endif
 		TrackInfoWindow*	trackinfo;	
 		ValuableManager*	fVManager;	
 		BasicModelManager*	fModel;

@@ -51,30 +51,40 @@ static		BTextControl	*txt;
 
 #define kMsgAddFolder 		'addf'
 #define kMsgRemoveFolder 	'remf'
+#define kMsgSelect			'self'
+
+
+
 #define kMsgCancel 			'canj'
 #define kMsgSave 			'resj'
-#define kMsgSelect			'self'
 #define kVstFolders 		"vstfolders"
+
+#ifdef MEDIA_BROWSER
+ #define kMsgAddFolderMB 		'addm'
+ #define kMsgRemoveFolderMB 		'remm'
+ #define kMsgSelectMB			'selm'
+#endif
 
 //Preferences
 void
 Panels::showPrefsPanel()
 {
-	BzWindow *win=new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"", B_FLOATING_WINDOW,0);
-	win->SetLook(B_MODAL_WINDOW_LOOK);
+	BzWindow *win=new BzWindow(BRect(0,0,PREFS_L,PREFS_H),"Preferences", B_FLOATING_WINDOW, 0);
+//	win->SetLook(B_MODAL_WINDOW_LOOK);
 	win->SetFeel(B_MODAL_APP_WINDOW_FEEL);
-	win->SetFlags(B_ASYNCHRONOUS_CONTROLS|B_NOT_RESIZABLE);
-
-	BBox* foldersBox = new BBox("vstFolders");
-	foldersBox->SetFont(be_bold_font);
-	foldersBox->SetLabel("Additional VST folders");
+	win->SetFlags(B_ASYNCHRONOUS_CONTROLS|B_NOT_RESIZABLE|B_NOT_ZOOMABLE);
+	float padding = be_control_look->DefaultItemSpacing();
+	
+	
+	// VST
+	BBox* foldersBox = new BBox("VST");
+	foldersBox->SetBorder(B_NO_BORDER);
 
 	BButton* addButton = new BButton("add", "Add", new BMessage(kMsgAddFolder));
 
 	BButton* fRemove = new BButton("remove", "Remove", new BMessage(kMsgRemoveFolder));
 
 	fRemove->SetEnabled(false);
-
 
 	BListView* fFoldersListView = new BListView(BRect(), "listFolders",B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL,
                 B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
@@ -83,16 +93,58 @@ Panels::showPrefsPanel()
 	BScrollView* foldersScrollView = new BScrollView("folderScroll", fFoldersListView, B_FOLLOW_ALL_SIDES,0,true,true);
 	foldersScrollView->SetExplicitMinSize(BSize(be_plain_font->Size() * 30, 250));
 
-	float padding = be_control_look->DefaultItemSpacing();
+	BLayoutBuilder::Group<>(foldersBox, B_VERTICAL, padding)
+			.SetInsets(padding)
+			.Add(new BStringView("txt","Additional folders to parse for VST effects and instruments"))
+			.AddGroup(B_HORIZONTAL, padding)
+				.SetInsets(0)
+				.Add(foldersScrollView)
+					.AddGroup(B_VERTICAL, padding / 2, 0.0f)
+						.SetInsets(0)
+						.Add(addButton)
+						.Add(fRemove)
+						.AddGlue();	
+			
+	// END VST
 
-	BLayoutBuilder::Group<>(foldersBox, B_HORIZONTAL, padding)
-			.SetInsets(padding, padding * 2, padding, padding)
-			.Add(foldersScrollView)
-			.AddGroup(B_VERTICAL, padding / 2, 0.0f)
+#ifdef MEDIA_BROWSER	
+	// Media Browser
+	BBox* mbBox = new BBox("Media Browser");
+	mbBox->SetBorder(B_NO_BORDER);
+	
+	BButton* mbAdd 	  = new BButton("mb_add", "Add", new BMessage(kMsgAddFolderMB));
+	BButton* mbRemove = new BButton("mb_remove", "Remove", new BMessage(kMsgRemoveFolderMB));
+	mbRemove->SetEnabled(false);
+	
+	BListView* mbListView = new BListView(BRect(), "listFolders",B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL,
+                B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
+    
+    mbListView->SetSelectionMessage(new BMessage(kMsgSelectMB));
+    
+    BScrollView* mbScroll = new BScrollView("mbScroll", mbListView, B_FOLLOW_ALL_SIDES,0,true,true);
+	mbScroll->SetExplicitMinSize(BSize(be_plain_font->Size() * 30, 250));
+	
+	
+	BLayoutBuilder::Group<>(mbBox, B_VERTICAL, padding)
+		.SetInsets(padding)
+		.Add(new BStringView("txt","MediaBrowser folders to scan for samples files"))
+		.AddGroup(B_HORIZONTAL, padding)
+			.SetInsets(0)
+			.Add(mbScroll)
+				.AddGroup(B_VERTICAL, padding / 2, 0.0f)
 					.SetInsets(0)
-					.Add(addButton)
-					.Add(fRemove)
-					.AddGlue();
+					.Add(mbAdd)
+					.Add(mbRemove)
+					.AddGlue();						
+	// END MEDIA BROWSER
+#endif
+					
+	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);				
+	tabView->AddTab(foldersBox);
+
+#ifdef MEDIA_BROWSER
+	tabView->AddTab(mbBox);
+#endif
 
 	BBox* fButtonsBox = new BBox("buttons");
 	fButtonsBox->SetBorder(B_NO_BORDER);
@@ -107,23 +159,20 @@ Panels::showPrefsPanel()
 
 
 	BLayoutBuilder::Group<>(fButtonsBox, B_HORIZONTAL, padding)
-			//.SetInsets(padding, padding * 2, padding, padding)
-			.SetInsets(0)
+			.SetInsets(padding)
+			.Add(new BStringView("txt","You need to restart XRS to apply these settings"))
 			.AddGlue()
 			.AddGroup(B_HORIZONTAL, padding / 2, 0.0f)
-			//		.SetInsets(0)
 					.Add(fCancel)
 					.Add(fSave)
 					.AddGlue();
 
 	BLayoutBuilder::Group<>(win, B_VERTICAL, 0)
-			.SetInsets(B_USE_WINDOW_SPACING)
-			.Add(foldersBox)
+			.SetInsets(0, B_USE_WINDOW_SPACING)
+			.Add(tabView)
 			.AddStrut(B_USE_DEFAULT_SPACING)
-			.Add(new BStringView("ciao","You need to restart XRS to apply these settings"))
 			.Add(fButtonsBox);
 
-	//win->Layout(true);
 	if (fRemove->Bounds().Width() > fSave->Bounds().Width())
 			fSave->SetExplicitMinSize(BSize(fRemove->Bounds().Width(), B_SIZE_UNSET));
 	else

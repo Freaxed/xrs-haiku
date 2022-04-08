@@ -70,11 +70,6 @@ SRCS =  \
 ./src/GUI/FixedText.cpp \
 ./src/GUI/GfxMeter.cpp \
 ./src/GUI/MainWindow.cpp \
-./src/GUI/MediaBrowser/IconListItem.cpp \
-./src/GUI/MediaBrowser/MBWindow.cpp \
-./src/GUI/MediaBrowser/VerticalTitle.cpp \
-./src/GUI/MediaBrowser/XListItem.cpp \
-./src/GUI/MediaBrowser/XListView.cpp \
 ./src/GUI/MixerUI/MixerLine.cpp \
 ./src/GUI/MixerUI/MixerWindow.cpp \
 ./src/GUI/Panels.cpp \
@@ -198,7 +193,6 @@ LOCAL_INCLUDE_PATHS =  \
 ./src/Extensions/VIW \
 ./src/Extensions/XFluidSynth \
 ./src/GUI \
-./src/GUI/MediaBrowser \
 ./src/GUI/MixerUI \
 ./src/GUI/new_style2 \
 ./src/GUI/playlist \
