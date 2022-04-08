@@ -1,6 +1,6 @@
 //Current version info
 //#define     BOUND_CHECK       
-#define 	VERSION_NUMBER 		"1.9.1"
+#define 	VERSION_NUMBER 		"1.9.2"
 
 #ifdef BOUND_CHECK
     #define 	DEFAULT_TITLE  	"[BC] XRS"
