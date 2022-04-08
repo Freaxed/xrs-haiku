@@ -24,7 +24,7 @@ AboutBox::AboutBox(bool big_mode):BWindow( BRect( 0, 0, PREFS_L, PREFS_H),
                                            "About XRS", 
 										   B_TITLED_WINDOW_LOOK, 
 										   B_MODAL_APP_WINDOW_FEEL, 
-										   B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE)
+										   B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	fStatusText = NULL;
 	float larg = PREFS_L;
