@@ -16,6 +16,8 @@
 #include "MeasureManager.h"
 #include "Xed_Utils.h"
 #include "MainWindow.h"
+#include "ValuableManager.h"
+#include "CommonValuableID.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -26,44 +28,24 @@
 
 rgb_color col_matrix[8];
 
-XMatrix::XMatrix(BRect r,BView* n,XMPoz* k):BView(r,"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW)
+XMatrix::XMatrix(BRect r, BView* n, XMPoz* k):BView(r,"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW), sequence (NULL)
 {
-	the_n=n;
-	the_s=k;
-	
-	curSub=0;
+	the_n = n;
+	the_s = k;
+	curSub = 0;
+
 	//RGB Color Matrix
+	col_matrix[0] = rgb_color{ 255,   0,   0, 255 };
+	col_matrix[1] = rgb_color{ 255, 255,   0, 255 };
+	col_matrix[2] = rgb_color{   0, 255,   0, 255 };
+	col_matrix[3] = rgb_color{   0,   0, 255, 255 };
 	
-	col_matrix[0].red=255;
-	col_matrix[0].green=0;
-	col_matrix[0].blue=0;
-	col_matrix[0].alpha=255;
-	
-	col_matrix[1].red=255;
-	col_matrix[1].green=255;
-	col_matrix[1].blue=0;
-	col_matrix[1].alpha=255;
-		
-	col_matrix[2].red=0;
-	col_matrix[2].green=255;
-	col_matrix[2].blue=0;
-	col_matrix[2].alpha=255;
-		
-	col_matrix[3].red=0;
-	col_matrix[3].green=0;
-	col_matrix[3].blue=255;
-	col_matrix[3].alpha=255;
-	
-	MeasureManager::Get()->RegisterMe(this);
-	
-	morbido=XUtils::GetBitmap(7);
-	
+	morbido = XUtils::GetBitmap(7);
 }
 
 void
 XMatrix::ScrollTo(BPoint p)
-{
-	
+{	
 	BView::ScrollTo(p);
 	the_n->ScrollTo(BPoint(0,p.y));
 	the_s->ScrollTo(BPoint(p.x,0));
@@ -72,17 +54,14 @@ XMatrix::ScrollTo(BPoint p)
 void
 XMatrix::Reset(Sequence* s)
 {
-	sequence=s;
-	
-				
-	curPat=0;
-	sel=0;
-	y_count=s->getMaxPat();
-	MaxPat=0;
-	
-		
+	sequence = s;				
+	curPat = 0;
+	sel = 0;
+	y_count = s->getMaxPat();
+	MaxPat = 0;
 	Invalidate();
 }
+
 void
 XMatrix::AttachedToWindow()
 {
@@ -91,25 +70,33 @@ XMatrix::AttachedToWindow()
 	SetFontSize(XBOX/2);
 	SetBlendingMode(B_PIXEL_ALPHA,B_ALPHA_OVERLAY);
 	SetDrawingMode(B_OP_ALPHA);
+	ValuableManager::Get()->RegisterValuableReceiver(VID_PATTERN_CURRENT, this);	
+}
+
+void
+XMatrix::DetachedFromWindow()
+{
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_PATTERN_CURRENT, this);	
+	BView::DetachedFromWindow();
 }
 
 void
 XMatrix::Select(int y)
 {
-	int oldsel=sel;
-	
-	sel=y;
+	if(sequence == NULL) 
+		return;
+
+	int oldsel = sel;
+	sel = y;
 	
 	if(Window()->Lock())
 	{
-	for(int x=0;x<X_COUNT;x++)
-	 {
-		_drawBall(x,oldsel);
-	 	_drawBall(x,sel);
-	 }	
-		
-		
-	Window()->Unlock();
+		for(int x=0;x<X_COUNT;x++)
+		{
+			_drawBall(x,oldsel);
+			_drawBall(x,sel);
+		}		
+		Window()->Unlock();
 	}
 }
 
@@ -117,37 +104,33 @@ XMatrix::Select(int y)
 void
 XMatrix::Draw(BRect r)
 {
-	//SetScale(0.5);
 	
-	if(sequence==NULL) return;
+	if(sequence == NULL) 
+		return;
 	
 	int	ax1=(int)floor(r.left/XBOX)-1;
 	int	ay1=(int)floor(r.top/XBOX)-1;
 	int	ax2=(int)ceil(r.right/XBOX)+1;
 	int	ay2=(int)ceil(r.bottom/XBOX)+1;
 	
-	if(ax2>X_COUNT) ax2=X_COUNT;
+	if(ax2 > X_COUNT) 
+		ax2 = X_COUNT;
 	
-	if(ay2>y_count) 
+	if(ay2 > y_count) 
+		ay2 = y_count;
+		
+	for(int y=ay1;y<ay2;y++) 
 	{
-		//SetHighColor(0,0,0);
-		//StrokeLine(BPoint(ax1*XBOX,y_count*XBOX),BPoint(ax2*XBOX+XBOX,y_count*XBOX));//  _
-		ay2=y_count;
-	}
-	
-	
-	
-	for(int y=ay1;y<ay2;y++)
-	 for(int x=ax1;x<ax2;x++)
-	 			_drawBall(x,y);	 
-				
+		for(int x=ax1;x<ax2;x++)
+		{
+	 		_drawBall(x,y);
+	 	}
+	}				
 }				
 
 void
 XMatrix::_drawBall(int x,int y)
 {
-	//SetScale(0.5);
-	
 	BRect r(x*XBOX,y*XBOX,x*XBOX+XBOX-1,y*XBOX+XBOX-1);
 	
 	if(y==sel)
@@ -178,14 +161,6 @@ void
 XMatrix::MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg)
 {
 	MainWindow::Get()->SetWheelTarget(code == B_ENTERED_VIEW ? this : NULL);
-	/*
-	if(code==B_ENTERED_VIEW )
-		MainWindow::Get()->SetWheelTarget(this);
-	else
-	if(code==B_EXITED_VIEW )
-	
-		MainWindow::Get()->SetWheelTarget(NULL);
-	*/	
 	BView::MouseMoved(where,code,dragDropMsg);
 }
 
@@ -223,8 +198,13 @@ XMatrix::setMaxs(int seq,int pat)
 void
 XMatrix::MessageReceived(BMessage *m)
 {
-	if(m->what==SETPAT)
-		Select(MeasureManager::Get()->GetCurrentPattern());
+	if(m->what == MSG_VALUABLE_CHANGED)
+	{
+		int32 value;
+		if (ValuableTools::SearchValues(VID_PATTERN_CURRENT, m, &value)){
+				Select(value);
+		}
+	}
 	else
 		BView::MessageReceived(m);
 }

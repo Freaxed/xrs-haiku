@@ -14,7 +14,7 @@
 #include "GlobalDef.h"
 
 #include <PopUpMenu.h>
-#include <View.h>
+#include <Box.h>
 
 class Song;
 class BankManager;
@@ -26,7 +26,7 @@ class XPot;
 class BPictureButton;
 class PeakView;
 
-class XPanel : public BView
+class XPanel : public BBox
 {
 	public:
 						XPanel (BRect);

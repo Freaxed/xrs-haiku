@@ -36,6 +36,8 @@ public:
 	void 	Draw(BRect updateRect);
 	
 	void	SetSensitivity(float v) { fSentitivity = v;};
+
+	void	SetDisplayDelta(int delta) {fDisplayDelta = delta; }; //for example: value 0->9 but display 1->10 ; delta = 1
 	
 	
 private:
@@ -61,6 +63,7 @@ private:
 	int dig[3];
 	char dix[4];
 	float fSentitivity;
+	int	fDisplayDelta;
 
 };
 

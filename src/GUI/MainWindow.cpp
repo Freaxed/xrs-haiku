@@ -22,7 +22,7 @@
 #include 	"TrackManager.h"
 #include	"MeasureManager.h"
 #include	"locale.h"
-#include 	"PositionView.h"
+
 #ifdef XRS_MIDI
 	#include 	"XrsMidiIn.h"
 #endif
@@ -69,8 +69,8 @@ MainWindow::MainWindow() :
 	
 	nb=fPanel->Bounds();
 	nb.top = XPANEL_H+INFO_BAR_LY + 3;
-	nb.right -= B_V_SCROLL_BAR_WIDTH;
-	nb.bottom -= B_V_SCROLL_BAR_WIDTH; 
+	nb.right  -= B_V_SCROLL_BAR_WIDTH;
+	nb.bottom -= B_H_SCROLL_BAR_HEIGHT; 
 	
 	fTracksPanel = new TracksPanel(nb);
 	
@@ -78,20 +78,16 @@ MainWindow::MainWindow() :
 	scroll_view = new BScrollView("XRScrollView", fTracksPanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
 	fPanel->AddChild(scroll_view);
 
-	//SplitPane *split=new SplitPane(nb,scroll_view,new BView(BRect(0,0,10,10),NULL,0,0),B_FOLLOW_ALL_SIDES);
-	//split->SetViewInsetBy(BPoint(0,0));
-	//fPanel->AddChild(split);	
 		
-	ticks=new TickView( BRect(0,XPANEL_H,WINDOW_XL-B_V_SCROLL_BAR_WIDTH,XPANEL_H+INFO_BAR_LY+2));
+	ticks = new TickView(BRect(1, XPANEL_H, WINDOW_XL-1, XPANEL_H+INFO_BAR_LY+2));
 	fPanel->AddChild(ticks);
-	
-	ticks->AddChild(new PositionView( BRect(10,0,10+54+54,18),0));		
+			
 
 	LoadConfig();
 
 	float a,b,c,d;
 	GetSizeLimits(&a,&b,&c,&d);
-	SetSizeLimits(100,b,100,d);
+	SetSizeLimits(300, b, 300, d);
 	
 	SetWheelTarget(NULL);
 	
@@ -338,7 +334,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MENU_CUT:
 			paste->SetEnabled(true);
 		case MENU_PASTE:
-			fTracksPanel->resetPattern();
+			fTracksPanel->resetPattern(MeasureManager::Get()->GetCurrentPattern());
 			break;
 		case MENU_RENAME:
 			fTracksPanel->RenameSelectedTrack();
@@ -347,7 +343,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MENU_MEA_CUT:
 			mea_paste->SetEnabled(true);
 		case MENU_MEA_PASTE:
-			fTracksPanel->resetPattern();
+			fTracksPanel->resetPattern(MeasureManager::Get()->GetCurrentPattern());
 			break;
 		
 		case ADD_TRACK:		
@@ -368,7 +364,7 @@ MainWindow::MessageReceived(BMessage* message)
 					curSong->RemoveTrack(trk);
 				XHost::Get()->SendMessage(X_UnLockSem,0);
 				fTracksPanel->RemoveTrackAt(pos);
-				fTracksPanel->resetPattern(); //UI Refresh!
+				fTracksPanel->resetPattern(MeasureManager::Get()->GetCurrentPattern()); //UI Refresh!
 			   }
 			  
 			break;
@@ -380,7 +376,7 @@ MainWindow::MessageReceived(BMessage* message)
 			WindowManager::Get()->Switch(MixerWindow::Get());
 			break;
 		case ADD_PATTERN:
-			{
+		{
 			int z = MeasureManager::Get()->GetCurrentPattern();
 			XHost::Get()->SendMessage(X_LockSem,0);
 				curSong->AddMeasure();
@@ -388,8 +384,8 @@ MainWindow::MessageReceived(BMessage* message)
 			fPanel->ResetMeasureCount();
 			MatrixWindow::Get()->Reset(curSong->getSequence(), curSong->getNumberNotes());
 			MeasureManager::Get()->SetCurrentPattern(z);
-			}
-			break;
+		}
+		break;
 		
 		case REMOVE_PATTERN:
 		{

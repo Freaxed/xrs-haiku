@@ -33,13 +33,9 @@
 #include <Application.h>
 
 
-#include "VectorNew.h"
-
-#define	SETPAT	'setp'
-
 class Sequence;
 
-class MeasureManager: public BMessageFilter 
+class MeasureManager 
 {
 	public:
 	
@@ -48,10 +44,9 @@ class MeasureManager: public BMessageFilter
 		filter_result 	Filter(BMessage *message, BHandler **target);
 		
 		void			Reset(Sequence*);
-		void			RegisterMe(BHandler*);
 		
-		int				GetCurrentPattern(); //the pattern selected!
-		void			SetCurrentPattern(int pat); //
+		int32			GetCurrentPattern(); //the pattern selected!
+		void			SetCurrentPattern(int32 pat); //
 		
 		//Moving the Sequence 
 		bool		MoveNextCol();
@@ -78,41 +73,10 @@ class MeasureManager: public BMessageFilter
 		int			curSub;
 		int			curPos;	
 		
-		int			curpat;
+		int32		curpat;
 		Sequence*	sequence;
 		bool		all_patterns;
 		
-		VectorNew<BHandler*> hands;
-		
 };
 
-//extern	MeasureManager*		mea_manager;
-
 #endif
-
-
-/*
- 	JTrack : myPat->getNumberNotes() unico utilizzo e poi lo usa
- 	per passarlo alla altre strutture sotto (vnc piano etc..)
- 	qui teniamo la cosa così
- 	
- 	Juice: eliminiamo/trasformiamo rispetto a MatrixWindow
- 	
- 		mw->getSelectedPattern();
- 		mw->substep();
- 		mw->resetStep();
- 		
- 	XPanel
- 			da eliminare
- 			panel->isAllPat()
- 			
- 			** FATTO		panel->getCurrentPattern()
-
- 			
- 			[isAllPat lasciarlo in Song oppure spostarlo qui  ???]
- 			 
- 			anche in MainWindow c'e' rif a matrixWindow (mw->)
-
-
-*/
-//--

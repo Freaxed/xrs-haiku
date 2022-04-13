@@ -161,7 +161,7 @@ TheApp::PrepareToRun()
 	fModel = new BasicModelManager();
 	
 	mea_manager = MeasureManager::Get();
-	AddCommonFilter(mea_manager);
+	//AddCommonFilter(mea_manager);
 	
 	trackinfo = TrackInfoWindow::Get();
 

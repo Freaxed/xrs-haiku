@@ -32,7 +32,7 @@
 #define VID_MIXER_MAIN_MET			VID_MIXER_LIN_MET(0)
 
 
-
+#define VID_PATTERN_CURRENT         "xrs.pattern.current"
 
 
 #endif // CommonValuableID_H

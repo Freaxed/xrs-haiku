@@ -24,6 +24,8 @@ BasicModelManager::BasicModelManager(){
 		REG(VID_MIXER_LIN_PAN(i), (int32)00);
 		REG(VID_MIXER_LIN_MET(i), (float)0.0f, (float)0.0f);
 	}
+
+	REG(VID_PATTERN_CURRENT, (int32)0);
 };
 
 BasicModelManager::~BasicModelManager() {}
@@ -42,4 +44,6 @@ BasicModelManager::ResetValues()
 		SET(VID_MIXER_LIN_PAN(i), (int32)00);
 		SET(VID_MIXER_LIN_MET(i), (float)0.0f, (float)0.0f);
 	}
+
+	SET(VID_PATTERN_CURRENT, (int32)0);
 }

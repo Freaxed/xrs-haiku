@@ -26,6 +26,8 @@
 #include <TranslationUtils.h>
 #include <InterfaceKit.h>
 #include "Song.h"
+#include "ValuableManager.h"
+#include "CommonValuableID.h"
 
 
 TracksPanel::TracksPanel(BRect rect): TrackList(rect),ticks(NULL)
@@ -98,11 +100,11 @@ status_t
 TracksPanel::Init(BView* tk)
 {
 	ticks=tk;
-	tm=TrackManager::Get();
-	tm->curPanel=this;
-	MeasureManager::Get()->RegisterMe(this);
+	tm = TrackManager::Get();
+	tm->curPanel = this;
 	return B_OK;
 }
+
 JTrack*
 TracksPanel::getJTrackAt(int h)
 {
@@ -114,14 +116,24 @@ TracksPanel::getNumberJTrack()
 	return xnv.Count();
 }
 
-
-
-
 Track*
 TracksPanel::getCurrentTrack()
 {
 	return tm->getCurrentTrack() ; //selTrack;
 	
+}
+
+void
+TracksPanel::AttachedToWindow()
+{
+	TrackList::AttachedToWindow();
+	ValuableManager::Get()->RegisterValuableReceiver(VID_PATTERN_CURRENT, this);
+}
+void
+TracksPanel::DetachedFromWindow()
+{
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_PATTERN_CURRENT, this);
+	TrackList::DetachedFromWindow();
 }
 
 
@@ -218,8 +230,13 @@ TracksPanel::MessageReceived(BMessage* message)
 	switch(message->what)
 	{
 	
-	case SETPAT:
-		resetPattern();
+	case MSG_VALUABLE_CHANGED:
+	{
+		int32 value;
+		if (ValuableTools::SearchValues(VID_PATTERN_CURRENT, message, &value)){
+				resetPattern(value);
+		}
+	}		
 	break;
 	
 	case TRACK_SET:
@@ -281,18 +298,13 @@ TracksPanel::soloSelectedTrack()
 	}
 }
 void
-TracksPanel::resetPattern()
+TracksPanel::resetPattern(int32 selPattern)
 {
-	int selPattern=MeasureManager::Get()->GetCurrentPattern();
-	
+	if (!curSong)
+		return;
+
 	for(int h=0;h<curSong->getNumberTrack();h++)		
 		getJTrackAt(h)->Refresh(curSong->getTrackAt(h)->getPatternAt(selPattern), curSong->GetBeatDivision());
-}
-
-void
-TracksPanel::MouseDown(BPoint)
-{
-	//if(!Window()->IsActive()) Window()->Activate(true);
 }
 
 void
@@ -300,7 +312,7 @@ TracksPanel::RemoveTrackAt(int id)
 {
 	JTrack*	tr;
 	
-	LogTrace("Rermoving the track.. %d\n",id);
+	LogTrace("Removing the track.. %d\n",id);
 	
 
 	if(id < 0) return;

@@ -31,9 +31,11 @@ class TracksPanel : public TrackList
 						TracksPanel (BRect);
 						
 		 	void		MessageReceived(BMessage* message);
-		 	void		MouseDown(BPoint);
 			void		FrameResized(float new_w,float new_h);
 			void		ScrollTo(BPoint p);
+
+			void		AttachedToWindow();
+			void		DetachedFromWindow();
 		
 			status_t		Init(BView*);
 				void		ResetToSong(Song *);
@@ -45,7 +47,7 @@ class TracksPanel : public TrackList
 				void		SelectTrack(int);
 				void		AddTrack(int h);
 				
-				void		resetPattern();
+				void		resetPattern(int32);
 				int			getCurrentPattern();
 				
 								

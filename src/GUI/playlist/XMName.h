@@ -23,6 +23,7 @@ class XMName: public BView
 		 void 	Draw(BRect);
 		 void 	MouseDown(BPoint);
 		 void	AttachedToWindow();	
+		 void	DetachedFromWindow();
 		 void	MessageReceived(BMessage* msg);
 			
 				 

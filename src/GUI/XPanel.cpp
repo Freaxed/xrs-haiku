@@ -40,7 +40,7 @@ BMenuItem* new_bpm_menu(const char* label, int32 bpm_value)
 
 
 
-XPanel::XPanel(BRect rect): BView(rect, "XPanel", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_NAVIGABLE)
+XPanel::XPanel(BRect rect): BBox(rect, "XPanel", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_NAVIGABLE, B_NO_BORDER)
 {
 	bpm_menu = new BPopUpMenu("popup",false);
 	bpm_menu->AddItem(new_bpm_menu(" 60 bpm",  60));
@@ -73,7 +73,7 @@ XPanel::isAllPat(){
 void
 XPanel::ResetMeasureCount(){
 	LogTrace("XPanel::ResetMeasureCount");
-	curpat->SetMax(curSong->getNumberMeasure());
+	curpat->SetMax(curSong->getNumberMeasure() - 1);
 }
 
 void
@@ -82,7 +82,7 @@ XPanel::ResetToSong(Song* s, TracksPanel* f)
 	curSong = s;
 	tp = f;	
 
-	curpat->UpdateValue(1, true);
+	curpat->UpdateValue(0, true);
 	all_bt->SetValue(MeasureManager::Get()->GetPatternMode());
 	ResetMeasureCount();
 }
@@ -93,17 +93,6 @@ XPanel::MessageReceived(BMessage* message)
 {
 	switch(message->what)
 	{
-	
-	case CURPAT_MSG:
-		message->what=SETPAT;
-		message->ReplaceInt32("be:value",message->FindInt32("be:value")-1);
-		be_app->PostMessage(message,be_app);
-	break;
-	
-	case SETPAT:
-		curpat->UpdateValue(MeasureManager::Get()->GetCurrentPattern()+1, false); 
-	break;
-	
 	case 'bpmp': //show the BPM menu
 		{
 			BPoint point;
@@ -125,14 +114,13 @@ XPanel::MessageReceived(BMessage* message)
 		}
 	break;
 	default:
-		BView::MessageReceived(message);
+		BBox::MessageReceived(message);
 	break;
 	}
 } 
 void
 XPanel::AttachedToWindow()
 {
-	SetViewColor(panelColor);
 	BRect r(0,0,24,22);
 	
 	r.OffsetTo(8,8);
@@ -201,20 +189,17 @@ XPanel::AttachedToWindow()
 	
 	r.OffsetBy(25,0);
 	r.right=r.left+36;
-	curpat = new ADigit(r, new BMessage(CURPAT_MSG), 1, 1);
+	curpat = new XDigit(r, VID_PATTERN_CURRENT, "curpattern", NULL, 0, 0);
+	curpat->SetDisplayDelta(1);
 	AddChild(curpat);
-	curpat->SetTarget(this);
 	
 	//window list	
 	r.OffsetBy(55,0);
 	r.right=r.left+24;
 	AddChild( tool[10] = XUtils::ToolBarButton( r, 5, "tool", new BMessage('winl'), B_ONE_STATE_BUTTON, this));
 	tool[10]->SetTarget(this);
-		
-		
 	MakeFocus(false);
-	
-	MeasureManager::Get()->RegisterMe(this);
+	BBox::AttachedToWindow();
 }
 
 void

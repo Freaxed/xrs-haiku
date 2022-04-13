@@ -14,6 +14,8 @@
 #include "GfxMsg.h"
 #include "MeasureManager.h"
 #include "maxcount.h"
+#include "ValuableManager.h"
+#include "CommonValuableID.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -23,9 +25,8 @@
 
 #define 	XBOX		18
 
-XMName::XMName(BRect r):BView(r,"",B_FOLLOW_TOP_BOTTOM,B_WILL_DRAW)
+XMName::XMName(BRect r):BView(r,"",B_FOLLOW_TOP_BOTTOM,B_WILL_DRAW) , sequence(NULL)
 {
-	MeasureManager::Get()->RegisterMe(this);
 }
 
 void
@@ -43,8 +44,15 @@ XMName::AttachedToWindow()
 	SetViewColor(200,200,220);
 	SetLowColor(200,200,220);
 	SetFontSize(12);
+	ValuableManager::Get()->RegisterValuableReceiver(VID_PATTERN_CURRENT, this);	
 }
 
+void
+XMName::DetachedFromWindow()
+{
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_PATTERN_CURRENT, this);	
+	BView::DetachedFromWindow();
+}
 
 void
 XMName::Select(int y)
@@ -58,7 +66,8 @@ XMName::Select(int y)
 void
 XMName::Draw(BRect r)
 {
-	if(sequence==NULL) return;
+	if(sequence == NULL) 
+		return;
 		
 	for(int y=0;y<y_count;y++)
 		_drawName(y);
@@ -67,6 +76,9 @@ XMName::Draw(BRect r)
 void
 XMName::_drawName(int y)
 {
+	if(sequence == NULL) 
+		return;
+
 	BRect r(0,y*XBOX,98,y*XBOX+XBOX-1);
 	
 	if(y==sel)
@@ -126,9 +138,7 @@ XMName::MouseDown(BPoint p)
 	
 	if(ay1!=sel &&  ay1<y_count)
 	{
-		BMessage* notify=new BMessage(SETPAT);
-		notify->AddInt32("be:value",ay1);
-		be_app->PostMessage(notify,be_app);
+		ValuableManager::Get()->UpdateValue(VID_PATTERN_CURRENT, ay1);
 	}
 
 }
@@ -136,8 +146,13 @@ XMName::MouseDown(BPoint p)
 void
 XMName::MessageReceived(BMessage *m)
 {
-	if(m->what==SETPAT)
-		Select(MeasureManager::Get()->GetCurrentPattern());
+	if(m->what == MSG_VALUABLE_CHANGED)
+	{
+		int32 value;
+		if (ValuableTools::SearchValues(VID_PATTERN_CURRENT, m, &value)){
+				Select(value);
+		}
+	}
 	else
 		BView::MessageReceived(m);
 }

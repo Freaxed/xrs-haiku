@@ -10,17 +10,15 @@
 #include "MeasureManager.h"
 #include "Sequence.h"
 #include "ValuableManager.h"
-
+#include "CommonValuableID.h"
 #include <stdio.h>
 
 
 MeasureManager::MeasureManager()
-	:BMessageFilter(B_PROGRAMMED_DELIVERY,B_LOCAL_SOURCE,SETPAT),
-	curpat(0),sequence(NULL)
+	:curpat(0),sequence(NULL)
 {
 	ValuableManager::Get()->RegisterValuable("measure.allpatters", (int32)0);
-	
-	curPos=0;
+	curPos = 0;
 }
 
 MeasureManager*
@@ -46,13 +44,6 @@ MeasureManager::GetCurrentPattern()
 	return curpat;
 }
 
-void
-MeasureManager::RegisterMe(BHandler* lop)
-{
-	if(!lop) 
-		return;
-	hands.Add(lop);
-}
 
 int			
 MeasureManager::ResetStep()
@@ -125,28 +116,10 @@ MeasureManager::GetPatternMode()
 {
 	return sequence->all;
 }
-void
-MeasureManager::SetCurrentPattern(int newpat)
-{ 
-	curpat=newpat;
-	BMessage *message = new BMessage(SETPAT);
-	
-	for(int i=0; i<hands.Count(); i++)
-	{
-		(hands[i]->Looper())->PostMessage(message,hands[i]);
-	}
-}
 
-filter_result
-MeasureManager::Filter(BMessage *message, BHandler **target)
-{
-	curpat = message->FindInt32("be:value");
-	message->RemoveName("be:value"); //bastard! (?)
-	
-	for(int i=0; i<hands.Count(); i++)
-	{
-		(hands[i]->Looper())->PostMessage(message,hands[i]);
-	}
-	return B_SKIP_MESSAGE;
-	
+void
+MeasureManager::SetCurrentPattern(int32 newpat)
+{ 
+	curpat = newpat;
+	ValuableManager::Get()->UpdateValue(VID_PATTERN_CURRENT, (int32)newpat);
 }

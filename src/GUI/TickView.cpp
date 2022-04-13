@@ -7,30 +7,27 @@
  *		Andrea Anzani <andrea.anzani@gmail.com>
  */
 
-// TickView II
-//	15-12-03 xmas!
-// version haiku:
-//	08-12-21
-
 #include "TickView.h"
 
-#include "Xed_Utils.h"
 #include <Window.h>
 #include <Message.h>
 #include <stdio.h>
 
+#include "Xed_Utils.h"
+#include "PositionView.h"
 #include "ValuableManager.h"
 #include "CommonValuableID.h"
 
-BBitmap*	b_tick;
-const float	xinc  = 23.0;
-const float space = 170.0;
+
+const float	xinc  = 23.0f;
+const float space = 169.0f;
 
 TickView::TickView(BRect frame): BView(frame,"TickView",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW)
 {
 	tick = -1;
 	num_notes = 16;
-	b_tick=XUtils::GetBitmap(5); //fix
+	b_tick = XUtils::GetBitmap(5);
+	AddChild(new PositionView( BRect(36, 0, 36 + 54+54, 18), 0));
 }
 
 void 
@@ -45,8 +42,9 @@ TickView::Draw(BRect b)
 {
 	for(float i=0.0f; i<(float)num_notes; i++)
 	{
-		DrawBitmap(b_tick,BPoint(space + (i*xinc) - 7.0f, 3.0f));
+		DrawBitmapAsync(b_tick, BPoint(space + (i*xinc) - 7.0f, 3.0f));
 	}
+	Sync();
 }
 
 void

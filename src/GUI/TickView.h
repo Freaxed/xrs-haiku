@@ -7,7 +7,7 @@
  */
 
 #include <View.h>
-#include "ValuableManager.h"
+#include <Bitmap.h>
 
 class TickView : public BView
 {
@@ -25,8 +25,9 @@ class TickView : public BView
 	
 	private:
 			
-			int32 	tick, num_notes;
-			BRect	TRect(int d);
+			int32 		tick, num_notes;
+			BRect		TRect(int d);
+			BBitmap*	b_tick;
 };
 
 //-

@@ -32,7 +32,8 @@ ADigit::ADigit(BRect frame, BMessage *message,
 	int32 minValue, int32 maxValue,
 	uint32 resizingMode, uint32 flags)
 	: BControl(frame,  "_adigit",  "_", message, B_FOLLOW_NONE,B_WILL_DRAW),
-	m_fMinValue(minValue), m_fMaxValue(maxValue),
+	m_fMinValue(minValue), m_fMaxValue(maxValue), 
+	fDisplayDelta(0),
 	track(false)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -58,10 +59,12 @@ ADigit::SetValue(int32 n)
 	
 	sprintf(dix,"%3d",(int)n);
 
-	for(int i=0;i<3;i++)
+	for(int i=0; i<3; i++)
 	{
-		dig[i]=dix[i]-47;
-		if(dig[i]<0) dig[i]=0;
+		dig[i] = dix[i] - 47 + fDisplayDelta;
+		
+		if (dig[i] < 0) 
+			dig[i] = 0;
 	}
 			
 	BControl::SetValue(n);
