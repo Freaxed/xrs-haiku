@@ -44,41 +44,54 @@ void
 TracksPanel::FixScrollBar()
 {
 
-	if(Window()->Lock()){
-	if(xnv.Count() == 0)
+	if(Window()->Lock())
 	{
-		ScrollBar(B_VERTICAL)->SetRange(0,0);
-		ScrollBar(B_HORIZONTAL)->SetRange(0,0);
-	}
-	else
-	{	float old=ScrollBar(B_VERTICAL)->Value();
+		BScrollBar* vScroll = ScrollBar(B_VERTICAL);
+		BScrollBar* hScroll = ScrollBar(B_HORIZONTAL);
+		if(xnv.Count() == 0)
+		{
+			vScroll->SetRange(0,0);
+			hScroll->SetRange(0,0);
+		}
+		else
+		{	
+			const BRect bounds = Bounds();
+			BSize size(xnv[xnv.Count()-1]->Frame().right, xnv[xnv.Count()-1]->Frame().bottom);
+			if (hScroll != NULL) {
+			
+				float delta = size.Width() - bounds.Width(),
+				proportion = bounds.Width() / size.Width();
+				if (delta < 0)
+					delta = 0;
+				hScroll->SetRange(0, delta);
+				hScroll->SetSteps(be_plain_font->Size() * 1.33,
+				bounds.Width());
+				hScroll->SetProportion(proportion);
+			}
+			
+			if (vScroll != NULL) {
+				float delta = size.Height() - bounds.Height(),
+					proportion = bounds.Height() / size.Height();
+				if (delta < 0)
+					delta = 0;
+
+				vScroll->SetRange(0, delta);
+				vScroll->SetSteps(be_plain_font->Size() * 1.33,
+					bounds.Height());
+				vScroll->SetProportion(proportion);
+			}
 		
-		//Vertical
-		float lastH = xnv[xnv.Count()-1]->Frame().bottom+old;
-		float ds=lastH-Frame().Height();
-		if(ds<0) ds=0;
-		//printf("LAST HEIGHT %f %f max %f \n",lastH,old,ds);
-		ScrollBar(B_VERTICAL)->SetRange(0,ds);
-		ScrollBar(B_VERTICAL)->SetProportion(Frame().Height()/lastH);
-		
-		//horiz
-		old=ScrollBar(B_HORIZONTAL)->Value();
-		lastH = xnv[xnv.Count()-1]->Frame().right+old;
-		ds=lastH-Frame().Width();
-		if(ds<0) ds=0;
-		ScrollBar(B_HORIZONTAL)->SetRange(0,ds);
-		ScrollBar(B_HORIZONTAL)->SetProportion(Frame().Width()/lastH);
-	
-	}
-	Window()->Unlock();
+		}
+		Window()->Unlock();
 	}
 
 }
 
-
 void		
-TracksPanel::FrameResized(float new_w,float new_h){
-FixScrollBar();
+TracksPanel::FrameResized(float new_w,float new_h)
+{
+	BView::FrameResized(new_w, new_h);
+	FixScrollBar();
 }
 
 status_t

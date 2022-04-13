@@ -100,17 +100,16 @@ void
 TrackBlock::_expanded(TrackEnd* te, float delta, int direction)
 {
 	if(!te) return;
-	float c=te->getExpansionSize();
-		
+	float c = delta;
+	
+	Expand(direction * c);	
 	((TrackList*)Parent())->Expanded(this, direction * c);
-	Expand(direction * c);		
-	
-	
+
 	int i = trackend_list.IndexOf(te);
 		
 	for(int j=i+1;j<trackend_list.Count();j++)
 	{
-		trackend_list[j]->MoveBy(0, direction * te->getExpansionSize());			
+		trackend_list[j]->MoveBy(0, direction * delta);			
 	}
 	
 }
