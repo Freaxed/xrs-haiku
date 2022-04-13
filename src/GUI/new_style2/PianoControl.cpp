@@ -30,7 +30,7 @@ PianoControl::PianoControl(BRect frame,	const char*	name):TrackEnd(frame,  name)
 	w_note->SetFont(&tmp);	
 	
 	
-	fPianoView = new PianoEdit(BRect(109, 0, Bounds().right - B_V_SCROLL_BAR_WIDTH, 120));
+	fPianoView = new PianoEdit(BRect(109, 0, Bounds().right - B_V_SCROLL_BAR_WIDTH - 1, 120));
 		
 	fScrollView = new BScrollView("XRScroolView", fPianoView, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW, false, true, B_NO_BORDER);
 	

@@ -61,7 +61,7 @@ PianoEdit::Draw(BRect r)
 
 	//SetHighColor(160,160,160);
 	
-	if(right>fPattern->getNumberNotes()) 
+	if(right > fPattern->getNumberNotes()) 
 		right = fPattern->getNumberNotes();
 	
 	for(int j=top;j<bottom;j++)
