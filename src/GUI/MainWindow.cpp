@@ -37,9 +37,6 @@
 #include 	<Entry.h>
 #include 	<Directory.h>
 
-#define	MOUSE_WHEEL	1598904131
-
-
 MainWindow*
 MainWindow::Get()
 {
@@ -150,25 +147,21 @@ MainWindow::CreateMenu(){
 	AddChild(menuBar);
 }
 
-
-void
-MainWindow::UpdateRecents(){	
-}
-
 void		
-MainWindow::PlayButtonOn(bool state){
+MainWindow::PlayButtonOn(bool state)
+{
 	if(Lock()){
 	 fPanel->OnPlay(state);
 	 Unlock();
 	}
 }
 
-void MainWindow::Close(){}
+	
 
-MainWindow::~MainWindow(){
-		SaveConfig();				
+MainWindow::~MainWindow()
+{
+	SaveConfig();				
 }
-
 
 bool
 MainWindow::QuitRequested()
@@ -184,24 +177,15 @@ MainWindow::Saved()
 void
 MainWindow::Init()
 {
-
 	fTracksPanel->Init(ticks);
-	
-	
+
 	if(Lock())
 	{
-		BMenu* x=TrackManager::Get()->getMenu();
+		BMenu* x = TrackManager::Get()->getMenu();
 		x->SetTargetForItems(this);
 		menuBar->AddItem(x);
-		/***/
-		// recent documents
-		//BMessage treno;
-		//be_roster->GetRecentDocuments(&treno,10,NULL,"application/x-vnd.xeD.XRS");
-		//treno.PrintToStream();
-		//FIX ME (up)
 		Unlock();
 	}
-
 }
 
 void
@@ -239,24 +223,14 @@ MainWindow::ResetToSong(Song* s)
 void
 MainWindow::WindowActivated(bool active)
 {
-	if(!fPanel) return;
-	
-	if(active)
-		//fPanel->SetEventMask(B_KEYBOARD_EVENTS);
-		fPanel->MakeFocus(true);
-	else
-		//fPanel->SetEventMask(0);
-		fPanel->MakeFocus(false);	
-	
+	if(fPanel) 
+		fPanel->MakeFocus(active);
 }
 
 void
 MainWindow::SetWheelTarget(BHandler *h)
 {
-	if(h)
-		wheel_target=h;
-	else
-		wheel_target=NULL; //tp;
+	wheel_target = h;
 }
 
 void		
@@ -278,10 +252,7 @@ MainWindow::OnPlay(bool doPlay)
 		PlayButtonOn(doPlay);
 	
 	Unlock();
-	}		
-	
-	
-	
+	}	
 }
 
 
@@ -295,19 +266,11 @@ MainWindow::MessageReceived(BMessage* message)
 	
 	switch(message->what)
 	{
-	
 		case 'hide':
 			WindowManager::Get()->CloseAll();
-			break;
-		
-		case MOUSE_WHEEL: /* mouse wheel */
+			break;		
+		case B_MOUSE_WHEEL_CHANGED:
 			if(wheel_target) wheel_target->Looper()->PostMessage(message,wheel_target);
-			break;
-		
-		case 'obsv':
-			//fix me!
-			//printf("here\n");
-			PostMessage(message,fPanel);
 			break;
 		case MENU_SETTINGS:
 			Panels::showSettings(curSong);		
@@ -317,13 +280,10 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		case MENU_EXPORT:
 			Panels::showExport(MeasureManager::Get()->GetCurrentPattern()+1,curSong->getNumberMeasure());
-			break;
-		
+			break;		
 		case PLAY_START:
-		{
 			OnPlay (message->GetInt32("be:value", 1) == 1);
-		}
-		break;
+			break;
 		case PLAY_ALL_SET:
 			MeasureManager::Get()->SetPatternMode(fPanel->isAllPat());
 			break;
@@ -409,8 +369,6 @@ MainWindow::MessageReceived(BMessage* message)
 
 			
 			}
-			
-			
 		}
 		break;	
 		default:
@@ -422,17 +380,7 @@ MainWindow::MessageReceived(BMessage* message)
 status_t
 MainWindow::AskRemove(const char *txt)
 {
-	BAlert *sam;
-	int32 sam_say;
-	
-	BString ask(T_GEN_REMOVE);
-	ask << " ";
-	
-	sam=new BAlert(ask.String(),txt,T_GEN_REMOVE,T_GEN_NO);
-	sam_say=sam->Go();
-	
-	if(sam_say==0) return B_OK;
-	else return B_ERROR;
+	return (new BAlert(T_GEN_REMOVE, txt, T_GEN_REMOVE, T_GEN_NO))->Go() == 0 ? B_OK : B_ERROR;
 }
 void
 MainWindow::AddTrack(Track* trk)
