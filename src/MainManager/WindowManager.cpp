@@ -191,15 +191,6 @@ WindowManager::UnregisterMe(BWindow* win){
 	
 
 }
-void
-WindowManager::dump()
-{
-	for(int i=0;i<CountItems();i++)
-	{
-		token	*t=(token*)ItemAt(i);
-		printf("WINDOWMANAGER: %s\n",t->reg_name.String());
-	}
-}
 
 BPopUpMenu* 
 WindowManager::getMenu(){ 

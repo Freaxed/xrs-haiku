@@ -11,8 +11,8 @@
 #define _SEQUENCE_H_
 
 #include <TimedEventQueue.h>
+#include <StringList.h>
 
-class BList;
 class BString;
 
 class Sequence
@@ -29,7 +29,7 @@ class Sequence
 		void		RemoveMeasure(int pos);
 		void		AddMeasure(const char*);
 		
-		BString*	GetMeasureName(int);
+		BString		GetMeasureName(int);
 		void		SetMeasureName(const char*,int);
 		void		setItemAt(int col,int raw,bool c=false);
 		int			ItemAt(int col,int raw=0);
@@ -45,7 +45,7 @@ class Sequence
 
 				
 		BTimedEventQueue*	matrix2;
-		BList				names;
+		BStringList			fNames;
 		int					MaxSeq,MaxPat;
 
 };

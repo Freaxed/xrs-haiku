@@ -92,13 +92,12 @@ XMName::_drawName(int y)
 		
 	SetHighColor(0,0,0);
 		
-	BString* s=sequence->GetMeasureName(y);
-		
-	if(s!=NULL){
-		BString label("");
-		label << y+1 << ": " << s->String();
-		DrawString(label.String(),BPoint(3,y*XBOX+12));
-	} 
+	BString s = sequence->GetMeasureName(y);		
+	
+	BString label("");
+	label << y+1 << ": " << s.String();
+	DrawString(label.String(),BPoint(3,y*XBOX+12));
+ 
 	
 	SetHighColor(169,172,151);
 	StrokeLine(BPoint(0,y*XBOX+XBOX-1),BPoint(100,y*XBOX+XBOX-1));
@@ -106,13 +105,13 @@ XMName::_drawName(int y)
 void
 XMName::_MessForRect(int ay1)
 {
-	BString* text=sequence->GetMeasureName(ay1);
+	BString text = sequence->GetMeasureName(ay1);
 	BRect n(ConvertToScreen(BRect( Bounds().left,ay1*XBOX,Bounds().right,(ay1+1)*XBOX)));
 	BMessage* m=new BMessage('ttty');
 	m->AddPoint("from",BPoint(n.left,n.top));
 	m->AddPoint("to",BPoint(n.right,n.bottom));
 	m->AddInt16("pos",ay1);
-	m->AddString("name",text->String());
+	m->AddString("name",text.String());
 	Looper()->PostMessage(m,Parent());
 }
 void
@@ -138,7 +137,7 @@ XMName::MouseDown(BPoint p)
 	
 	if(ay1!=sel &&  ay1<y_count)
 	{
-		ValuableManager::Get()->UpdateValue(VID_PATTERN_CURRENT, ay1);
+		MeasureManager::Get()->SetCurrentPattern(ay1);
 	}
 
 }

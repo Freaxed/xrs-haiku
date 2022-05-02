@@ -13,8 +13,7 @@
 
 Pattern::Pattern (int n)
 {
-	for(int h=0 ;  h<n ; h++)   
-		noteList.Add(new Note());
+	setNumberNotes(n);
 }
 
 Note*

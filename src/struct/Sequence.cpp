@@ -29,37 +29,38 @@ Sequence::Sequence()
 void
 Sequence::AddMeasure(const char* name){
 
-	names.AddItem((void*)(new BString(name) ));
+	fNames.Add(BString(name));
 	MaxPat++;
 
 }
-BString*
+BString
 Sequence::GetMeasureName(int pos){
 
-	if(pos<0 || pos >= names.CountItems()) return NULL;
-	return (BString*)(names.ItemAt(pos));
+	if(pos<0 || pos >= fNames.CountStrings()) return NULL;
+
+	return fNames.StringAt(pos);
 }
 void
 Sequence::SetMeasureName(const char* s,int pos)
 {
-	if(pos<0 || pos >= names.CountItems()) return;
-	 ((BString*)(names.ItemAt(pos)))->SetTo(s);
+	if(pos<0 || pos >= fNames.CountStrings()) return;
+	
+	fNames.Replace(pos, BString(s));
 }
 
 
 int
 Sequence::Reset()
 {
-	if(matrix2!=NULL) delete matrix2;
-	matrix2=new BTimedEventQueue();
-
-	for(int i=0;i<names.CountItems();i++)
-	{
-		BString* s=(BString*)names.ItemAt(i);
-		if(s!=NULL) delete s;
-		names.RemoveItem(i);
-	}
+	if (matrix2!=NULL) 
+		delete matrix2;
+	
+	matrix2 = new BTimedEventQueue();
+	
+	fNames.MakeEmpty();
+	
 	MaxSeq=0;
+
 	return 0;
 					
 }
@@ -88,9 +89,7 @@ Sequence::RemoveMeasure(int pos)
 		}		
 	}
 
-	BString* s=(BString*)names.ItemAt(pos);
-	if(s!=NULL) delete s;
-	names.RemoveItem(pos);
+	fNames.Remove(pos);
 
 }
 
@@ -139,7 +138,7 @@ Sequence::ItemAt(int col, int row)
 void 
 Sequence::LoadSettings(BMessage& playlist)
 {
-	assert(names.CountItems() == 1);
+	assert(fNames.CountStrings() == 1);
 	
 	BMessage	measures;
 	playlist.FindMessage("Measures", &measures);
@@ -179,9 +178,9 @@ Sequence::SaveSettings(BMessage& playlist)
 	measures.AddInt16("NumMeasures", MaxPat);
 	for (int i=0; i<MaxPat; i++) {
 		BMessage measure;
-		BString* name = GetMeasureName(i);
-		assert(name);
-		measure.AddString("Name", name->String());
+		BString name = GetMeasureName(i);
+
+		measure.AddString("Name", name.String());
 		
 		for(int p=0; p < getMaxSeq() + 1; p++) //WHY +1?? (last + 1 = count)
 		{

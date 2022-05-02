@@ -42,7 +42,6 @@ class	WindowManager: public BList, public BMessageFilter
 	
 						WindowManager();
 			void		_switch(BWindow*, int32 pos);
-			void		dump();
 			
 			struct token
 			{
