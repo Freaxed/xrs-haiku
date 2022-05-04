@@ -57,15 +57,21 @@ MainWindow::MainWindow() :
 	float menuY, menuX;
 	menuBar->GetPreferredSize(&menuX,&menuY);
 	BRect nb(Bounds());
-	nb.top=menuY+1;
+	
+	nb.top    = menuY + 1;
+	nb.bottom = nb.top + XPANEL_H - 1;
 	
 	
-	fPanel = new XPanel(nb); 
+	fPanel = new XPanel(nb);
 	AddChild(fPanel);
+
+	menuY = nb.bottom + 1 + INFO_BAR_LY + 2;
+	ticks = new TickView(BRect(nb.left, nb.bottom + 1, nb.right, menuY));
+	AddChild(ticks);
+
 	
-	
-	nb=fPanel->Bounds();
-	nb.top = XPANEL_H+INFO_BAR_LY + 3;
+	nb = Bounds();	
+	nb.top = menuY + 1;
 	nb.right  -= B_V_SCROLL_BAR_WIDTH;
 	nb.bottom -= B_H_SCROLL_BAR_HEIGHT; 
 	
@@ -73,11 +79,10 @@ MainWindow::MainWindow() :
 	
 	BScrollView		*scroll_view;
 	scroll_view = new BScrollView("XRScrollView", fTracksPanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
-	fPanel->AddChild(scroll_view);
+	AddChild(scroll_view);
 
 		
-	ticks = new TickView(BRect(1, XPANEL_H, WINDOW_XL-1, XPANEL_H+INFO_BAR_LY+2));
-	fPanel->AddChild(ticks);
+
 			
 
 	LoadConfig();

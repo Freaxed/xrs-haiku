@@ -22,7 +22,7 @@
 const float	xinc  = 23.0f;
 const float space = 169.0f;
 
-TickView::TickView(BRect frame): BView(frame,"TickView",B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW)
+TickView::TickView(BRect frame): BBox(frame, "TickView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW, B_NO_BORDER)
 {
 	tick = -1;
 	num_notes = 16;
@@ -84,8 +84,8 @@ TickView::TRect(int d)
 void
 TickView::AttachedToWindow()
 {
-	BView::AttachedToWindow();
-	SetViewColor(Parent()->ViewColor());
+	BBox::AttachedToWindow();
+	//SetViewColor(Parent()->ViewColor());
 	
 	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BEAT, this);	
 	
@@ -95,7 +95,7 @@ void
 TickView::DetachedFromWindow()
 {
 	ValuableManager::Get()->UnregisterValuableReceiver(VID_TEMPO_BEAT, this);	
-	BView::DetachedFromWindow();
+	BBox::DetachedFromWindow();
 }
 
 void
@@ -107,5 +107,5 @@ TickView::MessageReceived(BMessage* msg)
 		SetTick(tick);
 	}
 	else
-		BView::MessageReceived(msg);
+		BBox::MessageReceived(msg);
 }

@@ -40,7 +40,7 @@ BMenuItem* new_bpm_menu(const char* label, int32 bpm_value)
 
 
 
-XPanel::XPanel(BRect rect): BBox(rect, "XPanel", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_NAVIGABLE, B_NO_BORDER)
+XPanel::XPanel(BRect rect): BBox(rect, "XPanel", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_NAVIGABLE, B_NO_BORDER)
 {
 	bpm_menu = new BPopUpMenu("popup",false);
 	bpm_menu->AddItem(new_bpm_menu(" 60 bpm",  60));

@@ -6,10 +6,10 @@
  *		Andrea Anzani <andrea.anzani@gmail.com>
  */
 
-#include <View.h>
+#include <Box.h>
 #include <Bitmap.h>
 
-class TickView : public BView
+class TickView : public BBox
 {
 	public:
 		
