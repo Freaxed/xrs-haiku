@@ -14,10 +14,8 @@
 #include "GlobalDef.h"
 #include	<CheckBox.h>
 
-class XMatrix;
-class XMName;
+class PlaylistBox;
 class Sequence;
-class XMPoz;
 
 class MatrixWindow:public XrsWindow
 {
@@ -26,29 +24,15 @@ class MatrixWindow:public XrsWindow
 			static MatrixWindow*	Get();
 					~MatrixWindow();
 					
-			 void MessageReceived(BMessage*);
-			 bool QuitRequested();
-			 void FrameResized(float,float);
-				
-			
-				void	Reset(Sequence*, int16 notesPerMeasaure);
-				//void	setPosition(int);
+			bool 	QuitRequested();
+			void	Reset(Sequence*, int16 notesPerMeasaure);
 	
 	private:
 				 MatrixWindow();
-				BCheckBox	*en;
-				XMatrix 	*the_m;
-				XMName		*the_n;
-				BScrollView *scroll;
-				BScrollBar	*scroll_bar;
-				Sequence	*seq;
-				int 			y_count;
-				XMPoz *tt;
+				PlaylistBox*	fBox;
 		
 };
 
-
-//deprecated extern MatrixWindow*	mw;
 
 #endif
 
