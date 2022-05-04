@@ -36,6 +36,7 @@
 #include 	<Path.h>
 #include 	<Entry.h>
 #include 	<Directory.h>
+#include    "SplitPane.h"
 
 MainWindow*
 MainWindow::Get()
@@ -71,19 +72,25 @@ MainWindow::MainWindow() :
 
 	
 	nb = Bounds();	
-	nb.top = menuY + 1;
+	nb.top     = menuY + 1;
 	nb.right  -= B_V_SCROLL_BAR_WIDTH;
 	nb.bottom -= B_H_SCROLL_BAR_HEIGHT; 
+
+	BBox*	playground = new BBox(nb, "playgroud", B_FOLLOW_ALL);
 	
-	fTracksPanel = new TracksPanel(nb);
+	BRect local(0, 0, nb.right, nb.Width() / 2);
+	fTracksPanel = new TracksPanel(local);
 	
 	BScrollView		*scroll_view;
 	scroll_view = new BScrollView("XRScrollView", fTracksPanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
-	AddChild(scroll_view);
+	//AddChild(scroll_view);
 
+	BBox*	pax = new BBox(local, "pax");
 		
 
-			
+	SplitPane*	splitPane = new SplitPane(playground->Bounds(), scroll_view, pax, B_FOLLOW_ALL);
+	playground->AddChild(splitPane);
+	AddChild(playground);
 
 	LoadConfig();
 
