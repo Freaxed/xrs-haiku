@@ -62,6 +62,7 @@ SRCS =  \
 ./src/Extensions/XFluidSynth/SFSTrackBoost.cpp \
 ./src/Extensions/XFluidSynth/SFWindow.cpp \
 ./src/Extensions/XFluidSynth/XFSynth.cpp \
+./src/GUI/SplitPane.cpp \
 ./src/GUI/ADigit.cpp \
 ./src/GUI/APot.cpp \
 ./src/GUI/AboutBox.cpp \
