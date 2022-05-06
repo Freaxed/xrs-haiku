@@ -104,6 +104,7 @@ SRCS =  \
 ./src/GUI/track/JTrack.cpp \
 ./src/GUI/track/XNotesView.cpp \
 ./src/GUI/track/XTrack.cpp \
+./src/GUI/track/TrackInfoBox.cpp \
 ./src/MainManager/BasicModelManager.cpp \
 ./src/MainManager/JFileManager.cpp \
 ./src/MainManager/LoadingError.cpp \

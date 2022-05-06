@@ -17,29 +17,23 @@
 #include	<CheckBox.h>
 #include	<Message.h>
 
-class		Track;
-class		XDigit;
+class TrackInfoBox;
+class Track;
 
 class	TrackInfoWindow : public XrsWindow
 {
 	public:
-				
-				~TrackInfoWindow();
+					~TrackInfoWindow();
 			
 			static	TrackInfoWindow*	Get();
 			
 			bool	QuitRequested();
-			void	MessageReceived(BMessage*);
 			void	SetTrack(Track* tr);
-
-				
+	        void    RegisterPanel(BView*);
 		
 	private:
 				TrackInfoWindow();
-		
-		Track*	myTrack;	
-		XDigit*	ch;
-		BCheckBox*	en;
+				TrackInfoBox*	fTrackInfoBox;
 };
 #endif
 //--

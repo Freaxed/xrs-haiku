@@ -108,7 +108,7 @@ TrackManager::RegisterTrackBoost(TrackBoost* boost)
 		BView *v=(BView*)boost->getPanel();
 		if(v)
 		{
-			TrackInfoWindow::Get()->AddChild(v);
+			TrackInfoWindow::Get()->RegisterPanel(v);
 			v->Hide();
 		}
 		

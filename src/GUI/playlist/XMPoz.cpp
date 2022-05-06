@@ -31,7 +31,7 @@ extern int 	notes_per_measaure;
 char na[3];
 
 
-XMPoz::XMPoz(BRect r):BView(r,"Juice",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW|B_DRAW_ON_CHILDREN){
+XMPoz::XMPoz(BRect r):BView(r,"XMPoz",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW|B_DRAW_ON_CHILDREN){
 
 	loop_start=-1;
 	loop_end=-1;
