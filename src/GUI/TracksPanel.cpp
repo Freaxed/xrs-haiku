@@ -28,10 +28,11 @@
 #include "Song.h"
 #include "ValuableManager.h"
 #include "CommonValuableID.h"
+#include "TrackInfoBox.h"
 
-
-TracksPanel::TracksPanel(BRect rect): TrackList(rect),ticks(NULL)
+TracksPanel::TracksPanel(BRect rect): TrackList(rect),ticks(NULL),fTrackInfoBox(NULL)
 {
+	curSong = NULL;
 	SetViewColor(bkColor);
 }
 
@@ -97,9 +98,10 @@ TracksPanel::FrameResized(float new_w,float new_h)
 }
 
 status_t
-TracksPanel::Init(BView* tk)
+TracksPanel::Init(BView* tk, TrackInfoBox* lTrackInfoBox)
 {
 	ticks=tk;
+	fTrackInfoBox = lTrackInfoBox;
 	tm = TrackManager::Get();
 	tm->curPanel = this;
 	return B_OK;
@@ -346,9 +348,9 @@ TracksPanel::RemoveTrackAt(int id)
 void
 TracksPanel::SelectTrack(int id)
 {	if(id<0)
-		tm->SelectTrack(NULL);
+		tm->SelectTrack(NULL, NULL);
 	else
-		tm->SelectTrack(getJTrackAt(id));
+		tm->SelectTrack(getJTrackAt(id), fTrackInfoBox);
 }
 void
 TracksPanel::RefreshGraphics()

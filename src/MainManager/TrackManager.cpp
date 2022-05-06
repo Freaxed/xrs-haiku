@@ -37,6 +37,8 @@
 #include <Menu.h>
 #include <MenuItem.h>
 
+#include "TrackInfoBox.h"
+
 
 TrackManager::TrackManager()
 {
@@ -105,12 +107,12 @@ TrackManager::RegisterTrackBoost(TrackBoost* boost)
 		myMenu->AddItem(new BMenuItem( boost->Name(), m, '1' + (char)id ) );
 
 
-		BView *v=(BView*)boost->getPanel();
-		if(v)
-		{
-			TrackInfoWindow::Get()->RegisterPanel(v);
-			v->Hide();
-		}
+		// BView *panel = (BView*)boost->getPanel();
+		// if(panel ) 
+		// {
+		// 	TrackInfoWindow::Get()->RegisterPanel(panel ) ;
+		// 	panel - >Hide();
+		// }
 		
 
 		LogInfo("TrackBooster [%s] loaded.", boost->Name());
@@ -205,7 +207,7 @@ TrackManager::ResetToSong(Song* s)
 {
 	curSong = s;
 	
-	SelectTrack(NULL);	
+	SelectTrack(NULL, NULL);	
 	
 	for(int i=0; i < MAX_PLUG; i++)
 	{
@@ -216,28 +218,6 @@ TrackManager::ResetToSong(Song* s)
 	
 }
 
-//void
-//TrackManager::Restart()
-//{
-//	TrackInfoWindow::Get()->Lock();
-//	if(curJTrack != NULL) 
-//		curJTrack->Deselect();
-//	
-//	curJTrack = NULL;
-//	
-//	for(int i=0;i<MAX_PLUG;i++)
-//	{
-//		if(isBoosterValid(i)) 
-//			list[i]->Restart();
-//	}	
-//
-//	TrackInfoWindow::Get()->Unlock();
-//	
-//	curSong = NULL;
-//	
-//	WindowManager::Get()->Hide(TrackInfoWindow::Get());
-//	
-//}
 void
 TrackManager::Close()
 {
@@ -266,7 +246,7 @@ TrackManager::Init()
 }
 
 status_t
-TrackManager::SelectTrack(JTrack* x) {
+TrackManager::SelectTrack(JTrack* x, TrackInfoBox* lTrackInfoBox) {
 
 	if ( curJTrack == x && x != NULL) 
 		return B_ERROR;
@@ -280,20 +260,24 @@ TrackManager::SelectTrack(JTrack* x) {
 	{
 		curJTrack->Select();
 		if(list[x->getTrack()->getModel()] != NULL) {		
-			if(list[x->getTrack()->getModel()]->getPanel() != NULL)
+			
+			PlugPanel*	panel = list[x->getTrack()->getModel()]->getPanel();
+			if(panel != NULL)
 			{
-
-				PlugPanel	*v=list[x->getTrack()->getModel()]->getPanel();
-				if(TrackInfoWindow::Get()->Lock()){
+				if (panel->Parent() == NULL && lTrackInfoBox) {
+					lTrackInfoBox->AddChild(panel);
+					((BView*)panel)->Hide();
+				}
+					
+				if(lTrackInfoBox && lTrackInfoBox->Looper()->Lock()){
 					if(current) 
 						current->Hide();
-					current=(BView*)v;
+					current=(BView*)panel; 
 					current->Show();
-					TrackInfoWindow::Get()->Unlock();
-					v->ResetToTrack(x->getTrack());
-					TrackInfoWindow::Get()->SetTrack(x->getTrack());
+					lTrackInfoBox->Looper()->Unlock();
 
-
+					panel->ResetToTrack(x->getTrack());
+					lTrackInfoBox->SetTrack(x->getTrack());
 				}
 				LogTrace("After Lock");
 				
@@ -303,12 +287,12 @@ TrackManager::SelectTrack(JTrack* x) {
 	else
 	{
  		WindowManager::Get()->Hide(TrackInfoWindow::Get());
-		if(TrackInfoWindow::Get()->Lock()){
+		if(lTrackInfoBox && lTrackInfoBox->Looper()->Lock()){
 			if(current) 
 			   current->Hide();
 			   
 			current = NULL;
-			TrackInfoWindow::Get()->Unlock();
+			lTrackInfoBox->Looper()->Unlock();
 		}
 	}	
 	
@@ -316,10 +300,10 @@ TrackManager::SelectTrack(JTrack* x) {
 	return B_OK;
 }
 bool
-TrackManager::RefReceived(entry_ref ref,JTrack *trk,BMessage *g){
+TrackManager::RefReceived(entry_ref ref, JTrack *trk, TrackInfoBox* lTrackInfoBox, BMessage *g){
 
 	/* Drag'n Drop! */
-	SelectTrack(trk);
+	SelectTrack(trk, lTrackInfoBox);
 	Track*	x=trk->getTrack();
 	if(list[x->getModel()]->RefReceived(ref,x,g)==B_OK)
 			RefreshSelected();
@@ -329,8 +313,8 @@ void
 TrackManager::ResetPanel(Track* x){
 
 	if (!x) return;
-	PlugPanel	*v= list[x->getModel()]->getPanel();
-	if(v) v->ResetToTrack(x);
+	PlugPanel	*panel =  list[x->getModel()]->getPanel();
+	if(panel)  panel->ResetToTrack(x);
 
 }
 Track*

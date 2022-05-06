@@ -33,6 +33,7 @@ char na[3];
 
 XMPoz::XMPoz(BRect r):BView(r,"XMPoz",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW|B_DRAW_ON_CHILDREN){
 
+	sequence = NULL;
 	loop_start=-1;
 	loop_end=-1;
 	tracking[0]=false;

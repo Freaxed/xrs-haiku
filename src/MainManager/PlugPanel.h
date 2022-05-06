@@ -16,24 +16,13 @@ class PlugPanel : public BBox
 		virtual void 	ResetToTrack(Track* tr){curTrack=tr;};
 	
 	protected:
-			void	SetTitle(const char* txt){
-			
-				if(Window() && txt!=NULL ){
-					BString	text(T_TRACKINFO_TITLE);
-					text << " - " << txt;
-					Window()->SetTitle(text.String());
-				
-				}
-			
-			}
-	virtual	void	Hide(){
+				void	SetTitle(const char* txt) {} //deprecated
+		
+		virtual	void	Hide() {
 			ResetToTrack(NULL);
 			BBox::Hide();
-	}
-	
+		}
 	private:
 			Track*	curTrack;		
-			
-	
 };
 #endif

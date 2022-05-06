@@ -23,7 +23,7 @@ class Song;
 class Pattern;
 class JTrack;
 class Track;
-
+class TrackInfoBox;
 
 class TracksPanel : public TrackList
 {
@@ -37,7 +37,7 @@ class TracksPanel : public TrackList
 			void		AttachedToWindow();
 			void		DetachedFromWindow();
 		
-			status_t		Init(BView*);
+			status_t		Init(BView*, TrackInfoBox*);
 				void		ResetToSong(Song *);
 				int			getNumberJTrack();			
 				void		RemoveTrackAt(int id);
@@ -69,6 +69,7 @@ class TracksPanel : public TrackList
 		Song			*curSong;
 		TrackManager	*tm; //uhm shold be removed for sanity
 		BView			*ticks;	
+		TrackInfoBox*	fTrackInfoBox;
 		
 };
 

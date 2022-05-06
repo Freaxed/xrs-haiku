@@ -66,8 +66,8 @@ JTrack::RControl()
 void
 JTrack::InvokeRename()
 {
-		if(xtr)
-			xtr->SendRenameMessage();
+	if(xtr)
+		xtr->SendRenameMessage();
 }
 
 void
@@ -80,20 +80,20 @@ JTrack::MessageReceived(BMessage* message)
 		Window()->PostMessage(message,trackend_list[0]);
 		Window()->PostMessage(message,trackend_list[1]);
 	break;
-	case XRS_BANK_SAMPLE:	
-	{
-		entry_ref	ref;
-		message->FindRef("refs",&ref);
-		TrackManager::Get()->RefReceived(ref,this,message);
-	}
-	break;
+	// case XRS_BANK_SAMPLE:	
+	// {
+	// 	entry_ref	ref;
+	// 	message->FindRef("refs", &ref);
+	// 	TrackManager::Get()->RefReceived(ref, this, message);
+	// }
+	// break;
 		
-	case XRS_SIMPLE_DATA:
-	 {
-	 	entry_ref	ref;
-		message->FindRef("refs",&ref);
-		TrackManager::Get()->RefReceived(ref,this);
-	 }
+	// case XRS_SIMPLE_DATA:
+	//  {
+	//  	entry_ref	ref;
+	// 	message->FindRef("refs",&ref);
+	// 	TrackManager::Get()->RefReceived(ref,this);
+	//  }
 	break;
 	case TRACK_ON:
 		myTrack->setOn(volpot->IsOn());

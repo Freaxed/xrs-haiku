@@ -21,6 +21,7 @@ class TracksPanel;
 
 class BMenu;
 class BFile;
+class TrackInfoBox;
 
 #define	MAX_PLUG	16 		//Only up to 16 plug_ins?
 
@@ -48,10 +49,10 @@ public:
 	
 	
 	Track*			SendRef(entry_ref,int16,BMessage *m=NULL);
-	bool			RefReceived(entry_ref,JTrack*,BMessage *g=NULL);	
+	bool			RefReceived(entry_ref, JTrack*, TrackInfoBox* lTrackInfoBox, BMessage *g = NULL);	
 	bool			isBoosterValid(int);
 	
-	status_t		SelectTrack(JTrack* t);
+	status_t		SelectTrack(JTrack* x, TrackInfoBox* lTrackInfoBox);
 	JTrack*			getCurrentJTrack(){ return curJTrack; };
 	Track*			getCurrentTrack();
 	void			soloTrack(Track*);
@@ -64,7 +65,6 @@ public:
 	void			RefreshSelected();
 	void			ResetToSong(Song*);
 	void			Init();
-	//void			Restart();
 	void			Close();
 	
 	void			GetXRSDirectoryEntry(entry_ref*,const char*);

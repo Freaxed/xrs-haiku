@@ -19,7 +19,7 @@
 #define	ENABLE_MIDI_IN	'enmi'
 #include "TrackInfoBox.h"
 
-TrackInfoBox::TrackInfoBox(BRect _r) : BBox(_r, "TrackInfoBox")
+TrackInfoBox::TrackInfoBox(BRect _r) : BBox(_r, "TrackInfoBox", B_FOLLOW_RIGHT)
 {
     BBox* bot = new BBox(BRect(0, 230, 180, 281), "");
 	
