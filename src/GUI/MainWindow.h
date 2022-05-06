@@ -20,6 +20,7 @@ class BMenu;
 class Pattern;
 class TickView;
 class Track;
+class PlaylistBox;
 
 class MainWindow : public XrsWindow
 {
@@ -55,6 +56,7 @@ class MainWindow : public XrsWindow
 			Song*			curSong;
 			TracksPanel*	fTracksPanel;						
 			TickView*		ticks;
+			PlaylistBox*	fPlaylistBox;
 						
 			/*Up Menu */
 			BMenuItem*		saveas_item;

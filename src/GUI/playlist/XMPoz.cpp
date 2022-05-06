@@ -178,7 +178,7 @@ XMPoz::_drawTick(int x)
 void
 XMPoz::DrawAfterChildren(BRect r)
 {
-	if(!sequence->loop_enable) return;
+	if(!sequence || !sequence->loop_enable) return;
 	
 	
 	if(r.Intersects(marker[1])){
@@ -215,7 +215,7 @@ XMPoz::MouseUp(BPoint p)
 void
 XMPoz::MouseDown(BPoint point)
 {
-	if(sequence==NULL) return;
+	if(sequence == NULL) return;
 	if(!sequence->loop_enable) return;
 	
 	int32 buttons;

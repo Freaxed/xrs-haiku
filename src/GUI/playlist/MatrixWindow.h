@@ -25,6 +25,7 @@ class MatrixWindow:public XrsWindow
 					~MatrixWindow();
 					
 			bool 	QuitRequested();
+	private:
 			void	Reset(Sequence*, int16 notesPerMeasaure);
 	
 	private:

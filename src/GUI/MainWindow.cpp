@@ -37,6 +37,7 @@
 #include 	<Entry.h>
 #include 	<Directory.h>
 #include    "SplitPane.h"
+#include	"PlaylistBox.h"
 
 MainWindow*
 MainWindow::Get()
@@ -73,22 +74,21 @@ MainWindow::MainWindow() :
 	
 	nb = Bounds();	
 	nb.top     = menuY + 1;
-	nb.right  -= B_V_SCROLL_BAR_WIDTH;
-	nb.bottom -= B_H_SCROLL_BAR_HEIGHT; 
+	//nb.right  -= B_V_SCROLL_BAR_WIDTH;
+	//nb.bottom -= B_H_SCROLL_BAR_HEIGHT; 
 
 	BBox*	playground = new BBox(nb, "playgroud", B_FOLLOW_ALL);
 	
-	BRect local(0, 0, nb.right, nb.Width() / 2);
+	BRect local(0, 0, nb.right - B_V_SCROLL_BAR_WIDTH , (nb.Height() / 2) - B_H_SCROLL_BAR_HEIGHT);
 	fTracksPanel = new TracksPanel(local);
 	
 	BScrollView		*scroll_view;
 	scroll_view = new BScrollView("XRScrollView", fTracksPanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
 	//AddChild(scroll_view);
 
-	BBox*	pax = new BBox(local, "pax");
-		
+	fPlaylistBox = new PlaylistBox(local);		
 
-	SplitPane*	splitPane = new SplitPane(playground->Bounds(), scroll_view, pax, B_FOLLOW_ALL);
+	SplitPane*	splitPane = new SplitPane(playground->Bounds(), scroll_view, fPlaylistBox, B_FOLLOW_ALL);
 	playground->AddChild(splitPane);
 	AddChild(playground);
 
@@ -226,6 +226,7 @@ MainWindow::ResetToSong(Song* s)
 	//fPanel->ResetToSong(curSong, fTracksPanel);
 	fTracksPanel->ResetToSong(curSong);
 	fPanel->ResetToSong(curSong, fTracksPanel);
+	fPlaylistBox->Reset(curSong->getSequence(), curSong->getNumberNotes());
 	
 	ResetTitle();	
 	
@@ -354,7 +355,7 @@ MainWindow::MessageReceived(BMessage* message)
 				curSong->AddMeasure();
 			XHost::Get()->SendMessage(X_UnLockSem,0);
 			fPanel->ResetMeasureCount();
-			MatrixWindow::Get()->Reset(curSong->getSequence(), curSong->getNumberNotes());
+			fPlaylistBox->Reset(curSong->getSequence(), curSong->getNumberNotes());
 			MeasureManager::Get()->SetCurrentPattern(z);
 		}
 		break;
@@ -371,7 +372,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if(err==B_OK){
 			
 				fPanel->ResetMeasureCount();
-				MatrixWindow::Get()->Reset(curSong->getSequence(), curSong->getNumberNotes());
+				fPlaylistBox->Reset(curSong->getSequence(), curSong->getNumberNotes());
 			
 			if( f >= curSong->getNumberMeasure() ) 
 				

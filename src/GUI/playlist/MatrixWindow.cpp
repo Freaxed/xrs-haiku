@@ -52,7 +52,7 @@ MatrixWindow::MatrixWindow() :
 {
 	SetName("playlist_");
 
-	AddChild(fBox = new PlaylistBox(Bounds()));
+	//AddChild(fBox = new PlaylistBox(Bounds()));
 	
 	WindowManager::Get()->RegisterMe(this,T_PLAYLIST_TITLE);
 	LoadConfig();
@@ -69,7 +69,7 @@ MatrixWindow::Reset(Sequence* s, int16 notesPerMeasaure)
 {
 	if(Lock())
 	{
-		fBox->Reset(s, notesPerMeasaure);
+		//fBox->Reset(s, notesPerMeasaure);
 		Unlock();
 	}
 }

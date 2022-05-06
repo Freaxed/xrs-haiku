@@ -255,11 +255,6 @@ TheApp::LoadSong(entry_ref ref)
 		main_window->Unlock();
 	}
 
-	if (mw->Lock())
-	{
-		mw->Reset(currentSong->getSequence(), currentSong->getNumberNotes());	
-		mw->Unlock();
-	}
 	
 	if (MixerWindow::Get()->Lock())
 	{
@@ -444,10 +439,7 @@ TheApp::MessageReceived(BMessage* message)
 				main_window->ResetToSong(currentSong);
 				main_window->Unlock();
 			}
-			if(mw->Lock()){
-				mw->Reset(currentSong->getSequence(), currentSong->getNumberNotes());
-				mw->Unlock();
-			}
+
 			JuiceEngine::Get()->LockEngine("SongReset");
 			JuiceEngine::Get()->ResetSong(currentSong);
 			JuiceEngine::Get()->UnlockEngine("SongReset");
