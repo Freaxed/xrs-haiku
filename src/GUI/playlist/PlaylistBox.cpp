@@ -51,9 +51,9 @@ PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES,
 	menuMea->AddItem(new BMenuItem(T_GEN_RENAME,new BMessage('rena')));
 
 	AddChild(menuBar);
-	//Position
-	AddChild( tt = new XMPoz(BRect(101,menuH-19,452-14,menuH-1)));
 
+	//Position
+	AddChild( tt = new XMPoz(BRect(101, menuH-19, _r.right - B_V_SCROLL_BAR_WIDTH, menuH-1)));
 	//Matrix
 	BRect r=Bounds();
 	r.left=101;
@@ -65,7 +65,8 @@ PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES,
 	the_n=new XMName(BRect(0,menuH,100,r.bottom));
 	AddChild(the_n);
 
-	the_m=new XMatrix(r,the_n,tt);
+
+	the_m = new XMatrix(r, the_n, tt);
 	AddChild(scroll=new BScrollView("w2",the_m,B_FOLLOW_ALL_SIDES,B_WILL_DRAW,true,true));
 	
 	scroll_bar=scroll->ScrollBar(B_HORIZONTAL);
@@ -105,23 +106,23 @@ PlaylistBox::MessageReceived(BMessage *m)
 		case 'ttty':
 		{
 		
-		BPoint f,t;
-		
-		m->FindPoint("from", &f);
-		m->FindPoint("to", &t);
-				
-		/*  Disabling KeyBoard for MainWindow*/
-		
-		if(MainWindow::Get()->Lock()){		
-			MainWindow::Get()->WindowActivated(false);
-			MainWindow::Get()->Unlock();
-		} 
-		
-		BMessage *mx=new BMessage(JMSG_NAME_SET);
-		mx->AddInt16("pos",m->FindInt16("pos"));
-		
-		new TextControlFloater(BRect(f,t),B_ALIGN_LEFT,be_plain_font,m->FindString("name"),this,mx,new BMessage(JMSG_NAME_NOTSET));
-		
+			BPoint f,t;
+			
+			m->FindPoint("from", &f);
+			m->FindPoint("to", &t);
+					
+			/*  Disabling KeyBoard for MainWindow*/
+			
+			if(MainWindow::Get()->Lock()){		
+				MainWindow::Get()->WindowActivated(false);
+				MainWindow::Get()->Unlock();
+			} 
+			
+			BMessage *mx=new BMessage(JMSG_NAME_SET);
+			mx->AddInt16("pos",m->FindInt16("pos"));
+			
+			new TextControlFloater(BRect(f,t),B_ALIGN_LEFT,be_plain_font,m->FindString("name"),this,mx,new BMessage(JMSG_NAME_NOTSET));
+			
 		}
 		break;
 		

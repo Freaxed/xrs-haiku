@@ -28,13 +28,10 @@
 #include 	"TrackManager.h"
 #include 	"MixerWindow.h"
 #include	"VstManager.h"
-#include	"XHost.h"
-
 
 #include	"ValuableManager.h"
 
 #include	"WindowManager.h"
-//#include	"MatrixWindow.h"
 #ifdef XRS_MIDI
 	#include	"XrsMidiIn.h"
 	#include	"XrsMidiOut.h"

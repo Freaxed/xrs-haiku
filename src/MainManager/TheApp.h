@@ -12,31 +12,20 @@
 
 #include "MainWindow.h"
 #include "Song.h"
-#include "JFileManager.h"
 
-class Juice;
 class Pattern;
 class BList;
-		//managers
-class		WindowManager;
-class		VstManager;
-class		TrackManager;
-class		MeasureManager;
-class		JFileManager;		
-		//others
-class		XHost;
-class		PMixer;
-class		JuiceEngine;
-		//windows
-class		MixerWindow;
-class		MainWindow;
-//class		MatrixWindow;
-class		MBWindow;
-class		TrackInfoWindow;	
-class		ValuableManager;
-		//model	
-class		BasicModelManager;
-class		ValuableMonitorWindow;
+class WindowManager;
+class TrackManager;
+class MeasureManager;
+class JFileManager;		
+class JuiceEngine;
+class MixerWindow;
+class MainWindow;
+class MBWindow;
+class ValuableManager;
+class BasicModelManager;
+class ValuableMonitorWindow;
 
 class TheApp : public BApplication {
 

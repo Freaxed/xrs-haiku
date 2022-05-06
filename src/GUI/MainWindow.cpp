@@ -38,6 +38,7 @@
 #include 	<Directory.h>
 #include    "SplitPane.h"
 #include	"PlaylistBox.h"
+#include	<ControlLook.h>
 
 MainWindow*
 MainWindow::Get()
@@ -74,23 +75,22 @@ MainWindow::MainWindow() :
 	
 	nb = Bounds();	
 	nb.top     = menuY + 1;
-	//nb.right  -= B_V_SCROLL_BAR_WIDTH;
-	//nb.bottom -= B_H_SCROLL_BAR_HEIGHT; 
 
-	BBox*	playground = new BBox(nb, "playgroud", B_FOLLOW_ALL);
+	BBox*	background = new BBox(nb, "playgroud", B_FOLLOW_ALL);
 	
 	BRect local(0, 0, nb.right - B_V_SCROLL_BAR_WIDTH , (nb.Height() / 2) - B_H_SCROLL_BAR_HEIGHT);
 	fTracksPanel = new TracksPanel(local);
 	
 	BScrollView		*scroll_view;
 	scroll_view = new BScrollView("XRScrollView", fTracksPanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
-	//AddChild(scroll_view);
 
 	fPlaylistBox = new PlaylistBox(local);		
+	SplitPane*	splitPane = new SplitPane(background->Bounds(), scroll_view, fPlaylistBox, B_FOLLOW_ALL);
+	splitPane->SetAlignment(B_HORIZONTAL);
+	background->AddChild(splitPane);
+	splitPane->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	SplitPane*	splitPane = new SplitPane(playground->Bounds(), scroll_view, fPlaylistBox, B_FOLLOW_ALL);
-	playground->AddChild(splitPane);
-	AddChild(playground);
+	AddChild(background);
 
 	LoadConfig();
 

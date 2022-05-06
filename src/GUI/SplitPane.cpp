@@ -25,8 +25,8 @@
 
 #include "SplitPane.h"
 
-BCursor* h_arrow=NULL;
-BCursor* v_arrow=NULL;
+BCursor* h_arrow = NULL;
+BCursor* v_arrow = NULL;
 
 //#include "ImageButton.h"
 
@@ -35,7 +35,7 @@ BCursor* v_arrow=NULL;
 
 #include "Utils.h"
 
-//const pattern test = {(255,0,0,255,0,0,255,0)};
+
 /*******************************************************
 *   Setup the main view. Add in all the niffty components
 *   we have made and get things rolling

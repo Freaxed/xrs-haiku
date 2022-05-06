@@ -73,19 +73,19 @@ XMPoz::Reset(Sequence* s, int16 notesPerMeasaure)
 	Invalidate();
 	
 	factor = 16.0 / notesPerMeasaure;
-
 }
+
 void
 XMPoz::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	SetLowColor(200,200,220);
+	SetLowColor(200, 200, 220);
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetFontSize(7);
 	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_BEAT,   this);	
-	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_MEASURE, this);	
-
+	ValuableManager::Get()->RegisterValuableReceiver(VID_TEMPO_MEASURE, this);
 }
+
 void
 XMPoz::DetachedFromWindow()
 {
@@ -94,22 +94,20 @@ XMPoz::DetachedFromWindow()
 	BView::AttachedToWindow();
 }
 
-
-
-
 void
 XMPoz::Draw(BRect r)
 {
-	if(sequence==NULL) return;
-	
+	if ( sequence == NULL ) 
+		return;
 		
-	int	ax1=(int)floor(r.left/XBOX)-1;
-	int	ax2=(int)ceil(r.right/XBOX)+1;
+	int	ax1 = (int)floor(r.left/XBOX) - 1;
+	int	ax2 = (int)ceil(r.right/XBOX) + 1;
 
-	if (ax2>X_COUNT) ax2=X_COUNT;
+	if (ax2>X_COUNT) 
+		ax2=X_COUNT;	
 	
-	
-	for(int x=ax1;x<ax2;x++)	_drawCell(x);
+	for(int x=ax1;x<ax2;x++)	
+		_drawCell(x);
 	
 	// loop points
 	//if(!sequence->loop_enable) return;
@@ -122,8 +120,9 @@ XMPoz::Draw(BRect r)
 		SetHighColor(255,255,155);
 		FillTriangle(marker[0].LeftTop(),BPoint(marker[0].right,marker[0].Height()/2),BPoint(marker[0].left,marker[0].bottom));
 	}*/
-		
 }
+
+
 void
 XMPoz::_drawCell(int x)
 {
