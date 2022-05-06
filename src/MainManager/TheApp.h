@@ -30,7 +30,7 @@ class		JuiceEngine;
 		//windows
 class		MixerWindow;
 class		MainWindow;
-class		MatrixWindow;
+//class		MatrixWindow;
 class		MBWindow;
 class		TrackInfoWindow;	
 class		ValuableManager;
@@ -75,22 +75,21 @@ private:
 		
 		//managers
 		WindowManager*		win_manager;
-		VstManager*			vst_manager;
 		TrackManager*		track_manager;
 		MeasureManager*	 	mea_manager;
 		JFileManager*		jfm;		
+
 		//others
-		XHost*				xhost;
-		PMixer*				a_mixer;
 		JuiceEngine*		msucco;
+
 		//windows
 		MixerWindow*		mixerWin;
 		MainWindow*			main_window;
-		MatrixWindow*		mw;
+
 #ifdef MEDIA_BROWSER
 		MBWindow*			media_browser;
 #endif
-		TrackInfoWindow*	trackinfo;	
+
 		ValuableManager*	fVManager;	
 		BasicModelManager*	fModel;
 		ValuableMonitorWindow* fValuableMonitor;

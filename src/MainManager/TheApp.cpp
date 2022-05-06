@@ -34,7 +34,7 @@
 #include	"ValuableManager.h"
 
 #include	"WindowManager.h"
-#include	"MatrixWindow.h"
+//#include	"MatrixWindow.h"
 #ifdef XRS_MIDI
 	#include	"XrsMidiIn.h"
 	#include	"XrsMidiOut.h"
@@ -56,7 +56,7 @@ TheApp::TheApp(const char * signature) :
 	BApplication(signature)
 {
 	currentSong=NULL;
-	clipboard=new Pattern(NUM_NOTES);
+	clipboard=new Pattern(NUM_NOTES); //FIXME: the numnotes may vary!
 	dinamic_clip=new BList(1);
 	PrepareToRun();
 }
@@ -67,55 +67,49 @@ TheApp::~TheApp()
 	if(msucco->LockEngine("~TheApp")){
 
 		msucco->ReallyStop();	//stop the engine	
-//		xhost->AllowLock(false);
 		 
-		//fVManager->Dump();
-		 
-		 if(fValuableMonitor && fValuableMonitor->Lock()) {
-		 	fValuableMonitor->Quit();
-		 }
+		if(fValuableMonitor && fValuableMonitor->Lock()) {
+			fValuableMonitor->Quit();
+		}
 		 	
-		 delete fModel;
+		delete fModel;
 	     
-	     if(fVManager->Lock())
+	    if(fVManager->Lock())
 			fVManager->Quit();
 		 
-		 if(trackinfo->Lock())				
-			 trackinfo->Quit();
+		if(TrackInfoWindow::Get()->Lock())				
+			 TrackInfoWindow::Get()->Quit();
 		
-		 track_manager->Close();
+		track_manager->Close();
 			 		
-		 delete (currentSong);
+		delete (currentSong);
 		 
 			 
-		 if(mixerWin->Lock())
-		 {
+		if(mixerWin->Lock())
+		{
 			if(mixerWin->IsHidden())
 		 		Config()->PutFloatKey("mixer_window_show",0);
 		 	else
 		 		Config()->PutFloatKey("mixer_window_show",1);
 		 		
 			mixerWin->Quit();
-		 }
+		}
 		 
-		 if(main_window->Lock()) 
+		if(main_window->Lock()) 
 		 	main_window->Quit();
 
 #ifdef MEDIA_BROWSER		 	
 
-		 if(media_browser->Lock())
-		 {
+		if(media_browser->Lock())
+		{
 		 	if(media_browser->IsHidden())
 		 		Config()->PutFloatKey("media_browser_show",0);
 		 	else
 		 		Config()->PutFloatKey("media_browser_show",1);
 		 		
 		 	media_browser->Quit();
-		 }
+		}
 #endif 
-
-		 if(mw->Lock()) 
-		 	mw->Quit();
 		 	
 
 #ifdef XRS_MIDI
@@ -130,11 +124,9 @@ TheApp::~TheApp()
 		PotViewer::Get()->Quit();
 	}
 	
-	delete a_mixer;	
+	delete PMixer::Get();	
 	delete track_manager;
-	delete vst_manager;
-	
-	
+	delete VstManager::Get();
 	
 	Configurator::Get()->Close();
 	LogInfo("Goodbye XRS!");
@@ -149,7 +141,7 @@ TheApp::PrepareToRun()
 	Configurator::Get()->Init("XRSConfig");	
 	
 	ab->setText("loading..vst");
-	vst_manager = VstManager::Get();
+	VstManager::Get();
 	
 	ab->setText("loading..Extensions");
 	
@@ -161,9 +153,8 @@ TheApp::PrepareToRun()
 	fModel = new BasicModelManager();
 	
 	mea_manager = MeasureManager::Get();
-	//AddCommonFilter(mea_manager);
 	
-	trackinfo = TrackInfoWindow::Get();
+	TrackInfoWindow::Get();
 
 	
 	track_manager = TrackManager::Get();
@@ -175,21 +166,13 @@ TheApp::PrepareToRun()
 		
 	ab->setText("loading..Mixer");
 	
-	a_mixer= PMixer::Get();
+
+	mixerWin = MixerWindow::Get();
 	
-	mixerWin= MixerWindow::Get();
-	
-	
-	
-	//matrix
-	mw= MatrixWindow::Get();
-	mw->Show();
-	mw->Hide();
-	
-	xhost=XHost::Get();	
+
 	//juice
-	msucco= JuiceEngine::Get();
-	main_window= MainWindow::Get();
+	msucco = JuiceEngine::Get();
+	main_window = MainWindow::Get();
 
 	
 	msucco->Init();
@@ -221,7 +204,6 @@ TheApp::PrepareToRun()
 	if(show<1)
 		win_manager->Hide(mixerWin);
 	
-	main_window->AddToSubset(mw);
 	main_window->Show();
 	
 	fValuableMonitor = NULL;
