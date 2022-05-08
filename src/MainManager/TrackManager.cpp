@@ -199,8 +199,6 @@ TrackManager::ResetToSong(Song* s)
 		if(isBoosterValid(i)) 
 			list[i]->ResetToSong();
 	}
-	
-	
 }
 
 void

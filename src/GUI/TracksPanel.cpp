@@ -225,47 +225,36 @@ TracksPanel::ResetToSong(Song* s)
 void
 TracksPanel::MessageReceived(BMessage* message)
 {
-	int id;
-	entry_ref ref;
-	
-
 	switch(message->what)
-	{
-	
-	case MSG_VALUABLE_CHANGED:
-	{
-		int32 value;
-		if (ValuableTools::SearchValues(VID_PATTERN_CURRENT, message, &value)){
-				resetPattern(value);
+	{	
+		case MSG_VALUABLE_CHANGED:
+		{
+			int32 value;
+			if (ValuableTools::SearchValues(VID_PATTERN_CURRENT, message, &value)){
+					resetPattern(value);
+			}
+		}		
+		break;
+		
+		case TRACK_SET:
+			SelectTrack(message->GetInt16("id", 0));
+			LogInfo("Right click to be implemented..");
+		break;		
+		
+		case B_SIMPLE_DATA:
+		{
+			entry_ref ref;		
+			for( int i=0; message->FindRef("refs",i, &ref) == B_OK;i++ )
+		  		{
+		  			//Create a new track from a user dropped file.
+		  			MainWindow::Get()->AddTrack(tm->SendRef(ref,0,message));
+		  		}
 		}
-	}		
-	break;
-	
-	case TRACK_SET:
-	
-		id=message->FindInt16("id");
-		SelectTrack(id);
-		LogInfo("Right click to be implemented..");
-	break;
-	
-		
-	case B_SIMPLE_DATA:
-		
-		
-		int i;
-		i=0;
-		
-		while( message->FindRef("refs",i, &ref) == B_OK )
-   		{
-   			//Create a new track from a user dropped file.
-   			MainWindow::Get()->AddTrack(tm->SendRef(ref,0,message));
-			i++;		
-   		}
-   	break;
-		
-	default:
-		BView::MessageReceived(message);
-	break;
+		  	break;
+			
+		default:
+			BView::MessageReceived(message);
+		break;
 	}
 } 
 
