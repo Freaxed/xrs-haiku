@@ -82,7 +82,6 @@ SRCS =  \
 ./src/GUI/StereoVolumesView.cpp \
 ./src/GUI/TextControlFloater.cpp \
 ./src/GUI/TickView.cpp \
-./src/GUI/TrackInfoWindow.cpp \
 ./src/GUI/TracksPanel.cpp \
 ./src/GUI/ValuablePeakView.cpp \
 ./src/GUI/VertPeakView.cpp \

@@ -70,7 +70,6 @@ public:
 	void			GetXRSDirectoryEntry(entry_ref*,const char*);
 	BMenu*			getMenu() {return myMenu;}
 	
-	void			ShowTrackInfo();
 		
 	protected:
 	friend class TracksPanel;	

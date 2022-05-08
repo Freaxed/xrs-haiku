@@ -245,8 +245,7 @@ TracksPanel::MessageReceived(BMessage* message)
 	
 		id=message->FindInt16("id");
 		SelectTrack(id);
-		//message->PrintToStream();
-		if(message->FindInt32("mouse")==2) tm->ShowTrackInfo();
+		LogInfo("Right click to be implemented..");
 	break;
 	
 		

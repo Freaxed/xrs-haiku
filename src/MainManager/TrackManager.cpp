@@ -20,7 +20,6 @@
 #include "Song.h"
 #include "TracksPanel.h"
 #include "PlugPanel.h"
-#include "TrackInfoWindow.h"
 #include "WindowManager.h"
 
 #include "SamplerTrackBoost.h" //remove!
@@ -106,15 +105,6 @@ TrackManager::RegisterTrackBoost(TrackBoost* boost)
 	
 		myMenu->AddItem(new BMenuItem( boost->Name(), m, '1' + (char)id ) );
 
-
-		// BView *panel = (BView*)boost->getPanel();
-		// if(panel ) 
-		// {
-		// 	TrackInfoWindow::Get()->RegisterPanel(panel ) ;
-		// 	panel - >Hide();
-		// }
-		
-
 		LogInfo("TrackBooster [%s] loaded.", boost->Name());
 		return B_OK;
 }
@@ -167,7 +157,6 @@ TrackManager::SaveTrackSettings(Track* trk, BMessage* data)
 void
 TrackManager::LoadBoosterSettings(BMessage* data)
 {
-	WindowManager::Get()->Hide(TrackInfoWindow::Get());
 	int16 i = data->GetInt16("id", -1);
 	if(isBoosterValid(i)) 
 		list[i]->LoadBoosterSettings(data);
@@ -191,11 +180,7 @@ TrackManager::SendRef(entry_ref ref, int16 id, BMessage *msg)
 	
 	return track;
 }
-void
-TrackManager::ShowTrackInfo()
-{
-	WindowManager::Get()->Switch(TrackInfoWindow::Get());
-}
+
 JTrack*
 TrackManager::MakeJTrack(Track* trk, BRect rect, int16 pos)
 {
@@ -240,9 +225,6 @@ TrackManager::Init()
 	
 	
 	LoadAllTrackBoost();
-		
-	WindowManager::Get()->Show(TrackInfoWindow::Get());
-	WindowManager::Get()->Hide(TrackInfoWindow::Get());
 }
 
 status_t
@@ -286,7 +268,6 @@ TrackManager::SelectTrack(JTrack* x, TrackInfoBox* lTrackInfoBox) {
 	}
 	else
 	{
- 		WindowManager::Get()->Hide(TrackInfoWindow::Get());
 		if(lTrackInfoBox && lTrackInfoBox->Looper()->Lock()){
 			if(current) 
 			   current->Hide();

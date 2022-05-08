@@ -39,7 +39,7 @@
 #ifdef MEDIA_BROWSER
 	#include    "MBWindow.h"
 #endif
-#include	"TrackInfoWindow.h"
+
 #include 	"PotViewer.h"
 #include 	"PMixer.h"
 #include	"JuiceEngine.h"
@@ -74,8 +74,6 @@ TheApp::~TheApp()
 	    if(fVManager->Lock())
 			fVManager->Quit();
 		 
-		if(TrackInfoWindow::Get()->Lock())				
-			 TrackInfoWindow::Get()->Quit();
 		
 		track_manager->Close();
 			 		
@@ -151,8 +149,6 @@ TheApp::PrepareToRun()
 	
 	mea_manager = MeasureManager::Get();
 	
-	TrackInfoWindow::Get();
-
 	
 	track_manager = TrackManager::Get();
 	track_manager->Init();
