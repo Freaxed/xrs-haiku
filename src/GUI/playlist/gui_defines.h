@@ -5,6 +5,6 @@
 #ifndef _H_GUI_DEFINES
 #define _H_GUI_DEFINES
 
-#define 	XBOX		32 //18
+#define 	XBOX		24
 
 #endif // _H_GUI_DEFINES

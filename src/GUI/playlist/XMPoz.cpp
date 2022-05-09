@@ -89,7 +89,7 @@ XMPoz::Reset(Sequence* s, int16 notesPerMeasaure)
 
 	Invalidate();
 	
-	factor = 16.0 / notesPerMeasaure;
+	factor = (float)(XBOX - 2) / notesPerMeasaure;
 }
 
 void

@@ -57,6 +57,7 @@ XTrack::AttachedToWindow()
 	SetDrawingMode(B_OP_ALPHA);
 	SetFontSize(12);
 }
+#include "Utils.h"
 void
 XTrack::Draw(BRect r)
 {
@@ -85,11 +86,7 @@ XTrack::Draw(BRect r)
 			SetHighColor(0,0,0,255);
 		}
 	}
-	BFont f;
-	GetFont(&f);
-	DrawCentredText(name.String(),&f,BRect(12,7,87,22),this,true);
-	
-	//DrawString(name.String(),15,BPoint(10,17));
+	BPDrawString(name.String(), this, Bounds(), B_ALIGN_CENTER, 3.0f);
 }
 void
 XTrack::_drawPad()

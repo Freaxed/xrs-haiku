@@ -73,6 +73,8 @@ XMName::Draw(BRect r)
 		_drawName(y);
 }
 
+#include "Utils.h"
+
 void
 XMName::_drawName(int y)
 {
@@ -81,10 +83,10 @@ XMName::_drawName(int y)
 
 	BRect r(0,y*XBOX,98,y*XBOX+XBOX-1);
 	
-	if(y==sel)
-			SetHighColor(255,227,153);	
+	if (y==sel)
+		SetHighColor(255,227,153);	
 	else
-			SetHighColor(200,200,220);
+		SetHighColor(200,200,220);
 	
 	
 	FillRect(r);
@@ -96,8 +98,8 @@ XMName::_drawName(int y)
 	
 	BString label("");
 	label << y+1 << ": " << s.String();
-	DrawString(label.String(),BPoint(3,y*XBOX+12));
- 
+	
+	BPDrawString(label.String(), this, r, B_ALIGN_LEFT, 3.0f);
 	
 	SetHighColor(169,172,151);
 	StrokeLine(BPoint(0,y*XBOX+XBOX-1),BPoint(100,y*XBOX+XBOX-1));
