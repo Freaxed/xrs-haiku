@@ -14,6 +14,7 @@
 #include <CheckBox.h>
 #include <ScrollView.h>
 #include <ScrollBar.h>
+#include <Menu.h>
 
 class XMatrix;
 class XMName;
@@ -26,10 +27,11 @@ class PlaylistBox : public BBox
         PlaylistBox(BRect);
         virtual void FrameResized(float,float);
         virtual void MessageReceived(BMessage *m);
+        virtual void AttachedToWindow();
         void Reset(Sequence* s, int16 notesPerMeasaure);
 
     private:
-        BCheckBox*   en;
+        BCheckBox*   fEnableLoop;
         XMatrix*     the_m;
         XMName*      the_n;
         BScrollView* scroll;
@@ -37,6 +39,7 @@ class PlaylistBox : public BBox
         Sequence*    seq;
         int 		 y_count;
         XMPoz*       tt;
+        BMenu*		 menuMea;
 
 };
 

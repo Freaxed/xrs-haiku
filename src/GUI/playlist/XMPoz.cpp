@@ -18,8 +18,8 @@
 
 #include <stdio.h>
 #include <Window.h>
+#include "gui_defines.h"
 
-#define XBOX		18
 #define	MARKER_MOVED 'mark'
 #define	MARKER_SIZE	 8
 #define	GRID_SIZE	 XBOX	
@@ -30,6 +30,22 @@ extern int 	notes_per_measaure;
 
 char na[3];
 
+void
+UpdateMarkerPosition(BRect& marker, int who, int position)
+{
+	int32 leftStart = (GRID_SIZE * position);
+	if (who == 0)
+	{
+		marker.Set( leftStart + 1, 0, leftStart + MARKER_SIZE, 14);
+	}
+	else
+	{
+		int32 rightEnd = (GRID_SIZE * position) + GRID_SIZE;
+		
+		marker.Set( rightEnd - MARKER_SIZE - 2, 0, rightEnd - 2, 14);
+	}
+}
+
 
 XMPoz::XMPoz(BRect r):BView(r,"XMPoz",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DRAW|B_DRAW_ON_CHILDREN){
 
@@ -38,8 +54,8 @@ XMPoz::XMPoz(BRect r):BView(r,"XMPoz",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DR
 	loop_end=-1;
 	tracking[0]=false;
 	tracking[1]=false;
-	marker[0].Set(1,0,MARKER_SIZE,14);
-	marker[1].Set(MARKER_SIZE+2,0,MARKER_SIZE+1+MARKER_SIZE,14);
+	UpdateMarkerPosition(marker[0], 0, 0);
+	UpdateMarkerPosition(marker[1], 0, 0);
 
 	curPat=-1;
 }
@@ -111,16 +127,17 @@ XMPoz::Draw(BRect r)
 		_drawCell(x);
 	
 	// loop points
-	//if(!sequence->loop_enable) return;
-	
-	/*if(r.Intersects(marker[1])){
-		SetHighColor(255,255,155);
-		FillTriangle(BPoint(marker[1].left,marker[1].Height()/2),BPoint(marker[1].right,marker[1].top),BPoint(marker[1].right,marker[1].bottom));
+	if (sequence->loop_enable)
+	{
+		if(r.Intersects(marker[1])){
+			SetHighColor(255,255,155);
+			FillTriangle(BPoint(marker[1].left,marker[1].Height()/2),BPoint(marker[1].right,marker[1].top),BPoint(marker[1].right,marker[1].bottom));
+		}
+		if(r.Intersects(marker[0])){
+			SetHighColor(255,255,155);
+			FillTriangle(marker[0].LeftTop(),BPoint(marker[0].right,marker[0].Height()/2),BPoint(marker[0].left,marker[0].bottom));
+		}
 	}
-	if(r.Intersects(marker[0])){
-		SetHighColor(255,255,155);
-		FillTriangle(marker[0].LeftTop(),BPoint(marker[0].right,marker[0].Height()/2),BPoint(marker[0].left,marker[0].bottom));
-	}*/
 }
 
 
@@ -128,9 +145,7 @@ void
 XMPoz::_drawCell(int x)
 {
 	int maxseq=sequence->getMaxSeq();
-	
-	
-		
+			
 	SetHighColor(200,200,220);
 	FillRect(BRect(x*XBOX,0,x*XBOX+XBOX-1,XBOX-2));
 	
@@ -157,15 +172,6 @@ XMPoz::_drawCell(int x)
 	
 	sprintf(na,"%2d",x+1);
 	DrawString(na,BPoint(x*XBOX+3,8));
-	
-	/*if(marker[1]){
-		SetHighColor(255,255,155);
-		FillTriangle(BPoint(marker[1].left,marker[1].Height()/2),BPoint(marker[1].right,marker[1].top),BPoint(marker[1].right,marker[1].bottom));
-	}
-	if(r.Intersects(marker[0])){
-		SetHighColor(255,255,155);
-		FillTriangle(marker[0].LeftTop(),BPoint(marker[0].right,marker[0].Height()/2),BPoint(marker[0].left,marker[0].bottom));
-	}*/
 }
 
 void
@@ -336,6 +342,7 @@ XMPoz::MarkerPosition(int i)
 	int	ax=((int)floor(marker[i].left/GRID_SIZE));
 	return ax;
 }
+
 void	
 XMPoz::MoveMarker(int num,int ax,bool set)
 {
@@ -344,19 +351,10 @@ XMPoz::MoveMarker(int num,int ax,bool set)
 		else
 			sequence->loop_points[num]=ax;
 	}
-	//printf("Marker %d %d\n",num,ax);
-	
-	ax *=GRID_SIZE;
-	
+
 	BRect temp=marker[num];
 	
-	if(num==0)			
-		marker[num].left=ax+1;
-	else
-		marker[num].left=ax+MARKER_SIZE+2;
-		
-	marker[num].right=marker[num].left+MARKER_SIZE-1;
-	
+	UpdateMarkerPosition(marker[num], num, ax);	
 	
 	if(set){
 		Invalidate(temp);

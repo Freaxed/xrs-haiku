@@ -18,7 +18,6 @@ TrackBlock::TrackBlock(BRect r, const char* name) : BView(r, name, B_FOLLOW_NONE
 {
 	SetViewColor(214,219,239);
 	expanded = false;
-	selected = false;
 }
 
 void

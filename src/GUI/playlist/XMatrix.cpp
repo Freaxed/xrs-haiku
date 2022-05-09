@@ -23,8 +23,7 @@
 #include <stdio.h>
 #include <Window.h>
 #include <Message.h>
-
-#define 	XBOX		18
+#include "gui_defines.h"
 
 rgb_color col_matrix[8];
 

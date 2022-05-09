@@ -15,7 +15,6 @@
 #include 	"GfxMsg.h"
 #include 	"JFileManager.h"
 #include 	"TracksPanel.h"
-#include 	"MatrixWindow.h"
 #include 	"TickView.h"
 #include 	"XHost.h"
 #include	"MixerWindow.h"
@@ -350,7 +349,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 			
 		case EDIT_MSG:
-			WindowManager::Get()->Switch(MatrixWindow::Get());		
+			LogInfo("Button to be removed!");	
 			break;
 		case 'VST':
 			WindowManager::Get()->Switch(MixerWindow::Get());

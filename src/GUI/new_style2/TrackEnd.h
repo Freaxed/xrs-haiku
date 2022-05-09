@@ -18,10 +18,10 @@ class BPictureButton;
 class TrackEnd: public BView
 {
 	public:
-			     			TrackEnd(BRect r, const char* name);
-	 		virtual 	void 		MessageReceived(BMessage*);
-	 		virtual 	void		Draw(BRect r);
-	 		virtual 	void 		AttachedToWindow();
+			     				TrackEnd(BRect r, const char* name);
+	 		virtual	void 		MessageReceived(BMessage*);
+	 		virtual	void		Draw(BRect r);
+	 		virtual	void 		AttachedToWindow();
 	 				bool		IsExpanded(){ return expanded;}
 	 		virtual	void		Expand();
 	 		virtual	void		UnExpand();
@@ -30,7 +30,7 @@ class TrackEnd: public BView
 	 		
 	private:
 			bool 				expanded;
-			BPictureButton *brez;
+			BPictureButton*		brez;
 			
 };
 #endif

@@ -95,7 +95,6 @@ SRCS =  \
 ./src/GUI/new_style2/TrackEnd.cpp \
 ./src/GUI/new_style2/TrackList.cpp \
 ./src/GUI/new_style2/VolView.cpp \
-./src/GUI/playlist/MatrixWindow.cpp \
 ./src/GUI/playlist/PlaylistBox.cpp \
 ./src/GUI/playlist/XMName.cpp \
 ./src/GUI/playlist/XMPoz.cpp \

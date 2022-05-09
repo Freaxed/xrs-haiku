@@ -153,7 +153,7 @@ JTrack::MessageReceived(BMessage* message)
 	break;
 	
 	case CHANGE_NAME:
-		{
+	{
 		
 		BPoint f,t;
 		
@@ -163,8 +163,7 @@ JTrack::MessageReceived(BMessage* message)
 		/*  Disabling KeyBoard for MainWindow */
 		Window()->WindowActivated(false);
 		new TextControlFloater(BRect(f,t),B_ALIGN_LEFT,be_plain_font,myTrack->getName(),this,new BMessage(JMSG_NAME_SET),new BMessage(JMSG_NAME_NOTSET));
-		SetSelected(true);
-		}
+	}
 	break;
 	default:
 		

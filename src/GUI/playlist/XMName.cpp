@@ -22,8 +22,8 @@
 #include <Window.h>
 #include <String.h>
 #include <Message.h>
+#include "gui_defines.h"
 
-#define 	XBOX		18
 
 XMName::XMName(BRect r):BView(r,"",B_FOLLOW_TOP_BOTTOM,B_WILL_DRAW) , sequence(NULL)
 {

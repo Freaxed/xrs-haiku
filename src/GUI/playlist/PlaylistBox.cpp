@@ -23,8 +23,8 @@
 #include "MainWindow.h"
 #include "JMessages.h"
 #include "TextControlFloater.h"
+#include "gui_defines.h"
 
-#define XBOX			18
 #define	Y_COUNT			NUM_PATTERN
 #define	LOOP_ENABLE		'lope'
 #define	RENAME_PATTERN	'renp'
@@ -43,14 +43,15 @@ PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES,
 	
 	
 	
-	BMenu *menuMea;
-	menuBar->AddItem(menuMea=new BMenu(T_PLAYLIST_MEASURES));
+	menuBar->AddItem( menuMea = new BMenu(T_PLAYLIST_MEASURES));
 	menuMea->AddItem(new BMenuItem(T_GEN_ADD,new BMessage(ADD_PATTERN)));
 	menuMea->AddItem(new BMenuItem(T_GEN_REMOVE,new BMessage(REMOVE_PATTERN)));
 	menuMea->AddSeparatorItem();
 	menuMea->AddItem(new BMenuItem(T_GEN_RENAME,new BMessage('rena')));
 
 	AddChild(menuBar);
+	
+
 
 	//Position
 	AddChild( tt = new XMPoz(BRect(101, menuH-19, _r.right - B_V_SCROLL_BAR_WIDTH, menuH-1)));
@@ -72,7 +73,7 @@ PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES,
 	scroll_bar=scroll->ScrollBar(B_HORIZONTAL);
 	scroll->SetViewColor(ViewColor());	
 
-	AddChild(en=new BCheckBox(BRect(0,r.bottom+1,101,r.bottom+B_V_SCROLL_BAR_WIDTH+1),"",T_PLAYLIST_LOOP_POINTS,new BMessage(LOOP_ENABLE),B_FOLLOW_BOTTOM));
+	AddChild(fEnableLoop = new BCheckBox(BRect(0,r.bottom+1,101,r.bottom+B_V_SCROLL_BAR_WIDTH+1),"",T_PLAYLIST_LOOP_POINTS,new BMessage(LOOP_ENABLE),B_FOLLOW_BOTTOM));
 	
 	
 	the_m->MakeFocus(true);	
@@ -84,6 +85,14 @@ PlaylistBox::FrameResized(float w, float h)
 {
 	scroll_bar->SetRange(0,X_COUNT*XBOX-the_m->Bounds().Width());
     BBox::FrameResized(w, h);
+}
+
+void
+PlaylistBox::AttachedToWindow()
+{
+	BBox::AttachedToWindow();
+	menuMea->SetTargetForItems(this);
+	fEnableLoop->SetTarget(this);
 }
 
 void
@@ -99,7 +108,7 @@ PlaylistBox::MessageReceived(BMessage *m)
 			MainWindow::Get()->PostMessage(m);
 		break;
 		case LOOP_ENABLE:
-			seq->loop_enable=(bool)en->Value();
+			seq->loop_enable=(bool)fEnableLoop->Value();
 			tt->Invalidate();
 		break;
 		
@@ -158,7 +167,7 @@ void
 PlaylistBox::Reset(Sequence* s, int16 notesPerMeasaure)
 {
     seq=s;	
-    en->SetValue(s->loop_enable);
+    fEnableLoop->SetValue(s->loop_enable);
     tt->Reset(s, notesPerMeasaure);
     the_n->Reset(s);
     the_m->Reset(s);

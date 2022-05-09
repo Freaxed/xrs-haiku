@@ -31,21 +31,13 @@ class TrackBlock : public BView
 	 		void				Expanded(TrackEnd*,float);
 	 		void				UnExpanded(TrackEnd*,float);
 	 		virtual float		getExpansionSize() { return 24;};
-	 		
-	 		// experimental
-	 		
-	 		virtual void				SetSelected(bool sel){selected=sel;}
 	 									
 	 		
 	private:
-			bool expanded;
-			bool selected;
-			
+			bool 				expanded;
 			void				_expanded(TrackEnd*, float, int);
 			
 	protected:
-
-			VectorNew<TrackEnd*>	 trackend_list;
-			
+			VectorNew<TrackEnd*>	 trackend_list;			
 };
 #endif

@@ -16,7 +16,7 @@
 
 #define SPACE	10.0f
 
-TrackList::TrackList(BRect r):BView(r,"s2", B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS)
+TrackList::TrackList(BRect r):BView(r,"TrackList", B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS)
 {}
 
 void

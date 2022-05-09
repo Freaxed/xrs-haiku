@@ -28,23 +28,18 @@ TrackEnd::MessageReceived(BMessage* msg)
 	{
 	
 	case 'rez':
-			
-					
-			if(IsExpanded())
-				{
-					((TrackBlock*)Parent())->UnExpanded(this,getExpansionSize());
-					UnExpand();
-					Parent()->FrameResized(0,0); //fast and fourious
-				}
-				else
-				{
-					((TrackBlock*)Parent())->Expanded(this,getExpansionSize());
-					Expand();
-					Parent()->FrameResized(0,0); //fast and fourious
-				}	
-					
-			
-			
+		if(IsExpanded())
+		{
+			((TrackBlock*)Parent())->UnExpanded(this,getExpansionSize());
+			UnExpand();
+			Parent()->FrameResized(0,0); //fast and fourious
+		}
+		else
+		{
+			((TrackBlock*)Parent())->Expanded(this,getExpansionSize());
+			Expand();
+			Parent()->FrameResized(0,0); //fast and fourious
+		}	
 	break;
 	
 	default:
