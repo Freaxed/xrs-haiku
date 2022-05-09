@@ -19,8 +19,9 @@
 #include 	<stdio.h>
 #include 	<PictureButton.h>
 
+#define	SPACE		10
 #define	POT_X		TRACK_LX+TRACK_MENU_LX+70+SBUTTON_W+10
-#define	POT_Y		0
+#define	POT_Y		0 + SPACE
 #define	POT_H		24
 #define	POT_L		24
 
@@ -31,23 +32,21 @@
 const 	rgb_color  	onc 	= {255,52,49};
 
 
-
-
 JTrack::JTrack(BRect rect,int16 n):TrackBlock(rect,""),id(n),model(0)
 {
 	SetViewColor(bkColor);
 
-	AddChild(volpot=new APot(BRect(545,POT_Y,545+POT_H,POT_Y+POT_L),"pippo",new BMessage(TRACK_VOL),new BMessage(TRACK_ON),0, 100, XUtils::GetBitmap(0),XUtils::GetBitmap(1)));
-	AddChild(panpot=new APot(BRect(550+POT_H+3,POT_Y+3,550+POT_H+3+18,POT_Y+21),"pippo",new BMessage(TRACK_PAN),new BMessage(PAN_RESET),-100, 100,XUtils::GetBitmap(2),NULL));
-	AddChild(brez= new BPictureButton(BRect(6,7,6+10,7+8),"_menu",XUtils::GetPicture(0),XUtils::GetPicture(1),new BMessage('rez'),B_TWO_STATE_BUTTON));
+	AddChild(volpot = new APot(BRect(545,POT_Y,545+POT_H,POT_Y+POT_L),"pippo",new BMessage(TRACK_VOL),new BMessage(TRACK_ON),0, 100, XUtils::GetBitmap(0),XUtils::GetBitmap(1)));
+	AddChild(panpot = new APot(BRect(550+POT_H+3,POT_Y+3,550+POT_H+3+18,POT_Y+21),"pippo",new BMessage(TRACK_PAN),new BMessage(PAN_RESET),-100, 100,XUtils::GetBitmap(2),NULL));
+	AddChild(brez   = new BPictureButton(BRect(6, SPACE + 7, 16, SPACE + 15),"_menu",XUtils::GetPicture(0),XUtils::GetPicture(1),new BMessage('rez'),B_TWO_STATE_BUTTON));
 
 }
 
 void
 JTrack::RControl()
 {
-	AddChild(xtr=new XTrack(BRect(1+SBUTTON_W,0,1+SBUTTON_W+TRACK_LX,TRACK_LY-1),"init"));
-	AddChild(vnc=new XNotesView( BRect(160,0,530,BUTTON_LY),id));
+	AddChild(xtr=new XTrack(BRect(1+SBUTTON_W, SPACE ,1+SBUTTON_W+TRACK_LX, SPACE + TRACK_LY-1),"init"));
+	AddChild(vnc=new XNotesView( BRect(160, SPACE ,530, SPACE + BUTTON_LY),id));
 	TrackEnd *a,*b;
 	AddChild(a=new VolView(BRect(0,Bounds().bottom+1,530,Bounds().bottom+10)));
 	AddChild(b=new PianoControl(BRect(0,Bounds().bottom+11,530,Bounds().bottom+21),""));
@@ -57,10 +56,10 @@ JTrack::RControl()
 	
 	//Line position (new in 1.3)
 	BRect	pos(volpot->Frame());
-	pos.right=pos.left+36;
-	pos.bottom=pos.top+22;
+	pos.right  = pos.left + 36;
+	pos.bottom = pos.top  + 22;
 	AddChild(line_pos = new XDigit(pos, VID_EMPTY, "mixer_line", new BMessage(TRACK_ROUTELINE), 0,4));
-	line_pos->MoveBy(-50,0);
+	line_pos->MoveBy(-50, 0);
 }
 
 void
@@ -165,10 +164,8 @@ JTrack::MessageReceived(BMessage* message)
 		new TextControlFloater(BRect(f,t),B_ALIGN_LEFT,be_plain_font,myTrack->getName(),this,new BMessage(JMSG_NAME_SET),new BMessage(JMSG_NAME_NOTSET));
 	}
 	break;
-	default:
-		
+	default:		
 		TrackBlock::MessageReceived(message);
-		
 		break;
 	}
 
@@ -231,7 +228,7 @@ JTrack::ResetToTrack(Pattern* p , Track* tr, int16 beatDivision)
 	volpot->MoveTo(170+23*poz,volpot->Frame().top);	
 	panpot->MoveTo(170+23*poz+32,panpot->Frame().top);		
 	
-	line_pos->MoveTo(panpot->Frame().right+10,0);
+	line_pos->MoveTo(panpot->Frame().right+10, SPACE);
 	((BControl*)line_pos)->SetValue(myTrack->getRouteLine());
 	
 	volpot->SetValue( (int32)(myTrack->Gain() * 100.0f));
@@ -272,20 +269,17 @@ JTrack::Refresh(Pattern* p, int16 beatDivision)
 
 }
 void
-JTrack::Select()
+JTrack::SetSelected(bool selected)
 {
-	xtr->Select();
+	xtr->SetSelected(selected);
+	TrackBlock::SetSelected(selected);
 }
 int
 JTrack::getModel()
 {
 	return model;
 }
-void
-JTrack::Deselect()
-{
-	xtr->Deselect();
-}
+
 void
 JTrack::Mute(bool b,bool c)
 {
@@ -302,3 +296,14 @@ JTrack::Mute(bool b,bool c)
 	myTrack->setOn(volpot->IsOn());
 }
 
+void 
+JTrack::MouseDown(BPoint where)
+{
+	uint32 buttons;
+	BMessage *m = Window()->CurrentMessage();
+	GetMouse(&where, &buttons);
+	BMessage *msg = new BMessage(TRACK_SET);
+	msg->AddInt16("id", (int16) id);
+	msg->ReplaceInt32("mouse",buttons);
+	Looper()->PostMessage(msg, Window());
+}

@@ -7,7 +7,7 @@
 
 #define	XPANEL_H			40
 
-#define 	BUTTONS_X_START		12
+#define BUTTONS_X_START		12
 #define	BUTTONS_Y_START		72
 #define	BUTTON_LX			20
 #define	BUTTON_LY			24
@@ -89,5 +89,5 @@
 #define	EDIT_LX			43
 #define	EDIT_LY			23
 
-#define	JTRACK_LY			28
+#define	JTRACK_LY			38
 #define	INFO_BAR_LY			16

@@ -153,6 +153,8 @@ TracksPanel::RemoveTrack(int h)
 	}
 	FixScrollBar();
 }
+
+
 void
 TracksPanel::AddTrack(int h)
 {
@@ -161,11 +163,8 @@ TracksPanel::AddTrack(int h)
 	if(Window()->Lock())
 	{	
 		JTrack* t = tm->MakeJTrack(curSong->getTrackAt(h), 
-		                         BRect(BUTTONS_X_START,
-		                               BUTTONS_Y_START+(float)h*30.0f-40.0f,
-		                               WINDOW_XL-18.0f,
-		                               BUTTONS_Y_START+JTRACK_LY+(float)h*30.0f-40.0f),
-		                               (int16)h);
+		                           BRect(BUTTONS_X_START, 0, WINDOW_XL-18.0f, JTRACK_LY),
+		                           (int16)h);
 		xnv.Add(t);
 		t->RControl();
 		TrackList::AddTrack((TrackBlock*)t);

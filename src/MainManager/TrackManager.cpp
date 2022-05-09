@@ -232,13 +232,13 @@ TrackManager::SelectTrack(JTrack* x, TrackInfoBox* lTrackInfoBox) {
 		return B_ERROR;
 	
 	if(curJTrack != NULL) 
-		curJTrack->Deselect();
+		curJTrack->SetSelected(false);
 
 	curJTrack = x;
 
 	if(curJTrack != NULL) 	
 	{
-		curJTrack->Select();
+		curJTrack->SetSelected(true);
 		if(list[x->getTrack()->getModel()] != NULL) {		
 			
 			PlugPanel*	panel = list[x->getTrack()->getModel()]->getPanel();

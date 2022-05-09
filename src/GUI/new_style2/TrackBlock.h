@@ -10,21 +10,20 @@
 #ifndef _TRACKBLOCK_H_
 #define _TRACKBLOCK_H_
 
-#include <View.h>
+#include "SelectableView.h"
 #include <Button.h>
 
 #include "VectorNew.h"
 
 class TrackEnd;
 
-class TrackBlock : public BView
+class TrackBlock : public SelectableView
 {
 	public:
 			     		 	TrackBlock(BRect r,const char* name);
 	 		virtual void    MessageReceived(BMessage*);
 	 		virtual void	Draw(BRect r);
-	 		bool			IsExpanded(){ return expanded;}
-	 		
+	 		 		
 	 			
 	 		virtual void		Expand(float);
 	 		virtual void		UnExpand(float);
@@ -32,10 +31,13 @@ class TrackBlock : public BView
 	 		void				UnExpanded(TrackEnd*,float);
 	 		virtual float		getExpansionSize() { return 24;};
 	 									
-	 		
+	 		bool				IsExpanded()  { return expanded;}
+
+
 	private:
 			bool 				expanded;
 			void				_expanded(TrackEnd*, float, int);
+			
 			
 	protected:
 			VectorNew<TrackEnd*>	 trackend_list;			

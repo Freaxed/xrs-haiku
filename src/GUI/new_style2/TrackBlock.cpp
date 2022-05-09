@@ -14,9 +14,9 @@
 
 #include <Window.h>
 
-TrackBlock::TrackBlock(BRect r, const char* name) : BView(r, name, B_FOLLOW_NONE,B_WILL_DRAW) 
+TrackBlock::TrackBlock(BRect r, const char* name) : SelectableView(r) 
 {
-	SetViewColor(214,219,239);
+	SetSelected(false);
 	expanded = false;
 }
 
@@ -58,13 +58,11 @@ TrackBlock::MessageReceived(BMessage* msg)
 
 void
 TrackBlock::Draw(BRect r)
-{	
+{
 	BView::Draw(r);
 	SetHighColor(255,255,255);
-	if(r.Intersects(BRect(0,Bounds().bottom-1,Bounds().right,Bounds().bottom)))
-	
+	if(r.Intersects(BRect(0,Bounds().bottom-1,Bounds().right,Bounds().bottom)))	
 		StrokeLine(BPoint(r.left,Bounds().bottom),BPoint(r.right,Bounds().bottom));
-	
 }
 
 void

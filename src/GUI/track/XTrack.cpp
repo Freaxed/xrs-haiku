@@ -11,6 +11,7 @@
 #include "XTrack.h"
 #include "JMessages.h"
 #include "Xed_Utils.h"
+#include "Utils.h"
 
 #include <InterfaceKit.h>
 #include <stdio.h>
@@ -19,10 +20,9 @@
 #define	XRS_SIMPLE_DATA	'xrsd'
 #define	XRS_BANK_SAMPLE	'xbks'
 
-extern void DrawCentredText(const char * TextToCentre, BFont * FontWithWhichToDraw, BRect RectInWhichToCentre, BView * ViewInWhichToDraw, bool MaxHeight);
 
-void	get_color(BBitmap *bmp,int x,int y,rgb_color *cc){
-
+void	get_color(BBitmap *bmp,int x,int y,rgb_color *cc)
+{
 	switch(bmp->ColorSpace())
 	{
 		case B_RGB32: 
@@ -57,35 +57,21 @@ XTrack::AttachedToWindow()
 	SetDrawingMode(B_OP_ALPHA);
 	SetFontSize(12);
 }
-#include "Utils.h"
+
 void
 XTrack::Draw(BRect r)
-{
-	if(pad!=NULL)
-	{
-	  if(selected){
-	   
-	   		SetHighColor(255,60,60,255);
-    		
-    		_drawPad();
-    		
-    		DrawBitmap(pad);
-    		
-			SetLowColor(HighColor());
-			SetHighColor(255,255,205,255);
-		}
-	   else
-	   	{
-	   		SetHighColor(rgb_pad);
-    		
-    		_drawPad();
-    		
-    		DrawBitmap(pad);
-			
-			SetLowColor(HighColor());
-			SetHighColor(0,0,0,255);
-		}
-	}
+{   
+	selected ? SetHighColor(255,60,60,255) : SetHighColor(rgb_pad);
+	
+	_drawPad();
+	
+	if (pad)
+		DrawBitmap(pad);
+	
+	SetLowColor(HighColor());
+
+	selected ? SetHighColor(255,255,205,255) : SetHighColor(0,0,0,255);
+
 	BPDrawString(name.String(), this, Bounds(), B_ALIGN_CENTER, 3.0f);
 }
 void
@@ -99,7 +85,7 @@ void
 XTrack::Init(BMessage *m)
 {
 	msg=m;
-	msg->AddInt32("mouse",0);	
+	msg->AddInt32("mouse", 0);	
 }
 void 
 XTrack::MouseDown(BPoint where)
@@ -133,25 +119,16 @@ XTrack::SendRenameMessage()
 }
 
 void
-XTrack::Select()
+XTrack::SetSelected(bool _selected)
 {
 	if(Window()->Lock())
 	{
-		selected=true;
+		selected = _selected;
 		Invalidate();
 		Window()->Unlock();
 	}	
 }
-void
-XTrack::Deselect()
-{
-	if(Window()->Lock())
-	{
-		selected=false;
-		Invalidate();
-		Window()->Unlock();
-	}
-}
+
 bool
 XTrack::isSelected()
 {

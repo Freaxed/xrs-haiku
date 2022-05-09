@@ -22,18 +22,20 @@ class XTrack : public BView
 	public:
 			XTrack (BRect,const char*);
 
-	 void 	Draw(BRect);	
-	 void 	MouseDown(BPoint);
-	 void 	MessageReceived(BMessage*);
-	 void	AttachedToWindow();
-		  void 	Init(BMessage*);
-		  void	Select();
-		  void	Deselect();
-		  bool	isSelected();
-		  void	SetName(const char *t);
-		  void	SetTarget(BHandler* h){target=h;};	
-		  void	SetPadColor(rgb_color col){ rgb_pad=col;};
-		  void	SendRenameMessage();
+	void 	Draw(BRect);	
+	void 	MouseDown(BPoint);
+	void 	MessageReceived(BMessage*);
+	void	AttachedToWindow();
+	void 	Init(BMessage*);
+
+	void	SetSelected(bool selected);
+	bool	isSelected();
+
+	void	SetName(const char *t);
+	void	SetTarget(BHandler* h){target=h;};	
+	void	SetPadColor(rgb_color col){ rgb_pad=col;};
+	void	SendRenameMessage();
+	
 	private:
 
 		BBitmap *pad;

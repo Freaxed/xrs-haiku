@@ -14,7 +14,7 @@
 #include <Window.h>
 #include <stdio.h>
 
-#define SPACE	10.0f
+#define SPACE	2.0f
 
 TrackList::TrackList(BRect r):BView(r,"TrackList", B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS)
 {}
@@ -33,6 +33,7 @@ TrackList::AddTrack(TrackBlock *tb)
 	tb->MoveTo(0, y);
 	list.Add(tb);
 }
+
 void
 TrackList::RemoveTrack(TrackBlock* t)
 {
@@ -50,6 +51,7 @@ TrackList::Expanded(TrackBlock* t, float delta)
 	_moveAfter(t, delta);
 	FrameResized(0,0); //fast and fourious
 }
+
 void
 TrackList::UnExpanded(TrackBlock* b,float delta)
 {

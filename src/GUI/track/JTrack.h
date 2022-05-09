@@ -21,17 +21,17 @@ class		BPictureButton;
 class JTrack : public TrackBlock
 {
 	public:
-				JTrack(BRect,int16);
+				JTrack(BRect, int16);
 		
 		virtual void	AttachedToWindow();
 			  	void	Init(BMessage *m);
 			  	void	RControl();
 			  	void	ResetToTrack(Pattern*, Track*, int16 beatDivisio);
 			  	void	Refresh(Pattern*, int16 beatDivision);
-			    void	Select();
-			  	void	Deselect();
+			    void	SetSelected(bool selected);
 			  	int		getModel();
 			  	void	Mute(bool,bool);
+				void  	MouseDown(BPoint where);
 		
 		
 			  void	SetName(const char*);
