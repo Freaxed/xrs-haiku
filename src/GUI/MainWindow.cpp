@@ -68,9 +68,8 @@ MainWindow::MainWindow() :
 	fPanel = new XPanel(nb);
 	AddChild(fPanel);
 
-	menuY = nb.bottom + 1 + INFO_BAR_LY + 2;
-	ticks = new TickView(BRect(nb.left, nb.bottom + 1, nb.right, menuY));
-	AddChild(ticks);
+	menuY = nb.bottom;
+	
 
 	
 	nb = Bounds();	
@@ -80,9 +79,18 @@ MainWindow::MainWindow() :
 	BBox*	tracksBackground = new BBox(BRect(0, 0, nb.right, (nb.Height() / 2) - B_H_SCROLL_BAR_HEIGHT ), "tracksBackground", B_FOLLOW_ALL);
 
 	BRect local = tracksBackground->Bounds();
+	
 	local.right  -= 182 + B_V_SCROLL_BAR_WIDTH;
 	local.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
+
+	ticks = new TickView(BRect(0, 1, local.right, INFO_BAR_LY + 3));
+	tracksBackground->AddChild(ticks);
+
+	local.top     = INFO_BAR_LY + 4;
+
 	fTracksPanel = new TracksPanel(local);
+
+	
 	
 	BScrollView		*scroll_view;
 	scroll_view = new BScrollView("XRScrollView", fTracksPanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
@@ -95,7 +103,7 @@ MainWindow::MainWindow() :
 	splitPane->SetAlignment(B_HORIZONTAL);
 	background->AddChild(splitPane);
 	splitPane->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
+	splitPane->SetResizeViewOne(true, true);
 	AddChild(background);
 
 	LoadConfig();
