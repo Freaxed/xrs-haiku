@@ -18,14 +18,16 @@ class SelectableView : public BView
 {
     public:
                     SelectableView(BRect r) : BView(r, "selectable_view", B_FOLLOW_NONE, B_WILL_DRAW) 
-                                            {
-                                                  SetSelected (false); 
-                                            }
+                    {
+                        SetSelected (false);
+                        fColor = rgb_color{214,219,239};
+                        fSelectedColor = tint_color(fColor, B_LIGHTEN_1_TINT); //rgb_color{255,227,153}
+                    }
 
         	virtual void	SetSelected(bool s, bool invalidate = true) 
                     {                  
                         fSelected = s;
-                        rgb_color color =  fSelected ? rgb_color{255,227,153} : rgb_color{214,219,239};
+                        rgb_color& color =  fSelected ?  fSelectedColor : fColor;
                         
                         for (int i=0;i<CountChildren();i++) {
                             ChildAt(i)->SetViewColor(color);
@@ -41,6 +43,8 @@ class SelectableView : public BView
 			bool	IsSelected() {return fSelected; }
     private:
             bool        fSelected;
+            rgb_color   fColor;
+            rgb_color   fSelectedColor;
 
 };
 #endif //_SELECTABLE_VIEW_H_
