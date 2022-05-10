@@ -25,9 +25,11 @@ PianoControl::PianoControl(BRect frame,	const char*	name):TrackEnd(frame,  name)
 	
 	BFont tmp(be_fixed_font);
 	w_note = new BStringView(BRect(40, 80, 100, 120),"---","---");
+	
 	AddChild(w_note);
 	tmp.SetSize(12);
-	w_note->SetFont(&tmp);	
+	w_note->SetFont(&tmp);
+	w_note->ResizeToPreferred();
 	
 	
 	fPianoView = new PianoEdit(BRect(109, 0, Bounds().right - B_V_SCROLL_BAR_WIDTH - 1, 120));
