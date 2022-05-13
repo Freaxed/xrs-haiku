@@ -26,9 +26,7 @@
 
 BRect marker[2];
 
-extern int 	notes_per_measaure;
 
-char na[3];
 
 void
 UpdateMarkerPosition(BRect& marker, int who, int position)
@@ -125,19 +123,6 @@ XMPoz::Draw(BRect r)
 	
 	for(int x=ax1;x<ax2;x++)	
 		_drawCell(x);
-	
-	// loop points
-	if (sequence->loop_enable)
-	{
-		if(r.Intersects(marker[1])){
-			SetHighColor(255,255,155);
-			FillTriangle(BPoint(marker[1].left,marker[1].Height()/2),BPoint(marker[1].right,marker[1].top),BPoint(marker[1].right,marker[1].bottom));
-		}
-		if(r.Intersects(marker[0])){
-			SetHighColor(255,255,155);
-			FillTriangle(marker[0].LeftTop(),BPoint(marker[0].right,marker[0].Height()/2),BPoint(marker[0].left,marker[0].bottom));
-		}
-	}
 }
 
 
@@ -170,6 +155,7 @@ XMPoz::_drawCell(int x)
 	SetHighColor(0,0,0);
 	StrokeLine(BPoint(x*XBOX+XBOX-1,0),BPoint(x*XBOX+XBOX-1,XBOX-1));	
 	
+	static char na[3];
 	sprintf(na,"%2d",x+1);
 	DrawString(na,BPoint(x*XBOX+3,8));
 }
@@ -195,16 +181,20 @@ XMPoz::DrawAfterChildren(BRect r)
 		SetHighColor(255,255,155);
 		FillTriangle(marker[0].LeftTop(),BPoint(marker[0].right,marker[0].Height()/2),BPoint(marker[0].left,marker[0].bottom));
 	}
-	/*if(sequence==NULL) return;
+	/*
 	int x=curPat;
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA,B_ALPHA_OVERLAY);
 	SetHighColor(255,0,0,100);
+	FillRect(BRect(marker[0].LeftTop(), marker[1].RightBottom()));
+
 	FillRect(BRect(x*XBOX+1,8,x*XBOX+XBOX,25));
 	SetHighColor(255,0,0,100);
 	StrokeLine(BPoint(x*XBOX+1+XBOX/2,26),BPoint(x*XBOX+1+XBOX/2,r.bottom));
-	//FillRect(BRect(MarkerPosition(0)*XBOX,8,MarkerPosition(1)*XBOX+XBOX-1,90));
-	SetHighColor(0,0,0);	*/
+	FillRect(BRect(MarkerPosition(0)*XBOX,8,MarkerPosition(1)*XBOX+XBOX-1,90));
+	*/
+
+	SetHighColor(0,0,0);
 }	
 	
 	
