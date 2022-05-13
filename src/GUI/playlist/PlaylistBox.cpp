@@ -39,9 +39,10 @@ PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES,
 	BBox*	toolbox = new BBox(BRect(0, 0, _r.Width() - 1, TOOLBOX_H - 1), "toolbox", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	AddChild(toolbox);
 
-	/*
+	float nextPos = TOOLBOX_H;
+	
     //Menu Bar
-	BMenuBar* menuBar = new BMenuBar(BRect(0, TOOLBOX_H, 100, TOOLBOX_H + 20), "Menu Bar",B_FOLLOW_LEFT,B_ITEMS_IN_ROW,false);
+	BMenuBar* menuBar = new BMenuBar(BRect(0, nextPos, 100, nextPos + 20), "Menu Bar",B_FOLLOW_LEFT,B_ITEMS_IN_ROW,false);
 	
 	
 	float menuH, menuW;
@@ -52,17 +53,16 @@ PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES,
 	 else 
 	 	menuH = 21;
 	
-	menuH += TOOLBOX_H;
-	
+
 	menuBar->AddItem( menuMea = new BMenu(T_PLAYLIST_MEASURES));
 	menuMea->AddItem(new BMenuItem(T_GEN_ADD,new BMessage(ADD_PATTERN)));
 	menuMea->AddItem(new BMenuItem(T_GEN_REMOVE,new BMessage(REMOVE_PATTERN)));
 	menuMea->AddSeparatorItem();
 	menuMea->AddItem(new BMenuItem(T_GEN_RENAME,new BMessage('rena')));
 
-	AddChild(menuBar);*/
+	AddChild(menuBar);
 	
-	float nextPos = TOOLBOX_H;
+	
 
 	//Position
 	AddChild( tt = new XMPoz(BRect(101, nextPos, _r.right - B_V_SCROLL_BAR_WIDTH, nextPos + XMPOZ_H)));
