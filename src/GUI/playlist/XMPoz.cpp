@@ -50,8 +50,7 @@ XMPoz::XMPoz(BRect r):BView(r,"XMPoz",B_FOLLOW_TOP|B_FOLLOW_LEFT_RIGHT,B_WILL_DR
 	sequence = NULL;
 	loop_start=-1;
 	loop_end=-1;
-	tracking[0]=false;
-	tracking[1]=false;
+	fTracking = -1;
 	UpdateMarkerPosition(marker[0], 0, 0);
 	UpdateMarkerPosition(marker[1], 0, 0);
 
@@ -82,8 +81,8 @@ XMPoz::Reset(Sequence* s, int16 notesPerMeasaure)
 	sequence=s;
 	curPat=-1;
 	
-	MoveMarker(0,s->loop_points[0],false);
-	MoveMarker(1,s->loop_points[1],false);
+	UpdateMarkerPosition(marker[0], 0, s->loop_points[0]);	
+	UpdateMarkerPosition(marker[1], 1, s->loop_points[1]);	
 
 	Invalidate();
 	
@@ -181,18 +180,11 @@ XMPoz::DrawAfterChildren(BRect r)
 		SetHighColor(255,255,155);
 		FillTriangle(marker[0].LeftTop(),BPoint(marker[0].right,marker[0].Height()/2),BPoint(marker[0].left,marker[0].bottom));
 	}
-	/*
-	int x=curPat;
+	
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA,B_ALPHA_OVERLAY);
 	SetHighColor(255,0,0,100);
 	FillRect(BRect(marker[0].LeftTop(), marker[1].RightBottom()));
-
-	FillRect(BRect(x*XBOX+1,8,x*XBOX+XBOX,25));
-	SetHighColor(255,0,0,100);
-	StrokeLine(BPoint(x*XBOX+1+XBOX/2,26),BPoint(x*XBOX+1+XBOX/2,r.bottom));
-	FillRect(BRect(MarkerPosition(0)*XBOX,8,MarkerPosition(1)*XBOX+XBOX-1,90));
-	*/
 
 	SetHighColor(0,0,0);
 }	
@@ -202,12 +194,9 @@ XMPoz::DrawAfterChildren(BRect r)
 void
 XMPoz::MouseUp(BPoint p)
 {
-	if(tracking[0]) 
-		sequence->loop_points[0]=MarkerPosition(0);
-	if(tracking[1]) 
-		sequence->loop_points[1]=MarkerPosition(1);
-	
+	fTracking = -1;
 }
+
 void
 XMPoz::MouseDown(BPoint point)
 {
@@ -227,18 +216,12 @@ XMPoz::MouseDown(BPoint point)
 		
 		if (marker[0].Contains(point))
 		{
-			tracking[0]=false;
-			BMessage message(MARKER_MOVED);
-			message.AddInt16("which", 0);
-			DragMessage(&message, BRect(0.0, 0.0, -1.0, -1.0), this);
+			fTracking = 0;
 		}
 		else
 		if (marker[1].Contains(point))
 		{
-			tracking[1]=false;
-			BMessage message(MARKER_MOVED);
-			message.AddInt16("which", 1);
-			DragMessage(&message, BRect(0.0, 0.0, -1.0, -1.0), this);
+			fTracking = 1;
 		}
 	}
 }
@@ -300,30 +283,16 @@ XMPoz::MouseMoved(
 	uint32 transit,
 	const BMessage *message)
 {
+	if(point.x < 0 || fTracking < 0 || !sequence->loop_enable) 
+		return;
 
-	if (message)
-	{
-		switch (message->what)
-		{
-			case MARKER_MOVED:
-			{
-				if(!sequence->loop_enable) return;
-				if(point.x<0) return;
-				
-				int	ax=((int)floor(point.x/GRID_SIZE));
-				int  num=message->FindInt16("which");
-					MoveMarker(num,ax);
-				if( num==0 && MarkerPosition(0)>MarkerPosition(1))
-					MoveMarker(1,MarkerPosition(0));
-				if( num==1 && MarkerPosition(0)>MarkerPosition(1))
-					MoveMarker(0,MarkerPosition(1));
-				
-				
-			};
-			default:break;
-		}
-		
-	}
+	int	ax = (int)floor(point.x/GRID_SIZE);
+	
+	MoveMarker(fTracking, ax);
+	
+	if( MarkerPosition(0)>MarkerPosition(1))
+		MoveMarker((fTracking + 1) % 2, MarkerPosition(fTracking));
+
 }
 
 int
@@ -334,20 +303,27 @@ XMPoz::MarkerPosition(int i)
 }
 
 void	
-XMPoz::MoveMarker(int num,int ax,bool set)
+XMPoz::MoveMarker(int num, int ax)
 {
-	if(sequence && set) {
+	if(sequence) {
 		if(sequence->loop_points[num]==ax) return;
 		else
 			sequence->loop_points[num]=ax;
 	}
 
-	BRect temp=marker[num];
+	BRect temp = marker[num];
 	
 	UpdateMarkerPosition(marker[num], num, ax);	
 	
-	if(set){
-		Invalidate(temp);
-		Invalidate(marker[num]);
-	}
+	BRect r;
+	if (temp.left < marker[num].left)
+		r = BRect(temp.LeftTop(), marker[num].RightBottom());
+	else
+		r= BRect(marker[num].LeftTop(), temp.RightBottom());
+
+	Invalidate(r);
+/*	BRect invalidRect = temp & num;
+	Invalidate(invalidRect);
+	//Invalidate(marker[num]);
+*/
 }

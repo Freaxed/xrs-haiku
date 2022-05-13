@@ -40,9 +40,10 @@ class XMPoz: public BView
 			Sequence*	sequence;
 			int 			curPat;
 			int			loop_start,loop_end;
-			void			MoveMarker(int i,int block,bool set=true);
+			void			MoveMarker(int i,int block);
 			int			MarkerPosition(int i);
-			bool			tracking[2];
+
+			int8			fTracking;
 						
 			void			_drawCell(int i);
 			void			_drawTick(int i);
