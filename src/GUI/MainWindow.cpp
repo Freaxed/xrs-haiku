@@ -90,7 +90,9 @@ MainWindow::MainWindow() :
 
 	fTracksPanel = new TracksPanel(local);
 
-	
+	BRect xrect(local.right + 1, 1, local.right + 1 + B_V_SCROLL_BAR_WIDTH, INFO_BAR_LY + 3);
+	tracksBackground->AddChild(new BPictureButton(xrect, "xrect", XUtils::GetPicture(0),XUtils::GetPicture(1),new BMessage('rez'),B_TWO_STATE_BUTTON, B_FOLLOW_RIGHT | B_FOLLOW_TOP));
+
 	
 	BScrollView		*scroll_view;
 	scroll_view = new BScrollView("XRScrollView", fTracksPanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
