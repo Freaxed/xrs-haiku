@@ -83,7 +83,7 @@ XUtils::ResetList(BView* view)
 	b_list->AddItem((void*)nil);//4
 	b_list->AddItem((void*)MakeBitmapSkin("Line"));			//5
 	b_list->AddItem((void*)nil);//6
-	b_list->AddItem((void*)MakeBitmapSkin("Morbido"));			//7
+	b_list->AddItem((void*)nil);//7
 	b_list->AddItem((void*)MakeBitmapSkin("piano6"));			//8
 	b_list->AddItem((void*)MakeBitmapSkin("ButtonRedOn"));		//9
 	b_list->AddItem((void*)MakeBitmapSkin("ButtonRedOff"));		//10
