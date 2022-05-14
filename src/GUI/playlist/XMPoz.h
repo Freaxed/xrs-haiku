@@ -20,7 +20,6 @@ class XMPoz: public BView
 			XMPoz(BRect);
 			
 		 void 	Draw(BRect);
-		 void   	DrawAfterChildren(BRect r);
 		 void	MouseDown(BPoint p);
 		 void	MouseUp(BPoint p);
 		 void	MouseMoved(BPoint point,uint32 transit,const BMessage *message);
@@ -38,17 +37,20 @@ class XMPoz: public BView
 			void		setPositionPar(int);
 			
 			Sequence*	sequence;
-			int 			curPat;
-			int			loop_start,loop_end;
-			void			MoveMarker(int i,int block);
+			int 		curPat;
+			
+			void		MoveMarker(int i,int block);
 			int			MarkerPosition(int i);
 
-			int8			fTracking;
+			int8		fTracking;
 						
-			void			_drawCell(int i);
-			void			_drawTick(int i);
+			void		_drawCell(int i);
+			void		_drawTick(int i);
 			
-			float factor;
+			float 		factor;
+			BRect 		marker[2];
+			int16		fMarkerPosition[2];
+			void		UpdateMarkerPosition(int who, int position);
 			
 			//accumulate (don't like)
 
