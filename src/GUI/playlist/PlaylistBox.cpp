@@ -37,6 +37,10 @@ PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES,
 	BRect rect = Bounds();
 	_r.bottom = TOOLBOX_H - 1;
 	BBox*	toolbox = new BBox(BRect(0, 0, _r.Width() - 1, TOOLBOX_H - 1), "toolbox", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	
+	toolbox->AddChild(fEnableLoop = new BCheckBox(BRect(20, 2, 400, 40),"enable_loop",T_PLAYLIST_LOOP_POINTS,new BMessage(LOOP_ENABLE),B_FOLLOW_BOTTOM));
+	fEnableLoop->ResizeToPreferred();	
+
 	AddChild(toolbox);
 
 	float nextPos = TOOLBOX_H;
@@ -87,7 +91,6 @@ PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES,
 	scroll_bar=scroll->ScrollBar(B_HORIZONTAL);
 	scroll->SetViewColor(ViewColor());
 
-	AddChild(fEnableLoop = new BCheckBox(BRect(0,r.bottom+1,101,r.bottom+B_V_SCROLL_BAR_WIDTH+1),"enable_loop",T_PLAYLIST_LOOP_POINTS,new BMessage(LOOP_ENABLE),B_FOLLOW_BOTTOM));
 	
 	
 	the_m->MakeFocus(true);	
