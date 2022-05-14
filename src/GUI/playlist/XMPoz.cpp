@@ -163,7 +163,7 @@ XMPoz::_drawCell(int x)
 		PushState();
 		SetDrawingMode(B_OP_ALPHA);
 		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-		SetHighColor(255, 0, 0, 100);
+		SetHighColor(255, 0, 0, 80);
 		FillRect(BRect(x*XBOX , 0 , x*XBOX+XBOX-1, XBOX - 2));
 		PopState();
 		
@@ -222,13 +222,6 @@ XMPoz::MouseDown(BPoint point)
 	}
 }
 
-void
-XMPoz::setMaxs(int seq ,int pat)
-{
-	int k;
-	k=sequence->getMaxSeq();
-	Invalidate();
-}
 
 void
 XMPoz::setPosition(int val,int tick)

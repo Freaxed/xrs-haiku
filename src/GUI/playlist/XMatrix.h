@@ -32,8 +32,6 @@ class XMatrix: public BView
 			
 				void	Reset(Sequence*);
 				void	AddItem(int,int);
-				int		getMaxPat();
-				void	setMaxs(int,int);
 			 
 	private:
 			
@@ -48,9 +46,8 @@ class XMatrix: public BView
 			XMPoz*		the_s;
 			int 		MaxPat;
 			bool		key_rel;
-			BBitmap*	morbido;
 
-			void  _drawBall(int x,int y);
+			void  		_drawCell(int x,int y);
 };			
 
 #endif

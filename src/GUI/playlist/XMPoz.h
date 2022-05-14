@@ -29,8 +29,7 @@ class XMPoz: public BView
 
 			
 			
-			 void		Reset(Sequence*, int16 notesPerMeasaure);
-			 void		setMaxs(int,int);		
+		 void	Reset(Sequence*, int16 notesPerMeasaure);
 				
 	private:
 			void		setPosition(int,int);

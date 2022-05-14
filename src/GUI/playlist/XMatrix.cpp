@@ -38,8 +38,7 @@ XMatrix::XMatrix(BRect r, BView* n, XMPoz* k):BView(r,"",B_FOLLOW_ALL_SIDES,B_WI
 	col_matrix[1] = rgb_color{ 255, 255,   0, 255 };
 	col_matrix[2] = rgb_color{   0, 255,   0, 255 };
 	col_matrix[3] = rgb_color{   0,   0, 255, 255 };
-	
-	morbido = XUtils::GetBitmap(7);
+
 }
 
 void
@@ -64,11 +63,8 @@ XMatrix::Reset(Sequence* s)
 void
 XMatrix::AttachedToWindow()
 {
+	BView::AttachedToWindow();
 	SetViewColor(200,200,220);
-	SetLowColor(200,200,220);
-	SetFontSize(XBOX/2);
-	SetBlendingMode(B_PIXEL_ALPHA,B_ALPHA_OVERLAY);
-	SetDrawingMode(B_OP_ALPHA);
 	ValuableManager::Get()->RegisterValuableReceiver(VID_PATTERN_CURRENT, this);	
 }
 
@@ -92,8 +88,8 @@ XMatrix::Select(int y)
 	{
 		for(int x=0;x<X_COUNT;x++)
 		{
-			_drawBall(x,oldsel);
-			_drawBall(x,sel);
+			_drawCell(x,oldsel);
+			_drawCell(x,sel);
 		}		
 		Window()->Unlock();
 	}
@@ -122,17 +118,17 @@ XMatrix::Draw(BRect r)
 	{
 		for(int x=ax1;x<ax2;x++)
 		{
-	 		_drawBall(x,y);
+	 		_drawCell(x,y);
 	 	}
 	}				
 }				
 
 void
-XMatrix::_drawBall(int x,int y)
+XMatrix::_drawCell(int x,int y)
 {
-	BRect r(x*XBOX,y*XBOX,x*XBOX+XBOX-1,y*XBOX+XBOX-1);
+	BRect r(x*XBOX, y*XBOX, x*XBOX+XBOX-1, y*XBOX+XBOX-1);
 	
-	if(y==sel)
+	if ( y == sel )
 		SetHighColor(255,227,153,255);	
 	else
 		SetHighColor(200,200,220,255);
@@ -142,19 +138,12 @@ XMatrix::_drawBall(int x,int y)
 	{	
 		// matrix Pint! :
 		SetHighColor(col_matrix[y % 4]);
-		FillEllipse(BRect(x*XBOX,y*XBOX,x*XBOX+XBOX-3,y*XBOX+XBOX-3));
-		
-		DrawBitmap(morbido,r);
+		FillRect(r.InsetBySelf(3,3));
 	}
-	else
-	{
-		SetHighColor(0,0,0);
-		StrokeLine(BPoint(x*XBOX+XBOX-1,y*XBOX),BPoint(x*XBOX+XBOX-1,y*XBOX+XBOX-1)); // |
-		StrokeLine(BPoint(x*XBOX,y*XBOX+XBOX-1),BPoint(x*XBOX+XBOX-1,y*XBOX+XBOX-1)); //  _
-	}
-	
-		
-	
+
+	SetHighColor(0,0,0);
+	StrokeLine(BPoint(x*XBOX+XBOX-1,y*XBOX),BPoint(x*XBOX+XBOX-1,y*XBOX+XBOX-1)); // |
+	StrokeLine(BPoint(x*XBOX,y*XBOX+XBOX-1),BPoint(x*XBOX+XBOX-1,y*XBOX+XBOX-1)); //  _
 }
 void
 XMatrix::MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg)
@@ -177,21 +166,13 @@ XMatrix::MouseDown(BPoint p)
 	{
 		sequence->setItemAt(ax1,ay1);
 		
-		if(ax1 >= sequence->getMaxSeq()) setMaxs(ax1,ay1);
 		if(Window()->Lock())
 		{
-			_drawBall(ax1,ay1);
+			_drawCell(ax1,ay1);
 			Window()->Unlock();
 		}
 	}
 }
-void
-XMatrix::setMaxs(int seq,int pat)
-{
-	the_s->setMaxs(seq,pat);
-	Window()->PostMessage(1010);
-}
-
 
 
 void
