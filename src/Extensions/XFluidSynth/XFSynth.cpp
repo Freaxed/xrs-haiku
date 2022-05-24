@@ -185,15 +185,17 @@ void
 XFSynth::LoadSettings(BMessage& data)
 {
 	logOnLoadingError = true;
-	const char* filename = data.GetString("SoundFont", "");
-	if (!LoadSoundFont(filename))
+	BString filename;
+	if (data.FindString("SoundFont", &filename) == B_OK)
 	{
-		BString what("Can't load the SoundFont file [");
-		what << filename << "]!";
-		LoadingError::Add("SoundFont", what.String(), "Find the missing SoundFont and assign to the right tracks!");
+		if (!LoadSoundFont(filename.String()))
+		{
+			BString what("Can't load the SoundFont file [");
+			what << filename.String() << "]!";
+			LoadingError::Add("SoundFont", what.String(), "Find the missing SoundFont and assign to the right tracks!");
+		}
 	}
 
-	//DumpPreset();
 
 	int i=0;
 	BMessage channel;
