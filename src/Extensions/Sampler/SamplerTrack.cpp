@@ -156,6 +156,7 @@ SamplerTrack::LoadCustomSettings(BMessage& track)
 		if(s)
 		{
 			booster->_secureSetSample(this, s);
+			assert(s == getSample());
 			setName(getSample()->GetName());
 		}
 	}

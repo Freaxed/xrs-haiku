@@ -341,14 +341,12 @@ SamplerTrackBoost::ChangeSample(int id)
 void
 SamplerTrackBoost::_secureSetSample(SamplerTrack* tr,Sample* s)
 {
-	if(panel->Window()->Lock())
-	{
-	  XHost::Get()->SendMessage(X_LockSem,NULL);
-			tr->setSample(s);
-	  XHost::Get()->SendMessage(X_UnLockSem,NULL);
-	
-	 panel->Window()->Unlock();
-	}
+	XHost::Get()->SendMessage(X_LockSem, NULL);
+
+	tr->setSample(s);
+	LogTrace("SamplerTrackBoost: set sample %s", s->GetName());
+		
+	XHost::Get()->SendMessage(X_UnLockSem, NULL);
 }
 
 
