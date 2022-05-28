@@ -144,7 +144,7 @@ TracksPanel::RemoveTrack(int h)
 {
 	JTrack *t = xnv[h];
 	
-	if(Window()->Lock()){	
+	if(Window()->Lock()){
 		xnv.Erase(h);
 		LogTrace("Removing Track %d", h);
 		TrackList::RemoveTrack((TrackBlock*)t);
@@ -335,7 +335,7 @@ TracksPanel::RemoveTrackAt(int id)
 void
 TracksPanel::SelectTrack(int id)
 {	if(id<0)
-		tm->SelectTrack(NULL, NULL);
+		tm->SelectTrack(NULL, fTrackInfoBox);
 	else
 		tm->SelectTrack(getJTrackAt(id), fTrackInfoBox);
 }

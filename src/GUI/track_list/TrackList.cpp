@@ -38,7 +38,7 @@ void
 TrackList::RemoveTrack(TrackBlock* t)
 {
 	RemoveChild(t);
-	int pos = _moveAfter(t, -1*t->Bounds().Height()-10);
+	int pos = _moveAfter(t, -1 * t->Bounds().Height() - SPACE);
 
 	if (pos > -1)
 		list.Erase(pos);

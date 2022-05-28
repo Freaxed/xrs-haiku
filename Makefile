@@ -89,12 +89,12 @@ SRCS =  \
 ./src/GUI/XPanel.cpp \
 ./src/GUI/XPot.cpp \
 ./src/GUI/XrsWindow.cpp \
-./src/GUI/new_style2/PianoControl.cpp \
-./src/GUI/new_style2/PianoEdit.cpp \
-./src/GUI/new_style2/TrackBlock.cpp \
-./src/GUI/new_style2/TrackEnd.cpp \
-./src/GUI/new_style2/TrackList.cpp \
-./src/GUI/new_style2/VolView.cpp \
+./src/GUI/track_list/PianoControl.cpp \
+./src/GUI/track_list/PianoEdit.cpp \
+./src/GUI/track_list/TrackBlock.cpp \
+./src/GUI/track_list/TrackEnd.cpp \
+./src/GUI/track_list/TrackList.cpp \
+./src/GUI/track_list/VolView.cpp \
 ./src/GUI/playlist/PlaylistBox.cpp \
 ./src/GUI/playlist/XMName.cpp \
 ./src/GUI/playlist/XMPoz.cpp \
@@ -195,7 +195,7 @@ LOCAL_INCLUDE_PATHS =  \
 ./src/Extensions/XFluidSynth \
 ./src/GUI \
 ./src/GUI/MixerUI \
-./src/GUI/new_style2 \
+./src/GUI/track_list \
 ./src/GUI/playlist \
 ./src/GUI/track \
 ./src/MainManager \
