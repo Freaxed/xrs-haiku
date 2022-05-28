@@ -249,12 +249,12 @@ TrackManager::SelectTrack(JTrack* x, TrackInfoBox* lTrackInfoBox) {
 					((BView*)panel)->Hide();
 				}
 					
-				if(lTrackInfoBox && lTrackInfoBox->Looper()->Lock()){
+				if(lTrackInfoBox && lTrackInfoBox->LockLooper()){
 					if(current) 
 						current->Hide();
 					current=(BView*)panel; 
 					current->Show();
-					lTrackInfoBox->Looper()->Unlock();
+					lTrackInfoBox->UnlockLooper();
 
 					panel->ResetToTrack(x->getTrack());
 					lTrackInfoBox->SetTrack(x->getTrack());
@@ -266,13 +266,14 @@ TrackManager::SelectTrack(JTrack* x, TrackInfoBox* lTrackInfoBox) {
 	}
 	else
 	{
-		if(lTrackInfoBox && lTrackInfoBox->Looper()->Lock()){
+		if(lTrackInfoBox && lTrackInfoBox->LockLooper()){
 			if(current) 
 			   current->Hide();
 			   
 			current = NULL;
-			lTrackInfoBox->Looper()->Unlock();
-		}
+			lTrackInfoBox->UnlockLooper();
+		} 
+			 
 	}	
 	
 			
