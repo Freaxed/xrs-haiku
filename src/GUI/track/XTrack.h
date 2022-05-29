@@ -26,10 +26,9 @@ class XTrack : public BView
 	void 	MouseDown(BPoint);
 	void 	MessageReceived(BMessage*);
 	void	AttachedToWindow();
-	void 	Init(BMessage*);
+	void 	SetID(int16 id);
 
 	void	SetSelected(bool selected);
-	bool	isSelected();
 
 	void	SetName(const char *t);
 	void	SetTarget(BHandler* h){target=h;};	
@@ -41,7 +40,7 @@ class XTrack : public BView
 		BBitmap *pad;
 		bool	selected;
 	
-		BMessage	*msg;
+		BMessage	fMessage;
 		BHandler	*target;
 		BString		name;
 		void			_drawPad();

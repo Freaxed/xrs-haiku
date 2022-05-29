@@ -49,7 +49,8 @@ MainWindow::Get()
 	return instance;
 }
 
-
+BScrollView*		scroll_view;
+BPictureButton*		fShowHideInfo;
 MainWindow::MainWindow() :
 	XrsWindow(BRect(WINDOW_X_POS,WINDOW_Y_POS,WINDOW_X_POS+WINDOW_XL,WINDOW_Y_POS+WINDOW_YL),"XRS", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_OUTLINE_RESIZE)//|B_WILL_ACCEPT_FIRST_CLICK) //|B_AVOID_FOCUS)
 
@@ -91,10 +92,10 @@ MainWindow::MainWindow() :
 	fTracksPanel = new TracksPanel(local);
 
 	BRect xrect(local.right + 1, 1, local.right + 1 + B_V_SCROLL_BAR_WIDTH, INFO_BAR_LY + 3);
-	tracksBackground->AddChild(new BPictureButton(xrect, "xrect", XUtils::GetPicture(0),XUtils::GetPicture(1),new BMessage('rez'),B_TWO_STATE_BUTTON, B_FOLLOW_RIGHT | B_FOLLOW_TOP));
+	tracksBackground->AddChild(fShowHideInfo = new BPictureButton(xrect, "xrect", XUtils::GetPicture(0),XUtils::GetPicture(1),new BMessage('info'),B_TWO_STATE_BUTTON, B_FOLLOW_RIGHT | B_FOLLOW_TOP));
 
 	
-	BScrollView		*scroll_view;
+	
 	scroll_view = new BScrollView("XRScrollView", fTracksPanel , B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
 	tracksBackground->AddChild(scroll_view);
 
@@ -295,6 +296,25 @@ MainWindow::MessageReceived(BMessage* message)
 	
 	switch(message->what)
 	{
+		case 'info':
+		{
+			float delta = 0.0f;
+			if (!fTrackInfoBox->IsHidden())
+			{
+				delta = fTrackInfoBox->Frame().Width();
+				fTrackInfoBox->Hide();
+			}
+			else
+			{
+				delta = -1 * fTrackInfoBox->Frame().Width();
+				fTrackInfoBox->Show();				
+			}
+			
+			fShowHideInfo->MoveBy(delta, 0.0f);
+			ticks->ResizeBy(delta, 0.0f);
+			scroll_view->ResizeBy(delta, 0.0f);	
+		}
+		break;
 		case 'hide':
 			WindowManager::Get()->CloseAll();
 			break;		

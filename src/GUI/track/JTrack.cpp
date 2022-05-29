@@ -32,21 +32,24 @@
 const 	rgb_color  	onc 	= {255,52,49};
 
 
-JTrack::JTrack(BRect rect,int16 n):TrackBlock(rect,""),id(n),model(0)
+JTrack::JTrack(BRect rect,int16 n):TrackBlock(rect,"jtrack"), model(0)
 {
 	SetViewColor(bkColor);
 
-	AddChild(volpot = new APot(BRect(545,POT_Y,545+POT_H,POT_Y+POT_L),"pippo",new BMessage(TRACK_VOL),new BMessage(TRACK_ON),0, 100, XUtils::GetBitmap(0),XUtils::GetBitmap(1)));
-	AddChild(panpot = new APot(BRect(550+POT_H+3,POT_Y+3,550+POT_H+3+18,POT_Y+21),"pippo",new BMessage(TRACK_PAN),new BMessage(PAN_RESET),-100, 100,XUtils::GetBitmap(2),NULL));
+	AddChild(volpot = new APot(BRect(545,POT_Y,545+POT_H,POT_Y+POT_L),"track_volume",new BMessage(TRACK_VOL),new BMessage(TRACK_ON),0, 100, XUtils::GetBitmap(0),XUtils::GetBitmap(1)));
+	AddChild(panpot = new APot(BRect(550+POT_H+3,POT_Y+3,550+POT_H+3+18,POT_Y+21),"track_pan",new BMessage(TRACK_PAN),new BMessage(PAN_RESET),-100, 100,XUtils::GetBitmap(2),NULL));
 	AddChild(brez   = new BPictureButton(BRect(6, SPACE + 7, 16, SPACE + 15),"_menu",XUtils::GetPicture(0),XUtils::GetPicture(1),new BMessage('rez'),B_TWO_STATE_BUTTON));
 
+	RControl();
+	
+	SetID(id);
 }
 
 void
 JTrack::RControl()
 {
 	AddChild(xtr=new XTrack(BRect(1+SBUTTON_W, SPACE ,1+SBUTTON_W+TRACK_LX, SPACE + TRACK_LY-1),"init"));
-	AddChild(vnc=new XNotesView( BRect(160, SPACE ,530, SPACE + BUTTON_LY),id));
+	AddChild(vnc=new XNotesView( BRect(160, SPACE ,530, SPACE + BUTTON_LY)));
 	TrackEnd *a,*b;
 	AddChild(a=new VolView(BRect(0,Bounds().bottom+1,530,Bounds().bottom+10)));
 	AddChild(b=new PianoControl(BRect(0,Bounds().bottom+11,530,Bounds().bottom+21),""));
@@ -132,16 +135,16 @@ JTrack::MessageReceived(BMessage* message)
 		myTrack->LockName(false);
 		
 		if(strlen(name)>0) 
-			{
-				SetName(name);	
-				myTrack->LockName(true);
-			}
-			
-			else
-				{
-					myTrack->ResetName();
-					xtr->SetName(myTrack->getName());
-				}
+		{
+			SetName(name);	
+			myTrack->LockName(true);
+		}
+		else
+		{
+			myTrack->ResetName();
+			xtr->SetName(myTrack->getName());
+		}
+
 		if(TrackManager::Get()->getCurrentJTrack()==this)
 			TrackManager::Get()->ResetPanel(myTrack);
 		//Window()->CurrentFocus()->SetEventMask(B_KEYBOARD_EVENTS);
@@ -181,11 +184,12 @@ JTrack::AttachedToWindow()
 	line_pos->SetTarget(this);	
 	TrackBlock::AttachedToWindow();
 }
+
 void
-JTrack::Init(BMessage *m)
+JTrack::SetID(int16 _id)
 {
-	// check this.
-	xtr->Init(m);
+	id = _id;
+	xtr->SetID(id);
 }
 
 void
@@ -206,7 +210,6 @@ JTrack::ResetToTrack(Pattern* p , Track* tr, int16 beatDivision)
 	
 		
 	ResizeTo(160+23*poz+2+107,Frame().Height());
-		
 	
 	vnc->ResizeTo(23*myPat->getNumberNotes()+2,vnc->Frame().Height());
 	
@@ -245,13 +248,14 @@ JTrack::ResetToTrack(Pattern* p , Track* tr, int16 beatDivision)
 void
 JTrack::SetName(const char* t)
 {
-	if(myTrack==NULL) return;
+	if ( myTrack == NULL) 
+		return;
 		
-	if(Window()->Lock())
+	if(LockLooper())
 	{
 		myTrack->setName(t);
 		xtr->SetName(myTrack->getName());
-		Window()->Unlock();
+		UnlockLooper();
 	}
 }
 

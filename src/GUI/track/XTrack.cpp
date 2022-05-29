@@ -12,6 +12,7 @@
 #include "JMessages.h"
 #include "Xed_Utils.h"
 #include "Utils.h"
+#include "GfxMsg.h"
 
 #include <InterfaceKit.h>
 #include <stdio.h>
@@ -46,7 +47,11 @@ XTrack::XTrack(BRect rect,const char *t): BView(rect,"_xtrack",B_FOLLOW_NONE,B_W
 {
 	SetName(t);
 	selected=false;	
-	pad=XUtils::GetBitmap(27); //fix
+	pad = XUtils::GetBitmap(27); //fix
+	
+	fMessage.what = TRACK_SET;
+	fMessage.AddInt16("id",    -1);
+	fMessage.AddInt32("mouse",  0);	
 }
 
 void
@@ -82,10 +87,9 @@ XTrack::_drawPad()
 	FillRect(BRect(12,0,87,23));
 }
 void
-XTrack::Init(BMessage *m)
+XTrack::SetID(int16 id)
 {
-	msg=m;
-	msg->AddInt32("mouse", 0);	
+	fMessage.ReplaceInt16("id", id);
 }
 void 
 XTrack::MouseDown(BPoint where)
@@ -96,7 +100,7 @@ XTrack::MouseDown(BPoint where)
 	BMessage *m=Window()->CurrentMessage();
 	m->FindInt32("modifiers",&key);
 	GetMouse(&where, &buttons);
-	msg->ReplaceInt32("mouse",buttons);
+	fMessage.ReplaceInt32("mouse",buttons);
 	
 	if(key & B_CONTROL_KEY) 
 	{
@@ -104,7 +108,7 @@ XTrack::MouseDown(BPoint where)
 		return;
 	}
 	
-	Looper()->PostMessage(msg,target);
+	Looper()->PostMessage(&fMessage, target);
 			
 }
 
@@ -112,28 +116,24 @@ void
 XTrack::SendRenameMessage()
 {
 	BRect n(ConvertToScreen(Bounds()));
-	BMessage *m=new BMessage(CHANGE_NAME);
-	m->AddPoint("from",BPoint(n.left,n.top));
-	m->AddPoint("to",BPoint(n.right,n.bottom));
-	Looper()->PostMessage(m,Parent());
+	BMessage m(CHANGE_NAME);
+	m.AddPoint("from",BPoint(n.left,n.top));
+	m.AddPoint("to",BPoint(n.right,n.bottom));
+	Looper()->PostMessage(&m, Parent());
 }
 
 void
 XTrack::SetSelected(bool _selected)
 {
-	if(Window()->Lock())
+	if(LockLooper())
 	{
 		selected = _selected;
 		Invalidate();
-		Window()->Unlock();
+		UnlockLooper();
 	}	
 }
 
-bool
-XTrack::isSelected()
-{
-	return selected;
-}
+
 void
 XTrack::SetName(const char *t)
 {

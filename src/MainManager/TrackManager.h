@@ -34,10 +34,6 @@ public:
 	static TrackManager*	Get();	
 	Track*			getTrack(int16);
 	
-	JTrack*			MakeJTrack(Track*, BRect rect, int16 n);		
-	JTrack*			getJTrack();
-	
-
 	void			SaveBoosterSettings(BMessage& msg);
 	void			LoadBoosterSettings(BMessage& msg);
 

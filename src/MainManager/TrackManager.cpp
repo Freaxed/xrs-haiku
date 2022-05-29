@@ -181,11 +181,7 @@ TrackManager::SendRef(entry_ref ref, int16 id, BMessage *msg)
 	return track;
 }
 
-JTrack*
-TrackManager::MakeJTrack(Track* trk, BRect rect, int16 pos)
-{
-	return new JTrack(rect, pos);
-}
+
 
 void
 TrackManager::ResetToSong(Song* s)

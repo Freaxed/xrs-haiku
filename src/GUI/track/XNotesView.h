@@ -22,14 +22,14 @@ class XNotesView : public BControl
 {
 	public:
 	
-					XNotesView (BRect,int16);
+					XNotesView (BRect);
 					~XNotesView();
 		void		Draw(BRect);
 		void		MouseDown(BPoint);
 		void		MouseUp(BPoint);
 	 	void 		MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg);
 		void		Reset(Pattern*, int16 beatDivision);
-			
+		void		AttachedToWindow();
 	private:
 
 		Pattern*	curPattern;
@@ -40,7 +40,7 @@ class XNotesView : public BControl
 		int			prev;
 		bool		set_state;
 		int			selected;
-		BMessage	*notify;
+		BMessage*	notify;
 		int16		fBeatDivision;
 };
 #endif

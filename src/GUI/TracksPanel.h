@@ -45,7 +45,7 @@ class TracksPanel : public TrackList
 				void		RenameSelectedTrack();
 			 Track*			getCurrentTrack();
 				void		SelectTrack(int);
-				void		AddTrack(int h);
+				void		AddTrack(int16 h);
 				
 				void		resetPattern(int32);
 				int			getCurrentPattern();

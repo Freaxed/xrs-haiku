@@ -26,11 +26,12 @@ class TrackList : public BView
 			void	 RemoveTrack(TrackBlock*);
 			void	 Expanded(TrackBlock*,float );
 			void	 UnExpanded(TrackBlock*,float);
-	private:
-		
-		 	VectorNew<TrackBlock*>	list;
-		 	
+	private: 	
 		 	int		_moveAfter(TrackBlock*,float);
-				
+	
+	protected:
+			VectorNew<TrackBlock*>	list;
+			
+					 					
 };
 #endif

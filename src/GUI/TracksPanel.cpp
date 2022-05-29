@@ -144,37 +144,32 @@ TracksPanel::RemoveTrack(int h)
 {
 	JTrack *t = xnv[h];
 	
-	if(Window()->Lock()){
+	if(LockLooper()){
 		xnv.Erase(h);
 		LogTrace("Removing Track %d", h);
 		TrackList::RemoveTrack((TrackBlock*)t);
 		delete t;
-		Window()->Unlock();
+		UnlockLooper();
 	}
 	FixScrollBar();
 }
 
 
 void
-TracksPanel::AddTrack(int h)
+TracksPanel::AddTrack(int16 h)
 {
 	ScrollBar(B_HORIZONTAL)->SetValue(0);
 	
-	if(Window()->Lock())
+	if(LockLooper())
 	{	
-		JTrack* t = tm->MakeJTrack(curSong->getTrackAt(h), 
-		                           BRect(BUTTONS_X_START, 0, WINDOW_XL-18.0f, JTRACK_LY),
-		                           (int16)h);
+		JTrack* t = new JTrack(BRect(0, 0, Bounds().right, JTRACK_LY), h);
 		xnv.Add(t);
-		t->RControl();
-		TrackList::AddTrack((TrackBlock*)t);
 		
-		BMessage *msg=new BMessage(TRACK_SET);
-		msg->AddInt16("id", (int16) h);
-		t->Init(msg);
+		TrackList::AddTrack(t);
+
 		int selPattern=MeasureManager::Get()->GetCurrentPattern();
 		t->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h),curSong->GetBeatDivision());
-		Window()->Unlock();
+		UnlockLooper();
 	}
 
 	
@@ -236,8 +231,11 @@ TracksPanel::MessageReceived(BMessage* message)
 		break;
 		
 		case TRACK_SET:
+		{
 			SelectTrack(message->GetInt16("id", 0));
-			LogInfo("Right click to be implemented..");
+			int32 mouse = message->GetInt32("mouse", -1);
+			LogInfo("Mouse click (%d) to be implemented..", mouse);
+		}
 		break;		
 		
 		case B_SIMPLE_DATA:
@@ -301,8 +299,7 @@ TracksPanel::RemoveTrackAt(int id)
 {
 	JTrack*	tr;
 	
-	LogTrace("Removing the track.. %d\n",id);
-	
+	LogTrace("Removing the track.. %d\n",id);	
 
 	if(id < 0) return;
 	
@@ -310,20 +307,17 @@ TracksPanel::RemoveTrackAt(int id)
 	
 	RemoveTrack(id);
 	
-	if(Window()->Lock())
+	if(LockLooper())
 	{
-	
-	int selPattern=MeasureManager::Get()->GetCurrentPattern();
-	for(int h=id;h<xnv.Count();h++){
-	
-		tr=getJTrackAt(h);
-		BMessage *msg=new BMessage(TRACK_SET);
-		msg->AddInt16("id", (int16) h);
-		tr->Init(msg);
-		tr->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h), curSong->GetBeatDivision());
+		int selPattern = MeasureManager::Get()->GetCurrentPattern();
 			
+		for(int h=id;h<xnv.Count();h++){
+			tr = getJTrackAt(h);
+			tr->SetID(h);
+			tr->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h), curSong->GetBeatDivision());
 		}
-	Window()->Unlock();
+	
+		UnlockLooper();
 	}
 	if(curSong->getNumberTrack()>0)
 	{

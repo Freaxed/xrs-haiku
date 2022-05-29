@@ -24,8 +24,8 @@ class JTrack : public TrackBlock
 				JTrack(BRect, int16);
 		
 		virtual void	AttachedToWindow();
-			  	void	Init(BMessage *m);
-			  	void	RControl();
+			  	void	SetID(int16 id);
+
 			  	void	ResetToTrack(Pattern*, Track*, int16 beatDivisio);
 			  	void	Refresh(Pattern*, int16 beatDivision);
 			    void	SetSelected(bool selected);
@@ -56,7 +56,7 @@ class JTrack : public TrackBlock
 
 	private:
 	
-			
+			void				RControl();
 			int					_img;	
 			BPictureButton*		brez;
 			XDigit*				line_pos;

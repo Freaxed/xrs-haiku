@@ -19,14 +19,12 @@
 #include <InterfaceKit.h>
 
 
-	
-
-XNotesView::XNotesView(BRect rect,int16 t): BControl(rect,"_xnotesview","",NULL,B_FOLLOW_LEFT,B_WILL_DRAW)
+XNotesView::XNotesView(BRect rect): BControl(rect, "_xnotesview","", NULL, B_FOLLOW_LEFT, B_WILL_DRAW)
 {
-	picOn=XUtils::GetBitmap(9); //FIX.
-	picOff=XUtils::GetBitmap(10);
-	picOnB=XUtils::GetBitmap(11);
-	picOffB=XUtils::GetBitmap(12);
+	picOn   = XUtils::GetBitmap(9);
+	picOff  = XUtils::GetBitmap(10);
+	picOnB  = XUtils::GetBitmap(11);
+	picOffB = XUtils::GetBitmap(12);
 		
 	curPattern=NULL;
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -34,20 +32,29 @@ XNotesView::XNotesView(BRect rect,int16 t): BControl(rect,"_xnotesview","",NULL,
 	SetFontSize(10);
 	selected=-1;
 	
-	notify=new BMessage(NOTIFY_NOTE);
+	notify = new BMessage(NOTIFY_NOTE);
 	notify->AddInt16("note",0);
 
-	fBeatDivision	= 4; //FIXME, where is the default settings?
+	fBeatDivision = 0;
+}
+void		
+XNotesView::AttachedToWindow()
+{
+	SetTarget(Parent());
 }
 
-XNotesView::~XNotesView(){}
+XNotesView::~XNotesView()
+{
+	delete notify;
+}
 
 void
 XNotesView::Draw(BRect r)
 {
 	SetDrawingMode(B_OP_ALPHA);
 	
-	if(curPattern==NULL) return;
+	if(curPattern == NULL) 
+		return;
 	
 	BRect rect;
 	
@@ -79,8 +86,7 @@ XNotesView::Draw(BRect r)
 	}
 }
 void
-XNotesView::MouseMoved(BPoint p, uint32 tra/* transit */,
-	const BMessage* /* dragDropMsg */)
+XNotesView::MouseMoved(BPoint p, uint32 tra, const BMessage*)
 {	
 	if(curPattern==NULL ) return;
 	int	ax1=(int)floor(p.x/(BUTTON_LX+BUTTON_X_SPACE));
@@ -90,13 +96,11 @@ XNotesView::MouseMoved(BPoint p, uint32 tra/* transit */,
 		
 	if (IsTracking()  && tra==B_INSIDE_VIEW) {
 		
-		
-		
 		if(prev != ax1)
 		{
 			curPattern->getNoteAt(ax1)->setValue(set_state);
 			notify->ReplaceInt16("note",ax1);
-			Window()->PostMessage(notify,Parent());
+			Invoke(notify);
 		}
 		
 		Invalidate(BRect(ax1*(BUTTON_LX+BUTTON_X_SPACE),0,(ax1+1)*(BUTTON_LX+BUTTON_X_SPACE)-1,BUTTON_LY));	
@@ -132,7 +136,7 @@ XNotesView::MouseDown(BPoint p)
 	
 	curPattern->getNoteAt(ax1)->Swap();
 	notify->ReplaceInt16("note",ax1);
-	Window()->PostMessage(notify,Parent());
+	Invoke(notify);
 		
 	Invalidate(BRect(ax1*(BUTTON_LX+BUTTON_X_SPACE),0,(ax1+1)*(BUTTON_LX+BUTTON_X_SPACE)-1,BUTTON_LY));
 	
