@@ -51,7 +51,7 @@ TracksPanel::FixScrollBar()
 	{
 		BScrollBar* vScroll = ScrollBar(B_VERTICAL);
 		BScrollBar* hScroll = ScrollBar(B_HORIZONTAL);
-		if(xnv.Count() == 0)
+		if(list.Count() == 0)
 		{
 			vScroll->SetRange(0,0);
 			hScroll->SetRange(0,0);
@@ -59,7 +59,7 @@ TracksPanel::FixScrollBar()
 		else
 		{	
 			const BRect bounds = Bounds();
-			BSize size(xnv[xnv.Count()-1]->Frame().right, xnv[xnv.Count()-1]->Frame().bottom);
+			BSize size(list[list.Count()-1]->Frame().right, list[list.Count()-1]->Frame().bottom);
 			if (hScroll != NULL) {
 			
 				float delta = size.Width() - bounds.Width(),
@@ -110,12 +110,12 @@ TracksPanel::Init(BView* tk, TrackInfoBox* lTrackInfoBox)
 JTrack*
 TracksPanel::getJTrackAt(int h)
 {
-	return xnv[h];
+	return dynamic_cast<JTrack*>(list[h]);
 }
 int
 TracksPanel::getNumberJTrack()
 {
-	return xnv.Count();
+	return list.Count();
 }
 
 Track*
@@ -142,10 +142,10 @@ TracksPanel::DetachedFromWindow()
 void
 TracksPanel::RemoveTrack(int h)
 {
-	JTrack *t = xnv[h];
+	JTrack *t = getJTrackAt(h);
 	
 	if(LockLooper()){
-		xnv.Erase(h);
+		
 		LogTrace("Removing Track %d", h);
 		TrackList::RemoveTrack((TrackBlock*)t);
 		delete t;
@@ -163,8 +163,6 @@ TracksPanel::AddTrack(int16 h)
 	if(LockLooper())
 	{	
 		JTrack* t = new JTrack(BRect(0, 0, Bounds().right, JTRACK_LY), h);
-		xnv.Add(t);
-		
 		TrackList::AddTrack(t);
 
 		int selPattern=MeasureManager::Get()->GetCurrentPattern();
@@ -190,7 +188,7 @@ TracksPanel::ResetToSong(Song* s)
 	int max;
 	
 	//reverse remove
-	max=xnv.Count();
+	max=list.Count();
 	for(int h=max-1;h>=0;h--)
 	{
 		RemoveTrack(h);
@@ -206,9 +204,9 @@ TracksPanel::ResetToSong(Song* s)
 	
 	//Reset
 	int selPattern=MeasureManager::Get()->GetCurrentPattern();
-	for(int h=0;h<xnv.Count();h++)
+	for(int h=0;h<list.Count();h++)
 	{
-		xnv[h]->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h), curSong->GetBeatDivision());
+		getJTrackAt(h)->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h), curSong->GetBeatDivision());
 	}
 	
 	if(curSong->getNumberTrack()>0) SelectTrack(0);
@@ -235,6 +233,7 @@ TracksPanel::MessageReceived(BMessage* message)
 			SelectTrack(message->GetInt16("id", 0));
 			int32 mouse = message->GetInt32("mouse", -1);
 			LogInfo("Mouse click (%d) to be implemented..", mouse);
+			message->PrintToStream();
 		}
 		break;		
 		
@@ -311,7 +310,7 @@ TracksPanel::RemoveTrackAt(int id)
 	{
 		int selPattern = MeasureManager::Get()->GetCurrentPattern();
 			
-		for(int h=id;h<xnv.Count();h++){
+		for(int h=id;h<list.Count();h++){
 			tr = getJTrackAt(h);
 			tr->SetID(h);
 			tr->ResetToTrack(curSong->getTrackAt(h)->getPatternAt(selPattern),curSong->getTrackAt(h), curSong->GetBeatDivision());

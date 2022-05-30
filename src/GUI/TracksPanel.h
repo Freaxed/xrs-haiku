@@ -65,7 +65,6 @@ class TracksPanel : public TrackList
 		
 		void				FixScrollBar();
 		
-		VectorNew<JTrack*>	xnv;
 		Song			*curSong;
 		TrackManager	*tm; //uhm shold be removed for sanity
 		BView			*ticks;	

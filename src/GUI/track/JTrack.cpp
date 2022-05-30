@@ -32,7 +32,7 @@
 const 	rgb_color  	onc 	= {255,52,49};
 
 
-JTrack::JTrack(BRect rect,int16 n):TrackBlock(rect,"jtrack"), model(0)
+JTrack::JTrack(BRect rect, int16 n):TrackBlock(rect,"jtrack"), model(0)
 {
 	SetViewColor(bkColor);
 
@@ -42,7 +42,7 @@ JTrack::JTrack(BRect rect,int16 n):TrackBlock(rect,"jtrack"), model(0)
 
 	RControl();
 	
-	SetID(id);
+	SetID(n);
 }
 
 void

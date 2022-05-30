@@ -338,6 +338,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		case TRACK_SET:
 			PostMessage(message, fTracksPanel);
+			message->PrintToStream();
 			break;
 		case MENU_COPY:
 		case MENU_CUT:

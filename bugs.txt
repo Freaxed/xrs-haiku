@@ -1,1 +1,1 @@
-- rimozione prima traccia (se multitraccia)
+- saving MainWindow slit/button state
