@@ -36,7 +36,7 @@ void
 ExternalManager::MakeEmpty()
 {
 	LogDebug("ExternalManager::MakeEmpty()");
-	Sample	*sample;
+
 	while(CountItems()){
 		DeleteSampleAt(0);
 	}

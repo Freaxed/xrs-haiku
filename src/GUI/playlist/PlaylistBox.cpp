@@ -34,7 +34,6 @@
 
 PlaylistBox::PlaylistBox(BRect _r) : BBox(_r, "PlaylistBox", B_FOLLOW_ALL_SIDES, B_PLAIN_BORDER)
 {
-	BRect rect = Bounds();
 	_r.bottom = TOOLBOX_H - 1;
 	BBox*	toolbox = new BBox(BRect(0, 0, _r.Width() - 1, TOOLBOX_H - 1), "toolbox", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	

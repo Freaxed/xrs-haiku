@@ -37,7 +37,7 @@
 
 
 static		entry_ref rif;
-static		BTextControl	*txt;
+
 
 #define BOXSPACE	10.0f
 #define OFFSET		5.0f

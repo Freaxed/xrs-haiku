@@ -33,8 +33,8 @@ ADigit::ADigit(BRect frame, BMessage *message,
 	uint32 resizingMode, uint32 flags)
 	: BControl(frame,  "_adigit",  "_", message, B_FOLLOW_NONE,B_WILL_DRAW),
 	m_fMinValue(minValue), m_fMaxValue(maxValue), 
-	fDisplayDelta(0),
-	track(false)
+	track(false),
+	fDisplayDelta(0)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	

@@ -47,8 +47,7 @@ Configurator::Init(const char *filename)
 void 
 Configurator::Close()
 {
-	status_t err;
-	
+
 	LogInfo("Writing configuration file!");
 	
 	RemoveName("Version");

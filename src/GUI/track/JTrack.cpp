@@ -204,10 +204,12 @@ JTrack::ResetToTrack(Pattern* p , Track* tr, int16 beatDivision)
 	VolView* v=(VolView*)trackend_list[0];
 	
 	if(tr->SupportPanNote())
+	{
 		if( tr->SupportSustainNote())
 			v->SupportMultiMode(SUSTAIN_VIEW);
 		else
 			v->SupportMultiMode(PAN_VIEW);
+	}
 	
 	TrackEnd *a,*b;
 	a=trackend_list[0];

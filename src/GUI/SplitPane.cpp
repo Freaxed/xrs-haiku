@@ -294,17 +294,15 @@ void SplitPane::MouseMoved(BPoint where,uint32  transition,const BMessage */*m*/
 	
    if(Draggin){
    	
-      float minVal;
+     
       switch(align){
       case B_HORIZONTAL:
       	 SetViewCursor (h_arrow);  
          pos.y = (where.y)-(thickness.y/2);
-         minVal = ms1.y;
          break;
       case B_VERTICAL:
       	 SetViewCursor (v_arrow);  
          pos.x = (where.x)-(thickness.x/2);
-         minVal = ms1.x;
          break;
       }
 

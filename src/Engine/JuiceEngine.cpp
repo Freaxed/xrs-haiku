@@ -338,7 +338,6 @@ JuiceEngine::process_row(int32 row)
 	int32 	numtracks=fCurrentSong->getNumberTrack();	
 	int 	z = 0;
 	bool	clear = false; 
-	int 	pat = 0;
 	
 	z = MeasureManager::Get()->ResetStep();
 		
@@ -350,8 +349,6 @@ JuiceEngine::process_row(int32 row)
 			
 			z=MeasureManager::Get()->ResetStep();
 				
-			pat=z;
-			
 			while(z!=-1)
 			{
 				Pattern* pat=track->getPatternAt(z);

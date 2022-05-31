@@ -20,7 +20,7 @@ class LoopClock : public Clock {
 				// maybe we should use: beat as the beat and tick as the current misused beat..
 
 	public:
-				LoopClock():fLoopEnable(true),fMaxBeat (0) { }
+				LoopClock():fMaxBeat (0),fLoopEnable(true) { }
 		
 		 void	Tick()
 		 		{

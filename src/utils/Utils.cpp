@@ -259,7 +259,7 @@ ReadableSize(off_t	size) {
 				char		str[256];
 				if (size < kKB_SIZE)
 				{
-					sprintf(str, "%d bytes", size);
+					sprintf(str, "%ld bytes", size);
 				}
 				else
 				{
@@ -312,7 +312,7 @@ ReadableSpeed(float size) {
 		char		str[256];
 		if (size < kKB_SIZE)
 		{
-			sprintf(str, "%d b/s", (off_t)size);
+			sprintf(str, "%ld b/s", (off_t)size);
 		}
 		else
 		{

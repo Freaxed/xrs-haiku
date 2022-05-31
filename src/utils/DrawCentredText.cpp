@@ -41,7 +41,7 @@ void DrawCentredText(const char * TextToCentre, BFont * FontWithWhichToDraw, BRe
 			ViewInWhichToDraw->SetFont(FontWithWhichToDraw);
 			ViewInWhichToDraw->DrawString(TextWillCentre,BPoint(RectInWhichToCentre.left+(RectInWhichToCentre.Width()-FontWithWhichToDraw->StringWidth(TextWillCentre))/2,RectInWhichToCentre.top+(RectInWhichToCentre.Height()-i*HEIGHT_RATIO)/2+fonth.ascent));
 
-			delete TextWillCentre;
+			free(TextWillCentre);
 		}
 		else
 		{

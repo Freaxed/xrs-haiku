@@ -45,8 +45,8 @@ class Clock {
 		}
 				
 	protected:
-		int16	beat;
-		int16	tick;
+		uint32	beat;
+		uint32	tick;
 	
 	private:	
 		VectorNew<Tickable*>	fLTick;		

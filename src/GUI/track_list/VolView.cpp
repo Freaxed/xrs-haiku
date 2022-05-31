@@ -325,16 +325,17 @@ VolView::_randPar()
 		double r = ( (double)rand() / (double)(RAND_MAX) );
 		
 		if(mode_view==VELOCITY_VIEW)
-		curPattern->getNoteAt(i)->SetGain(-r);	
+			curPattern->getNoteAt(i)->SetGain(-r);	
 		else
 		if(mode_view==PAN_VIEW)
-		curPattern->getNoteAt(i)->SetPan((r*-2)-1.0);
+			curPattern->getNoteAt(i)->SetPan((r*-2)-1.0);
 		else
-		if(mode_view==SUSTAIN_VIEW)
-		if(rand() % 2)
-		curPattern->getNoteAt(i)->setOct(0);
-		else
-		curPattern->getNoteAt(i)->setOct(8);
+		if(mode_view==SUSTAIN_VIEW) {
+			if(rand() % 2)
+				curPattern->getNoteAt(i)->setOct(0);
+			else
+			curPattern->getNoteAt(i)->setOct(8);
+		}
 
 	}
 }

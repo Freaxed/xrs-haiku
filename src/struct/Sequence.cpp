@@ -142,7 +142,7 @@ Sequence::LoadSettings(BMessage& playlist)
 	
 	BMessage	measures;
 	playlist.FindMessage("Measures", &measures);
-	int maxPat = measures.GetInt16("NumMeasures", 1);
+	//int maxPat = measures.GetInt16("NumMeasures", 1);
 	
 	int i=0;
 	BMessage measure;
