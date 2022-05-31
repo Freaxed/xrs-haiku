@@ -72,13 +72,13 @@ TextControlFloater::~TextControlFloater() {
 }
 
 TextControlFloater::TextControlFloater(
-	BRect											frame,
-	alignment									align,
-	const BFont*							font,
-	const char*								text,
-	const BMessenger&					target,
-	BMessage*									message,
-	BMessage*									cancelMessage) :
+	BRect				frame,
+	// alignment			align,
+	// const BFont*		font,
+	const char*			text,
+	BHandler*			target,
+	BMessage*			message,
+	BMessage*			cancelMessage) :
 	BWindow(
 		frame, //.InsetBySelf(-3.0,-3.0), // expand frame to counteract control border
 		"TextControlFloater",
@@ -101,8 +101,8 @@ TextControlFloater::TextControlFloater(
 	Run();
 	Lock();
 	
-	m_control->TextView()->SetFontAndColor(font);
-	m_control->TextView()->SetAlignment(align);
+//	m_control->TextView()->SetFontAndColor(font);
+//	m_control->TextView()->SetAlignment(align);
 	m_control->SetDivider(-3.0);
 
 	m_control->SetViewColor(B_TRANSPARENT_COLOR);
@@ -129,8 +129,7 @@ void TextControlFloater::WindowActivated(
 // BHandler
 // ---------------------------------------------------------------- //
 
-void TextControlFloater::MessageReceived(
-	BMessage*									message) {
+void TextControlFloater::MessageReceived(BMessage* message) {
 	
 	if(message->what == m_message->what) {
 		// done; relay message to final target

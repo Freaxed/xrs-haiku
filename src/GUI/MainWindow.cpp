@@ -336,10 +336,6 @@ MainWindow::MessageReceived(BMessage* message)
 		case PLAY_ALL_SET:
 			MeasureManager::Get()->SetPatternMode(fPanel->isAllPat());
 			break;
-		case TRACK_SET:
-			PostMessage(message, fTracksPanel);
-			message->PrintToStream();
-			break;
 		case MENU_COPY:
 		case MENU_CUT:
 			paste->SetEnabled(true);

@@ -96,7 +96,7 @@ TNPanel::MessageReceived(BMessage* msg)
 			float	y=frame.top+50;
 			XHost::Get()->SendMessage(X_MainWindowDeactivate,0);
 			
-			TextControlFloater *tf=new TextControlFloater(BRect(BRect(x,y,x+200,y+20)),B_ALIGN_LEFT,be_plain_font,"",this,new BMessage(X_SAVE_PRESET_OK),new BMessage(X_SAVE_LOST));
+			TextControlFloater *tf=new TextControlFloater(BRect(BRect(x,y,x+200,y+20)),"",this,new BMessage(X_SAVE_PRESET_OK),new BMessage(X_SAVE_LOST));
 			tf->SetLook(B_FLOATING_WINDOW_LOOK);
 			tf->SetTitle(T_VSTWIN_NAME);
 		}

@@ -221,7 +221,7 @@ TracksPanel::MessageReceived(BMessage* message)
 	{	
 		case MSG_VALUABLE_CHANGED:
 		{
-			int32 value;
+			int32 value;	
 			if (ValuableTools::SearchValues(VID_PATTERN_CURRENT, message, &value)){
 					resetPattern(value);
 			}
@@ -230,10 +230,12 @@ TracksPanel::MessageReceived(BMessage* message)
 		
 		case TRACK_SET:
 		{
-			SelectTrack(message->GetInt16("id", 0));
-			int32 mouse = message->GetInt32("mouse", -1);
-			LogInfo("Mouse click (%d) to be implemented..", mouse);
-			message->PrintToStream();
+			SelectTrack(message->GetInt32("be:value", 0));
+			int32 mouse = message->GetInt32("mouse", -1);			
+			if (mouse == B_SECONDARY_MOUSE_BUTTON)
+			{
+				LogInfo("Right mouse click to be implemented.. (PopUp menu?)");
+			}
 		}
 		break;		
 		
@@ -335,19 +337,16 @@ TracksPanel::SelectTrack(int id)
 void
 TracksPanel::RefreshGraphics()
 {
-	if(Window()->Lock()){
-//	Reset(curSong);
-	Window()->Unlock();
-	}
+
 }	
 void
 TracksPanel::RefreshSelected()
 {
 	int selPattern=MeasureManager::Get()->GetCurrentPattern();
 	if(Window()->Lock()){
-	if(tm->getCurrentJTrack())
-	tm->getCurrentJTrack()->ResetToTrack(tm->getCurrentJTrack()->getTrack()->getPatternAt(selPattern),tm->getCurrentJTrack()->getTrack(), curSong->GetBeatDivision());
-	Window()->Unlock();
+		if(tm->getCurrentJTrack())
+		tm->getCurrentJTrack()->ResetToTrack(tm->getCurrentJTrack()->getTrack()->getPatternAt(selPattern),tm->getCurrentJTrack()->getTrack(), curSong->GetBeatDivision());
+		Window()->Unlock();
 	}
 }	
 void

@@ -148,24 +148,24 @@ PlaylistBox::MessageReceived(BMessage *m)
 			BMessage *mx=new BMessage(JMSG_NAME_SET);
 			mx->AddInt16("pos",m->FindInt16("pos"));
 			
-			new TextControlFloater(BRect(f,t),B_ALIGN_LEFT,be_plain_font,m->FindString("name"),this,mx,new BMessage(JMSG_NAME_NOTSET));
+			new TextControlFloater(BRect(f,t),m->FindString("name"),this,mx,new BMessage(JMSG_NAME_NOTSET));
 			
 		}
 		break;
 		
 		case JMSG_NAME_SET:
-			
-			const char* name;
+		{
+			BString name;
 			m->FindString("_value", &name);
 			
 						
-			seq->SetMeasureName(name,m->FindInt16("pos"));
+			seq->SetMeasureName(name.String(), m->GetInt16("pos", 0));
 			
 			if(MainWindow::Get()->Lock()){
 				MainWindow::Get()->WindowActivated(true);
 				MainWindow::Get()->Unlock();
 			}
-		
+		}
 		break;
 		
 		case JMSG_NAME_NOTSET:

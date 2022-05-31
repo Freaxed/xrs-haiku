@@ -125,18 +125,17 @@ JTrack::MessageReceived(BMessage* message)
 	break;
 	
 	case JMSG_NAME_SET:
+	{
+		if(myTrack == NULL) return;
 		
-		if(myTrack==NULL) return;
-		
-		const char* name;
-		message->FindString("_value", &name);
-		
+		BString name;
+		message->FindString("_value", &name);		
 		
 		myTrack->LockName(false);
 		
-		if(strlen(name)>0) 
+		if(name.Length() > 0) 
 		{
-			SetName(name);	
+			SetName(name.String());	
 			myTrack->LockName(true);
 		}
 		else
@@ -145,28 +144,17 @@ JTrack::MessageReceived(BMessage* message)
 			xtr->SetName(myTrack->getName());
 		}
 
-		if(TrackManager::Get()->getCurrentJTrack()==this)
+		if(TrackManager::Get()->getCurrentJTrack() == this)
 			TrackManager::Get()->ResetPanel(myTrack);
-		//Window()->CurrentFocus()->SetEventMask(B_KEYBOARD_EVENTS);
+
 		Window()->WindowActivated(true);
+	}
 	break;
+
 	case JMSG_NAME_NOTSET:
 		Window()->WindowActivated(true);
 	break;
 	
-	case CHANGE_NAME:
-	{
-		
-		BPoint f,t;
-		
-		message->FindPoint("from", &f);
-		message->FindPoint("to", &t);
-		
-		/*  Disabling KeyBoard for MainWindow */
-		Window()->WindowActivated(false);
-		new TextControlFloater(BRect(f,t),B_ALIGN_LEFT,be_plain_font,myTrack->getName(),this,new BMessage(JMSG_NAME_SET),new BMessage(JMSG_NAME_NOTSET));
-	}
-	break;
 	default:		
 		TrackBlock::MessageReceived(message);
 		break;
@@ -177,7 +165,7 @@ JTrack::MessageReceived(BMessage* message)
 void
 JTrack::AttachedToWindow()
 {
-	xtr->SetTarget(Window());
+	xtr->SetTarget(Parent());
 	volpot->SetTarget(this);
 	panpot->SetTarget(this);
 	brez->SetTarget(this);
@@ -189,7 +177,7 @@ void
 JTrack::SetID(int16 _id)
 {
 	id = _id;
-	xtr->SetID(id);
+	xtr->SetValue(id);
 }
 
 void
@@ -303,11 +291,5 @@ JTrack::Mute(bool b,bool c)
 void 
 JTrack::MouseDown(BPoint where)
 {
-	uint32 buttons;
-	BMessage *m = Window()->CurrentMessage();
-	GetMouse(&where, &buttons);
-	BMessage *msg = new BMessage(TRACK_SET);
-	msg->AddInt16("id", (int16) id);
-	msg->ReplaceInt32("mouse",buttons);
-	Looper()->PostMessage(msg, Window());
+	xtr->MouseDown(where);
 }

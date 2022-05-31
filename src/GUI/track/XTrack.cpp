@@ -17,6 +17,7 @@
 #include <InterfaceKit.h>
 #include <stdio.h>
 #include <String.h>
+#include "TextControlFloater.h"
 
 #define	XRS_SIMPLE_DATA	'xrsd'
 #define	XRS_BANK_SAMPLE	'xbks'
@@ -43,15 +44,15 @@ void	get_color(BBitmap *bmp,int x,int y,rgb_color *cc)
 
 }
 
-XTrack::XTrack(BRect rect,const char *t): BView(rect,"_xtrack",B_FOLLOW_NONE,B_WILL_DRAW)
+XTrack::XTrack(BRect rect,const char *t): BControl(rect,"_xtrack",t, NULL, B_FOLLOW_NONE,B_WILL_DRAW)
 {
 	SetName(t);
 	selected=false;	
 	pad = XUtils::GetBitmap(27); //fix
 	
-	fMessage.what = TRACK_SET;
-	fMessage.AddInt16("id",    -1);
-	fMessage.AddInt32("mouse",  0);	
+	fMessage = new BMessage (TRACK_SET);
+	fMessage->AddInt32("mouse",  0);	
+	SetMessage(fMessage);
 }
 
 void
@@ -77,7 +78,7 @@ XTrack::Draw(BRect r)
 
 	selected ? SetHighColor(255,255,205,255) : SetHighColor(0,0,0,255);
 
-	BPDrawString(name.String(), this, Bounds(), B_ALIGN_CENTER, 3.0f);
+	BPDrawString(Label(), this, Bounds(), B_ALIGN_CENTER, 3.0f);
 }
 void
 XTrack::_drawPad()
@@ -86,11 +87,7 @@ XTrack::_drawPad()
 	FillEllipse(BRect(76,0,99,23));
 	FillRect(BRect(12,0,87,23));
 }
-void
-XTrack::SetID(int16 id)
-{
-	fMessage.ReplaceInt16("id", id);
-}
+
 void 
 XTrack::MouseDown(BPoint where)
 {
@@ -100,7 +97,7 @@ XTrack::MouseDown(BPoint where)
 	BMessage *m=Window()->CurrentMessage();
 	m->FindInt32("modifiers",&key);
 	GetMouse(&where, &buttons);
-	fMessage.ReplaceInt32("mouse",buttons);
+	Message()->ReplaceInt32("mouse",buttons);
 	
 	if(key & B_CONTROL_KEY) 
 	{
@@ -108,19 +105,16 @@ XTrack::MouseDown(BPoint where)
 		return;
 	}
 	
-	Looper()->PostMessage(&fMessage, target);
-			
+	Invoke();
 }
 
 void
 XTrack::SendRenameMessage()
 {
-	BRect n(ConvertToScreen(Bounds()));
-	BMessage m(CHANGE_NAME);
-	m.AddPoint("from",BPoint(n.left,n.top));
-	m.AddPoint("to",BPoint(n.right,n.bottom));
-	Looper()->PostMessage(&m, Parent());
+	Window()->WindowActivated(false);
+	new TextControlFloater(ConvertToScreen(Bounds()), Label(), Parent(), new BMessage(JMSG_NAME_SET), new BMessage(JMSG_NAME_NOTSET));
 }
+
 
 void
 XTrack::SetSelected(bool _selected)
@@ -137,7 +131,7 @@ XTrack::SetSelected(bool _selected)
 void
 XTrack::SetName(const char *t)
 {
-	name.SetTo(t);
+	SetLabel(t);
 	Invalidate();	
 }
 void
@@ -165,7 +159,7 @@ XTrack::MessageReceived(BMessage* message)
 		Window()->PostMessage(message,Parent());
 		break;
 	default:
-		BView::MessageReceived(message);
+		BControl::MessageReceived(message);
 		break;
 	
 	}

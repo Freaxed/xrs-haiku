@@ -136,7 +136,7 @@ ADigit::MessageReceived(BMessage* msg)
 		BString txt;
 		txt << GetValue();
 		
-		new TextControlFloater(BRect(f,t),B_ALIGN_LEFT,be_plain_font,txt.String(),this,new BMessage('nset'),new BMessage('nnet'));
+		new TextControlFloater(BRect(f,t),txt.String(),this,new BMessage('nset'),new BMessage('nnet'));
 
 	}
 	break;
@@ -148,9 +148,9 @@ ADigit::MessageReceived(BMessage* msg)
 	case 'nset':
 	{
 		//qui controllo: se è un numero, se è minore del minimo o maggiore del massimo.
-		const char* name;
+		BString name;
 		msg->FindString("_value", &name);
-		int32 num=atoi(name);
+		int32 num = atoi(name.String());
 		UpdateValue(num, true);
 		
 		Window()->WindowActivated(true);

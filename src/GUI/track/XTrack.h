@@ -10,14 +10,12 @@
 #ifndef _X_TRACK_
 #define _X_TRACK_
 
-#include <View.h>
+#include <Control.h>
 #include <GraphicsDefs.h>
 #include <String.h>
 
-#define	CHANGE_NAME		'ttt'
 
-
-class XTrack : public BView
+class XTrack : public BControl
 {
 	public:
 			XTrack (BRect,const char*);
@@ -26,24 +24,19 @@ class XTrack : public BView
 	void 	MouseDown(BPoint);
 	void 	MessageReceived(BMessage*);
 	void	AttachedToWindow();
-	void 	SetID(int16 id);
 
 	void	SetSelected(bool selected);
 
 	void	SetName(const char *t);
-	void	SetTarget(BHandler* h){target=h;};	
 	void	SetPadColor(rgb_color col){ rgb_pad=col;};
 	void	SendRenameMessage();
 	
 	private:
-
-		BBitmap *pad;
-		bool	selected;
 	
-		BMessage	fMessage;
-		BHandler	*target;
-		BString		name;
-		void			_drawPad();
+		BBitmap *pad;
+		bool	selected;	
+		BMessage*	fMessage;
+		void		_drawPad();
 		rgb_color	rgb_pad;
 };
 #endif

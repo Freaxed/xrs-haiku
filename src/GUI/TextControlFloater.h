@@ -18,9 +18,6 @@
 class BTextControl;
 class BFont;
 
-//#include "cortex_defs.h"
-
-
 class TextControlFloater :
 	public	BWindow {
 	typedef	BWindow _inherited;
@@ -29,34 +26,30 @@ public:												// dtor/ctors
 	virtual ~TextControlFloater();
 
 	TextControlFloater(
-		BRect											frame,
-		alignment									align,
-		const BFont*							font,
-		const char*								text,
-		const BMessenger&					target,
-		BMessage*									message,
-		BMessage*									cancelMessage=0);
+		BRect						frame,
+		// alignment					align,
+		// const BFont*				font,
+		const char*					text,
+		BHandler*					target,
+		BMessage*					message,
+		BMessage*					cancelMessage = NULL);
 
 public:												// BWindow
-	virtual void WindowActivated(
-		bool											activated);
-
+	virtual void WindowActivated(bool activated);
 	virtual bool QuitRequested();
 		
 public:												// BHandler
-	virtual void MessageReceived(
-		BMessage*									message);
+	virtual void MessageReceived(BMessage*	message);
 		
 private:
-	BTextControl*								m_control;
-
-	BMessenger									m_target;	
-	const BMessage*							m_message;
-	BMessage*										m_cancelMessage;
+	BTextControl*		m_control;
+	BMessenger			m_target;	
+	const BMessage*		m_message;
+	BMessage*			m_cancelMessage;
 	
 	// true if a message has been sent indicating the
 	// user modified the text
-	bool												m_sentUpdate;
+	bool				m_sentUpdate;
 };
 
 
