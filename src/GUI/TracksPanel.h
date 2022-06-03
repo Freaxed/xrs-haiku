@@ -37,38 +37,36 @@ class TracksPanel : public TrackList
 			void		AttachedToWindow();
 			void		DetachedFromWindow();
 		
-			status_t		Init(BView*, TrackInfoBox*);
-				void		ResetToSong(Song *);
-				int			getNumberJTrack();			
-				void		RemoveTrackAt(int id);
-				void		RemoveTrack(int);
-				void		RenameSelectedTrack();
-			 Track*			getCurrentTrack();
-				void		SelectTrack(int);
-				void		AddTrack(int16 h);
+			status_t	Init(BView*, TrackInfoBox*);
+			void		ResetToSong(Song *);
+			int			getNumberJTrack();			
+			void		RemoveTrackAt(int id);
+			void		RemoveTrack(int);
+			void		RenameSelectedTrack();
+			Track*		getCurrentTrack();
+			void		SelectTrack(int);
+			void		AddTrack(int16 h);
 				
-				void		resetPattern(int32);
-				int			getCurrentPattern();
-				
+			void		resetPattern(int32);
+			int			getCurrentPattern();				
 								
-				void		muteSelectedTrack();
-				void		soloSelectedTrack();	
+			void		muteSelectedTrack();
+			void		soloSelectedTrack();	
 					
 	protected:
 	friend class TrackManager;
-						JTrack*	getJTrackAt(int h);		
-						void		RefreshGraphics();
-						void		RefreshSelected();
-						void		Refresh(JTrack* t);
-	private:
-	
+
+			JTrack*		getJTrackAt(int h);		
+			void		RefreshGraphics();
+			void		RefreshSelected();
+			void		Refresh(JTrack* t);
+	private:		
+			void		FixScrollBar();
 		
-		void				FixScrollBar();
-		
-		Song			*curSong;
-		TrackManager	*tm; //uhm shold be removed for sanity
-		BView			*ticks;	
-		TrackInfoBox*	fTrackInfoBox;
+			Song*			curSong;
+			TrackManager*	tm; //uhm shold be removed for sanity
+			BView*			ticks;	
+			TrackInfoBox*	fTrackInfoBox;
 		
 };
 
