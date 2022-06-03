@@ -37,6 +37,9 @@ class	WindowManager: public BList, public BMessageFilter
 		void		CloseAll();
 		
 		BPopUpMenu*	getMenu();
+
+		void SaveSettings(BMessage&);
+		void LoadSettings(BMessage&);
 		
 	private:
 	

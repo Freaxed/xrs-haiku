@@ -78,17 +78,13 @@ TheApp::~TheApp()
 		track_manager->Close();
 			 		
 		delete (currentSong);
+
+		WindowManager::Get()->SaveSettings(*Config());
 		 
 			 
 		if(mixerWin->Lock())
-		{
-			if(mixerWin->IsHidden())
-		 		Config()->PutFloatKey("mixer_window_show",0);
-		 	else
-		 		Config()->PutFloatKey("mixer_window_show",1);
-		 		
 			mixerWin->Quit();
-		}
+
 		 
 		if(main_window->Lock()) 
 		 	main_window->Quit();
@@ -96,15 +92,10 @@ TheApp::~TheApp()
 #ifdef MEDIA_BROWSER		 	
 
 		if(media_browser->Lock())
-		{
-		 	if(media_browser->IsHidden())
-		 		Config()->PutFloatKey("media_browser_show",0);
-		 	else
-		 		Config()->PutFloatKey("media_browser_show",1);
-		 		
 		 	media_browser->Quit();
-		}
 #endif 
+
+
 		 	
 
 #ifdef XRS_MIDI
@@ -161,7 +152,7 @@ TheApp::PrepareToRun()
 	
 
 	mixerWin = MixerWindow::Get();
-	
+	win_manager->Show(mixerWin);
 
 	//juice
 	msucco = JuiceEngine::Get();
@@ -178,24 +169,14 @@ TheApp::PrepareToRun()
 		
 	if(ab->Lock()) ab->Quit();	
 	
-	float show;
 	
 #ifdef MEDIA_BROWSER
-
 	media_browser = new MBWindow();
 	win_manager->Show(media_browser);
-	
-	show=Config()->FloatKey("media_browser_show",1);
-	
-	if(show<1)
-		win_manager->Hide(media_browser);
 #endif
-	//
-	show=Config()->FloatKey("mixer_window_show",0);
-	win_manager->Show(mixerWin);
+
 	
-	if(show<1)
-		win_manager->Hide(mixerWin);
+	WindowManager::Get()->LoadSettings(*Config());
 	
 	main_window->Show();
 	

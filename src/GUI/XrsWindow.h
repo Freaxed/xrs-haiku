@@ -14,22 +14,29 @@
 #include <Message.h>
 #include <String.h>
 
-class XrsWindow : public BWindow {
-
+class XrsWindow : public BWindow 
+{
 	public:
 		XrsWindow(BRect frame,const char *title,window_type type,uint32 flags,uint32 workspaces = B_CURRENT_WORKSPACE):
-			BWindow(frame,title,type,flags,workspaces){ fFrame = frame;}
+			BWindow(frame,title,type,flags,workspaces){ /*fFrame = frame;*/}
 
 		XrsWindow(BRect r,const char *name,window_look look, window_feel feel,uint32 flags, uint32 workspaces=B_CURRENT_WORKSPACE):
-			BWindow(r,name,look,feel,workspaces){ fFrame = r;}
+			BWindow(r,name,look,feel,workspaces){ /*fFrame = r;*/}
 		
-		void	SaveConfig();
-		void	LoadConfig(BRect *frame = NULL);
+		virtual ~XrsWindow(){ SaveConfig(); };
+		virtual void SaveSettings(BMessage&);
+		virtual void LoadSettings(BMessage&);
+
 		void	SetName(const char* name);
+
+		virtual thread_id 	Run ();
 	
 	private:
+		
+		void	SaveConfig();
+		void	LoadConfig();
+		
 		BString	fName;
-		BRect	fFrame;
 };
 
 #endif

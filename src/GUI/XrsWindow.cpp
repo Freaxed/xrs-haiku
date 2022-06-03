@@ -9,47 +9,61 @@
 #include "XrsWindow.h"
 #include "Configurator.h"	
 
-void
-XrsWindow::SaveConfig() {		
-			
-	BString temp(fName);
-	temp += "Xpos";
-	Config()->PutFloatKey(temp.String(),Frame().left);
-	
-	temp = fName;
-	temp += "Ypos";
-	Config()->PutFloatKey(temp.String(),Frame().top);
-	
-	temp = fName;
-	temp += "Xstop";
-	Config()->PutFloatKey(temp.String(),Frame().right-Frame().left);
-	
-	temp = fName;
-	temp += "Ystop";
-	Config()->PutFloatKey(temp.String(),Frame().bottom-Frame().top);
+#define CONFIG_POSTFIX "_Config"
+
+thread_id 	
+XrsWindow::Run ()
+{
+	LoadConfig();
+	return BWindow::Run();
 }
-		
+
 void
-XrsWindow::LoadConfig(BRect* aframe){
-			
-	BRect frame;
-	if (aframe) 
-		frame = *aframe;
-	else
-		frame = fFrame;
-		
-	BString temp=fName;
-	BString temp2=fName;
-	temp+="Xpos";
-	temp2+="Ypos";
-	MoveTo(Config()->FloatKey(temp.String(),frame.left),Config()->FloatKey(temp2.String(),frame.top));
-	
-	temp=temp2=fName;
-	temp+="Xstop";
-	temp2+="Ystop";
-	ResizeTo(Config()->FloatKey(temp.String(),frame.Width()),Config()->FloatKey(temp2.String(),frame.Height()));
+XrsWindow::SaveConfig()
+{		
+	BMessage	xrsWindowConfig;
+	xrsWindowConfig.AddRect("Frame", Frame());	
+
+	SaveSettings(xrsWindowConfig);
+	BString key = fName;
+	key << CONFIG_POSTFIX;
+
+	Config()->RemoveName(key);
+	Config()->AddMessage(key, &xrsWindowConfig);
+}
+
+void 
+XrsWindow::SaveSettings(BMessage&)
+{
 
 }
+
+void
+XrsWindow::LoadConfig()
+{
+	BString key = fName;
+	key << CONFIG_POSTFIX;
+	BMessage	xrsWindowConfig;
+	if (Config()->FindMessage(key, &xrsWindowConfig) == B_OK)
+	{
+		BRect frame;
+		if (xrsWindowConfig.FindRect("Frame", &frame) == B_OK)
+		{
+			MoveTo(frame.left, frame.top);
+			ResizeTo(frame.Width(), frame.Height());
+		}
+		LoadSettings(xrsWindowConfig);
+	}
+	
+}
+
+void 
+XrsWindow::LoadSettings(BMessage&)
+{
+
+}
+		
+
 		
 void
 XrsWindow::SetName(const char* name){ 

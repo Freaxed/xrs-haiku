@@ -22,7 +22,7 @@ MixerWindow::Get()
 MixerWindow::MixerWindow(void)
 	: XrsWindow(BRect(150,130,280,60),"", B_FLOATING_WINDOW,B_ASYNCHRONOUS_CONTROLS|B_NOT_ZOOMABLE|B_AVOID_FOCUS|B_NOT_RESIZABLE)
 {
-	SetName("mixer_");
+	SetName("MixerWindow");
 	SetTitle("Mixer");
 	
 	BGroupLayout* group = BLayoutBuilder::Group<>(B_HORIZONTAL);

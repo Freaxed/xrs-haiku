@@ -55,7 +55,7 @@ MainWindow::MainWindow() :
 	XrsWindow(BRect(WINDOW_X_POS,WINDOW_Y_POS,WINDOW_X_POS+WINDOW_XL,WINDOW_Y_POS+WINDOW_YL),"XRS", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_OUTLINE_RESIZE)//|B_WILL_ACCEPT_FIRST_CLICK) //|B_AVOID_FOCUS)
 
 {
-	SetName("");
+	SetName("MainWindow");
 	
 	CreateMenu();
 	float menuY, menuX;
@@ -109,7 +109,7 @@ MainWindow::MainWindow() :
 	splitPane->SetResizeViewOne(true, true);
 	AddChild(background);
 
-	LoadConfig();
+	//LoadConfig();
 
 	float a,b,c,d;
 	GetSizeLimits(&a,&b,&c,&d);
@@ -189,7 +189,7 @@ MainWindow::PlayButtonOn(bool state)
 
 MainWindow::~MainWindow()
 {
-	SaveConfig();				
+	//SaveConfig();				
 }
 
 bool

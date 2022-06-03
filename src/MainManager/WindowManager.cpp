@@ -13,6 +13,7 @@
 #include	<malloc.h>
 #include	<stdio.h>
 #include	<Message.h>
+#include "Log.h"
 
 WindowManager::WindowManager():BList(10),BMessageFilter(B_PROGRAMMED_DELIVERY,B_LOCAL_SOURCE,WINSTATE)
 {
@@ -20,16 +21,16 @@ WindowManager::WindowManager():BList(10),BMessageFilter(B_PROGRAMMED_DELIVERY,B_
 	menu->SetRadioMode(false);
 	
 	menu->AddSeparatorItem();
-	menu->AddSeparatorItem();
+	//menu->AddSeparatorItem();
 	
 	BMessage	*msg=new BMessage(WINSTATE);
 	BMenuItem	*item;
 	msg->AddBool("close_all",true);
 	menu->AddItem(item=new BMenuItem(T_MENU_HIDE_ALL,msg,'-'));
 	item->SetTrigger('C');
-	AddItem(NULL);
-	AddItem(NULL);
-	AddItem(NULL);
+	// AddItem(NULL);
+	// AddItem(NULL);
+	// AddItem(NULL);
 }
 
 
@@ -89,6 +90,48 @@ WindowManager::Switch(BWindow* mw){
 	}
 	
 }	
+
+void 
+WindowManager::SaveSettings(BMessage& msg)
+{
+	BMessage wMan;
+	LogTrace("WindowManager::SaveSettings -> %d windows", CountItems());
+	for(int i=0;i<CountItems();i++)
+	{		
+		token* t= (token*) ItemAt(i);
+		BMessage regWindow;
+		regWindow.AddString("Name", t->reg_name.String());
+		regWindow.AddBool("Show", !t->pointer->IsHidden());
+		wMan.AddMessage("Window", &regWindow);
+	}
+	msg.RemoveName("WindowManager");
+	msg.AddMessage("WindowManager", &wMan);
+}
+
+void 
+WindowManager::LoadSettings(BMessage& msg)
+{
+	BMessage wMan;
+	if (msg.FindMessage("WindowManager", &wMan) == B_OK)
+	{
+		int j=0;
+		BMessage regWindow;
+		while(wMan.FindMessage("Window", j++, &regWindow) == B_OK)
+		{
+			bool show = regWindow.GetBool("Show", true);
+			BString name = regWindow.GetString("Name", "___null___");
+			for(int i=0;i<CountItems();i++)
+			{
+				token* t= (token*) ItemAt(i);
+				if (t->reg_name == name)
+				{
+					show ? Show(t->pointer) : Hide(t->pointer);
+				}
+			}
+		}
+	}
+}
+
 void
 WindowManager::Show(BWindow* mw){
 
@@ -156,11 +199,8 @@ WindowManager::RegisterMe(BWindow* win,const char *str){
 	t->reg_name=str;	
 	t->pointer=win;
 	
-	int32 pos=CountItems()-2;
-	
-	
-	if(dynamic_cast<XrsWindow*>(win) || pos<0) pos=0;
-		
+	int32 pos=CountItems();
+
 	BMenuItem*	item;
 	
 	AddItem((void*)t,pos);
@@ -174,6 +214,8 @@ WindowManager::RegisterMe(BWindow* win,const char *str){
 			item->SetMarked(true);
 		win->Unlock();
 	}
+
+	LogTrace("WindowManager: registering window %s (%d)", str, CountItems());
 }
 void
 WindowManager::UnregisterMe(BWindow* win){
@@ -183,11 +225,13 @@ WindowManager::UnregisterMe(BWindow* win){
 		token	*t=(token*)ItemAt(i);
 		if(t && t->pointer==win){
 		
+		LogTrace("WindowManager: un-registering window %s  (%d)",  t->reg_name.String(), CountItems());
 			RemoveItem(t);
 			menu->RemoveItem(i);
 			break;
 			}
 	}
+	
 	
 
 }
