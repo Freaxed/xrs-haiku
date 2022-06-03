@@ -8,44 +8,41 @@
  */
 
 
-#include	"Track.h"
-#include	"XDigit.h"
+#include "Track.h"
+#include "XDigit.h"
 #ifdef XRS_MIDI
-	#include	"XrsMidiIn.h"
+	#include "XrsMidiIn.h"
+	#define	 SET_MIDI_IN		'stmi'
+	#define	 ENABLE_MIDI_IN		'enmi'
 #endif
 #include	"locale.h"
 
-#define	SET_MIDI_IN		'stmi'
-#define	ENABLE_MIDI_IN	'enmi'
+
 #include "TrackInfoBox.h"
 
-TrackInfoBox::TrackInfoBox(BRect _r) : BBox(_r, "TrackInfoBox", B_FOLLOW_RIGHT)
+TrackInfoBox::TrackInfoBox(BRect _r) : BBox(_r, "TrackInfoBox", B_FOLLOW_RIGHT, 0, B_NO_BORDER)
 {
-    BBox* bot = new BBox(BRect(0, 230, 180, 281), "");
-	
+#ifdef XRS_MIDI	
 	BBox *sampler= new BBox(BRect(8,10,172,42) ,"toolbar", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW, B_FANCY_BORDER);		
 	BRect r(sampler->Bounds());
 	r.InsetBy(4,4);
 	r.right -= 50;
 	r.top   += 2;
-
 	sampler->AddChild(fMidiEnabled = new BCheckBox(r,"",T_TRACKINFO_MIDIN,new BMessage(ENABLE_MIDI_IN)));
 	sampler->AddChild(fMidiChannel = new XDigit(BRect(120,5,120+36,5+22), VID_EMPTY ,"sampler_midi_in", new BMessage(SET_MIDI_IN), 1,16));
 	fMidiChannel->SetTarget(this);
-#ifndef XRS_MIDI
 	fMidiEnabled->SetEnabled(false);
 	fMidiChannel->SetEnabled(false);
-#endif
 	bot->AddChild(sampler);
-	AddChild(bot);
-	fTrack=NULL;
+#endif
+	fTrack = NULL;
 }
 
 
 void
-TrackInfoBox::SetTrack(Track* tr){ 
-	
-	fTrack=tr;
+TrackInfoBox::SetTrack(Track* tr)
+{ 
+	fTrack = tr;
 #ifdef XRS_MIDI
 	if (Lock())
 	{
