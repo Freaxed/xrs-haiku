@@ -21,16 +21,12 @@ WindowManager::WindowManager():BList(10),BMessageFilter(B_PROGRAMMED_DELIVERY,B_
 	menu->SetRadioMode(false);
 	
 	menu->AddSeparatorItem();
-	//menu->AddSeparatorItem();
 	
 	BMessage	*msg=new BMessage(WINSTATE);
 	BMenuItem	*item;
 	msg->AddBool("close_all",true);
 	menu->AddItem(item=new BMenuItem(T_MENU_HIDE_ALL,msg,'-'));
 	item->SetTrigger('C');
-	// AddItem(NULL);
-	// AddItem(NULL);
-	// AddItem(NULL);
 }
 
 
@@ -257,7 +253,7 @@ WindowManager::Filter(BMessage *message, BHandler **target)
 {
 	int32 	index;
 	BWindow	*win;
-	if(message->FindBool("close_all"))
+	if(message->GetBool("close_all", false))
 	{
 		CloseAll();
 	}
