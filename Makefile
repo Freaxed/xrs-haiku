@@ -131,7 +131,6 @@ SRCS =  \
 ./src/utils/ImageCache.cpp \
 ./src/utils/Logger.cpp \
 ./src/utils/PBox.cpp \
-./src/utils/Setting.cpp \
 ./src/utils/SettingsTextView.cpp \
 ./src/utils/Utils.cpp \
 ./src/utils/Xed_Utils.cpp \
