@@ -22,6 +22,7 @@ class TickView;
 class Track;
 class PlaylistBox;
 class TrackInfoBox;
+class SplitPane;
 
 class MainWindow : public XrsWindow
 {
@@ -38,12 +39,13 @@ class MainWindow : public XrsWindow
 				void		Saved();						
 				void		PlayButtonOn(bool state);
 				void		SetWheelTarget(BHandler*);
-			
+				virtual void SaveSettings(BMessage&);
+				virtual void LoadSettings(BMessage&);			
 	protected:
 	friend class TracksPanel;
 	
 				void		AddTrack(Track*);
-	
+
 	
 	private:
 							MainWindow();
@@ -78,8 +80,9 @@ class MainWindow : public XrsWindow
 			BMenuItem*		mea_cut;
 			BMenuItem*		mea_paste;
 			BHandler*		wheel_target;
-			
-			
+			BScrollView*	scroll_view;
+			BPictureButton*	fShowHideInfo;
+			SplitPane*		splitPane;
 };
 
 #endif

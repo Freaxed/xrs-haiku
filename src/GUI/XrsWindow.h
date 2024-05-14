@@ -24,13 +24,15 @@ class XrsWindow : public BWindow
 			BWindow(r,name,look,feel,workspaces){ /*fFrame = r;*/}
 		
 		virtual ~XrsWindow(){ SaveConfig(); };
-		virtual void SaveSettings(BMessage&);
-		virtual void LoadSettings(BMessage&);
+
 
 		void	SetName(const char* name);
 
 		virtual thread_id 	Run ();
-	
+
+
+		virtual void SaveSettings(BMessage&);
+		virtual void LoadSettings(BMessage&);
 	private:
 		
 		void	SaveConfig();

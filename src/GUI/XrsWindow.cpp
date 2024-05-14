@@ -35,7 +35,6 @@ XrsWindow::SaveConfig()
 void 
 XrsWindow::SaveSettings(BMessage&)
 {
-
 }
 
 void

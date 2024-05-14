@@ -49,8 +49,7 @@ MainWindow::Get()
 	return instance;
 }
 
-BScrollView*		scroll_view;
-BPictureButton*		fShowHideInfo;
+
 MainWindow::MainWindow() :
 	XrsWindow(BRect(WINDOW_X_POS,WINDOW_Y_POS,WINDOW_X_POS+WINDOW_XL,WINDOW_Y_POS+WINDOW_YL),"XRS", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_OUTLINE_RESIZE)//|B_WILL_ACCEPT_FIRST_CLICK) //|B_AVOID_FOCUS)
 
@@ -102,7 +101,7 @@ MainWindow::MainWindow() :
 	tracksBackground->AddChild((fTrackInfoBox = new TrackInfoBox(BRect(local.right + B_V_SCROLL_BAR_WIDTH + 2, 0, nb.right,  280))));
 	
 	fPlaylistBox = new PlaylistBox(local);		
-	SplitPane*	splitPane = new SplitPane(background->Bounds(), tracksBackground, fPlaylistBox, B_FOLLOW_ALL);
+	splitPane = new SplitPane(background->Bounds(), tracksBackground, fPlaylistBox, B_FOLLOW_ALL);
 	splitPane->SetAlignment(B_HORIZONTAL);
 	background->AddChild(splitPane);
 	splitPane->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -118,6 +117,25 @@ MainWindow::MainWindow() :
 	SetWheelTarget(NULL);
 	
 	AddShortcut('-', 0, new BMessage('hide'));
+}
+
+void 
+MainWindow::SaveSettings(BMessage& msg)
+{
+	debugger("S");
+	BMessage splitPaneConfig;
+	splitPane->GetState(splitPaneConfig);
+	msg.AddMessage("SplitPane", &splitPaneConfig);
+
+}
+void 
+MainWindow::LoadSettings(BMessage& msg)
+{
+	BMessage splitPaneConfig;
+	if (msg.FindMessage("SplitPane", &splitPaneConfig) == B_OK)
+	{
+		splitPane->SetState(&splitPaneConfig);
+	}
 }
 
 void
