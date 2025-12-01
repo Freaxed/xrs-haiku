@@ -10,3 +10,5 @@ objects.*
 src/tests/test-sampler/output.wav
 
 src/commit.h
+./cache*
+

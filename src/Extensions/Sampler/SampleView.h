@@ -16,9 +16,10 @@ class Sample;
 class SampleView : public BView
 {
 	public:
-				SampleView(BRect, BBitmap* viewBitmap);
+				SampleView(BBitmap* viewBitmap);
 	
 	 	void 	Draw(BRect);
+		void 	FrameResized(float newWidth, float newHeight);
 		
 		void 	Init(Sample* sample, bool reversed, float boost);
 	 	

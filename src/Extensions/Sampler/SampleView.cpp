@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
@@ -14,22 +14,27 @@
 #include "Sample.h"
 
 
-SampleView::SampleView(BRect vframe, BBitmap* viewBitmap):
-	BView(vframe, "sampleView", 0, B_WILL_DRAW|B_FRAME_EVENTS),
+SampleView::SampleView(BBitmap* viewBitmap):
+	BView("sampleView", B_WILL_DRAW | B_FRAME_EVENTS),
 	mReversed(false),
 	mBoost(1.0f),
 	mViewBitmap(viewBitmap),
-	mSample(NULL)
+	mSample(NULL),
+	mIncX(0.0f)
 {
-
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
-		
+
 void
 SampleView::Init(Sample* sample, bool reversed, float boost)
 {
 	mSample   = sample;
 	if (mSample) {
-		mIncX = ((float)mSample->GetFullframes()/(float)Bounds().Width()) - 0.01; //Move on FrameResized!
+		float width = Bounds().Width();
+		if (width > 0)
+			mIncX = ((float)mSample->GetFullframes() / width) - 0.01;
+		else
+			mIncX = 0.0f;
 		mReversed = reversed;
 		mBoost 	  = boost;
 		// mStart	  = (int)(0 * mIncX); //FIX
@@ -38,25 +43,37 @@ SampleView::Init(Sample* sample, bool reversed, float boost)
 	Invalidate();
 }
 
-void	
+void
 SampleView::SetReversed(bool reversed){
 	mReversed = reversed;
 	Invalidate();
 }
 
-void	
+void
 SampleView::SetBoost(float boost){
 	mBoost = boost;
 	Invalidate();
 }
 
 void
+SampleView::FrameResized(float newWidth, float newHeight)
+{
+	BView::FrameResized(newWidth, newHeight);
+
+	// Recalculate scaling when view is resized
+	if (mSample && newWidth > 0) {
+		mIncX = ((float)mSample->GetFullframes() / newWidth) - 0.01;
+		Invalidate();
+	}
+}
+
+void
 SampleView::Draw(BRect b)
-{	
+{
 	if (mViewBitmap)
-		DrawBitmapAsync(mViewBitmap);
-		
-	
+		DrawBitmapAsync(mViewBitmap, b);
+
+
 	if (mSample) {
 		SetHighColor(238,235,227);
 		float value;
@@ -74,13 +91,13 @@ SampleView::Draw(BRect b)
 			BPoint next((float)i, (float)((zero) + (zero*value)));
 		 	StrokeLine(previous, next);
  	     	previous = next;
-	 	}	
+	 	}
 	 	// if (mStart >= b.left && mStart <= b.right)
 	 	// {
 	 	// 	SetHighColor(255, 0, 0);
 	 	// 	StrokeLine(BPoint(mStart, b.top), BPoint(mStart, b.bottom));
 	 	// }
-	} 	
+	}
 	Sync();
 }
 
