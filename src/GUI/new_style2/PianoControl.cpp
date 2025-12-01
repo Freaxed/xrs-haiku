@@ -15,6 +15,7 @@
 #include 	"Pattern.h"
 #include 	"PianoEdit.h"
 #include	"locale.h"
+#include	"GraphicsDef.h"
 
 PianoControl::PianoControl(BRect frame,	const char*	name):TrackEnd(frame,  name) 
 {
@@ -142,4 +143,29 @@ PianoControl::setNote(int note)
 	sprintf(infonote,"%c%c%1d (%d)",  notesLetter[n], sharp, oct, note);
 
 	w_note->SetText(infonote);			
+}
+
+BSize
+PianoControl::MinSize()
+{
+	// Minimo: dimensione collassata
+	return BSize(4 * (BUTTON_LX + BUTTON_X_SPACE), BUTTON_LY);
+}
+
+BSize
+PianoControl::MaxSize()
+{
+	// Segue la dimensione del pattern
+	if (fCurrentPattern == NULL)
+		return BSize(B_SIZE_UNLIMITED, BUTTON_LY);
+	
+	int noteCount = fCurrentPattern->getNumberNotes();
+	float height = IsExpanded() ? BUTTON_LY + getExpansionSize() : BUTTON_LY;
+	return BSize((BUTTON_LX + BUTTON_X_SPACE) * noteCount, height);
+}
+
+BSize
+PianoControl::PreferredSize()
+{
+	return MaxSize();
 }

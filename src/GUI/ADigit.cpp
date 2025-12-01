@@ -208,3 +208,22 @@ ADigit::set_mouse(BPoint p)
 	if(x!=0 && y!=0) //bug??
 		set_mouse_position(x,y);	
 }
+
+BSize
+ADigit::MinSize()
+{
+	// 3 cifre + margini: (3 * DIGITSIZE) + (2 * XPOS)
+	return BSize(3 * DIGITSIZE + 2 * XPOS, HEIGHT + 2 * YPOS);
+}
+
+BSize
+ADigit::MaxSize()
+{
+	return MinSize(); // Dimensione fissa
+}
+
+BSize
+ADigit::PreferredSize()
+{
+	return MinSize();
+}

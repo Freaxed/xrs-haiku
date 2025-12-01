@@ -7,9 +7,12 @@
  *		Andrea Anzani <andrea.anzani@gmail.com>
  */
 
-#include "Window.h"
+#include <Window.h>
+#include <LayoutBuilder.h>
 
 class BStringView;
+class BTextView;
+class BScrollView;
 
 class AboutBox : public BWindow
 {

@@ -29,6 +29,11 @@ public:
  			float		getExpansionSize() { /*WARNING */return 112.0;};
 			void		MessageReceived(BMessage*);
 			void		Refresh();
+			
+			// Layout Kit support
+			BSize		MinSize();
+			BSize		MaxSize();
+			BSize		PreferredSize();
 private:
 
 		Pattern*				fCurrentPattern;		

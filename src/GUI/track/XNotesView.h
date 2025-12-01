@@ -24,13 +24,17 @@ class XNotesView : public BControl
 	
 					XNotesView (BRect,int16);
 					~XNotesView();
-		void		Draw(BRect);
-		void		MouseDown(BPoint);
-		void		MouseUp(BPoint);
-	 	void 		MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg);
-		void		Reset(Pattern*, int16 beatDivision);
-			
-	private:
+	void		Draw(BRect);
+	void		MouseDown(BPoint);
+	void		MouseUp(BPoint);
+ 	void 		MouseMoved(BPoint where, uint32 code,const BMessage *dragDropMsg);
+	void		Reset(Pattern*, int16 beatDivision);
+	
+	// Layout Kit support
+	BSize		MinSize();
+	BSize		MaxSize();
+	BSize		PreferredSize();
+	void		GetPreferredSize(float* width, float* height);	private:
 
 		Pattern*	curPattern;
 		BBitmap*	picOn;

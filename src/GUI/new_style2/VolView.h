@@ -39,9 +39,12 @@ class VolView : public TrackEnd
 			void		AttachedToWindow();
 			void		SupportMultiMode(int maxv=PAN_VIEW); //turn on multimode				
 			
-	private:
-
-		bool			multimode;
+			// Layout Kit support
+			BSize		MinSize();
+			BSize		MaxSize();
+			BSize		PreferredSize();
+			
+private:		bool			multimode;
 		Pattern*		curPattern;
 		int				prev;
 		bool			track;

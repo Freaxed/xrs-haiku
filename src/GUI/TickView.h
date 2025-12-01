@@ -17,15 +17,17 @@ class TickView : public BView
 		  void 		SetTick(int);
 		  void		SetNumberNotes(int);
 		  
-	      void 		Draw(BRect);
-	      void 		AttachedToWindow();
-	      void 		DetachedFromWindow();
-	      void		MessageReceived(BMessage*);
+	  void 		Draw(BRect);
+	  void 		AttachedToWindow();
+	  void 		DetachedFromWindow();
+	  void		MessageReceived(BMessage*);
 
+	  // Layout Kit support
+	  BSize		MinSize();
+	  BSize		MaxSize();
+	  BSize		PreferredSize();
 	
-	private:
-			
-			int32 		tick, num_notes;
+private:			int32 		tick, num_notes;
 			BRect		TRect(int d);
 			BBitmap*	b_tick;
 };

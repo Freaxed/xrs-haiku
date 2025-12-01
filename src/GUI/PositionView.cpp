@@ -186,3 +186,23 @@ PositionView::MessageReceived(BMessage* msg)
 	else
 		BView::MessageReceived(msg);
 }
+
+BSize
+PositionView::MinSize()
+{
+	// 3 digits + dot + 3 digits + dot + 2 digits = 9 cifre
+	// XD è 9.0f per cifra
+	return BSize(9 * XD, YD);
+}
+
+BSize
+PositionView::MaxSize()
+{
+	return MinSize(); // Dimensione fissa
+}
+
+BSize
+PositionView::PreferredSize()
+{
+	return MinSize();
+}

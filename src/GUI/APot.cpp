@@ -101,7 +101,12 @@ APot::MinSize() { return MaxSize(); }
 
 BSize				
 APot::MaxSize() { return BSize(m_Size, m_Size); }
-		             
+
+BSize				
+APot::PreferredSize()
+{
+	return BSize(m_Size, m_Size);
+}
 		             
 APot::~APot() {}
 

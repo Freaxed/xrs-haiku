@@ -12,6 +12,7 @@
 
 #include <Window.h>
 #include <StringView.h>
+#include <LayoutBuilder.h>
 
 
 class PotViewer: public BWindow {

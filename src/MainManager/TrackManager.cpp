@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
@@ -50,7 +50,7 @@ TrackManager*
 TrackManager::Get()
 {
 	static	TrackManager*	instance = NULL;
-	if (instance == NULL) 
+	if (instance == NULL)
 			instance = new TrackManager();
 	return instance;
 }
@@ -69,7 +69,7 @@ TrackManager::SaveBoosterSettings(BMessage& boostsSettings)
 		{
 			BMessage boost;
 			SaveBoosterSettings(i, &boost);
-			boostsSettings.AddMessage("BoostSettings", &boost);		
+			boostsSettings.AddMessage("BoostSettings", &boost);
 		}
 	}
 }
@@ -87,7 +87,7 @@ TrackManager::LoadBoosterSettings(BMessage& msg)
 }
 
 
-status_t		
+status_t
 TrackManager::RegisterTrackBoost(TrackBoost* boost)
 {
 		int16	id = boost->Id();
@@ -96,22 +96,22 @@ TrackManager::RegisterTrackBoost(TrackBoost* boost)
 			return B_ERROR;
 		}
 
-		list[id] = boost;		
+		list[id] = boost;
 		boost->Init();
 
 		BMessage *m = new BMessage(ADD_TRACK);
 		m->AddInt16("id", id);
-	
+
 		myMenu->AddItem(new BMenuItem( boost->Name(), m, '1' + (char)id ) );
 
 
-		BView *v=(BView*)boost->getPanel();
-		if(v)
+		BView *panel = dynamic_cast<BView*>(boost->getPanel());
+		if(panel)
 		{
-			TrackInfoWindow::Get()->AddChild(v);
-			v->Hide();
+			TrackInfoWindow::Get()->AddPanel(panel);
+			panel->Hide();
 		}
-		
+
 
 		LogInfo("TrackBooster [%s] loaded.", boost->Name());
 		return B_OK;
@@ -161,19 +161,19 @@ TrackManager::SaveTrackSettings(Track* trk, BMessage* data)
 	list[trk->getModel()]->SaveTrackSettings(trk,data);
 }
 
-	
+
 void
 TrackManager::LoadBoosterSettings(BMessage* data)
 {
 	WindowManager::Get()->Hide(TrackInfoWindow::Get());
 	int16 i = data->GetInt16("id", -1);
-	if(isBoosterValid(i)) 
+	if(isBoosterValid(i))
 		list[i]->LoadBoosterSettings(data);
 }
 void
 TrackManager::LoadTrackSettings(Track* trk,BMessage* data)
 {
-	list[trk->getModel()]->LoadTrackSettings(trk,data);	
+	list[trk->getModel()]->LoadTrackSettings(trk,data);
 }
 
 Track*
@@ -181,12 +181,12 @@ TrackManager::SendRef(entry_ref ref, int16 id, BMessage *msg)
 {
 	if(!isBoosterValid(id))
 		return NULL;
-	
+
 	Track* track = getTrack(id);
-	
-	if ( list[id]->RefReceived(ref, track, msg) != B_OK ) 
+
+	if ( list[id]->RefReceived(ref, track, msg) != B_OK )
 		return NULL;
-	
+
 	return track;
 }
 void
@@ -204,46 +204,46 @@ void
 TrackManager::ResetToSong(Song* s)
 {
 	curSong = s;
-	
-	SelectTrack(NULL);	
-	
+
+	SelectTrack(NULL);
+
 	for(int i=0; i < MAX_PLUG; i++)
 	{
-		if(isBoosterValid(i)) 
+		if(isBoosterValid(i))
 			list[i]->ResetToSong();
 	}
-	
-	
+
+
 }
 
 //void
 //TrackManager::Restart()
 //{
 //	TrackInfoWindow::Get()->Lock();
-//	if(curJTrack != NULL) 
+//	if(curJTrack != NULL)
 //		curJTrack->Deselect();
-//	
+//
 //	curJTrack = NULL;
-//	
+//
 //	for(int i=0;i<MAX_PLUG;i++)
 //	{
-//		if(isBoosterValid(i)) 
+//		if(isBoosterValid(i))
 //			list[i]->Restart();
-//	}	
+//	}
 //
 //	TrackInfoWindow::Get()->Unlock();
-//	
+//
 //	curSong = NULL;
-//	
+//
 //	WindowManager::Get()->Hide(TrackInfoWindow::Get());
-//	
+//
 //}
 void
 TrackManager::Close()
 {
 	for(int i=0;i<MAX_PLUG;i++)
 	{
-		if(isBoosterValid(i)) 
+		if(isBoosterValid(i))
 			delete list[i];
 	}
 }
@@ -255,12 +255,12 @@ TrackManager::Init()
 	current   = NULL;
 
 	myMenu = new BMenu(T_MENU_EXTENSION);
-	for(int i=0;i<MAX_PLUG;i++) 
+	for(int i=0;i<MAX_PLUG;i++)
 		list[i] = NULL;
-	
-	
+
+
 	LoadAllTrackBoost();
-		
+
 	WindowManager::Get()->Show(TrackInfoWindow::Get());
 	WindowManager::Get()->Hide(TrackInfoWindow::Get());
 }
@@ -268,24 +268,24 @@ TrackManager::Init()
 status_t
 TrackManager::SelectTrack(JTrack* x) {
 
-	if ( curJTrack == x && x != NULL) 
+	if ( curJTrack == x && x != NULL)
 		return B_ERROR;
-	
-	if(curJTrack != NULL) 
+
+	if(curJTrack != NULL)
 		curJTrack->Deselect();
 
 	curJTrack = x;
 
-	if(curJTrack != NULL) 	
+	if(curJTrack != NULL)
 	{
 		curJTrack->Select();
-		if(list[x->getTrack()->getModel()] != NULL) {		
+		if(list[x->getTrack()->getModel()] != NULL) {
 			if(list[x->getTrack()->getModel()]->getPanel() != NULL)
 			{
 
 				PlugPanel	*v=list[x->getTrack()->getModel()]->getPanel();
 				if(TrackInfoWindow::Get()->Lock()){
-					if(current) 
+					if(current)
 						current->Hide();
 					current=(BView*)v;
 					current->Show();
@@ -296,7 +296,7 @@ TrackManager::SelectTrack(JTrack* x) {
 
 				}
 				LogTrace("After Lock");
-				
+
 			}
 		}
 	}
@@ -304,15 +304,15 @@ TrackManager::SelectTrack(JTrack* x) {
 	{
  		WindowManager::Get()->Hide(TrackInfoWindow::Get());
 		if(TrackInfoWindow::Get()->Lock()){
-			if(current) 
+			if(current)
 			   current->Hide();
-			   
+
 			current = NULL;
 			TrackInfoWindow::Get()->Unlock();
 		}
-	}	
-	
-			
+	}
+
+
 	return B_OK;
 }
 bool
@@ -341,7 +341,7 @@ TrackManager::getCurrentTrack()
 }
 void
 TrackManager::GetXRSDirectoryEntry(entry_ref * ref,const char* folder)
-{	
+{
 	XUtils::GetXRSDirectoryEntry(ref,folder);
 }
 
@@ -349,9 +349,9 @@ TrackManager::GetXRSDirectoryEntry(entry_ref * ref,const char* folder)
 void
 TrackManager::getAllMyTrack(BList* l, int id)
 {
-	if(curSong == NULL) 
+	if(curSong == NULL)
 		return;
-	
+
 	for(int i=0;i<curSong->getNumberTrack();i++)
 	{
 		if(curSong->getTrackAt(i)->getModel()==id)
@@ -362,7 +362,7 @@ void
 TrackManager::getAllMyJTrack(BList* l, int id)
 {
 	if(curSong==NULL) return ;
-	
+
 	for(int i=0;i<curPanel->getNumberJTrack();i++)
 	{
 		if(curSong->getTrackAt(i)->getModel()==id)
@@ -373,7 +373,7 @@ void
 TrackManager::refreshAllMyTrack(int id)
 {
 	if(curPanel==NULL) return ;
-	
+
 	for(int i=0;i<curPanel->getNumberJTrack();i++)
 	{
 		if(curPanel->getJTrackAt(i)->getModel()==id)

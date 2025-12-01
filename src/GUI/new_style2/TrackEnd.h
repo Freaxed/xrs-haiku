@@ -28,6 +28,11 @@ class TrackEnd: public BView
 	 		virtual	float		getExpansionSize() { return 15.0;};
 	 		virtual	void		Refresh(){};
 	 		
+	 		// Layout Kit support (default implementation)
+	 		virtual BSize		MinSize();
+	 		virtual BSize		MaxSize();
+	 		virtual BSize		PreferredSize();
+	 		
 	private:
 			bool 				expanded;
 			BPictureButton *brez;

@@ -298,6 +298,30 @@ VolView::Reset(Pattern* trk)
 	Invalidate();			
 }
 
+BSize
+VolView::MinSize()
+{
+	// Minimo: 4 note visibili (arbitrario)
+	return BSize(4 * (BUTTON_LX + BUTTON_X_SPACE), BUTTON_LY);
+}
+
+BSize
+VolView::MaxSize()
+{
+	// Segue la dimensione del pattern associato
+	if (curPattern == NULL)
+		return BSize(B_SIZE_UNLIMITED, BUTTON_LY);
+	
+	int noteCount = curPattern->getNumberNotes();
+	return BSize((BUTTON_LX + BUTTON_X_SPACE) * noteCount, BUTTON_LY);
+}
+
+BSize
+VolView::PreferredSize()
+{
+	return MaxSize();
+}
+
 void
 VolView::_resetPar()
 {

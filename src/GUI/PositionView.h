@@ -22,14 +22,18 @@ class PositionView : public BView
 		
 					PositionView(BRect,int d);
 		 
-	virtual void 		Draw(BRect);
-	virtual void 		AttachedToWindow();
-	virtual void		DetachedFromWindow();
+virtual void 		Draw(BRect);
+virtual void 		AttachedToWindow();
+virtual void		DetachedFromWindow();
 	
-	virtual void		MessageReceived(BMessage*);
+virtual void		MessageReceived(BMessage*);
 	
+	// Layout Kit support
+	BSize			MinSize();
+	BSize			MaxSize();
+	BSize			PreferredSize();
 	
-	private:
+private:
 		void	SetTick(int,int,int);
 		
 		void	SetPos(int);

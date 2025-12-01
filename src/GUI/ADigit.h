@@ -39,6 +39,10 @@ public:
 
 	void	SetDisplayDelta(int delta) {fDisplayDelta = delta; }; //for example: value 0->9 but display 1->10 ; delta = 1
 	
+	// Layout Kit support
+	BSize		MinSize();
+	BSize		MaxSize();
+	BSize		PreferredSize();
 	
 private:
 

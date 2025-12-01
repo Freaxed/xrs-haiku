@@ -17,6 +17,7 @@
 #include "PositionView.h"
 #include "ValuableManager.h"
 #include "CommonValuableID.h"
+#include "GraphicsDef.h"
 
 
 const float	xinc  = 23.0f;
@@ -108,4 +109,24 @@ TickView::MessageReceived(BMessage* msg)
 	}
 	else
 		BView::MessageReceived(msg);
+}
+
+BSize
+TickView::MinSize()
+{
+	// Minimo: 4 tick visibili
+	return BSize(4 * (BUTTON_LX + BUTTON_X_SPACE), INFO_BAR_LY);
+}
+
+BSize
+TickView::MaxSize()
+{
+	// Segue il numero di note
+	return BSize((BUTTON_LX + BUTTON_X_SPACE) * num_notes, INFO_BAR_LY);
+}
+
+BSize
+TickView::PreferredSize()
+{
+	return MaxSize();
 }

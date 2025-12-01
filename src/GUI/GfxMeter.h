@@ -23,15 +23,17 @@ class GfxMeter:	public BView
 	
 	public:				GfxMeter(BRect frame, ValuableID id);		
 						~GfxMeter();								
-		void	AttachedToWindow();
-		void	DetachedFromWindow();
-		void 	Draw(BRect r);
-		void 	MessageReceived(BMessage *message);
+	void	AttachedToWindow();
+	void	DetachedFromWindow();
+	void 	Draw(BRect r);
+	void 	MessageReceived(BMessage *message);
 		
-		
-	private:
+	// Layout Kit support
+	BSize	MinSize();
+	BSize	MaxSize();
+	BSize	PreferredSize();
 	
-		float		pixel_l;
+private:		float		pixel_l;
 		float		pixel_r;
 		
 		float		width;

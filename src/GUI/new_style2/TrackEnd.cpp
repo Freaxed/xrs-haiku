@@ -10,6 +10,7 @@
 #include "TrackEnd.h"
 #include "TrackBlock.h"
 #include "Xed_Utils.h"
+#include "GraphicsDef.h"
 
 #include <Window.h>
 
@@ -82,4 +83,25 @@ TrackEnd::UnExpand()
 	r.bottom=11;
 	Invalidate(r);
 	expanded=false;
+}
+
+BSize
+TrackEnd::MinSize()
+{
+	// Default: dimensione minima generica
+	return BSize(50, BUTTON_LY);
+}
+
+BSize
+TrackEnd::MaxSize()
+{
+	// Default: illimitato
+	return BSize(B_SIZE_UNLIMITED, BUTTON_LY + getExpansionSize());
+}
+
+BSize
+TrackEnd::PreferredSize()
+{
+	float height = IsExpanded() ? BUTTON_LY + getExpansionSize() : BUTTON_LY;
+	return BSize(B_SIZE_UNSET, height);
 }

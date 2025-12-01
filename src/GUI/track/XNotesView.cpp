@@ -151,3 +151,37 @@ XNotesView::Reset(Pattern* trk, int16 beatDivision)
 	fBeatDivision	= beatDivision;
 	Invalidate();			
 }
+
+BSize
+XNotesView::MinSize()
+{
+	// Minimo: 1 nota visibile
+	return BSize((BUTTON_LX + BUTTON_X_SPACE), BUTTON_LY);
+}
+
+BSize
+XNotesView::MaxSize()
+{
+	// Massimo: basato sul pattern corrente, o illimitato se non c'è pattern
+	if (curPattern == NULL)
+		return BSize(B_SIZE_UNLIMITED, BUTTON_LY);
+	
+	int noteCount = curPattern->getNumberNotes();
+	return BSize((BUTTON_LX + BUTTON_X_SPACE) * noteCount, BUTTON_LY);
+}
+
+BSize
+XNotesView::PreferredSize()
+{
+	return MaxSize();
+}
+
+void
+XNotesView::GetPreferredSize(float* width, float* height)
+{
+	BSize size = PreferredSize();
+	if (width)
+		*width = size.width;
+	if (height)
+		*height = size.height;
+}

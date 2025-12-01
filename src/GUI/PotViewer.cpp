@@ -20,10 +20,16 @@ PotViewer::Get()
 
 PotViewer::PotViewer():BWindow(BRect(-100,-100,-50,-50),"",B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,B_NOT_MOVABLE|B_AVOID_FOCUS){
 
-	AddChild(fText=new BStringView(Bounds(),"value","",B_FOLLOW_ALL_SIDES)); 
+	fText = new BStringView("value",""); 
 	fText->SetFontSize(10);
 	fText->SetAlignment(B_ALIGN_CENTER);
 	fText->SetViewColor(247,255,146,255);
+	
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(2, 2, 2, 2)
+		.Add(fText);
+	
+	MoveTo(-100, -100);
 	Show();
 	Hide();
 }
@@ -83,7 +89,7 @@ PotViewer::SetText(BString text)
 	fText->SetText(text.String());
 	float h,w;
 	fText->GetPreferredSize(&w,&h);
-	ResizeTo(w, h);
+	ResizeTo(w + 4, h + 4); // Add insets
 }
 		
 

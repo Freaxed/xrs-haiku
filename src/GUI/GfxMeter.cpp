@@ -99,3 +99,24 @@ void GfxMeter::MessageReceived(BMessage *msg){
 			break;
 	}
 }
+
+BSize
+GfxMeter::MinSize()
+{
+	// Dimensione minima visibile del meter
+	return BSize(20, 40);
+}
+
+BSize
+GfxMeter::MaxSize()
+{
+	// Può crescere verticalmente
+	return BSize(30, B_SIZE_UNLIMITED);
+}
+
+BSize
+GfxMeter::PreferredSize()
+{
+	// Dimensione preferita (tipica)
+	return BSize(25, 60);
+}

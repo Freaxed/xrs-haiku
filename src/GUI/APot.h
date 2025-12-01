@@ -85,6 +85,8 @@ public:
 
 			BSize	MaxSize();
 	
+			BSize	PreferredSize();
+	
 			void	SetSize(float size) { m_Size = size; }
 			
 			void	FrameResized(float newWidth, float newHeight);
