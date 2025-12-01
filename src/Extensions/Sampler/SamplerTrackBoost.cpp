@@ -32,6 +32,8 @@
 
 #include "sampler_locale.h"
 #include "locale.h"
+
+#include <Autolock.h>
 #include "LoadingError.h"
 
 // DINAMIC CAST!!!!!!!! //
@@ -341,14 +343,12 @@ SamplerTrackBoost::ChangeSample(int id)
 void
 SamplerTrackBoost::_secureSetSample(SamplerTrack* tr,Sample* s)
 {
-	if(panel->Window()->Lock())
-	{
-	  XHost::Get()->SendMessage(X_LockSem,NULL);
-			tr->setSample(s);
-	  XHost::Get()->SendMessage(X_UnLockSem,NULL);
+	// RAII: BAutolock and XHostLock automatically unlock on scope exit
+	BAutolock windowLock(panel->Window());
+	if(!windowLock.IsLocked()) return;
 	
-	 panel->Window()->Unlock();
-	}
+	XHostLock engineLock("SamplerTrackBoost::_secureSetSample");
+	tr->setSample(s);
 }
 
 

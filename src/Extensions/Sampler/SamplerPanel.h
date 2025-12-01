@@ -43,7 +43,8 @@ class SamplerPanel: public PlugPanel {
 		Sample*				my_sample;
 		SamplerTrackBoost*	booster;
 		
-		//GUI
+		// GUI widgets (raw pointers are safe - ownership transferred to BeOS view hierarchy via AddChild())
+		// These are automatically deleted when the parent view is destroyed
 		XDigit* 		depth;
 		XDigit*  		shift;	
 		SampleView*		sw;

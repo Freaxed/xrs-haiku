@@ -38,3 +38,26 @@ class XHost{
 				XHost();
 };
 
+// RAII wrapper for XHost engine locking
+// Guarantees unlock on all exit paths (exceptions, early returns, normal flow)
+class XHostLock {
+public:
+	explicit XHostLock(const char* who = "XHostLock") 
+		: fWho(who)
+	{
+		XHost::Get()->LockEngine(fWho);
+	}
+	
+	~XHostLock()
+	{
+		XHost::Get()->UnlockEngine(fWho);
+	}
+	
+	// Prevent copying to avoid double-unlock
+	XHostLock(const XHostLock&) = delete;
+	XHostLock& operator=(const XHostLock&) = delete;
+	
+private:
+	const char* fWho;
+};
+

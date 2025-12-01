@@ -19,6 +19,8 @@
 #include "XDigit.h"
 #include "XHost.h"
 
+#include <Autolock.h>
+
 #define	REMOVE		'remv'
 #define	REMOVEALL	'rema'
 #define	LOADEXT		'loae'
@@ -149,36 +151,35 @@ SamplerPanel::SetTrack(SamplerTrack *tr)
 	
 	sampTrack = tr;
 	
-	if(Window()->Lock()){
-		
-		if(tr == NULL || tr->getSample() == NULL)
-		{
-			
-			sw->Init(NULL, false, false);
-			shift->UpdateValue(16, true);
-			pit_ck->SetValue(false);
-			boost_ck->SetValue(false);
-			loop_ck->SetValue(false);
-			menu->Superitem()->SetLabel(T_SAMPLER_NOSELECTED);
-			depth->UpdateValue(1, true);
-		}
-		else
-		{
-			SetTitle(tr->getName());
-			my_sample=tr->getSample();
-			sw->Init(my_sample, tr->isReversed(), 1.0f);
+	// RAII: BAutolock automatically unlocks on scope exit (including early returns/exceptions)
+	BAutolock lock(Window());
+	if(!lock.IsLocked()) return;
 	
-			menu->Superitem()->SetLabel(my_sample->GetName());
-			shift->UpdateValue(tr->getResample(), true);
-			pit_ck->SetValue(tr->isResampleEnable());
-			boost_ck->SetValue(tr->isBoostEnable());
-			loop_ck->SetValue(tr->IsLoopEnable());
-			rev->SetValue(tr->isReversed());
-			depth->UpdateValue((int32)tr->amp, true);
-			sw->SetBoost(tr->amp);		
-		}
+	if(tr == NULL || tr->getSample() == NULL)
+	{
 		
-		Window()->Unlock();
+		sw->Init(NULL, false, false);
+		shift->UpdateValue(16, true);
+		pit_ck->SetValue(false);
+		boost_ck->SetValue(false);
+		loop_ck->SetValue(false);
+		menu->Superitem()->SetLabel(T_SAMPLER_NOSELECTED);
+		depth->UpdateValue(1, true);
+	}
+	else
+	{
+		SetTitle(tr->getName());
+		my_sample=tr->getSample();
+		sw->Init(my_sample, tr->isReversed(), 1.0f);
+
+		menu->Superitem()->SetLabel(my_sample->GetName());
+		shift->UpdateValue(tr->getResample(), true);
+		pit_ck->SetValue(tr->isResampleEnable());
+		boost_ck->SetValue(tr->isBoostEnable());
+		loop_ck->SetValue(tr->IsLoopEnable());
+		rev->SetValue(tr->isReversed());
+		depth->UpdateValue((int32)tr->amp, true);
+		sw->SetBoost(tr->amp);		
 	}
 }
 
@@ -215,17 +216,21 @@ SamplerPanel::MessageReceived(BMessage* message)
 	 	case TRACK_SAMP_EXT:
 	 		booster->ChangeSample(message->FindInt16("sample"));//ok
 	 	break;
-	 	case MOD:
+	 case MOD:
 	 		if(sampTrack==NULL) return;
-	 		XHost::Get()->SendMessage(X_LockSem,NULL);
+	 		{
+	 			// RAII: XHostLock automatically unlocks on scope exit
+	 			XHostLock lock("SamplerPanel::MOD");
 	 			sampTrack->setResample(shift->GetValue());
-	 		XHost::Get()->SendMessage(X_UnLockSem,NULL);
+	 		}
 	 	break;
-	 	case PIT_ON:
+	 case PIT_ON:
 	 		if(sampTrack==NULL) return;
-	 		XHost::Get()->SendMessage(X_LockSem,NULL);
+	 		{
+	 			// RAII: XHostLock automatically unlocks on scope exit
+	 			XHostLock lock("SamplerPanel::PIT_ON");
 	 			sampTrack->setResampleEnable((bool)pit_ck->Value());
-	 		XHost::Get()->SendMessage(X_UnLockSem,NULL);
+	 		}
 	 	break;
 	 	case TRACK_REV:
 			if(sampTrack==NULL) return;
