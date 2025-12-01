@@ -21,7 +21,7 @@
 
 	
 
-XNotesView::XNotesView(BRect rect,int16 t): BControl(rect,"_xnotesview","",NULL,B_FOLLOW_LEFT,B_WILL_DRAW)
+XNotesView::XNotesView(BRect rect,int16 t): BControl(rect,"_xnotesview","",NULL,B_FOLLOW_LEFT, B_WILL_DRAW)
 {
 	picOn=XUtils::GetBitmap(9); //FIX.
 	picOff=XUtils::GetBitmap(10);
@@ -45,6 +45,12 @@ XNotesView::~XNotesView(){}
 void
 XNotesView::Draw(BRect r)
 {
+	// Fill background with parent's color
+	if (Parent()) {
+		SetHighColor(Parent()->ViewColor());
+		FillRect(r);
+	}
+	
 	SetDrawingMode(B_OP_ALPHA);
 	
 	if(curPattern==NULL) return;
