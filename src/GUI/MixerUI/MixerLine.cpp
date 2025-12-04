@@ -29,20 +29,21 @@
 
 MixerLine::MixerLine(PBus* bus, ValuableID volume, ValuableID pan, ValuableID meter) : BBox(bus->Name()), fBus(bus)
 {
-	BGroupLayout* hGroup = BLayoutBuilder::Group<>(B_HORIZONTAL);
+	BGroupLayout* hGroup = BLayoutBuilder::Group<>(B_HORIZONTAL,10.0);
+	hGroup->SetInsets(5.0f,5.0f,5.0f,5.0f);
 	
 	BGroupLayout* group = BLayoutBuilder::Group<>(B_VERTICAL);
-	group->SetSpacing(10.0f);
+	//group->SetSpacing(10.0f);
 	group->AddView(new BStringView("_line_name_", bus->Name()))
 		 ->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
-		 
+
 	BGroupLayout* g1 = BLayoutBuilder::Group<>(B_HORIZONTAL);
-	g1->SetSpacing(0.0f);
+	//g1->SetSpacing(10.0f);
 	StereoVolumesView* volView = new StereoVolumesView(volume, pan);
 	g1->AddView(volView);
-	
+
 	group->AddItem(g1);
-	
+
 	fVSTMenu = new BMenu("Effects");
 	const BList*	vstList = fBus->Effector()->GetEffectsList();
 	for (uint8 i=0;i<vstList->CountItems();i++) {
@@ -51,36 +52,36 @@ MixerLine::MixerLine(PBus* bus, ValuableID volume, ValuableID pan, ValuableID me
 		VSTPlugin* plug = (VSTPlugin*)vstList->ItemAt(i);
 		fVSTMenu->AddItem(new BMenuItem(plug->EffectName(), info));
 	}
-	
-	
+
+
 
 	fPopUp = new BPopUpMenu("");
 	fPopUp->AddItem(fVSTMenu);
 	fPopUp->AddSeparatorItem();
 	fPopUp->AddItem(new BMenuItem(T_VIW_NOVST, new BMessage(REMOVE_VSTI)));
-	
-	
+
+
 	//VST
 	BMessage extraInfo;
 	extraInfo.AddInt8("vst:position", -1);
-	
+
 	for(uint8 i=0;i<MAX_VST;i++)
 	{
 		extraInfo.ReplaceInt8("vst:position", i);
 		fBoxsList[i] = new StringBox("", fPopUp, &extraInfo);
 		group->AddView(fBoxsList[i]);
 	}
-	
+
 	ValuableVPeakView* peak = new ValuableVPeakView(meter, "_peak_");
 	hGroup->AddView(peak);
 //	  ->SetExplicitMaxSize(BSize(200, 24));
-	  
-	
+
+
 	hGroup->AddItem(group);
 	AddChild(hGroup->View());
-	
+
 	for (uint i=0;i<MAX_VST;i++) {
-		fPlugWindows[i] = NULL; 
+		fPlugWindows[i] = NULL;
 	}
 
 
@@ -88,12 +89,12 @@ MixerLine::MixerLine(PBus* bus, ValuableID volume, ValuableID pan, ValuableID me
 
 void
 MixerLine::AttachedToWindow()
-{	
+{
 	fPopUp->SetTargetForItems(this);
 	fVSTMenu->SetTargetForItems(this);
 }
 
-void	
+void
 MixerLine::ResetUI()
 {
 	// let's synch bus effects with the line
@@ -102,10 +103,10 @@ MixerLine::ResetUI()
 		VSTItem* item = effector->GetVstAtPosition(i);
 		UpdateItem(item, i);
 	}
-	
+
 }
 
-void		
+void
 MixerLine::UpdateItem(VSTItem* item, uint8 position)
 {
 	StringBox*	box = fBoxsList[position];
@@ -113,16 +114,16 @@ MixerLine::UpdateItem(VSTItem* item, uint8 position)
 	CreateVstWindow(item, position);
 }
 
-void		
+void
 MixerLine::CreateVstWindow(VSTItem* item, uint8 position)
 {
 	assert(position < MAX_VST);
 	PlugWindow* prevWindow = fPlugWindows[position];
 	if (prevWindow && prevWindow->Lock())
 		prevWindow->Quit();
-	
+
 	fPlugWindows[position] = NULL;
-	
+
 	if (item) {
 		fPlugWindows[position] = new PlugWindow(item, true);
 		fPlugWindows[position]->Show();
@@ -130,17 +131,17 @@ MixerLine::CreateVstWindow(VSTItem* item, uint8 position)
 }
 
 
-void		
+void
 MixerLine::CreateVstItem(VSTPlugin* templ, BMessage* msg)
 {
 	BMessage extra;
 	int8    position = -1;
-	if (msg->FindMessage("extra", &extra) == B_OK && 
+	if (msg->FindMessage("extra", &extra) == B_OK &&
 	    extra.FindInt8("vst:position", &position) == B_OK)
 	{
 		VSTItem* item = fBus->Effector()->CreateVstAtPosition(templ, position);
 		UpdateItem(item, position);
-	}	
+	}
 	else
 	{
 		LogError("Can't create VST from MixerLine: no extra info or vst:position!");
@@ -150,7 +151,7 @@ MixerLine::CreateVstItem(VSTPlugin* templ, BMessage* msg)
 	}
 }
 
-void	
+void
 MixerLine::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
@@ -162,11 +163,11 @@ MixerLine::MessageReceived(BMessage* msg)
 		break;
 		case SET_VSTI:
 			{
-						
+
 				const BList*	vstList = fBus->Effector()->GetEffectsList();
 				int16 vstID = msg->FindInt16("vst:id");
 				VSTPlugin* plug = (VSTPlugin*)vstList->ItemAt(vstID);
-				
+
 				CreateVstItem(plug, msg);
 			}
 		break;
