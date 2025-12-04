@@ -71,7 +71,7 @@ void
 SampleView::Draw(BRect b)
 {
 	if (mViewBitmap)
-		DrawBitmapAsync(mViewBitmap, b);
+		DrawBitmapAsync(mViewBitmap, Bounds());
 
 
 	if (mSample) {
