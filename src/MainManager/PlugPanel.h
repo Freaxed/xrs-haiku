@@ -12,7 +12,7 @@ class	Track;
 class PlugPanel : public BBox
 {
 	public:
-						PlugPanel(BRect r=BRect(0,0,180,230)):BBox(r,""),curTrack(NULL){};				
+						PlugPanel():BBox(""),curTrack(NULL){};				
 		virtual void 	ResetToTrack(Track* tr){curTrack=tr;};
 	
 	protected:
