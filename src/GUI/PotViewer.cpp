@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,50 +9,50 @@
 #include "PotViewer.h"
 #include <String.h>
 
-PotViewer*	
+PotViewer*
 PotViewer::Get()
 {
 	static	PotViewer*	instance = NULL;
-	if (instance == NULL) 
+	if (instance == NULL)
 			instance = new PotViewer();
 	return instance;
 }
 
 PotViewer::PotViewer():BWindow(BRect(-100,-100,-50,-50),"",B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,B_NOT_MOVABLE|B_AVOID_FOCUS){
 
-	fText = new BStringView("value",""); 
-	fText->SetFontSize(10);
+	fText = new BStringView("value","");
+//	fText->SetFontSize(10);
 	fText->SetAlignment(B_ALIGN_CENTER);
 	fText->SetViewColor(247,255,146,255);
-	
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(2, 2, 2, 2)
 		.Add(fText);
-	
+
 	MoveTo(-100, -100);
 	Show();
 	Hide();
 }
-void	
+void
 PotViewer::InitShow(BView* pot, float distance){
 
 	if(Lock()){
-	
+
 		if(!IsHidden()) Hide();
 
 		BRect r = pot->ConvertToScreen(pot->Bounds());
-		
+
 		MoveTo(r.left,r.bottom + distance);
-		
+
 		SetText("");
 		SetSizeLimits(r.right-r.left, 1000.0f, Size().Height(), Size().Height());
 		Show();
-		
+
 		Unlock();
 	}
 }
 
-void	
+void
 PotViewer::InitHide(){
 if(Lock()){
 if(!IsHidden()) Hide();
@@ -62,20 +62,20 @@ Unlock();}
 void
 PotViewer::SetValue(BString value) {
 	if(Lock()){
-		if(IsHidden()) 
+		if(IsHidden())
 			return;
 		SetText(value);
 		Unlock();
 	}
 }
-		
-void	
+
+void
 PotViewer::SetValue(int32 value){
 
 	if(Lock()){
-		if(IsHidden()) 
+		if(IsHidden())
 			return;
-	
+
 		BString s;
 		s << value;
 		SetText(s);
@@ -83,7 +83,7 @@ PotViewer::SetValue(int32 value){
 	}
 }
 
-void	
+void
 PotViewer::SetText(BString text)
 {
 	fText->SetText(text.String());
@@ -91,6 +91,6 @@ PotViewer::SetText(BString text)
 	fText->GetPreferredSize(&w,&h);
 	ResizeTo(w + 4, h + 4); // Add insets
 }
-		
+
 
 //--
