@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
@@ -36,21 +36,21 @@ XMName::Reset(Sequence* s)
 	sel=0;
 	y_count=s->getMaxPat();
 	Invalidate();
-	
+
 }
 void
 XMName::AttachedToWindow()
 {
 	SetViewColor(200,200,220);
 	SetLowColor(200,200,220);
-	SetFontSize(12);
-	ValuableManager::Get()->RegisterValuableReceiver(VID_PATTERN_CURRENT, this);	
+	//SetFontSize(12);
+	ValuableManager::Get()->RegisterValuableReceiver(VID_PATTERN_CURRENT, this);
 }
 
 void
 XMName::DetachedFromWindow()
 {
-	ValuableManager::Get()->UnregisterValuableReceiver(VID_PATTERN_CURRENT, this);	
+	ValuableManager::Get()->UnregisterValuableReceiver(VID_PATTERN_CURRENT, this);
 	BView::DetachedFromWindow();
 }
 
@@ -59,16 +59,16 @@ XMName::Select(int y)
 {
 	int oldsel=sel;
 	sel=y;
-	_drawName(sel);	
+	_drawName(sel);
 	_drawName(oldsel);
 }
 
 void
 XMName::Draw(BRect r)
 {
-	if(sequence == NULL) 
+	if(sequence == NULL)
 		return;
-		
+
 	for(int y=0;y<y_count;y++)
 		_drawName(y);
 }
@@ -76,29 +76,29 @@ XMName::Draw(BRect r)
 void
 XMName::_drawName(int y)
 {
-	if(sequence == NULL) 
+	if(sequence == NULL)
 		return;
 
 	BRect r(0,y*XBOX,98,y*XBOX+XBOX-1);
-	
+
 	if(y==sel)
-			SetHighColor(255,227,153);	
+			SetHighColor(255,227,153);
 	else
 			SetHighColor(200,200,220);
-	
-	
+
+
 	FillRect(r);
 	SetLowColor(HighColor());
-		
+
 	SetHighColor(0,0,0);
-		
-	BString s = sequence->GetMeasureName(y);		
-	
+
+	BString s = sequence->GetMeasureName(y);
+
 	BString label("");
 	label << y+1 << ": " << s.String();
 	DrawString(label.String(),BPoint(3,y*XBOX+12));
- 
-	
+
+
 	SetHighColor(169,172,151);
 	StrokeLine(BPoint(0,y*XBOX+XBOX-1),BPoint(100,y*XBOX+XBOX-1));
 }
@@ -118,23 +118,23 @@ void
 XMName::MouseDown(BPoint p)
 {
 	if(sequence==NULL) return;
-	
+
 	int	ay1=(int)floor(p.y/XBOX);
-	
+
 	int32 key;
-	
-		
+
+
 	BMessage *m=Window()->CurrentMessage();
 	m->FindInt32("modifiers",&key);
-	 
-	
+
+
 	if( ( key & B_CONTROL_KEY)  && m!=NULL)
 	{
 		_MessForRect(ay1);
 		return;
 	}
 	else
-	
+
 	if(ay1!=sel &&  ay1<y_count)
 	{
 		MeasureManager::Get()->SetCurrentPattern(ay1);

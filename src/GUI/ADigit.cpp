@@ -85,6 +85,11 @@ ADigit::Draw(BRect box)
 	for(int i=0; i<3; i++) {
 		DrawBitmapAsync(digit,BRect(dig[i]*DIGITSIZE,0,dig[i]*DIGITSIZE+DIGITSIZE-1,HEIGHT-1),BRect(XPOS+i*DIGITSIZE,YPOS,XPOS-1+i*DIGITSIZE+DIGITSIZE,YPOS+HEIGHT-1));
 	}
+
+	if (track) {
+		SetHighColor(255,0,0);
+		StrokeRect(Bounds(),B_SOLID_HIGH);
+	}
 }
 void
 ADigit::MouseDown(BPoint p)
@@ -112,9 +117,8 @@ ADigit::MouseDown(BPoint p)
 	 mouse_start=p;
 	 ConvertToScreen(&mouse_start);
 	 be_app->HideCursor();
-	 SetMouseEventMask(B_POINTER_EVENTS,B_NO_POINTER_HISTORY);
-	 //Invalidate();
-	
+	 Invalidate();
+	 SetMouseEventMask(B_POINTER_EVENTS,B_NO_POINTER_HISTORY);	
 }
 
 void
@@ -175,6 +179,7 @@ ADigit::MouseUp(BPoint p)
 	
 	Invoke();
 	SetMouseEventMask(0);
+	Invalidate();
 	
 }
 void

@@ -21,13 +21,14 @@ class JMDrumPanel: public PlugPanel
 	 void 	ResetToTrack(Track* tr);
 	 void	AttachedToWindow();
 	 void	MessageReceived(BMessage *msg);
-	
+
 	private:
-		
+
 		JMDrumTrack*	myTrack;
 		BSlider*		sl[16];
 		BStringView*	txt[16];
-		BString	display;
-		
+		BMenu*			presetz;
+		BMenu*			men;
+
 };
 //--

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
@@ -25,7 +25,7 @@ void	get_color(BBitmap *bmp,int x,int y,rgb_color *cc){
 
 	switch(bmp->ColorSpace())
 	{
-		case B_RGB32: 
+		case B_RGB32:
     	case B_RGBA32:
     	{
     		uint32 offset = (y*bmp->BytesPerRow() / 4)+x;
@@ -35,9 +35,9 @@ void	get_color(BBitmap *bmp,int x,int y,rgb_color *cc){
 			cc->alpha=255;
 		}
 		break;
-		
+
 		default:
-		break;	
+		break;
 	}
 
 }
@@ -45,7 +45,7 @@ void	get_color(BBitmap *bmp,int x,int y,rgb_color *cc){
 XTrack::XTrack(BRect rect,const char *t): BView(rect,"_xtrack",B_FOLLOW_NONE,B_WILL_DRAW)
 {
 	SetName(t);
-	selected=false;	
+	selected=false;
 	pad=XUtils::GetBitmap(27); //fix
 }
 
@@ -55,7 +55,7 @@ XTrack::AttachedToWindow()
 	SetViewColor(Parent()->ViewColor());
 	SetBlendingMode(B_PIXEL_ALPHA,B_ALPHA_OVERLAY);
 	SetDrawingMode(B_OP_ALPHA);
-	SetFontSize(12);
+//	SetFontSize(12);
 }
 void
 XTrack::Draw(BRect r)
@@ -63,24 +63,24 @@ XTrack::Draw(BRect r)
 	if(pad!=NULL)
 	{
 	  if(selected){
-	   
+
 	   		SetHighColor(255,60,60,255);
-    		
+
     		_drawPad();
-    		
+
     		DrawBitmap(pad);
-    		
+
 			SetLowColor(HighColor());
 			SetHighColor(255,255,205,255);
 		}
 	   else
 	   	{
 	   		SetHighColor(rgb_pad);
-    		
+
     		_drawPad();
-    		
+
     		DrawBitmap(pad);
-			
+
 			SetLowColor(HighColor());
 			SetHighColor(0,0,0,255);
 		}
@@ -88,7 +88,7 @@ XTrack::Draw(BRect r)
 	BFont f;
 	GetFont(&f);
 	DrawCentredText(name.String(),&f,BRect(12,7,87,22),this,true);
-	
+
 	//DrawString(name.String(),15,BPoint(10,17));
 }
 void
@@ -102,27 +102,27 @@ void
 XTrack::Init(BMessage *m)
 {
 	msg=m;
-	msg->AddInt32("mouse",0);	
+	msg->AddInt32("mouse",0);
 }
-void 
+void
 XTrack::MouseDown(BPoint where)
 {
 	int32 key;
 	uint32 buttons;
-	
+
 	BMessage *m=Window()->CurrentMessage();
 	m->FindInt32("modifiers",&key);
 	GetMouse(&where, &buttons);
 	msg->ReplaceInt32("mouse",buttons);
-	
-	if(key & B_CONTROL_KEY) 
+
+	if(key & B_CONTROL_KEY)
 	{
 		SendRenameMessage();
 		return;
 	}
-	
+
 	Looper()->PostMessage(msg,target);
-			
+
 }
 
 void
@@ -143,7 +143,7 @@ XTrack::Select()
 		selected=true;
 		Invalidate();
 		Window()->Unlock();
-	}	
+	}
 }
 void
 XTrack::Deselect()
@@ -164,35 +164,35 @@ void
 XTrack::SetName(const char *t)
 {
 	name.SetTo(t);
-	Invalidate();	
+	Invalidate();
 }
 void
 XTrack::MessageReceived(BMessage* message)
 {
 	//message->PrintToStream();
 	switch(message->what){
-	
+
 	case 1347638341: //color dropped from kColor or similar.
 		rgb_color *newc;
 		newc=new rgb_color;
 		ssize_t size;
 		size=sizeof(newc);
-		message->FindData("RGBColor",'RGBC',0,(const void**)&newc,&size); 
+		message->FindData("RGBColor",'RGBC',0,(const void**)&newc,&size);
         newc->alpha=255;
         SetPadColor(*newc);
         Invalidate();
         delete newc;
 		break;
-		
-	case B_SIMPLE_DATA:		
+
+	case B_SIMPLE_DATA:
 		message->what=XRS_SIMPLE_DATA;
-		
+
 	case XRS_BANK_SAMPLE:
 		Window()->PostMessage(message,Parent());
 		break;
 	default:
 		BView::MessageReceived(message);
 		break;
-	
+
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2006-2022, Andrea Anzani.
  * Distributed under the terms of the MIT License.
  *
@@ -19,7 +19,7 @@
 #include <InterfaceKit.h>
 
 
-	
+
 
 XNotesView::XNotesView(BRect rect,int16 t): BControl(rect,"_xnotesview","",NULL,B_FOLLOW_LEFT, B_WILL_DRAW)
 {
@@ -27,13 +27,13 @@ XNotesView::XNotesView(BRect rect,int16 t): BControl(rect,"_xnotesview","",NULL,
 	picOff=XUtils::GetBitmap(10);
 	picOnB=XUtils::GetBitmap(11);
 	picOffB=XUtils::GetBitmap(12);
-		
+
 	curPattern=NULL;
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetFont(be_fixed_font);
-	SetFontSize(10);
+//	SetFontSize(10);
 	selected=-1;
-	
+
 	notify=new BMessage(NOTIFY_NOTE);
 	notify->AddInt16("note",0);
 
@@ -50,98 +50,98 @@ XNotesView::Draw(BRect r)
 		SetHighColor(Parent()->ViewColor());
 		FillRect(r);
 	}
-	
+
 	SetDrawingMode(B_OP_ALPHA);
-	
+
 	if(curPattern==NULL) return;
-	
+
 	BRect rect;
-	
+
 	int	ax1=(int)floor(r.left/(BUTTON_LX+BUTTON_X_SPACE));
 	int	ax2=(int)ceil(r.right/(BUTTON_LX+BUTTON_X_SPACE));
-	
+
 	if(ax2>curPattern->getNumberNotes()) ax2=curPattern->getNumberNotes();
-	
-	
-	
+
+
+
 	for(int h=ax1;h<ax2;h++)
-	{	  
+	{
 		rect.Set((BUTTON_LX+BUTTON_X_SPACE)*h,0,(BUTTON_LX+BUTTON_X_SPACE)*(h+1)-BUTTON_X_SPACE,BUTTON_LY);
-	
+
 		if( h % fBeatDivision == 0 )
-		{ 			
-			if(curPattern->getNoteAt(h)->getValue()) 
-					DrawBitmapAsync(picOn,rect); 
+		{
+			if(curPattern->getNoteAt(h)->getValue())
+					DrawBitmapAsync(picOn,rect);
 				else
 					DrawBitmapAsync(picOff,rect);
 		}
 		else
-		{			
-			if(curPattern->getNoteAt(h)->getValue()) 
-					DrawBitmapAsync(picOnB,rect); 
+		{
+			if(curPattern->getNoteAt(h)->getValue())
+					DrawBitmapAsync(picOnB,rect);
 				else
-					DrawBitmapAsync(picOffB,rect); 
+					DrawBitmapAsync(picOffB,rect);
 		}
 	}
 }
 void
 XNotesView::MouseMoved(BPoint p, uint32 tra/* transit */,
 	const BMessage* /* dragDropMsg */)
-{	
+{
 	if(curPattern==NULL ) return;
 	int	ax1=(int)floor(p.x/(BUTTON_LX+BUTTON_X_SPACE));
-	
+
 	if(ax1>=curPattern->getNumberNotes()) ax1=curPattern->getNumberNotes()-1;
 	if(ax1<0) ax1=0;
-		
+
 	if (IsTracking()  && tra==B_INSIDE_VIEW) {
-		
-		
-		
+
+
+
 		if(prev != ax1)
 		{
 			curPattern->getNoteAt(ax1)->setValue(set_state);
 			notify->ReplaceInt16("note",ax1);
 			Window()->PostMessage(notify,Parent());
 		}
-		
-		Invalidate(BRect(ax1*(BUTTON_LX+BUTTON_X_SPACE),0,(ax1+1)*(BUTTON_LX+BUTTON_X_SPACE)-1,BUTTON_LY));	
+
+		Invalidate(BRect(ax1*(BUTTON_LX+BUTTON_X_SPACE),0,(ax1+1)*(BUTTON_LX+BUTTON_X_SPACE)-1,BUTTON_LY));
 		prev = ax1;
-	
+
 	}
 }
 
 void
 XNotesView::MouseUp(BPoint p)
 {
-	SetTracking(false); 
+	SetTracking(false);
 	prev=-1;
 }
-	
+
 void
 XNotesView::MouseDown(BPoint p)
 {
-	if(curPattern==NULL) 
+	if(curPattern==NULL)
 		return;
 	int	ax1=(int)floor(p.x/(BUTTON_LX+BUTTON_X_SPACE));
-	
+
 	if(ax1>= curPattern->getNumberNotes() ) ax1=curPattern->getNumberNotes()-1;
 	if(ax1<0) ax1=0;
-	
+
 	prev = ax1;
 	SetTracking(true);
 	SetMouseEventMask(B_POINTER_EVENTS,
 				B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
-				
-	set_state=!curPattern->getNoteAt(ax1)->getValue();	
-	
-	
+
+	set_state=!curPattern->getNoteAt(ax1)->getValue();
+
+
 	curPattern->getNoteAt(ax1)->Swap();
 	notify->ReplaceInt16("note",ax1);
 	Window()->PostMessage(notify,Parent());
-		
+
 	Invalidate(BRect(ax1*(BUTTON_LX+BUTTON_X_SPACE),0,(ax1+1)*(BUTTON_LX+BUTTON_X_SPACE)-1,BUTTON_LY));
-	
+
 }
 
 void
@@ -149,7 +149,7 @@ XNotesView::Reset(Pattern* trk, int16 beatDivision)
 {
 	curPattern 		= trk;
 	fBeatDivision	= beatDivision;
-	Invalidate();			
+	Invalidate();
 }
 
 BSize
@@ -165,7 +165,7 @@ XNotesView::MaxSize()
 	// Massimo: basato sul pattern corrente, o illimitato se non c'è pattern
 	if (curPattern == NULL)
 		return BSize(B_SIZE_UNLIMITED, BUTTON_LY);
-	
+
 	int noteCount = curPattern->getNumberNotes();
 	return BSize((BUTTON_LX + BUTTON_X_SPACE) * noteCount, BUTTON_LY);
 }
