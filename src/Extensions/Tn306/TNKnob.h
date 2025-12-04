@@ -5,31 +5,27 @@
 #ifndef TNKnob_H
 #define TNKnob_H
 
-
-#include <SupportDefs.h>
 #include "ParameterValueKnob.h"
+#include <SupportDefs.h>
 
-
-class TNKnob : public ParameterValueKnob  {
+class TNKnob : public ParameterValueKnob {
 public:
-							TNKnob(const char* label, TB303Knobs::update_value fun, TB303Knobs* knobs):
-							fFunction(fun), fKnobs(knobs)
-							{
-								SetLabelText(label);
-								SetFontSize(10.0f);
-								SetKnobSize(32.0f);
-								SetBorder(B_NO_BORDER);
-							}
-							
-	virtual		void		SetValue(float newValue) {
-								ParameterValueKnob::SetValue(newValue);
-								(fKnobs->*fFunction)(newValue);
-							}
-	
-private:
-				TB303Knobs::update_value	fFunction;	
-				TB303Knobs*		fKnobs;
-};
+  TNKnob(const char *label, TB303Knobs::update_value fun, TB303Knobs *knobs)
+      : fFunction(fun), fKnobs(knobs) {
+    SetLabelText(label);
+    SetFontSize(10.0f);
+    SetKnobSize(32.0f);
+    SetBorder(B_NO_BORDER);
+  }
 
+  virtual void SetValue(float newValue) {
+    ParameterValueKnob::SetValue(newValue);
+    (fKnobs->*fFunction)(newValue);
+  }
+
+private:
+  TB303Knobs::update_value fFunction;
+  TB303Knobs *fKnobs;
+};
 
 #endif // TNKnob_H
